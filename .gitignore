@@ -40,7 +40,9 @@ bower_components
 build/Release
 
 # Directory Build
-lib
+lib/**/*.js
+
+lib/**/*.js.map
 
 # Dependency directories
 node_modules/
