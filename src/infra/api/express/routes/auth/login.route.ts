@@ -7,7 +7,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Cria um novo usuário
+ *     summary: Login do usuário
  *     description: Esta rota permite o login do usuário no sistema.
  *     tags:
  *       - Auth
