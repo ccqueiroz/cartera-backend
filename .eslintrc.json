@@ -1,0 +1,13 @@
+{
+  "extends": "@caiocezarqueiroz/eslint-config/settingsGenerator/eslint/node.js",
+  "rules": {
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never"
+      }
+    ]
+  }
+}

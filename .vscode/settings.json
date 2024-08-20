@@ -1,0 +1,9 @@
+{
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.exclude": { "node_modules": true },
+  "workbench.settings.editor": "json"
+}
