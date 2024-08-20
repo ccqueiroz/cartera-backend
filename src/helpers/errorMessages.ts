@@ -1,6 +1,6 @@
 export const ERROR_MESSAGES = {
   INVALID_TOKEN: 'Token de autorização inválido.',
-  MISSING_REQUIRED_PARAMETERS: 'Parâmetro obrigatório ausente.',
+  MISSING_REQUIRED_PARAMETERS: 'Parâmetros obrigatórios ausentes.',
   INVALID_CREDENTIALS: 'Credenciais Inválidas.',
   USER_ALREADY_EXISTS: 'Usuário já registrado.',
   USER_NOT_FOUND: 'Usuário não encontrado.',
