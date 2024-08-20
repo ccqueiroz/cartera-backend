@@ -3,7 +3,39 @@ import { HttpMethod, HttpMiddleware, Route } from '../route';
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-
+/**
+ * @swagger
+ * /api/auth/recovery-password:
+ *   post:
+ *     summary: Recuperar senha
+ *     description: Esta rota permite a recuperação de senha do usuário no sistema.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: usuario@example.com
+ *     responses:
+ *       200:
+ *         description: E-mail enviado com sucesso.
+ *         content: {}
+ *       401:
+ *         description: Credenciais Inválidas.
+ *       404:
+ *         description: Usuário não encontrado.
+ *       429:
+ *         description: O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.
+ *       500:
+ *         description: Erro interno no servidor.
+ */
 export class RecoveryPasswordRoute implements Route {
   private constructor(
     private readonly path: string,

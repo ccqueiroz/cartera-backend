@@ -3,11 +3,11 @@ import { MapRoutes, Route } from '../route';
 import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { SignoutRoute } from './signout.route';
 import { SignoutUseCase } from '@/usecases/auth/signout.usecase';
-import { LoginRoute } from './login';
+import { LoginRoute } from './login.route';
 import { LoginUseCase } from '@/usecases/auth/login.usecase';
 import { RecoveryPasswordRoute } from './recovery-password.route';
 import { RecoveryPasswordUseCase } from '@/usecases/auth/recovery-password.usecase';
-import { RegisterRoute } from './register';
+import { RegisterRoute } from './register.route';
 import { RegisterUserUseCase } from '@/usecases/auth/register.usecase';
 import { emailValidator } from '@/infra/validators';
 

@@ -3,7 +3,24 @@ import { HttpMethod, HttpMiddleware, Route } from '../route';
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-
+/**
+ * @swagger
+ * /api/auth/signout:
+ *   get:
+ *     summary: Deslogar do sistema
+ *     description: Esta rota permite deslogar o usuário do sistema.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: false
+ *       content: {}
+ *     responses:
+ *       204:
+ *         description: Usuário deslogado com sucesso.
+ *         content: {}
+ *       500:
+ *         description: Erro interno no servidor.
+ */
 export class SignoutRoute implements Route {
   private constructor(
     private readonly path: string,
