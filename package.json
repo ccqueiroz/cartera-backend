@@ -12,7 +12,9 @@
     "start:dev": "ts-node-dev --respawn -r tsconfig-paths/register index.ts",
     "create-workspace-vscode": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/vscode/index.js",
     "create-editor-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/editorconfig/index.js",
-    "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js"
+    "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\""
   },
   "engines": {
     "node": "18"
@@ -22,7 +24,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase": "^8.0.0",
-    "firebase-admin": "^12.3.0",
+    "firebase-admin": "^12.4.0",
     "redis": "^4.6.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
