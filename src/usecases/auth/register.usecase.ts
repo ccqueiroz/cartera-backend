@@ -46,6 +46,9 @@ export class RegisterUserUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
+    if (!email || !password || !firstName || !lastName)
+      throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
+
     const hasUser = await this.authGateway.getUserByEmail({ email });
 
     if (hasUser) {

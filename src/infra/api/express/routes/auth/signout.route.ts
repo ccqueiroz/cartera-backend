@@ -1,8 +1,9 @@
 import { SignoutUseCase } from '@/usecases/auth/signout.usecase';
-import { HttpMethod, HttpMiddleware, Route } from '../route';
+import { HttpMethod, Route } from '../route';
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { HttpMiddleware } from '../../middlewares/middleware';
 /**
  * @swagger
  * /api/auth/signout:
@@ -43,9 +44,17 @@ export class SignoutRoute implements Route {
 
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
+      const user_auth = request.user_auth;
+
       try {
-        await this.signoutService.execute();
-        response.status(204);
+        if (!user_auth?.userId)
+          new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500);
+
+        await this.signoutService.execute({
+          userId: String(user_auth?.userId),
+        });
+
+        response.status(204).send();
       } catch (error) {
         next(
           error instanceof ApiError
