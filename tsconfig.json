@@ -12,8 +12,13 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "src/infra/api/express/@types"]
   },
-  "include": ["src/**/*", "**/*.spec.ts"],
+  "include": [
+    "src/**/*",
+    "**/*.spec.ts",
+    "src/infra/api/express/@types/**/*.d.ts"
+  ],
   "compileOnSave": true
 }
