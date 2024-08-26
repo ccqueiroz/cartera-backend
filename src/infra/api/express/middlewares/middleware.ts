@@ -1,12 +1,14 @@
 import { ApiError } from '@/helpers/errors';
 import { NextFunction, Request, Response } from 'express';
 
+export type HttpMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) => Promise<void>;
+
 export interface Middleware {
-  getHandler(): (
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ) => Promise<void>;
+  getHandler(): HttpMiddleware;
 }
 
 export interface ErrorMiddleware {
