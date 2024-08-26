@@ -1,8 +1,9 @@
-import { HttpMethod, HttpMiddleware, Route } from '../route';
+import { HttpMethod, Route } from '../route';
 import { Request, Response, NextFunction } from 'express';
 import { RegisterUserUseCase } from '@/usecases/auth/register.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { HttpMiddleware } from '../../middlewares/middleware';
 /**
  * @swagger
  * /api/auth/register-account:
@@ -97,6 +98,9 @@ export class RegisterRoute implements Route {
       try {
         const { email, password, confirmPassword, firstName, lastName } =
           request.body;
+
+        if (!email || !password || !confirmPassword || !firstName || !lastName)
+          throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
 
         if (password !== confirmPassword)
           throw new ApiError(

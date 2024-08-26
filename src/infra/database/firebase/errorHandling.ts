@@ -6,6 +6,10 @@ const errorsFirebase = {
     message: ERROR_MESSAGES.TOO_MANY_REQUESTS,
     httpCode: 429,
   },
+  'auth/id-token-expired': {
+    message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+    httpCode: 401,
+  },
   'auth/timeout': { message: ERROR_MESSAGES.TIMEOUT, httpCode: 500 },
   'auth/invalid-email': {
     message: ERROR_MESSAGES.INVALID_EMAIL,

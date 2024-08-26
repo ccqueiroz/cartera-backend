@@ -1,3 +1,5 @@
+import { checkIfIsNecessaryCreateNewTokenHelpers } from './src/infra/helpers';
+import { VerifyTokenMiddleware } from './src/infra/api/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from './src/infra/api/express/middlewares/error.middleware';
 import { ApiExpress } from './src/infra/api/express/api.express';
 import { PersonUserRepositoryFirebase } from './src/infra/repositories/person-user.repository.firebase';
@@ -19,10 +21,19 @@ function main() {
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);
   //
 
+  //MIDDLEWARES
+  const authVerifyTokenMiddleware = VerifyTokenMiddleware.create(
+    authRepository,
+    checkIfIsNecessaryCreateNewTokenHelpers,
+  );
+
+  //
+
   // ----- ROUTES -----
   const authRoutes = AuthRoutes.create(
     authRepository,
     personUserRepository,
+    authVerifyTokenMiddleware,
   ).execute();
   //
 

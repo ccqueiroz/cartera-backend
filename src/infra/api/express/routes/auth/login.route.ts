@@ -1,8 +1,9 @@
-import { HttpMethod, HttpMiddleware, Route } from '../route';
+import { HttpMethod, Route } from '../route';
 import { Request, Response, NextFunction } from 'express';
 import { LoginUseCase } from '@/usecases/auth/login.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { HttpMiddleware } from '../../middlewares/middleware';
 /**
  * @swagger
  * /api/auth/login:

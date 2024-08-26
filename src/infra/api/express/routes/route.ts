@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { HttpMiddleware } from '../middlewares/middleware';
 
 export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 
@@ -8,12 +9,6 @@ export const HttpMethod = {
   PUT: 'put' as HttpMethod,
   DELETE: 'delete' as HttpMethod,
 } as const;
-
-export type HttpMiddleware = (
-  request: Request,
-  response: Response,
-  next: NextFunction,
-) => void;
 
 export interface Route {
   getHandler(): (

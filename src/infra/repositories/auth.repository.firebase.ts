@@ -112,13 +112,12 @@ export class AuthRepositoryFirebase implements AuthGateway {
       });
   }
 
-  public async signout(): Promise<void> {
-    await this.auth
-      .signOut()
-      .then()
-      .catch((error) => {
-        ErrorsFirebase.presenterError(error);
-      });
+  public async signout({
+    userId,
+  }: Pick<AuthEntitieDTO, 'userId'>): Promise<void> {
+    await this.adminAuth.revokeRefreshTokens(userId).catch((error) => {
+      ErrorsFirebase.presenterError(error);
+    });
   }
 
   public async getUserByEmail({
@@ -165,5 +164,55 @@ export class AuthRepositoryFirebase implements AuthGateway {
       .deleteUser(userId)
       .then()
       .catch((error) => ErrorsFirebase.presenterError(error));
+  }
+
+  public async verifyToken({
+    accessToken,
+  }: Pick<AuthEntitieDTO, 'accessToken'>) {
+    const decodeToken = await this.adminAuth
+      .verifyIdToken(accessToken, true)
+      .then((response) => response)
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    if (!decodeToken) return null;
+
+    const user = AuthEntitie.with({
+      email: decodeToken?.email ?? '',
+      userId: decodeToken.uid,
+      expirationTime: decodeToken.exp.toString(),
+      accessToken: '',
+      refreshToken: '',
+      lastLoginAt: '',
+    });
+
+    return {
+      email: user.email,
+      userId: user.userId,
+      expirationTime: user.expirationTime,
+    };
+  }
+
+  public async createNewToken({ userId }: Pick<AuthEntitieDTO, 'userId'>) {
+    const newToken = await this.adminAuth
+      .createCustomToken(userId)
+      .then((response) => response)
+      .catch((error) => ErrorsFirebase.presenterError(error));
+
+    if (!newToken) return null;
+
+    const user = AuthEntitie.with({
+      email: '',
+      userId: '',
+      expirationTime: '',
+      accessToken: newToken,
+      refreshToken: '',
+      lastLoginAt: '',
+    });
+
+    return {
+      accessToken: user.accessToken,
+    };
   }
 }

@@ -9,7 +9,7 @@
   "private": false,
   "scripts": {
     "build": "tsc",
-    "start:dev": "ts-node-dev --respawn -r tsconfig-paths/register index.ts",
+    "start:dev": "ts-node-dev --respawn -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules index.ts",
     "create-workspace-vscode": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/vscode/index.js",
     "create-editor-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/editorconfig/index.js",
     "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js",

@@ -12,6 +12,7 @@ import { RegisterUserUseCase } from '@/usecases/auth/register.usecase';
 import { emailValidator } from '@/infra/validators';
 import { GetPersonUserByEmailUseCase } from '@/usecases/person_user/get-person-user-by-email.usecase';
 import { CreatePersonUserUseCase } from '@/usecases/person_user/create-person-user.usecase';
+import { Middleware } from '../../middlewares/middleware';
 
 export class AuthRoutes implements MapRoutes {
   private getPersonUserByEmail: GetPersonUserByEmailUseCase;
@@ -20,6 +21,7 @@ export class AuthRoutes implements MapRoutes {
   private constructor(
     private readonly authGateway: AuthGateway,
     private readonly personUserGateway: PersonUserGateway,
+    private readonly authVerifyMiddleware: Middleware,
     private readonly routes: Array<Route> = [],
   ) {
     this.getPersonUserByEmail = GetPersonUserByEmailUseCase.create({
@@ -30,19 +32,23 @@ export class AuthRoutes implements MapRoutes {
       emailValidatorGateway: emailValidator,
       personUserGateway: this.personUserGateway,
     });
+
     this.joinRoutes();
   }
 
   public static create(
     authGateway: AuthGateway,
     personUserGateway: PersonUserGateway,
+    authVerifyMiddleware: Middleware,
   ) {
-    return new AuthRoutes(authGateway, personUserGateway);
+    return new AuthRoutes(authGateway, personUserGateway, authVerifyMiddleware);
   }
 
   private factorySignout() {
     const signoutService = SignoutUseCase.create(this.authGateway);
-    const signoutRoute = SignoutRoute.create(signoutService);
+    const signoutRoute = SignoutRoute.create(signoutService, [
+      this.authVerifyMiddleware.getHandler(),
+    ]);
     this.routes.push(signoutRoute);
   }
 
