@@ -1,6 +1,9 @@
 import firebase from 'firebase';
 import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
-import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto';
+import {
+  CreatePersonUserOutputDTO,
+  PersonUserEntitieDTO,
+} from '@/domain/Person_User/dtos/person-user.dto';
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 
@@ -37,10 +40,51 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
 
     return PersonUserEntitie.with({
       id: user.id,
-      userId: user.userId || '2112',
-      name: user.name,
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       image: user?.image,
+      createdAt: user?.createdAt,
+      fullName: user?.fullName,
+      updatedAt: user?.updatedAt,
     });
+  }
+
+  public async createPersonUser({
+    email,
+    userId,
+    firstName,
+    lastName,
+    createdAt,
+  }: Pick<
+    PersonUserEntitieDTO,
+    'email' | 'firstName' | 'lastName' | 'userId' | 'createdAt'
+  >): Promise<CreatePersonUserOutputDTO | null> {
+    const newUser = PersonUserEntitie.create({
+      email,
+      userId,
+      firstName,
+      lastName,
+      createdAt,
+    });
+
+    const data = await this.dbCollection
+      .add({
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        userId: newUser.userId,
+        createdAt: newUser.createdAt,
+      })
+      .then((response) => response)
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return {
+      id: data?.id,
+      fullName: newUser.fullName,
+    };
   }
 }

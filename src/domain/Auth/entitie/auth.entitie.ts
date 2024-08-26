@@ -21,6 +21,14 @@ export class AuthEntitie {
     return this.props.email;
   }
 
+  public get firstName() {
+    return this.props.firstName;
+  }
+
+  public get lastName() {
+    return this.props.lastName;
+  }
+
   public get expirationTime() {
     return this.props.expirationTime;
   }
@@ -31,5 +39,9 @@ export class AuthEntitie {
 
   public get lastLoginAt() {
     return this.props.lastLoginAt;
+  }
+
+  public get createAt() {
+    return this.props.createdAt;
   }
 }

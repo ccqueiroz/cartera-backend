@@ -15,4 +15,5 @@ export const ERROR_MESSAGES = {
   USER_DISABLED: 'Conta do usuário desativada.',
   PASSWORD_IS_DIFERENT_CONFIRM_PASSWORD:
     'A senha e a confirmação de senha não conferem.',
+  CREATE_PERSON_USER_FAILED: 'Falha ao criar o usuário.',
 } as const;

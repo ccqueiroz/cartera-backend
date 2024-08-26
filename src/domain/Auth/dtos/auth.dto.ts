@@ -1,3 +1,6 @@
+import { BaseDto } from '@/domain/dtos/baseDto.dto';
+import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto';
+
 export type AuthEntitieDTO = {
   userId: string;
   email: string;
@@ -5,13 +8,12 @@ export type AuthEntitieDTO = {
   refreshToken: string;
   expirationTime: string;
   lastLoginAt: string;
-};
+} & Pick<Partial<PersonUserEntitieDTO>, 'firstName' | 'lastName'> &
+  BaseDto;
 
 export type AuthSignDTO = {
   password: string;
-} & Pick<AuthEntitieDTO, 'email'>;
+} & Pick<AuthEntitieDTO, 'email' | 'updatedAt'>;
 
-export type OutputDTO = {
-  success: boolean;
-  error?: unknown;
-};
+export type AuthRegisterDTO = AuthSignDTO &
+  Required<Pick<AuthEntitieDTO, 'firstName' | 'lastName'>>;

@@ -95,7 +95,8 @@ export class RegisterRoute implements Route {
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
-        const { email, password, confirmPassword } = request.body;
+        const { email, password, confirmPassword, firstName, lastName } =
+          request.body;
 
         if (password !== confirmPassword)
           throw new ApiError(
@@ -106,6 +107,8 @@ export class RegisterRoute implements Route {
         const userLogin = await this.registerService.execute({
           email,
           password,
+          firstName,
+          lastName,
         });
         response.status(201).json({ ...userLogin });
       } catch (error) {

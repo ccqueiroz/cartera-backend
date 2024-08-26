@@ -1,10 +1,9 @@
 import { AuthGateway } from '@/domain/Auth/gateway/auth.gateway';
 import { Usecase } from '../usecase';
-import { OutputDTO } from '@/domain/Auth/dtos/auth.dto';
 
 export type SignoutInputDTO = void;
 
-export type SignoutOutputDTO = OutputDTO;
+export type SignoutOutputDTO = void;
 
 export class SignoutUseCase
   implements Usecase<SignoutInputDTO, SignoutOutputDTO>
@@ -17,6 +16,5 @@ export class SignoutUseCase
 
   public async execute(): Promise<SignoutOutputDTO> {
     await this.authGateway.signout();
-    return { success: true };
   }
 }

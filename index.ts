@@ -6,11 +6,15 @@ import { AuthRepositoryFirebase } from './src/infra/repositories/auth.repository
 import {
   authFirebase,
   dbFirestore,
+  adminFirebase,
 } from './src/infra/database/firebase/firebase.database';
 
 function main() {
   // ----- REPOSITORIES -----
-  const authRepository = AuthRepositoryFirebase.create(authFirebase);
+  const authRepository = AuthRepositoryFirebase.create(
+    authFirebase,
+    adminFirebase,
+  );
 
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);
   //
