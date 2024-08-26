@@ -9,7 +9,7 @@ export interface AuthGateway {
   }: AuthRegisterDTO): Promise<AuthEntitieDTO & { id?: string }>;
   loginWithEmail({ email, password }: AuthSignDTO): Promise<AuthEntitieDTO>;
   recoveryPassword({ email }: Pick<AuthEntitieDTO, 'email'>): Promise<void>;
-  signout(): Promise<void>;
+  signout({ userId }: Pick<AuthEntitieDTO, 'userId'>): Promise<void>;
   getUserByEmail({
     email,
   }: Pick<AuthEntitieDTO, 'email'>): Promise<Pick<
@@ -17,4 +17,16 @@ export interface AuthGateway {
     'email' | 'userId' | 'lastLoginAt'
   > | null>;
   deleteUser({ userId }: Pick<AuthEntitieDTO, 'userId'>): Promise<void>;
+  verifyToken({
+    accessToken,
+  }: Pick<AuthEntitieDTO, 'accessToken'>): Promise<Pick<
+    AuthEntitieDTO,
+    'userId' | 'email' | 'expirationTime'
+  > | null>;
+  createNewToken({
+    userId,
+  }: Pick<AuthEntitieDTO, 'userId'>): Promise<Pick<
+    AuthEntitieDTO,
+    'accessToken'
+  > | null>;
 }
