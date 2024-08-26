@@ -1,19 +1,14 @@
 import { AuthGateway } from '@/domain/Auth/gateway/auth.gateway';
 import { Usecase } from '../usecase';
-import {
-  AuthEntitieDTO,
-  AuthSignDTO,
-  OutputDTO,
-} from '@/domain/Auth/dtos/auth.dto';
+import { AuthEntitieDTO, AuthSignDTO } from '@/domain/Auth/dtos/auth.dto';
 import { EmailValidatorGateway } from '@/domain/Validators/EmailValidator/gateway/email-validator.gateway';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ApiError } from '@/helpers/errors';
+import { OutputDTO } from '@/domain/dtos/output.dto';
 
 export type LoginInputDTO = AuthSignDTO;
 
-export type LoginOutputDTO = {
-  data?: AuthEntitieDTO;
-} & OutputDTO;
+export type LoginOutputDTO = OutputDTO<AuthEntitieDTO>;
 
 export class LoginUseCase implements Usecase<LoginInputDTO, LoginOutputDTO> {
   private constructor(
@@ -42,6 +37,6 @@ export class LoginUseCase implements Usecase<LoginInputDTO, LoginOutputDTO> {
       password,
     });
 
-    return { success: true, data: userLogin };
+    return { data: { ...userLogin } };
   }
 }
