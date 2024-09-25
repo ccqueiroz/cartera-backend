@@ -15,7 +15,9 @@
     "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "test": "jest --watchAll"
+    "test": "jest --silent --colors --noStackTrace",
+    "test:unit": "yarn test -- --watch",
+    "test:ci": "yarn test -- --coverage"
   },
   "engines": {
     "node": "18"
