@@ -3,6 +3,7 @@ import { LoginUseCase } from './login.usecase';
 import { AuthGateway } from '@/domain/Auth/gateway/auth.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 
 let authGatewayMock: jest.Mocked<AuthGateway>;
 let emailValidatorGatewayMock: jest.Mocked<EmailValidatorGateway>;
@@ -64,12 +65,19 @@ describe('Login Usecase', () => {
   it('should call loginWithEmail when not valid email are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(false);
 
-    await expect(
-      loginUseCase.execute({
+    const error = await loginUseCase
+      .execute({
         email: 'jonh.doe',
         password: '12345670',
-      }),
-    ).rejects.toThrow(new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400));
+      })
+      .catch((er) => er);
+
+    expect(error).toBeInstanceOf(ApiError);
+
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_EMAIL,
+      statusCode: 400,
+    });
 
     expect(authGatewayMock.loginWithEmail).not.toHaveBeenCalled();
   });
@@ -77,14 +85,19 @@ describe('Login Usecase', () => {
   it('should call loginWithEmail when not valid password are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
-    await expect(
-      loginUseCase.execute({
+    const error = await loginUseCase
+      .execute({
         email: 'jonh.doe@example.com',
         password: '',
-      }),
-    ).rejects.toThrow(
-      new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 401),
-    );
+      })
+      .catch((er) => er);
+
+    expect(error).toBeInstanceOf(ApiError);
+
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
+      statusCode: 401,
+    });
 
     expect(authGatewayMock.loginWithEmail).not.toHaveBeenCalled();
   });

@@ -8,6 +8,7 @@ import { RecoveryPasswordUseCase } from './recovery-password.usecase';
 import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 
 let authGatewayMock: jest.Mocked<AuthGateway>;
 let emailValidatorGatewayMock: jest.Mocked<EmailValidatorGateway>;
@@ -82,11 +83,18 @@ describe('Recovery Password Usecase', () => {
   it('should call recoveryPassword when not valid email are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(false);
 
-    await expect(
-      recoveryPasswordUseCase.execute({
+    const error = await recoveryPasswordUseCase
+      .execute({
         email: 'jonh.doe',
-      }),
-    ).rejects.toThrow(new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400));
+      })
+      .catch((er) => er);
+
+    expect(error).toBeInstanceOf(ApiError);
+
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_EMAIL,
+      statusCode: 400,
+    });
 
     expect(authGatewayMock.recoveryPassword).not.toHaveBeenCalled();
   });
@@ -98,11 +106,18 @@ describe('Recovery Password Usecase', () => {
       data: null,
     });
 
-    await expect(
-      recoveryPasswordUseCase.execute({
+    const error = await recoveryPasswordUseCase
+      .execute({
         email: 'jonh.doe@example.com',
-      }),
-    ).rejects.toThrow(new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404));
+      })
+      .catch((er) => er);
+
+    expect(error).toBeInstanceOf(ApiError);
+
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.USER_NOT_FOUND,
+      statusCode: 404,
+    });
 
     expect(authGatewayMock.recoveryPassword).not.toHaveBeenCalled();
   });
