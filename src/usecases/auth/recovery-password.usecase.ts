@@ -35,7 +35,7 @@ export class RecoveryPasswordUseCase
     email,
   }: RecoveryPasswordInputDTO): Promise<RecoveryPasswordOutputDTO> {
     if (!this.emailValidatorGateway.validate(email)) {
-      throw new Error(ERROR_MESSAGES.INVALID_EMAIL);
+      throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
     const hasUser = await this.getPersonUserByEmail.execute({ email }); //check se existe usuário pelo e-mail
