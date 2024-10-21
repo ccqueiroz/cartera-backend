@@ -62,7 +62,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       expirationTime: authEntitie.expirationTime,
       firstName: authEntitie.firstName,
       lastName: authEntitie.lastName,
-      createdAt: authEntitie.createAt,
+      createdAt: authEntitie.createdAt,
       lastLoginAt: authEntitie.lastLoginAt,
     };
   }

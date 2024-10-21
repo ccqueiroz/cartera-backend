@@ -41,7 +41,11 @@ export class AuthEntitie {
     return this.props.lastLoginAt;
   }
 
-  public get createAt() {
+  public get createdAt() {
     return this.props.createdAt;
+  }
+
+  public get updatedAt() {
+    return this.props.updatedAt;
   }
 }

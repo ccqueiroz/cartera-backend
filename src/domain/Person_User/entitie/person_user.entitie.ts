@@ -61,4 +61,8 @@ export class PersonUserEntitie {
   public get createdAt() {
     return this.props.createdAt;
   }
+
+  public get updatedAt() {
+    return this.props.updatedAt;
+  }
 }
