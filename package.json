@@ -16,6 +16,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "test": "jest --silent --colors --noStackTrace",
+    "test:coverage": "jest --coverage",
     "test:unit": "yarn test -- --watch -c jest-unit-config.ts",
     "test:ci": "yarn test -- --coverage"
   },
