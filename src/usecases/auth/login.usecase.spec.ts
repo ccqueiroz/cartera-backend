@@ -69,7 +69,7 @@ describe('Login Usecase', () => {
         email: 'jonh.doe',
         password: '12345670',
       }),
-    ).rejects.toThrow(new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 401));
+    ).rejects.toThrow(new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400));
 
     expect(authGatewayMock.loginWithEmail).not.toHaveBeenCalled();
   });

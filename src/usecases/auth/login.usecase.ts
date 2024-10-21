@@ -25,7 +25,7 @@ export class LoginUseCase implements Usecase<LoginInputDTO, LoginOutputDTO> {
 
   public async execute({ email, password }: LoginInputDTO) {
     if (!this.emailValidatorGateway.validate(email)) {
-      throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 401);
+      throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
     if (!email || !password) {
