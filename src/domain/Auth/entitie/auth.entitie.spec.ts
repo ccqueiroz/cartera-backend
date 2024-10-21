@@ -2,7 +2,7 @@ import { AuthEntitieDTO } from '../dtos/auth.dto';
 import { AuthEntitie } from './auth.entitie';
 
 describe('Auth Entitie', () => {
-  it('should be return Auth instance with mandatory atributes when call static method with of the AuthEntitie class', () => {
+  it('should be return Auth instance with mandatory attributes when call static method with of the AuthEntitie class', () => {
     const authObject = {
       email: 'jonh.doe@gmail.com',
       userId: 'user-id-test',
@@ -21,7 +21,7 @@ describe('Auth Entitie', () => {
     expect(auth.lastLoginAt).toBe(authObject.lastLoginAt);
   });
 
-  it('should be return Auth instance with all atributes when call static method with of the AuthEntitie class', () => {
+  it('should be return Auth instance with all attributes when call static method with of the AuthEntitie class', () => {
     const authObject: AuthEntitieDTO = {
       email: 'jonh.doe@gmail.com',
       userId: 'user-id-test',
