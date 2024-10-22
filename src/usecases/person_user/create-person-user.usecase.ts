@@ -51,7 +51,7 @@ export class CreatePersonUserUseCase
     });
 
     if (hasPersonUser) {
-      throw new ApiError(ERROR_MESSAGES.USER_ALREADY_EXISTS, 400);
+      throw new ApiError(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE, 400);
     }
 
     const personUser = await this.personUserGateway.createPersonUser({
