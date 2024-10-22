@@ -37,7 +37,7 @@ describe('Login Usecase', () => {
     expect(loginUseCase).toBeInstanceOf(LoginUseCase);
   });
 
-  it('should call loginWithEmail when valid email and password are provided', async () => {
+  it('should call execute method when valid email and password are provided', async () => {
     authGatewayMock.loginWithEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       userId: 'P1fJ3',
@@ -62,7 +62,7 @@ describe('Login Usecase', () => {
     expect(result.data.email).toBe('jonh.doe@example.com');
   });
 
-  it('should call loginWithEmail when not valid email are provided', async () => {
+  it('should call execute method when not valid email are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(false);
 
     const error = await loginUseCase
@@ -82,7 +82,7 @@ describe('Login Usecase', () => {
     expect(authGatewayMock.loginWithEmail).not.toHaveBeenCalled();
   });
 
-  it('should call loginWithEmail when not valid password are provided', async () => {
+  it('should call execute method when not valid password are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     const error = await loginUseCase

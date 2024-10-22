@@ -25,7 +25,7 @@ describe('Signout Usecase', () => {
     expect(signOutUseCase).toBeInstanceOf(SignoutUseCase);
   });
 
-  it('should call signout when valid userId are provided', async () => {
+  it('should call execute method when valid userId are provided', async () => {
     authGatewayMock.recoveryPassword.mockResolvedValue();
 
     await signOutUseCase.execute({
