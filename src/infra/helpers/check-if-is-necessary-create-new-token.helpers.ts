@@ -4,7 +4,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 export class CheckIfIsNecessaryCreateNewTokenHelpers
   implements CheckIfIsNecessaryCreateNewTokenGateWay
 {
-  execute(token: number): boolean {
+  execute(token: number | null): boolean {
     const _REMOVE_MINUTES = 5;
     if (!token) throw new ApiError(ERROR_MESSAGES.INVALID_TOKEN, 401);
     const unixTimeStampCurrentDate =
