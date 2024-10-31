@@ -51,7 +51,7 @@ describe('Recovery Password Usecase', () => {
     expect(recoveryPasswordUseCase).toBeInstanceOf(RecoveryPasswordUseCase);
   });
 
-  it('should call recoveryPassword when valid email are provided', async () => {
+  it('should call execute method when valid email are provided', async () => {
     authGatewayMock.recoveryPassword.mockResolvedValue();
 
     emailValidatorGatewayMock.validate.mockReturnValue(true);
@@ -80,7 +80,7 @@ describe('Recovery Password Usecase', () => {
     ).resolves.toBeUndefined();
   });
 
-  it('should call recoveryPassword when not valid email are provided', async () => {
+  it('should call execute method when not valid email are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(false);
 
     const error = await recoveryPasswordUseCase
@@ -99,7 +99,7 @@ describe('Recovery Password Usecase', () => {
     expect(authGatewayMock.recoveryPassword).not.toHaveBeenCalled();
   });
 
-  it('should call recoveryPassword when valid email are provided but dont be found user', async () => {
+  it('should call execute method when valid email are provided but dont be found user', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     getPersonUserByEmailUseCase.execute.mockResolvedValue({

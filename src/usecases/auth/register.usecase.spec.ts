@@ -51,7 +51,7 @@ describe('Register Usecase', () => {
     expect(registerUseCase).toBeInstanceOf(RegisterUserUseCase);
   });
 
-  it('should call registerWithEmail when valid email, password, firstName and lastName are provided', async () => {
+  it('should call execute method when valid email, password, firstName and lastName are provided', async () => {
     authGatewayMock.registerWithEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       userId: 'P1fJ3',
@@ -94,7 +94,7 @@ describe('Register Usecase', () => {
     expect(result.data.fullName).toBe('jonh doe');
   });
 
-  it('should call registerWithEmail when not valid email are provided', async () => {
+  it('should call execute method when not valid email are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(false);
 
     const error = await registerUseCase
@@ -116,7 +116,7 @@ describe('Register Usecase', () => {
     expect(authGatewayMock.registerWithEmail).not.toHaveBeenCalled();
   });
 
-  it('should call registerWithEmail when not valid password are provided', async () => {
+  it('should call execute method when not valid password are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     const error = await registerUseCase
@@ -138,7 +138,7 @@ describe('Register Usecase', () => {
     expect(authGatewayMock.registerWithEmail).not.toHaveBeenCalled();
   });
 
-  it('should call registerWithEmail when not valid firstName are provided', async () => {
+  it('should call execute method when not valid firstName are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     const error = await registerUseCase
@@ -160,7 +160,7 @@ describe('Register Usecase', () => {
     expect(authGatewayMock.registerWithEmail).not.toHaveBeenCalled();
   });
 
-  it('should call registerWithEmail when not valid lastName are provided', async () => {
+  it('should call execute method when not valid lastName are provided', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     const error = await registerUseCase
@@ -182,7 +182,7 @@ describe('Register Usecase', () => {
     expect(authGatewayMock.registerWithEmail).not.toHaveBeenCalled();
   });
 
-  it('should call registerWithEmail when the user already exist.', async () => {
+  it('should call execute method when the user already exist.', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
     authGatewayMock.getUserByEmail.mockResolvedValue({
