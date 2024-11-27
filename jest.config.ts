@@ -33,6 +33,8 @@ const config: Config = {
     '!**/src/**/index.ts',
     '!**/src/packages/clients/**/*.ts',
     '!**/*.gateway.ts',
+    '!**/src/infra/database/firebase/firebase.database.ts',
+    '!**/src/helpers/httpCodes.ts',
   ],
 
   // The directory where Jest should output its coverage files
