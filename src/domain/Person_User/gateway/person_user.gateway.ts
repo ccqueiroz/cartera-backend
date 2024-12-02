@@ -1,10 +1,12 @@
 import {
   CreatePersonUserOutputDTO,
+  EditPersonUserDTO,
+  EditPersonUserOutputDTO,
   PersonUserEntitieDTO,
 } from '../dtos/person-user.dto';
 
 export interface PersonUserGateway {
-  getUserByEmail({
+  getPersonUserByEmail({
     email,
   }: Pick<PersonUserEntitieDTO, 'email'>): Promise<PersonUserEntitieDTO | null>;
 
@@ -18,4 +20,15 @@ export interface PersonUserGateway {
     PersonUserEntitieDTO,
     'email' | 'firstName' | 'lastName' | 'userId' | 'createdAt'
   >): Promise<CreatePersonUserOutputDTO | null>;
+
+  getPersonUserById({
+    id,
+  }: Pick<PersonUserEntitieDTO, 'id'>): Promise<PersonUserEntitieDTO | null>;
+
+  editPersonUser({
+    personId,
+    personData,
+  }: EditPersonUserDTO): Promise<EditPersonUserOutputDTO>;
+
+  deletePersonUser({ id }: Pick<PersonUserEntitieDTO, 'id'>): Promise<void>;
 }
