@@ -1,10 +1,18 @@
 const mockFirestoreCollection = jest.fn();
 const mockFirestoreWhere = jest.fn();
+const mockFirestoreDoc = jest.fn();
 const mockFirestoreGet = jest.fn();
 const mockFirestoreAdd = jest.fn();
+const mockFirestoreUpdate = jest.fn();
+const mockFirestoreDelete = jest.fn();
 
 const mockFirestore = {
   collection: mockFirestoreCollection.mockReturnValue({
+    doc: mockFirestoreDoc.mockReturnValue({
+      get: mockFirestoreGet,
+      update: mockFirestoreUpdate,
+      delete: mockFirestoreDelete,
+    }),
     where: mockFirestoreWhere.mockReturnValue({
       get: mockFirestoreGet,
     }),
@@ -25,4 +33,7 @@ export {
   mockFirestoreWhere,
   mockFirestoreGet,
   mockFirestoreAdd,
+  mockFirestoreDoc,
+  mockFirestoreUpdate,
+  mockFirestoreDelete,
 };

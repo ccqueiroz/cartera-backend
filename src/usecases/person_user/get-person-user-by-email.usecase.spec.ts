@@ -13,8 +13,11 @@ describe('Get Person User By Email', () => {
 
   beforeEach(() => {
     personUserGatewayMock = {
-      getUserByEmail: jest.fn(),
+      getPersonUserByEmail: jest.fn(),
       createPersonUser: jest.fn(),
+      getPersonUserById: jest.fn(),
+      editPersonUser: jest.fn(),
+      deletePersonUser: jest.fn(),
     };
 
     emailValidatorGatewayMock = {
@@ -34,7 +37,7 @@ describe('Get Person User By Email', () => {
   });
 
   it('should call execute method when valid email and password are provided', async () => {
-    personUserGatewayMock.getUserByEmail.mockResolvedValue({
+    personUserGatewayMock.getPersonUserByEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       firstName: 'john',
       lastName: 'doe',
@@ -50,7 +53,7 @@ describe('Get Person User By Email', () => {
       email: 'jonh.doe@example.com',
     });
 
-    expect(personUserGatewayMock.getUserByEmail).toHaveBeenCalledWith({
+    expect(personUserGatewayMock.getPersonUserByEmail).toHaveBeenCalledWith({
       email: 'jonh.doe@example.com',
     });
 
@@ -76,6 +79,6 @@ describe('Get Person User By Email', () => {
       statusCode: 400,
     });
 
-    expect(personUserGatewayMock.getUserByEmail).not.toHaveBeenCalled();
+    expect(personUserGatewayMock.getPersonUserByEmail).not.toHaveBeenCalled();
   });
 });
