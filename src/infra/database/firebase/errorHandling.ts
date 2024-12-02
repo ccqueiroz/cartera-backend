@@ -51,6 +51,10 @@ const errorsFirebase = {
     message: ERROR_MESSAGES.EMAIL_NOT_FOUND,
     httpCode: 404,
   },
+  'not-found': {
+    message: ERROR_MESSAGES.USER_NOT_FOUND,
+    httpCode: 404,
+  },
 } as const;
 
 export class ErrorsFirebase {
