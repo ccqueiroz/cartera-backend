@@ -21,17 +21,27 @@ export class VerifyTokenMiddleware implements Middleware {
     );
   }
 
+  private extractToken(request: Request): string | null {
+    return request.headers.authorization?.split(' ')[1] || null;
+  }
+
+  private handleError(error: unknown, next: NextFunction): void {
+    if (error instanceof ApiError) {
+      next(error);
+    } else {
+      next(new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500));
+    }
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
-      const token =
-        request.headers.authorization &&
-        request.headers.authorization.split(' ')[1];
-
-      if (!token) {
-        throw new ApiError(ERROR_MESSAGES.INVALID_TOKEN, 401);
-      }
-
       try {
+        const token = this.extractToken(request);
+
+        if (!token) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_TOKEN, 401);
+        }
+
         const decodeToken = await this.authGateway.verifyToken({
           accessToken: token,
         });
@@ -54,7 +64,7 @@ export class VerifyTokenMiddleware implements Middleware {
         request.user_auth = { ...decodeToken };
         next();
       } catch (error) {
-        next(new ApiError(ERROR_MESSAGES.INVALID_TOKEN, 401));
+        this.handleError(error, next);
       }
     };
   }
