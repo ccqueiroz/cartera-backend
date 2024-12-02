@@ -2,6 +2,8 @@ import firebase from 'firebase';
 import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import {
   CreatePersonUserOutputDTO,
+  EditPersonUserDTO,
+  EditPersonUserOutputDTO,
   PersonUserEntitieDTO,
 } from '@/domain/Person_User/dtos/person-user.dto';
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
@@ -18,7 +20,7 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
     return new PersonUserRepositoryFirebase(db);
   }
 
-  public async getUserByEmail({
+  public async getPersonUserByEmail({
     email,
   }: Pick<
     PersonUserEntitieDTO,
@@ -49,6 +51,24 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
       fullName: user?.fullName,
       updatedAt: user?.updatedAt,
     });
+  }
+
+  public async getPersonUserById({
+    id,
+  }: Pick<PersonUserEntitieDTO, 'id'>): Promise<PersonUserEntitieDTO | null> {
+    const personUser = await this.dbCollection
+      .doc(id)
+      .get()
+      .then((response) =>
+        response.exists
+          ? { id: response.id, ...(response.data() as PersonUserEntitieDTO) }
+          : null,
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return personUser ? PersonUserEntitie.with({ ...personUser }) : null;
   }
 
   public async createPersonUser({
@@ -86,5 +106,38 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
       id: data?.id,
       fullName: newUser.fullName,
     };
+  }
+
+  public async editPersonUser({
+    personId,
+    personData,
+  }: EditPersonUserDTO): Promise<EditPersonUserOutputDTO> {
+    const updatedAt = new Date().getTime();
+
+    await this.dbCollection
+      .doc(personId)
+      .update({ ...personData, updatedAt })
+      .then((response) => response)
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return PersonUserEntitie.with({
+      id: personId,
+      ...personData,
+      updatedAt: updatedAt.toString(),
+    });
+  }
+
+  public async deletePersonUser({
+    id,
+  }: Pick<PersonUserEntitieDTO, 'id'>): Promise<void> {
+    await this.dbCollection
+      .doc(id)
+      .delete()
+      .then((response) => response)
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
   }
 }
