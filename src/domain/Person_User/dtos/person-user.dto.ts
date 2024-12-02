@@ -19,3 +19,10 @@ export type CreatePersonUserOutputDTO = Pick<
   PersonUserEntitieDTO,
   'id' | 'fullName'
 >;
+
+export type EditPersonUserDTO = {
+  personId: string;
+  personData: PersonUserEntitieDTO;
+};
+
+export type EditPersonUserOutputDTO = PersonUserEntitieDTO;
