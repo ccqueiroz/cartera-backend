@@ -46,7 +46,7 @@ export class CreatePersonUserUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
-    const hasPersonUser = await this.personUserGateway.getUserByEmail({
+    const hasPersonUser = await this.personUserGateway.getPersonUserByEmail({
       email,
     });
 
