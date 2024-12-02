@@ -49,7 +49,14 @@ export class EditPersonUserUseCase
 
     return {
       data: {
-        ...personUser,
+        id: personUser.id,
+        userId: personUser.userId,
+        firstName: personUser.firstName,
+        lastName: personUser.lastName,
+        fullName: personUser.fullName,
+        email: personUser.email,
+        image: personUser?.image ?? null,
+        updatedAt: personUser.updatedAt,
       },
     };
   }
