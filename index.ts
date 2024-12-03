@@ -1,3 +1,5 @@
+import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/payment-method.repository.firebase';
+import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
 import { checkIfIsNecessaryCreateNewTokenHelpers } from './src/infra/helpers';
 import { VerifyTokenMiddleware } from './src/infra/api/express/middlewares/verify-token.middleware';
@@ -20,6 +22,9 @@ function main() {
   );
 
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);
+
+  const paymentMethodRepository =
+    PaymentMethodRepositoryFirebase.create(dbFirestore);
   //
 
   //MIDDLEWARES
@@ -41,13 +46,18 @@ function main() {
     personUserRepository,
     authVerifyTokenMiddleware,
   ).execute();
+
+  const paymentMethodRoutes = PaymentMethodRoute.create(
+    paymentMethodRepository,
+    authVerifyTokenMiddleware,
+  ).execute();
   //
 
   //  ----- ERROR MIDDLEWARE -----
   const errorMiddleware = new ErrorMiddleware();
 
   const api = ApiExpress.create(
-    [...authRoutes, ...personUserRoutes],
+    [...authRoutes, ...personUserRoutes, ...paymentMethodRoutes],
     errorMiddleware,
   );
   const port = 8889;

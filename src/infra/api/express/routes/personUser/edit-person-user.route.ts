@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from 'express';
 
 /**
  * @swagger
- *  person-user/edit/{personUserId}:
+ *  /api/person-user/edit/{personUserId}:
  *   put:
  *     summary: Edita dados de um person user
  *     description: Esta rota permite a edição de um person user no sistema.

@@ -13,6 +13,7 @@ const mockFirestore = {
       update: mockFirestoreUpdate,
       delete: mockFirestoreDelete,
     }),
+    get: mockFirestoreGet,
     where: mockFirestoreWhere.mockReturnValue({
       get: mockFirestoreGet,
     }),
