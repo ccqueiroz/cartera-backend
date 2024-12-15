@@ -26,7 +26,7 @@ async function runMigration(filePath: string, migrationId: string) {
   const { default: migration } = await import(filePath);
 
   try {
-    await migration(db); // Executa a migração passando o Firestore
+    await migration(db);
     await db.collection(collection).doc(migrationId).set({
       id: migrationId,
       status: 'executed',
