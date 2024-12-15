@@ -137,7 +137,7 @@ describe('Payment Method Repository Firebase', () => {
     expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
   });
 
-  it('should be return throw Error if there is a problem with the getPersonUserById request', async () => {
+  it('should be return throw Error if there is a problem with the getPaymentMethodById request', async () => {
     const error = new Error('Unexpected error');
 
     jest.spyOn(ErrorsFirebase, 'presenterError').mockImplementation(() => {
