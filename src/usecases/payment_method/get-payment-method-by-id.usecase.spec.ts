@@ -6,7 +6,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 
 let paymentMethodUserGatewayMock: jest.Mocked<PaymentMethodGateway>;
 
-describe('Get Payment Methods', () => {
+describe('Get Payment Method By Id', () => {
   let getPaymentMethodByIdUseCase: GetPaymentMethodByIdUseCase;
 
   beforeEach(() => {
