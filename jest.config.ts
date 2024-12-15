@@ -35,6 +35,8 @@ const config: Config = {
     '!**/*.gateway.ts',
     '!**/src/infra/database/firebase/firebase.database.ts',
     '!**/src/helpers/httpCodes.ts',
+    '!./migrations-firebase/*ts',
+    '!./scripts/*ts',
   ],
 
   // The directory where Jest should output its coverage files
