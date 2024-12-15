@@ -1,3 +1,5 @@
+import { CategoryRoute } from './src/infra/api/express/routes/category/category.routes';
+import { CategoryRepositoryFirebase } from './src/infra/repositories/category.repository.firebase';
 import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/payment-method.repository.firebase';
 import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
@@ -25,6 +27,8 @@ function main() {
 
   const paymentMethodRepository =
     PaymentMethodRepositoryFirebase.create(dbFirestore);
+
+  const categoryRepository = CategoryRepositoryFirebase.create(dbFirestore);
   //
 
   //MIDDLEWARES
@@ -51,13 +55,23 @@ function main() {
     paymentMethodRepository,
     authVerifyTokenMiddleware,
   ).execute();
+
+  const categoryRoutes = CategoryRoute.create(
+    categoryRepository,
+    authVerifyTokenMiddleware,
+  ).execute();
   //
 
   //  ----- ERROR MIDDLEWARE -----
   const errorMiddleware = new ErrorMiddleware();
 
   const api = ApiExpress.create(
-    [...authRoutes, ...personUserRoutes, ...paymentMethodRoutes],
+    [
+      ...authRoutes,
+      ...personUserRoutes,
+      ...paymentMethodRoutes,
+      ...categoryRoutes,
+    ],
     errorMiddleware,
   );
   const port = 8889;
