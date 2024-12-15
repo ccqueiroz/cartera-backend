@@ -17,4 +17,5 @@ export const ERROR_MESSAGES = {
     'A senha e a confirmação de senha não conferem.',
   CREATE_PERSON_USER_FAILED: 'Falha ao criar o usuário.',
   PAYMENT_METHOD_NOT_FOUND: 'Método de pagamento não encontrado.',
+  CATEGORY_NOT_FOUND: 'Categoria não encontrada.',
 } as const;

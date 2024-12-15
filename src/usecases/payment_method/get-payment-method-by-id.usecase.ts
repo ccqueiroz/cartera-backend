@@ -27,7 +27,7 @@ export class GetPaymentMethodByIdUseCase
 
   public async execute({
     id,
-  }: Pick<PaymentMethodDTO, 'id'>): Promise<GetPaymentMethodByIdOutputDTO> {
+  }: GetPaymentMethodByIdInputDTO): Promise<GetPaymentMethodByIdOutputDTO> {
     if (!id) {
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
