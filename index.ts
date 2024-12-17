@@ -1,3 +1,5 @@
+import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
+import { PaymentStatusRepositoryFirebase } from './src/infra/repositories/payment-status.repository.firebase';
 import { CategoryRoute } from './src/infra/api/express/routes/category/category.routes';
 import { CategoryRepositoryFirebase } from './src/infra/repositories/category.repository.firebase';
 import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/payment-method.repository.firebase';
@@ -29,6 +31,9 @@ function main() {
     PaymentMethodRepositoryFirebase.create(dbFirestore);
 
   const categoryRepository = CategoryRepositoryFirebase.create(dbFirestore);
+
+  const paymentStatusRepository =
+    PaymentStatusRepositoryFirebase.create(dbFirestore);
   //
 
   //MIDDLEWARES
@@ -60,6 +65,11 @@ function main() {
     categoryRepository,
     authVerifyTokenMiddleware,
   ).execute();
+
+  const paymentStatusRoutes = PaymentStatusRoute.create(
+    paymentStatusRepository,
+    authVerifyTokenMiddleware,
+  ).execute();
   //
 
   //  ----- ERROR MIDDLEWARE -----
@@ -71,6 +81,7 @@ function main() {
       ...personUserRoutes,
       ...paymentMethodRoutes,
       ...categoryRoutes,
+      ...paymentStatusRoutes,
     ],
     errorMiddleware,
   );
