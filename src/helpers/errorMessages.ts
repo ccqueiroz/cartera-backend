@@ -18,4 +18,5 @@ export const ERROR_MESSAGES = {
   CREATE_PERSON_USER_FAILED: 'Falha ao criar o usuário.',
   PAYMENT_METHOD_NOT_FOUND: 'Método de pagamento não encontrado.',
   CATEGORY_NOT_FOUND: 'Categoria não encontrada.',
+  PAYMENT_STATUS_NOT_FOUND: 'Status não encontrada.',
 } as const;
