@@ -17,8 +17,8 @@ describe('Category Entitie', () => {
     const categoryObject = {
       id: 'Ak982jkk118279',
       description: 'Restaurante',
-      createdAt: '1724708206117',
-      updatedAt: '1724708206118',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
 
     const category = CategoryEntitie.with(categoryObject);
