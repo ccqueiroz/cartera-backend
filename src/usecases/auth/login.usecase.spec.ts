@@ -43,8 +43,8 @@ describe('Login Usecase', () => {
       userId: 'P1fJ3',
       accessToken: 'accessToken-token-teste',
       refreshToken: 'refreshToken-token-teste',
-      expirationTime: '1724708206117',
-      lastLoginAt: '1724704559822',
+      expirationTime: 1724708206117,
+      lastLoginAt: 1724704559822,
     });
 
     emailValidatorGatewayMock.validate.mockReturnValue(true);

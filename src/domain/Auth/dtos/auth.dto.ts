@@ -6,8 +6,8 @@ export type AuthEntitieDTO = {
   email: string;
   accessToken: string;
   refreshToken: string;
-  expirationTime: string;
-  lastLoginAt: string;
+  expirationTime: number;
+  lastLoginAt: number;
 } & Pick<Partial<PersonUserEntitieDTO>, 'firstName' | 'lastName'> &
   BaseDto;
 

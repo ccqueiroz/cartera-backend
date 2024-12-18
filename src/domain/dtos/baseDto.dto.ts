@@ -1,4 +1,4 @@
 export type BaseDto = {
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: number;
+  updatedAt?: number;
 };
