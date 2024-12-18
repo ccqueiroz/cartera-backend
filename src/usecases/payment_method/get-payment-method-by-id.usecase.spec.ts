@@ -30,8 +30,8 @@ describe('Get Payment Method By Id', () => {
     paymentMethodUserGatewayMock.getPaymentMethodById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Cartão de crédito',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
     });
 
     const result = await getPaymentMethodByIdUseCase.execute({
