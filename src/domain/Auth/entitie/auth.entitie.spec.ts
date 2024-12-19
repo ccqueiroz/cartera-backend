@@ -10,6 +10,8 @@ describe('Auth Entitie', () => {
       accessToken: 'access-token-test',
       refreshToken: 'refresh-token-test',
       lastLoginAt: 1724704559822,
+      createdAt: 1212121212,
+      updatedAt: null,
     };
     const auth = AuthEntitie.with(authObject);
 

@@ -58,8 +58,8 @@ describe('Category Repository Firebase', () => {
         expect.objectContaining({
           id: expect.any(String),
           description: expect.any(String),
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String),
+          createdAt: expect.any(Number),
+          updatedAt: expect.any(Number),
         }),
       ),
     );
@@ -69,8 +69,8 @@ describe('Category Repository Firebase', () => {
     expect(result.shift()).toEqual({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     });
   });
 
@@ -117,8 +117,8 @@ describe('Category Repository Firebase', () => {
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
     expect(result?.description).toBe('App Mobilidade');
-    expect(result?.createdAt).toEqual(expect.any(String));
-    expect(result?.updatedAt).toEqual(expect.any(String));
+    expect(result?.createdAt).toEqual(expect.any(Number));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
   });
 
   it('should be return null when provided id param, but this item not exist in database.', async () => {

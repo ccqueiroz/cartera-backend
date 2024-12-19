@@ -45,6 +45,7 @@ describe('Get Person User By Email', () => {
       createdAt: 12121212121212,
       fullName: 'john doe',
       id: '1999',
+      updatedAt: null,
     });
 
     emailValidatorGatewayMock.validate.mockReturnValue(true);

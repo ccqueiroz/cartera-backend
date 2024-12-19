@@ -30,7 +30,10 @@ export class AuthRepositoryFirebase implements AuthGateway {
     password,
     firstName,
     lastName,
-  }: AuthRegisterDTO): Promise<AuthEntitieDTO> {
+  }: Omit<
+    AuthRegisterDTO,
+    'createdAt' | 'updatedAt'
+  >): Promise<AuthEntitieDTO> {
     const auth = await this.auth
       .createUserWithEmailAndPassword(email, password)
       .then((response) => response)
@@ -50,6 +53,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       expirationTime: data?.stsTokenManager.expirationTime,
       lastLoginAt: data.lastLoginAt,
       createdAt: data.createdAt,
+      updatedAt: null,
       firstName,
       lastName,
     });
@@ -64,13 +68,14 @@ export class AuthRepositoryFirebase implements AuthGateway {
       lastName: authEntitie.lastName,
       createdAt: authEntitie.createdAt,
       lastLoginAt: authEntitie.lastLoginAt,
+      updatedAt: null,
     };
   }
 
   public async loginWithEmail({
     email,
     password,
-  }: AuthSignDTO): Promise<AuthEntitieDTO> {
+  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<AuthEntitieDTO> {
     const auth = await this.auth
       .signInWithEmailAndPassword(email, password)
       .then((response) => response)
@@ -89,6 +94,8 @@ export class AuthRepositoryFirebase implements AuthGateway {
       refreshToken: data?.stsTokenManager.refreshToken,
       expirationTime: data?.stsTokenManager.expirationTime,
       lastLoginAt: data.lastLoginAt,
+      updatedAt: null,
+      createdAt: data?.createdAt,
     });
 
     return {
@@ -98,6 +105,8 @@ export class AuthRepositoryFirebase implements AuthGateway {
       refreshToken: authEntitie.refreshToken,
       expirationTime: authEntitie.expirationTime,
       lastLoginAt: authEntitie.lastLoginAt,
+      createdAt: authEntitie.createdAt,
+      updatedAt: authEntitie.updatedAt,
     };
   }
 
@@ -145,8 +154,10 @@ export class AuthRepositoryFirebase implements AuthGateway {
       userId: authUser.uid,
       accessToken: '',
       refreshToken: '',
-      expirationTime: '',
+      expirationTime: null,
       lastLoginAt: authUser.metadata.lastSignInTime,
+      createdAt: null,
+      updatedAt: null,
     });
 
     return {
@@ -181,10 +192,12 @@ export class AuthRepositoryFirebase implements AuthGateway {
     const user = AuthEntitie.with({
       email: decodeToken?.email ?? '',
       userId: decodeToken.uid,
-      expirationTime: decodeToken.exp.toString(),
+      expirationTime: +decodeToken.exp.toString(),
       accessToken: '',
       refreshToken: '',
-      lastLoginAt: '',
+      lastLoginAt: 0,
+      createdAt: null,
+      updatedAt: null,
     });
 
     return {
@@ -205,10 +218,12 @@ export class AuthRepositoryFirebase implements AuthGateway {
     const user = AuthEntitie.with({
       email: '',
       userId: '',
-      expirationTime: '',
+      expirationTime: 0,
       accessToken: newToken,
       refreshToken: '',
-      lastLoginAt: '',
+      lastLoginAt: 0,
+      createdAt: null,
+      updatedAt: null,
     });
 
     return {

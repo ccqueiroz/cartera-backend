@@ -62,6 +62,8 @@ describe('Recovery Password Usecase', () => {
         firstName: 'jonh',
         lastName: 'doe',
         userId: '12121',
+        createdAt: 12121212,
+        updatedAt: 12121212,
       },
     });
 

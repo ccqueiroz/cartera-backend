@@ -62,6 +62,7 @@ describe('Register Usecase', () => {
       createdAt: 1724704559822,
       firstName: 'jonh',
       lastName: 'doe',
+      updatedAt: null,
     });
 
     authGatewayMock.getUserByEmail.mockResolvedValue(null);
