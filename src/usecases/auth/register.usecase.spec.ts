@@ -57,11 +57,12 @@ describe('Register Usecase', () => {
       userId: 'P1fJ3',
       accessToken: 'accessToken-token-teste',
       refreshToken: 'refreshToken-token-teste',
-      expirationTime: '1724708206117',
-      lastLoginAt: '1724704559822',
-      createdAt: '1724704559822',
+      expirationTime: 1724708206117,
+      lastLoginAt: 1724704559822,
+      createdAt: 1724704559822,
       firstName: 'jonh',
       lastName: 'doe',
+      updatedAt: null,
     });
 
     authGatewayMock.getUserByEmail.mockResolvedValue(null);
@@ -188,7 +189,7 @@ describe('Register Usecase', () => {
     authGatewayMock.getUserByEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       userId: 'P1fJ3',
-      lastLoginAt: '1724704559822',
+      lastLoginAt: 1724704559822,
     });
 
     const error = await registerUseCase

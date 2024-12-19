@@ -56,6 +56,7 @@ export class EditPersonUserUseCase
         fullName: personUser.fullName,
         email: personUser.email,
         image: personUser?.image ?? null,
+        createdAt: personUser.createdAt,
         updatedAt: personUser.updatedAt,
       },
     };

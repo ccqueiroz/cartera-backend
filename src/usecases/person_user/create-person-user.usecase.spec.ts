@@ -47,7 +47,7 @@ describe('Create Person User Usecase', () => {
       firstName: 'john',
       lastName: 'doe',
       userId: 'P1fJ3',
-      createdAt: '12121212121212',
+      createdAt: 12121212121212,
     });
 
     expect(personUserGatewayMock.createPersonUser).toHaveBeenCalledWith({
@@ -55,7 +55,7 @@ describe('Create Person User Usecase', () => {
       firstName: 'john',
       lastName: 'doe',
       userId: 'P1fJ3',
-      createdAt: '12121212121212',
+      createdAt: 12121212121212,
     });
 
     expect(result.data.fullName).toBe('john doe');
@@ -71,7 +71,7 @@ describe('Create Person User Usecase', () => {
         firstName: 'john',
         lastName: 'doe',
         userId: 'P1fJ3',
-        createdAt: '12121212121212',
+        createdAt: 12121212121212,
       })
       .catch((er) => er);
 
@@ -101,8 +101,8 @@ describe('Create Person User Usecase', () => {
       lastName: 'doe',
       image: 'htpp://image',
       fullName: 'jonh doe',
-      createdAt: '1212',
-      updatedAt: '1212',
+      createdAt: 1212,
+      updatedAt: 1212,
     });
 
     const error = await createPersonUserUseCase
@@ -111,7 +111,7 @@ describe('Create Person User Usecase', () => {
         firstName: 'john',
         lastName: 'doe',
         userId: 'P1fJ3',
-        createdAt: '12121212121212',
+        createdAt: 12121212121212,
       })
       .catch((er) => er);
 

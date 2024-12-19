@@ -6,8 +6,13 @@ export interface AuthGateway {
     password,
     firstName,
     lastName,
-  }: AuthRegisterDTO): Promise<AuthEntitieDTO & { id?: string }>;
-  loginWithEmail({ email, password }: AuthSignDTO): Promise<AuthEntitieDTO>;
+  }: Omit<AuthRegisterDTO, 'updatedAt'>): Promise<
+    AuthEntitieDTO & { id?: string }
+  >;
+  loginWithEmail({
+    email,
+    password,
+  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<AuthEntitieDTO>;
   recoveryPassword({ email }: Pick<AuthEntitieDTO, 'email'>): Promise<void>;
   signout({ userId }: Pick<AuthEntitieDTO, 'userId'>): Promise<void>;
   getUserByEmail({

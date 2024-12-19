@@ -17,6 +17,7 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "test": "jest --silent --colors --noStackTrace",
     "test:coverage": "jest --coverage",
+    "test:coverage:unit": "jest --config=jest-unit-config.ts --coverage",
     "test:unit": "yarn test -- --watch -c jest-unit-config.ts",
     "test:ci": "yarn test -- --coverage",
     "migrate": "ts-node scripts/run-migrations-firebase.ts"

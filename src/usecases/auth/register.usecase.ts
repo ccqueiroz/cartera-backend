@@ -7,7 +7,10 @@ import { OutputDTO } from '@/domain/dtos/output.dto';
 import { CreatePersonUserUseCase } from '@/usecases/person_user/create-person-user.usecase';
 import { Usecase } from '../usecase';
 
-export type RegisterUserInputDTO = AuthRegisterDTO;
+export type RegisterUserInputDTO = Omit<
+  AuthRegisterDTO,
+  'createdAt' | 'updatedAt'
+>;
 
 export type RegisterUserOutputDTO = OutputDTO<AuthEntitieDTO | null>;
 

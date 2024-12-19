@@ -31,8 +31,8 @@ export default async function (db: Firestore) {
     await paymentStatusRef.doc(method.id).set({
       id: method.id,
       description: method.description,
-      createdAt: `${new Date().getTime()}`,
-      updatedAt: '',
+      createdAt: new Date().getTime(),
+      updatedAt: null,
     });
     console.log(`Documento criado: ${method.description}`);
   }

@@ -42,9 +42,10 @@ describe('Get Person User By Email', () => {
       firstName: 'john',
       lastName: 'doe',
       userId: 'P1fJ3',
-      createdAt: '12121212121212',
+      createdAt: 12121212121212,
       fullName: 'john doe',
       id: '1999',
+      updatedAt: null,
     });
 
     emailValidatorGatewayMock.validate.mockReturnValue(true);

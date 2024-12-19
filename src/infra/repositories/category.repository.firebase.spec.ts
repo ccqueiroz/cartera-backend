@@ -20,32 +20,32 @@ describe('Category Repository Firebase', () => {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
           data: () => ({
             description: 'Restaurante',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
           }),
         },
         {
           id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
           data: () => ({
             description: 'Shopping',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
           }),
         },
         {
           id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
           data: () => ({
             description: 'App Mobilidade',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
           }),
         },
         {
           id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
           data: () => ({
             description: 'Aluguel e Financiamento Residencial',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
           }),
         },
       ],
@@ -58,8 +58,8 @@ describe('Category Repository Firebase', () => {
         expect.objectContaining({
           id: expect.any(String),
           description: expect.any(String),
-          createdAt: expect.any(String),
-          updatedAt: expect.any(String),
+          createdAt: expect.any(Number),
+          updatedAt: expect.any(Number),
         }),
       ),
     );
@@ -69,8 +69,8 @@ describe('Category Repository Firebase', () => {
     expect(result.shift()).toEqual({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
     });
   });
 
@@ -103,8 +103,8 @@ describe('Category Repository Firebase', () => {
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       data: () => ({
         description: 'App Mobilidade',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
       }),
     });
 
@@ -117,8 +117,8 @@ describe('Category Repository Firebase', () => {
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
     expect(result?.description).toBe('App Mobilidade');
-    expect(result?.createdAt).toEqual(expect.any(String));
-    expect(result?.updatedAt).toEqual(expect.any(String));
+    expect(result?.createdAt).toEqual(expect.any(Number));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
   });
 
   it('should be return null when provided id param, but this item not exist in database.', async () => {
