@@ -28,8 +28,8 @@ describe('Person User Repository Firebase', () => {
             firstName: 'Jonh',
             lastName: 'Doe',
             userId: 'abc098',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
             fullName: 'Jonh Doe',
           }),
         },
@@ -48,8 +48,8 @@ describe('Person User Repository Firebase', () => {
     expect(result?.firstName).toBe('Jonh');
     expect(result?.lastName).toBe('Doe');
     expect(result?.userId).toBe('abc098');
-    expect(result?.createdAt).toEqual(expect.any(String));
-    expect(result?.updatedAt).toEqual(expect.any(String));
+    expect(result?.createdAt).toEqual(expect.any(Number));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
     expect(result?.fullName).toBe('Jonh Doe');
   });
 
@@ -91,7 +91,7 @@ describe('Person User Repository Firebase', () => {
       firstName: 'Jonh',
       lastName: 'Doe',
       userId: 'abc098',
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().getTime(),
     });
 
     expect(mockFirestoreAdd).toHaveBeenCalledTimes(1);
@@ -113,7 +113,7 @@ describe('Person User Repository Firebase', () => {
         firstName: 'Jonh',
         lastName: 'Doe',
         userId: 'abc098',
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().getTime(),
       }),
     ).rejects.toThrow(error);
   });
@@ -127,8 +127,8 @@ describe('Person User Repository Firebase', () => {
         firstName: 'Jonh',
         lastName: 'Doe',
         userId: 'abc098',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
         fullName: 'Jonh Doe',
       }),
     });
@@ -145,8 +145,8 @@ describe('Person User Repository Firebase', () => {
     expect(result?.firstName).toBe('Jonh');
     expect(result?.lastName).toBe('Doe');
     expect(result?.userId).toBe('abc098');
-    expect(result?.createdAt).toEqual(expect.any(String));
-    expect(result?.updatedAt).toEqual(expect.any(String));
+    expect(result?.createdAt).toEqual(expect.any(Number));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
     expect(result?.fullName).toBe('Jonh Doe');
   });
 
@@ -205,7 +205,7 @@ describe('Person User Repository Firebase', () => {
     expect(result?.userId).toBe('abc098');
     expect(result?.fullName).toBe('Jonh Doe');
     expect(result?.image).toBeNull();
-    expect(result?.updatedAt).toEqual(expect.any(String));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
   });
 
   it('should be return throw Error if there is a problem with the editPersonUser request', async () => {

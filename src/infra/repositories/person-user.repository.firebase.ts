@@ -125,7 +125,7 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
     return PersonUserEntitie.with({
       id: personId,
       ...personData,
-      updatedAt: updatedAt.toString(),
+      updatedAt,
     });
   }
 
