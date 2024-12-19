@@ -5,6 +5,8 @@ describe('Payment Method Entitie', () => {
     const paymentMethodObject = {
       id: 'Ak982jkk118279',
       description: 'Pago',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
 
     const paymentMethod = PaymentMethodEntitie.with(paymentMethodObject);
@@ -17,8 +19,8 @@ describe('Payment Method Entitie', () => {
     const paymentMethodObject = {
       id: 'Ak982jkk118279',
       description: 'Pago',
-      createdAt: '1724708206117',
-      updatedAt: '1724708206118',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
 
     const paymentMethod = PaymentMethodEntitie.with(paymentMethodObject);

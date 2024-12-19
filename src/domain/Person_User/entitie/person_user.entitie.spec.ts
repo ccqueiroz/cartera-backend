@@ -8,6 +8,8 @@ describe('Person User Entitie', () => {
       lastName: 'Doe',
       fullName: 'Jhon Doe',
       email: 'jhon.doe@gmail.com',
+      createdAt: 121212,
+      updatedAt: null,
     };
 
     const personUser = PersonUserEntitie.with(personUserObject);
@@ -28,8 +30,8 @@ describe('Person User Entitie', () => {
       email: 'jhon.doe@gmail.com',
       id: '1212121',
       image: 'http://image-teste.com',
-      createdAt: '1724708206117',
-      updatedAt: '1724708206118',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
 
     const personUser = PersonUserEntitie.with(personUserObject);
@@ -51,7 +53,8 @@ describe('Person User Entitie', () => {
       firstName: 'Jhon',
       lastName: 'Doe',
       email: 'jhon.doe@gmail.com',
-      createdAt: '1724708206117',
+      createdAt: 1724708206117,
+      updatedAt: null,
     };
 
     const personUser = PersonUserEntitie.create(personUserObject);
@@ -74,7 +77,8 @@ describe('Person User Entitie', () => {
       firstName: 'Jhon',
       lastName: '',
       email: 'jhon.doe@gmail.com',
-      createdAt: '1724708206117',
+      createdAt: 1724708206117,
+      updatedAt: null,
     };
 
     const personUser = PersonUserEntitie.create(personUserObject);

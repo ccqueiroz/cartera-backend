@@ -73,6 +73,7 @@ describe('Auth Repository Firebase', () => {
       lastName: 'Doe',
       createdAt: expect.any(Number),
       lastLoginAt: expect.any(Number),
+      updatedAt: null,
     });
 
     expect(
@@ -149,6 +150,7 @@ describe('Auth Repository Firebase', () => {
       refreshToken: 'refresh-token',
       expirationTime: expect.any(Number),
       lastLoginAt: expect.any(Number),
+      updatedAt: null,
     });
 
     expect(mockFirebaseAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(
@@ -226,7 +228,7 @@ describe('Auth Repository Firebase', () => {
     expect(result).toEqual({
       email: 'jonh.doe@example.com',
       userId: '12345',
-      expirationTime: expect.any(String),
+      expirationTime: expect.any(Number),
     });
 
     expect(mockAdminAuth.verifyIdToken).toHaveBeenCalledWith(

@@ -28,8 +28,8 @@ describe('Get Category By Id', () => {
     categoryUserGatewayMock.getCategoryById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Aluguel e Financiamento Residencial',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
     });
 
     const result = await getCategoryByIdUseCase.execute({

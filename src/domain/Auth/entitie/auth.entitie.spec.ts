@@ -6,10 +6,12 @@ describe('Auth Entitie', () => {
     const authObject = {
       email: 'jonh.doe@gmail.com',
       userId: 'user-id-test',
-      expirationTime: '1724708206117',
+      expirationTime: 1724708206117,
       accessToken: 'access-token-test',
       refreshToken: 'refresh-token-test',
-      lastLoginAt: '1724704559822',
+      lastLoginAt: 1724704559822,
+      createdAt: 1212121212,
+      updatedAt: null,
     };
     const auth = AuthEntitie.with(authObject);
 
@@ -25,14 +27,14 @@ describe('Auth Entitie', () => {
     const authObject: AuthEntitieDTO = {
       email: 'jonh.doe@gmail.com',
       userId: 'user-id-test',
-      expirationTime: '1724708206117',
+      expirationTime: 1724708206117,
       accessToken: 'access-token-test',
       refreshToken: 'refresh-token-test',
-      lastLoginAt: '1724704559822',
+      lastLoginAt: 1724704559822,
       firstName: 'Jonh',
       lastName: 'Doe',
-      createdAt: '1724708206117',
-      updatedAt: '1724708206118',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
     const auth = AuthEntitie.with(authObject);
 

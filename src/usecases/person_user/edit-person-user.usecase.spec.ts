@@ -39,8 +39,8 @@ describe('Edit Person User Usecase', () => {
       image: 'https://example.com/profile.jpg',
       fullName: 'Jonh Doe',
       id: '1666',
-      createdAt: '121222222222222',
-      updatedAt: '122222222222223',
+      createdAt: 121222222222222,
+      updatedAt: 122222222222223,
     });
 
     personUserGatewayMock.getPersonUserById.mockResolvedValue({
@@ -51,8 +51,8 @@ describe('Edit Person User Usecase', () => {
       image: 'https://example.com/profile.jpg',
       fullName: 'Jonh Doe',
       id: '1666',
-      createdAt: '121222222222222',
-      updatedAt: '122222222222223',
+      createdAt: 121222222222222,
+      updatedAt: 122222222222223,
     });
 
     const result = await editPersonUserUseCase.execute({
@@ -65,8 +65,8 @@ describe('Edit Person User Usecase', () => {
         image: 'https://example.com/profile.jpg',
         fullName: 'Jonh Doe',
         id: '1666',
-        createdAt: '121222222222222',
-        updatedAt: '122222222222223',
+        createdAt: 121222222222222,
+        updatedAt: 122222222222223,
       },
     });
 
@@ -80,8 +80,8 @@ describe('Edit Person User Usecase', () => {
         image: 'https://example.com/profile.jpg',
         fullName: 'Jonh Doe',
         id: '1666',
-        createdAt: '121222222222222',
-        updatedAt: '122222222222223',
+        createdAt: 121222222222222,
+        updatedAt: 122222222222223,
       },
     });
 
@@ -106,8 +106,8 @@ describe('Edit Person User Usecase', () => {
           image: 'https://example.com/profile.jpg',
           fullName: 'Jonh Doe',
           id: '1666',
-          createdAt: '121222222222222',
-          updatedAt: '122222222222223',
+          createdAt: 121222222222222,
+          updatedAt: 122222222222223,
         },
       })
       .catch((er) => er);
@@ -136,8 +136,8 @@ describe('Edit Person User Usecase', () => {
           image: 'https://example.com/profile.jpg',
           fullName: 'Jonh Doe',
           id: '1666',
-          createdAt: '121222222222222',
-          updatedAt: '122222222222223',
+          createdAt: 121222222222222,
+          updatedAt: 122222222222223,
         },
       })
       .catch((er) => er);

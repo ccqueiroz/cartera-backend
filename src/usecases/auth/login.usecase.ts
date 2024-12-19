@@ -6,7 +6,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ApiError } from '@/helpers/errors';
 import { OutputDTO } from '@/domain/dtos/output.dto';
 
-export type LoginInputDTO = AuthSignDTO;
+export type LoginInputDTO = Omit<AuthSignDTO, 'updatedAt'>;
 
 export type LoginOutputDTO = OutputDTO<AuthEntitieDTO>;
 
