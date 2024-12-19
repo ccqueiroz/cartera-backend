@@ -5,6 +5,8 @@ describe('Payment Status Entitie', () => {
     const paymentStatusObject = {
       id: '06627d91-1aee-4479-859b-72f01c9ade24',
       description: 'Pago',
+      createdAt: 1724708206117,
+      updatedAt: 1724708206118,
     };
 
     const paymentStatus = PaymentStatusEntitie.with(paymentStatusObject);

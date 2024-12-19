@@ -194,6 +194,8 @@ describe('Person User Repository Firebase', () => {
         userId: 'abc098',
         fullName: 'Jonh Doe',
         image: null,
+        createdAt: 12121212,
+        updatedAt: null,
       },
     });
 
@@ -227,6 +229,8 @@ describe('Person User Repository Firebase', () => {
           userId: 'abc098',
           fullName: 'Jonh Doe',
           image: null,
+          createdAt: 12121212,
+          updatedAt: null,
         },
       }),
     ).rejects.toThrow(error);
