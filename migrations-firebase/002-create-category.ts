@@ -1,218 +1,169 @@
+import { CategoryType } from './../src/domain/Category/enums/category-type.enum';
 import { Firestore } from 'firebase-admin/firestore';
 import { randomUUID } from 'crypto';
 
 const categories = [
+  // Bills
   {
     id: randomUUID(),
-    description: 'Restaurante',
+    description: 'Restaurantes e Alimentação',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Shopping',
+    description: 'Compras e Lazer',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Saúde',
+    description: 'Saúde e Bem-Estar',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Lazer',
+    description: 'Eventos e Festas',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Festa',
+    description: 'Educação e Leitura',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Profissional',
+    description: 'Moradia e Manutenção Residencial',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'App Refeição',
+    description: 'Serviços e Utilidades Públicas',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'App Mobilidade',
+    description: 'Transporte e Mobilidade',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'supermercado',
+    description: 'Seguros e Proteção',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Combustível',
+    description: 'Vestuário e Acessórios',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Educação',
+    description: 'Viagens e Turismo',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Aluguel e/ou Financiamento Residencial',
-  },
-  {
-    id: randomUUID(),
-    description: 'Carta de Crédito',
-  },
-  {
-    id: randomUUID(),
-    description: 'Financiamento',
-  },
-  {
-    id: randomUUID(),
-    description: 'Serviços Públicos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Telefonia/Internet',
-  },
-  {
-    id: randomUUID(),
-    description: 'Seguros',
-  },
-  {
-    id: randomUUID(),
-    description: 'Vestuário',
-  },
-  {
-    id: randomUUID(),
-    description: 'Transporte Público',
-  },
-  {
-    id: randomUUID(),
-    description: 'Viagens',
-  },
-  {
-    id: randomUUID(),
-    description: 'Presentes',
-  },
-  {
-    id: randomUUID(),
-    description: 'Empréstimos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Poupança e Investimentos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Manutenção de Veículos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Manutenção Residencial',
-  },
-  {
-    id: randomUUID(),
-    description: 'Beleza e Cuidados Pessoais',
-  },
-  {
-    id: randomUUID(),
-    description: 'Academia/Fitness',
-  },
-  {
-    id: randomUUID(),
-    description: 'Manutenção Residencial',
-  },
-  {
-    id: randomUUID(),
-    description: 'Livros e Materiais de Leitura',
-  },
-  {
-    id: randomUUID(),
-    description: 'Jogos e Brinquedos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Eletrônicos e Acessórios',
-  },
-  {
-    id: randomUUID(),
-    description: 'Reforma Doméstica',
-  },
-  {
-    id: randomUUID(),
-    description: 'Mobília e Decoração',
-  },
-  {
-    id: randomUUID(),
-    description: 'Jardim e Exteriores',
-  },
-  {
-    id: randomUUID(),
-    description: 'Assistência Médica, Remédios e Afins',
-  },
-  {
-    id: randomUUID(),
-    description: 'Cuidados com Pets',
-  },
-  {
-    id: randomUUID(),
-    description: 'Serviços de Limpeza',
-  },
-  {
-    id: randomUUID(),
-    description: 'Lavanderia e Lavagem a Seco',
+    description: 'Presentes e Doações',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
     description: 'Taxas e Impostos',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Caridade e Doações',
+    description: 'Cuidados com Pets',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Cuidado com Crianças',
+    description: 'Cuidados com Dependentes',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Despesas de Negócios',
+    description: 'Serviços de Limpeza e Lavanderia',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Música e Arte',
+    description: 'Despesas de Negócios e Escritório',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Materiais de Escritório',
+    description: 'Tecnologia e Software',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Tecnologia e Sfotwares',
+    description: 'Serviços Profissionais',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
-    description: 'Serviços Jurídicos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Serviços de Contabilidade',
-  },
-  {
-    id: randomUUID(),
-    description: 'Artigos Esportivos',
-  },
-  {
-    id: randomUUID(),
-    description: 'Eventos e Conferências',
-  },
-  {
-    id: randomUUID(),
-    description: 'Taxas de Associações',
-  },
-  {
-    id: randomUUID(),
-    description: 'Serviços de Streaming',
+    description: 'Artigos Esportivos e Hobbies',
+    type: CategoryType.BILLS,
   },
   {
     id: randomUUID(),
     description: 'Consumos Diversos',
+    type: CategoryType.BILLS,
+  },
+  // Receivables
+  {
+    id: randomUUID(),
+    description: 'Salário/Pró-labore',
+    type: CategoryType.RECEIVABLE,
   },
   {
     id: randomUUID(),
-    description: 'Taxas Bancárias',
+    description: 'Recebimento por Serviço Prestado',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Aluguéis e Rendimentos de Ativos',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Investimentos e Rendimentos Financeiros',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Reembolsos e Indenizações',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Comissões e Bonificações',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Doações e Heranças',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Aportes e Financiamentos',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Receitas de Parcerias e Patrocínios',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Aposentadorias e Pensões',
+    type: CategoryType.RECEIVABLE,
+  },
+  {
+    id: randomUUID(),
+    description: 'Receitas Diversas',
+    type: CategoryType.RECEIVABLE,
   },
 ];
 
@@ -223,6 +174,7 @@ export default async function (db: Firestore) {
     await categoriesRef.doc(method.id).set({
       id: method.id,
       description: method.description,
+      type: method.type,
       createdAt: new Date().getTime(),
       updatedAt: null,
     });
