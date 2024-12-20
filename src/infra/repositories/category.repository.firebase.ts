@@ -29,6 +29,7 @@ export class CategoryRepositoryFirebase implements CategoryGateway {
     }
 
     const data = await query
+      .orderBy('description', 'asc')
       .get()
       .then((response) =>
         response.docs?.map(
