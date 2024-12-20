@@ -5,6 +5,7 @@ const mockFirestoreGet = jest.fn();
 const mockFirestoreAdd = jest.fn();
 const mockFirestoreUpdate = jest.fn();
 const mockFirestoreDelete = jest.fn();
+const mockFirestoreOrderBy = jest.fn();
 
 const mockFirestore = {
   collection: mockFirestoreCollection.mockReturnValue({
@@ -15,9 +16,15 @@ const mockFirestore = {
     }),
     get: mockFirestoreGet,
     where: mockFirestoreWhere.mockReturnValue({
+      orderBy: mockFirestoreOrderBy.mockReturnValue({
+        get: mockFirestoreGet,
+      }),
       get: mockFirestoreGet,
     }),
     add: mockFirestoreAdd,
+    orderBy: mockFirestoreOrderBy.mockReturnValue({
+      get: mockFirestoreGet,
+    }),
   }),
 };
 
