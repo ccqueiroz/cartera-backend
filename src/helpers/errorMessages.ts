@@ -19,4 +19,6 @@ export const ERROR_MESSAGES = {
   PAYMENT_METHOD_NOT_FOUND: 'Método de pagamento não encontrado.',
   CATEGORY_NOT_FOUND: 'Categoria não encontrada.',
   PAYMENT_STATUS_NOT_FOUND: 'Status não encontrada.',
+  CATEGORY_NOT_EXIST:
+    'O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida.',
 } as const;
