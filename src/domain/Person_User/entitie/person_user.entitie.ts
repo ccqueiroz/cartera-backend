@@ -22,7 +22,7 @@ export class PersonUserEntitie {
       email,
       createdAt,
       image: null,
-      updatedAt: createdAt,
+      updatedAt: null,
     });
   }
 
