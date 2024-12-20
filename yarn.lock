@@ -1631,6 +1631,11 @@
   resolved "https://registry.yarnpkg.com/@ungap/structured-clone/-/structured-clone-1.2.0.tgz#756641adb587851b5ccb3e095daf27ae581c8406"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
 
+"@utils-fns/mask@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@utils-fns/mask/-/mask-5.1.0.tgz#5b4bfc74f6f122adccda189926fcec5c52c250dc"
+  integrity sha512-t6dBS3YXdfTi2KYLHJ6Ih0hRNGhC1pu3isvE7074jT6AyVp7+36KUNd/nzq4NbKwxd53AfOeLUsOd/dWTTLulA==
+
 "@utils-fns/validators@^10.0.0":
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/@utils-fns/validators/-/validators-10.0.0.tgz#4b928d113bec9cd9799e6f20aadde5d6534b2939"
