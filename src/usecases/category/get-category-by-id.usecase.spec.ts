@@ -3,6 +3,7 @@ import { GetCategoryByIdUseCase } from './get-category-by-id.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 
 let categoryUserGatewayMock: jest.Mocked<CategoryGateway>;
 
@@ -28,6 +29,7 @@ describe('Get Category By Id', () => {
     categoryUserGatewayMock.getCategoryById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Aluguel e Financiamento Residencial',
+      type: CategoryType.BILLS,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     });
