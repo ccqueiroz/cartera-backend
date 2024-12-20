@@ -20,8 +20,8 @@ export type ReceivableDTO = {
   userId: UserId;
   descriptionReceivable: string;
   fixedReceivable: boolean;
-  receivableDate?: number;
-  icon?: string;
+  receivableDate: number | null;
+  icon: string | null;
   amount: number;
   paymentStatusId: PaymentStatusId;
   paymentStatusDescription: PaymentStatusDescription;
