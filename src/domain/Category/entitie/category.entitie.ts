@@ -17,6 +17,10 @@ export class CategoryEntitie {
     return this.props.description;
   }
 
+  public get type() {
+    return this.props.type;
+  }
+
   public get createdAt() {
     return this.props.createdAt;
   }

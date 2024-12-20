@@ -1,3 +1,4 @@
+import { CategoryType } from '../enums/category-type.enum';
 import { CategoryEntitie } from './category.entitie';
 
 describe('Category Entitie', () => {
@@ -5,6 +6,7 @@ describe('Category Entitie', () => {
     const categoryObject = {
       id: 'Ak982jkk118279',
       description: 'Restaurante',
+      type: CategoryType.BILLS,
       createdAt: 1724708206117,
       updatedAt: 1724708206118,
     };
@@ -13,12 +15,14 @@ describe('Category Entitie', () => {
 
     expect(category.id).toBe(categoryObject.id);
     expect(category.description).toBe(categoryObject.description);
+    expect(category.type).toBe(CategoryType.BILLS);
   });
 
   it('should be return Category instance with all attributes when call static method with of the CategoryEntitie class', () => {
     const categoryObject = {
       id: 'Ak982jkk118279',
       description: 'Restaurante',
+      type: CategoryType.BILLS,
       createdAt: 1724708206117,
       updatedAt: 1724708206118,
     };
@@ -27,6 +31,7 @@ describe('Category Entitie', () => {
 
     expect(category.id).toBe(categoryObject.id);
     expect(category.description).toBe(categoryObject.description);
+    expect(category.type).toBe(categoryObject.type);
     expect(category.createdAt).toBe(categoryObject.createdAt);
     expect(category.updatedAt).toBe(categoryObject.updatedAt);
   });
