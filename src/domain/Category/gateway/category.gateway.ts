@@ -1,6 +1,12 @@
-import { CategoryDTO } from '../dtos/category.dto';
+import {
+  CategoryDTO,
+  GetCategoriesInputDTO,
+  GetCategoryByIdInputDTO,
+} from '../dtos/category.dto';
 
 export interface CategoryGateway {
-  getCategories(): Promise<Array<CategoryDTO>>;
-  getCategoryById({ id }: Pick<CategoryDTO, 'id'>): Promise<CategoryDTO | null>;
+  getCategories(
+    type: Partial<GetCategoriesInputDTO>,
+  ): Promise<Array<CategoryDTO>>;
+  getCategoryById({ id }: GetCategoryByIdInputDTO): Promise<CategoryDTO | null>;
 }
