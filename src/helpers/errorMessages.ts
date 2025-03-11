@@ -21,4 +21,8 @@ export const ERROR_MESSAGES = {
   PAYMENT_STATUS_NOT_FOUND: 'Status não encontrada.',
   CATEGORY_NOT_EXIST:
     'O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida.',
+  INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS:
+    'Categoria, Método de Pagamento ou Status de Pagamento inválidos.',
+  RECEIVABLE_NOT_FOUND:
+    'Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.',
 } as const;
