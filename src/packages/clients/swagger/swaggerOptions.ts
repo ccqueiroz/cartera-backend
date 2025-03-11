@@ -15,6 +15,15 @@ const swaggerDefinition: OAS3Options = {
         description: 'Servidor de Desenvolvimento',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
   },
   apis: ['src/infra/api/express/routes/**/*.route.ts'],
 };
