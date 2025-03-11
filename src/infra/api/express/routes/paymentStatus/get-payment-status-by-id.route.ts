@@ -12,7 +12,9 @@ import { GetPaymentStatusByIdUseCase } from '@/usecases/payment_status/get-payme
  *     summary: Retorna um status pelo ID.
  *     description: Esta rota retorna os detalhes de um status específico no sistema, dado o seu ID.
  *     tags:
- *       - PaymentMethod
+ *       - PaymentStatus
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path

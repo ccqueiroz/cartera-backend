@@ -13,6 +13,8 @@ import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.u
  *     description: Esta rota retorna os detalhes de uma categoria de gastos específico no sistema, dado o seu ID.
  *     tags:
  *       - Category
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path

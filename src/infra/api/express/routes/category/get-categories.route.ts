@@ -14,6 +14,8 @@ import { CategoryType } from '@/domain/Category/enums/category-type.enum';
  *     description: Esta rota retorna uma lista de categorias de gastos disponíveis no sistema.
  *     tags:
  *       - Category
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: type

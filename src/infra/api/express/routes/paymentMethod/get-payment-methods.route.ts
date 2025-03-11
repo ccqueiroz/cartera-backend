@@ -13,6 +13,8 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  *     description: Esta rota retorna uma lista de métodos de pagamento disponíveis no sistema.
  *     tags:
  *       - PaymentMethod
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Retorna a lista de métodos de pagamento com sucesso.

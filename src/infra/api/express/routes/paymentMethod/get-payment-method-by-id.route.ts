@@ -13,6 +13,8 @@ import { GetPaymentMethodByIdUseCase } from '@/usecases/payment_method/get-payme
  *     description: Esta rota retorna os detalhes de um método de pagamento específico no sistema, dado o seu ID.
  *     tags:
  *       - PaymentMethod
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path

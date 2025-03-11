@@ -12,7 +12,9 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  *     summary: Retorna uma lista de status.
  *     description: Esta rota retorna uma lista de status disponíveis no sistema.
  *     tags:
- *       - PaymentStatu
+ *       - PaymentStatus
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Retorna a lista de pagamento com sucesso.
@@ -61,7 +63,7 @@ export class GetPaymentStatusRoute implements Route {
     middlewares: Array<HttpMiddleware> = [],
   ) {
     return new GetPaymentStatusRoute(
-      'payment-method/list-all',
+      'payment-status/list-all',
       HttpMethod.GET,
       getPaymentStatusService,
       middlewares,

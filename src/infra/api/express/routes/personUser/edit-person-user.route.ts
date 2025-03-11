@@ -7,12 +7,14 @@ import { Request, Response, NextFunction } from 'express';
 
 /**
  * @swagger
- *  /api/person-user/edit/{personUserId}:
+ * /api/person-user/edit/{personUserId}:
  *   put:
  *     summary: Edita dados de um person user
  *     description: Esta rota permite a edição de um person user no sistema.
  *     tags:
  *       - PersonUser
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: personUserId
  *         in: path
@@ -92,7 +94,7 @@ import { Request, Response, NextFunction } from 'express';
  *       404:
  *         description: Usuário não encontrado.
  *       429:
- *         description: O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.
+ *         description: O acesso a esta conta foi temporariamente desativado...
  *       500:
  *         description: Erro interno no servidor.
  */
