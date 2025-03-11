@@ -29,7 +29,7 @@ describe('Get Payment Status By Id', () => {
   it('should be call execute method and return the payment status when this id are provided', async () => {
     paymentStatusUserGatewayMock.getPaymentStatusById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      description: 'Cartão de crédito',
+      description: 'A receber',
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     });

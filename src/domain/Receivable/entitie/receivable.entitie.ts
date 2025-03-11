@@ -17,6 +17,8 @@ export class ReceivableEntitie {
     descriptionReceivable,
     fixedReceivable,
     receivableDate,
+    receivalDate = null,
+    receival = false,
     icon,
     amount,
     paymentStatusId,
@@ -35,6 +37,8 @@ export class ReceivableEntitie {
       descriptionReceivable,
       fixedReceivable,
       receivableDate,
+      receivalDate,
+      receival,
       icon,
       amount: maskedAmount,
       paymentStatusId,
@@ -89,6 +93,14 @@ export class ReceivableEntitie {
 
   public get receivableDate() {
     return this.props.receivableDate;
+  }
+
+  public get receivalDate() {
+    return this.props.receivalDate;
+  }
+
+  public get receival() {
+    return this.props.receival;
   }
 
   public get icon() {
