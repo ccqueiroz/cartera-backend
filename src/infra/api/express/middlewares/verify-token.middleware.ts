@@ -51,6 +51,7 @@ export class VerifyTokenMiddleware implements Middleware {
 
         if (
           decodeToken &&
+          decodeToken?.expirationTime &&
           !this.checkIfIsNecessaryCreateNewTokenGateway.execute(
             +decodeToken?.expirationTime,
           )
