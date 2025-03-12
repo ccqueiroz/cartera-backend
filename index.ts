@@ -1,3 +1,7 @@
+import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
+import { MargeSortHelper } from './src/infra/helpers/merge-sort.helpers';
+import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
+import { ReceivablesRepositoryFirebase } from './src/infra/repositories/receivables.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
 import { PaymentStatusRepositoryFirebase } from './src/infra/repositories/payment-status.repository.firebase';
 import { CategoryRoute } from './src/infra/api/express/routes/category/category.routes';
@@ -19,6 +23,9 @@ import {
 } from './src/infra/database/firebase/firebase.database';
 
 function main() {
+  // ----- HELPERS ---------
+  const mergeSort = new MargeSortHelper();
+
   // ----- REPOSITORIES -----
   const authRepository = AuthRepositoryFirebase.create(
     authFirebase,
@@ -34,14 +41,26 @@ function main() {
 
   const paymentStatusRepository =
     PaymentStatusRepositoryFirebase.create(dbFirestore);
+
+  const receivableRepository = ReceivablesRepositoryFirebase.create(
+    dbFirestore,
+    mergeSort,
+  );
   //
+
+  // ------- VALIDATION - CASES -----------
+  const validateCategoryPaymentMethodStatusUseCase =
+    ValidateCategoryPaymentMethodStatusUseCase.create({
+      categoryGateway: categoryRepository,
+      paymentMethodGateway: paymentMethodRepository,
+      paymentStatusGateway: paymentStatusRepository,
+    });
 
   //MIDDLEWARES
   const authVerifyTokenMiddleware = VerifyTokenMiddleware.create(
     authRepository,
     checkIfIsNecessaryCreateNewTokenHelpers,
   );
-
   //
 
   // ----- ROUTES -----
@@ -70,6 +89,12 @@ function main() {
     paymentStatusRepository,
     authVerifyTokenMiddleware,
   ).execute();
+
+  const receivableRoutes = ReceivableRoute.create(
+    receivableRepository,
+    authVerifyTokenMiddleware,
+    validateCategoryPaymentMethodStatusUseCase,
+  ).execute();
   //
 
   //  ----- ERROR MIDDLEWARE -----
@@ -82,6 +107,7 @@ function main() {
       ...paymentMethodRoutes,
       ...categoryRoutes,
       ...paymentStatusRoutes,
+      ...receivableRoutes,
     ],
     errorMiddleware,
   );
