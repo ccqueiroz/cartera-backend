@@ -25,7 +25,10 @@ const swaggerDefinition: OAS3Options = {
       },
     },
   },
-  apis: ['src/infra/api/express/routes/**/*.route.ts'],
+  apis: [
+    'src/packages/clients/swagger/schemas/schemas.swagger.ts',
+    'src/infra/api/express/routes/**/*.route.ts',
+  ],
 };
 
 export default swaggerDefinition;

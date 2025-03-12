@@ -17,32 +17,16 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Retorna a lista de métodos de pagamento com sucesso.
+ *         description: Retorna a lista de categorias de gastos com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: ID do método de pagamento.
- *                     example: PnAvaiVeApVMDZz21lKG94gU1fJ3
- *                   description:
- *                     type: string
- *                     description: Descrição do método de pagamento.
- *                     example: Cartão de crédito
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de criação do método de pagamento.
- *                     example: 2024-01-01T00:00:00Z
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de atualização do método de pagamento.
- *                     example: 2024-01-10T12:00:00Z
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PaymentMethodDTO'
  *       401:
  *         description: Credenciais inválidas.
  *       429:

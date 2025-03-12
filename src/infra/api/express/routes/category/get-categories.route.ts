@@ -23,6 +23,7 @@ import { CategoryType } from '@/domain/Category/enums/category-type.enum';
  *         schema:
  *           type: string
  *           enum: [BILLS, RECEIVABLE]
+ *           example: BILLS
  *         description: Filtra as categorias pelo tipo.
  *     responses:
  *       200:
@@ -30,28 +31,12 @@ import { CategoryType } from '@/domain/Category/enums/category-type.enum';
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: ID da categoria.
- *                     example: PnAvaiVeApVMDZz21lKG94gU1fJ3
- *                   description:
- *                     type: string
- *                     description: Descrição da categoria.
- *                     example: App Mobilidade
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de criação da categoria.
- *                     example: 2024-01-01T00:00:00Z
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de atualização da categoria.
- *                     example: 2024-01-10T12:00:00Z
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/CategoryDTO'
  *       400:
  *         description: O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida.
  *       401:
