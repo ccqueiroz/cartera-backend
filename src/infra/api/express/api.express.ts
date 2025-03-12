@@ -46,11 +46,11 @@ export class ApiExpress implements Api {
   public start(port: number) {
     this.app.listen(port, () => {
       console.log(`Server running on port ${port}`);
-      this.listRoutes();
+      this.listRoutes(port);
     });
   }
 
-  private listRoutes() {
+  private listRoutes(port: number) {
     const routes = this.app._router.stack
       .filter((route: any) => route.route)
       .map((route: any) => {
@@ -60,6 +60,7 @@ export class ApiExpress implements Api {
         };
       });
 
+    console.log('Swagger UI -> ', `http://localhost:${port}${API_DOC}/#/`);
     console.log(routes);
   }
 }
