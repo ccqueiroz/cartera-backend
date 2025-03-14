@@ -1,7 +1,7 @@
 import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
 import { MargeSortHelper } from './src/infra/helpers/merge-sort.helpers';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
-import { ReceivablesRepositoryFirebase } from './src/infra/repositories/receivables.firebase';
+import { ReceivablesRepositoryFirebase } from './src/infra/repositories/receivables.repository.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
 import { PaymentStatusRepositoryFirebase } from './src/infra/repositories/payment-status.repository.firebase';
 import { CategoryRoute } from './src/infra/api/express/routes/category/category.routes';
