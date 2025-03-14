@@ -31,6 +31,8 @@ describe('Receivable Entitie', () => {
       categoryDescription: 'Salário/Pró-labore',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Depósito',
+      receivalDate: null,
+      receival: false,
       createdAt: new Date().getTime(),
     };
 
@@ -81,6 +83,8 @@ describe('Receivable Entitie', () => {
       categoryDescription: 'Salário/Pró-labore',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Depósito',
+      receivalDate: null,
+      receival: false,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     };
@@ -132,6 +136,8 @@ describe('Receivable Entitie', () => {
       categoryDescription: 'Salário/Pró-labore',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Depósito',
+      receivalDate: null,
+      receival: false,
       createdAt: new Date().getTime(),
     };
 
