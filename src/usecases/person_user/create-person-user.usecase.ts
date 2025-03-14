@@ -62,6 +62,13 @@ export class CreatePersonUserUseCase
       createdAt,
     });
 
+    if (
+      !personUser ||
+      !Object.prototype.hasOwnProperty.call(personUser, 'id')
+    ) {
+      return { data: null };
+    }
+
     return {
       data: {
         id: personUser?.id,

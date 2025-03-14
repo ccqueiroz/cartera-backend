@@ -13,6 +13,8 @@ import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.u
  *     description: Esta rota retorna os detalhes de uma categoria de gastos específico no sistema, dado o seu ID.
  *     tags:
  *       - Category
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
@@ -29,24 +31,8 @@ import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.u
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
- *                   description: ID da categoria.
- *                   example: PnAvaiVeApVMDZz21lKG94gU1fJ3
- *                 description:
- *                   type: string
- *                   description: Descrição da categoria.
- *                   example: App Mobilidade
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *                   description: Data de criação da categoria.
- *                   example: 2024-01-01T00:00:00Z
- *                 updatedAt:
- *                   type: string
- *                   format: date-time
- *                   description: Data de atualização da categoria.
- *                   example: 2024-01-10T12:00:00Z
+ *                 data:
+ *                  $ref: '#/components/schemas/CategoryDTO'
  *       401:
  *         description: Credenciais inválidas.
  *       404:

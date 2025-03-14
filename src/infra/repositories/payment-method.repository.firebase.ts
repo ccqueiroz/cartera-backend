@@ -49,8 +49,17 @@ export class PaymentMethodRepositoryFirebase implements PaymentMethodGateway {
         ErrorsFirebase.presenterError(error);
       });
 
-    return paymentMethod
+    const response = paymentMethod
       ? PaymentMethodEntitie.with({ ...paymentMethod })
       : null;
+
+    return response
+      ? {
+          id: response.id,
+          description: response.description,
+          createdAt: response.createdAt,
+          updatedAt: response.updatedAt,
+        }
+      : response;
   }
 }

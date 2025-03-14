@@ -1,9 +1,11 @@
-import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
+import {
+  CategoryDTO,
+  GetCategoriesInputDTO,
+} from '@/domain/Category/dtos/category.dto';
 import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
 import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
-
 export class CategoryRepositoryFirebase implements CategoryGateway {
   private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
   private collection = 'Category';
@@ -16,8 +18,18 @@ export class CategoryRepositoryFirebase implements CategoryGateway {
     return new CategoryRepositoryFirebase(db);
   }
 
-  public async getCategories(): Promise<Array<CategoryDTO>> {
-    const data = await this.dbCollection
+  public async getCategories({
+    type,
+  }: Partial<GetCategoriesInputDTO> = {}): Promise<Array<CategoryDTO>> {
+    let query = this
+      .dbCollection as unknown as firebase.firestore.Query<firebase.firestore.DocumentData>;
+
+    if (type) {
+      query = query.where('type', '==', type);
+    }
+
+    const data = await query
+      .orderBy('description', 'asc')
       .get()
       .then((response) =>
         response.docs?.map(

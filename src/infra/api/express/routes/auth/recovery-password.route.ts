@@ -25,7 +25,7 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *                 type: string
  *                 example: usuario@example.com
  *     responses:
- *       200:
+ *       204:
  *         description: E-mail enviado com sucesso.
  *         content: {}
  *       401:
@@ -63,7 +63,7 @@ export class RecoveryPasswordRoute implements Route {
         const { email } = request.body;
 
         await this.recoveryPasswordService.execute({ email });
-        response.status(200).send();
+        response.status(204).send();
       } catch (error) {
         next(
           error instanceof ApiError

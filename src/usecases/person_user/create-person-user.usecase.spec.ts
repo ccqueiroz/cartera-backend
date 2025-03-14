@@ -58,8 +58,10 @@ describe('Create Person User Usecase', () => {
       createdAt: 12121212121212,
     });
 
-    expect(result.data.fullName).toBe('john doe');
-    expect(result.data.id).toBe('P1fJ3');
+    expect(result.data).not.toBeNull();
+
+    expect(result.data?.fullName).toBe('john doe');
+    expect(result.data?.id).toBe('P1fJ3');
   });
 
   it('should call execute method when not valid email are provided', async () => {
@@ -123,5 +125,25 @@ describe('Create Person User Usecase', () => {
     });
 
     expect(personUserGatewayMock.createPersonUser).not.toHaveBeenCalled();
+  });
+
+  it('should be return null when the createPersonUser repository to send the response without "id"', async () => {
+    emailValidatorGatewayMock.validate.mockReturnValue(true);
+
+    personUserGatewayMock.createPersonUser.mockResolvedValue({
+      fullName: 'john doe',
+    });
+
+    personUserGatewayMock.getPersonUserByEmail.mockResolvedValue(null);
+
+    const result = await createPersonUserUseCase.execute({
+      email: 'jonh.doe@example.com',
+      firstName: 'john',
+      lastName: 'doe',
+      userId: 'P1fJ3',
+      createdAt: 12121212121212,
+    });
+
+    expect(result.data).toBeNull();
   });
 });

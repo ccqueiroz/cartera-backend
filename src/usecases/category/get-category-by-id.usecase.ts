@@ -1,11 +1,12 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { Usecase } from '../usecase';
-import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
+import {
+  CategoryDTO,
+  GetCategoryByIdInputDTO,
+} from '@/domain/Category/dtos/category.dto';
 import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-
-export type GetCategoryByIdInputDTO = Pick<CategoryDTO, 'id'>;
 
 export type GetCategoryByIdOutputDTO = OutputDTO<CategoryDTO | null>;
 

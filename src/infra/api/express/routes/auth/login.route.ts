@@ -40,26 +40,7 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *                   type: boolean
  *                   example: true
  *                 data:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                       example: usuario@example.com
- *                     userId:
- *                       type: string
- *                       example: PnAvaiVeApVMDZz21lKG94gU1fJ3
- *                     accessToken:
- *                       type: string
- *                       example: eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ0MjY5YTE3MzBlNTA3MTllNmIxNjA2ZTQyYzNhYjMyYjEyODA0NDkiLCJ0eXAiOiJKV1QifQ...
- *                     refreshToken:
- *                       type: string
- *                       example: AMf-vBzHWb5CVzqi280Ai5zLoOyVzK-8QiQSsvfBBZ8Sp1yuiOr5ioekiz5y27v_H1rI8KgM7jWY7um7kFrjjme3jkFx6pWlReWS...
- *                     expirationTime:
- *                       type: integer
- *                       example: 1724148470215
- *                     lastLoginAt:
- *                       type: string
- *                       example: 1724144869975
+ *                   $ref: '#/components/schemas/AuthDTO'
  *       401:
  *         description: Credenciais Inválidas.
  *       429:

@@ -68,7 +68,7 @@ describe('Person User Entitie', () => {
     expect(personUser.email).toBe(personUserObject.email);
     expect(personUser.createdAt).toBe(personUserObject.createdAt);
     expect(personUser.image).toBeNull();
-    expect(personUser.updatedAt).toBe(personUserObject.createdAt);
+    expect(personUser.updatedAt).toBeNull();
   });
 
   it('should be return full name just with first name when create the instante of Person User and the attribute lastName dont be provider', () => {

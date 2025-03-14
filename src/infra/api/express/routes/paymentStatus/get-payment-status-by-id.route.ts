@@ -12,12 +12,13 @@ import { GetPaymentStatusByIdUseCase } from '@/usecases/payment_status/get-payme
  *     summary: Retorna um status pelo ID.
  *     description: Esta rota retorna os detalhes de um status específico no sistema, dado o seu ID.
  *     tags:
- *       - PaymentMethod
+ *       - PaymentStatus
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
- *         description: ID do status.
  *         schema:
  *           type: string
  *           example: 0e8f775d-07c1-4ca1-abea-57157ff173b0
@@ -29,24 +30,8 @@ import { GetPaymentStatusByIdUseCase } from '@/usecases/payment_status/get-payme
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
- *                   description: ID do status.
- *                   example: 0e8f775d-07c1-4ca1-abea-57157ff173b0
- *                 description:
- *                   type: string
- *                   description: Descrição do status.
- *                   example: Pago
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *                   description: Data de criação do status.
- *                   example: 2024-01-01T00:00:00Z
- *                 updatedAt:
- *                   type: string
- *                   format: date-time
- *                   description: Data de atualização do status.
- *                   example: 2024-01-10T12:00:00Z
+ *                 data:
+ *                  $ref: '#/components/schemas/PaymentStatusDTO'
  *       401:
  *         description: Credenciais inválidas.
  *       404:

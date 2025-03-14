@@ -12,35 +12,21 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  *     summary: Retorna uma lista de status.
  *     description: Esta rota retorna uma lista de status disponíveis no sistema.
  *     tags:
- *       - PaymentStatu
+ *       - PaymentStatus
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Retorna a lista de pagamento com sucesso.
+ *         description: Retorna a lista de categorias de gastos com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     description: ID do método do status.
- *                     example: 0e8f775d-07c1-4ca1-abea-57157ff173b0
- *                   description:
- *                     type: string
- *                     description: Descrição do método do status.
- *                     example: Pago
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de criação do método do status.
- *                     example: 2024-01-01T00:00:00Z
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: Data de atualização do método do status.
- *                     example: 2024-01-10T12:00:00Z
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PaymentStatusDTO'
  *       401:
  *         description: Credenciais inválidas.
  *       429:
@@ -61,7 +47,7 @@ export class GetPaymentStatusRoute implements Route {
     middlewares: Array<HttpMiddleware> = [],
   ) {
     return new GetPaymentStatusRoute(
-      'payment-method/list-all',
+      'payment-status/list-all',
       HttpMethod.GET,
       getPaymentStatusService,
       middlewares,
