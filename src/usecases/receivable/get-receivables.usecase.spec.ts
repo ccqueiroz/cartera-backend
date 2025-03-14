@@ -100,6 +100,7 @@ describe('Get Receivables UseCase', () => {
       totalPages: 1,
       page: 0,
       size: 10,
+      ordering: null,
     });
 
     const result = await getReceivablesUseCase.execute({
@@ -123,6 +124,7 @@ describe('Get Receivables UseCase', () => {
       totalPages: 1,
       page: 0,
       size: 10,
+      ordering: { amount: SortOrder.ASC },
     });
 
     const initialDate = new Date().getTime();
@@ -185,6 +187,7 @@ describe('Get Receivables UseCase', () => {
       totalPages: 1,
       page: 0,
       size: 10,
+      ordering: { amount: SortOrder.DESC },
     });
 
     const exactlyDate = new Date().getTime();
@@ -193,7 +196,7 @@ describe('Get Receivables UseCase', () => {
       size: 10,
       page: 0,
       sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
-      origin: { amount: SortOrder.DESC },
+      ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
         fixedReceivable: true,
@@ -221,6 +224,7 @@ describe('Get Receivables UseCase', () => {
       totalPages: 1,
       page: 0,
       size: 10,
+      ordering: null,
     });
 
     const result = await getReceivablesUseCase.execute({
