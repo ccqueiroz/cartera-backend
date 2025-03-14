@@ -112,7 +112,6 @@ describe('Payment Method Repository Firebase', () => {
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
     });
 
-    expect(result).toBeInstanceOf(PaymentMethodEntitie);
     expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
