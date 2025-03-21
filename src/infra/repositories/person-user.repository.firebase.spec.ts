@@ -1,25 +1,20 @@
-import {
-  mockFirestoreAdd,
-  mockFirestoreDelete,
-  mockFirestoreGet,
-  mockFirestoreUpdate,
-} from '@/test/mocks/firebase.mock';
 import { PersonUserRepositoryFirebase } from './person-user.repository.firebase';
-import firebase from 'firebase';
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { dbFirestore } from '../database/firebase/firebase.database';
+import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 describe('Person User Repository Firebase', () => {
   let personUserRepo: PersonUserRepositoryFirebase;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const dbFirestoreMock = firebase.firestore();
-    personUserRepo = PersonUserRepositoryFirebase.create(dbFirestoreMock);
+
+    personUserRepo = PersonUserRepositoryFirebase.create(dbFirestore);
   });
 
   it('should be return user data if email found when this search to be by email', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().get.mockResolvedValueOnce({
       docs: [
         {
           id: '123',
@@ -41,7 +36,7 @@ describe('Person User Repository Firebase', () => {
     });
 
     expect(result).toBeInstanceOf(PersonUserEntitie);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.where().get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('123');
     expect(result?.email).toBe('jonh.doe@example.com');
@@ -54,7 +49,7 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be return null if email not found', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().get.mockResolvedValueOnce({
       docs: [],
     });
 
@@ -74,7 +69,7 @@ describe('Person User Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.where().get.mockRejectedValueOnce(error);
 
     await expect(
       personUserRepo.getPersonUserByEmail({
@@ -84,7 +79,7 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be create a new person user when all parameters are passed correctly', async () => {
-    mockFirestoreAdd.mockResolvedValueOnce({ id: '12345' });
+    firestore.add.mockResolvedValueOnce({ id: '12345' });
 
     const result = await personUserRepo.createPersonUser({
       email: 'jonh.doe@example.com',
@@ -94,7 +89,7 @@ describe('Person User Repository Firebase', () => {
       createdAt: new Date().getTime(),
     });
 
-    expect(mockFirestoreAdd).toHaveBeenCalledTimes(1);
+    expect(firestore.add).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ id: '12345', fullName: 'Jonh Doe' });
   });
 
@@ -105,7 +100,7 @@ describe('Person User Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreAdd.mockRejectedValueOnce(error);
+    firestore.add.mockRejectedValueOnce(error);
 
     await expect(
       personUserRepo.createPersonUser({
@@ -119,7 +114,7 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be return user data if id found when this search to be by id', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.doc().get.mockResolvedValueOnce({
       exists: true,
       id: '123',
       data: () => ({
@@ -138,7 +133,7 @@ describe('Person User Repository Firebase', () => {
     });
 
     expect(result).toBeInstanceOf(PersonUserEntitie);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('123');
     expect(result?.email).toBe('jonh.doe@example.com');
@@ -151,7 +146,7 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be return user null if id not found when this search to be by id', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.doc().get.mockResolvedValueOnce({
       exists: false,
       id: null,
       data: () => null,
@@ -162,7 +157,7 @@ describe('Person User Repository Firebase', () => {
     });
 
     expect(result).not.toBeInstanceOf(PersonUserEntitie);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().get).toHaveBeenCalledTimes(1);
     expect(result).toBeNull();
   });
 
@@ -173,7 +168,7 @@ describe('Person User Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.doc().get.mockRejectedValueOnce(error);
 
     await expect(
       personUserRepo.getPersonUserById({
@@ -183,7 +178,7 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be update a person user when all parameters are passed correctly', async () => {
-    mockFirestoreUpdate.mockResolvedValueOnce({});
+    firestore.doc().update.mockResolvedValueOnce({});
 
     const result = await personUserRepo.editPersonUser({
       personId: '1666',
@@ -199,7 +194,7 @@ describe('Person User Repository Firebase', () => {
       },
     });
 
-    expect(mockFirestoreUpdate).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().update).toHaveBeenCalledTimes(1);
     expect(result?.id).toBe('1666');
     expect(result?.email).toBe('jonh.doe@example.com');
     expect(result?.firstName).toBe('Jonh');
@@ -217,7 +212,7 @@ describe('Person User Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreUpdate.mockRejectedValueOnce(error);
+    firestore.doc().update.mockRejectedValueOnce(error);
 
     await expect(
       personUserRepo.editPersonUser({
@@ -237,13 +232,13 @@ describe('Person User Repository Firebase', () => {
   });
 
   it('should be delete a person user when the id param to past correctly', async () => {
-    mockFirestoreDelete.mockResolvedValueOnce({});
+    firestore.doc().delete.mockResolvedValueOnce({});
 
     await personUserRepo.deletePersonUser({
       id: '1666',
     });
 
-    expect(mockFirestoreDelete).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().delete).toHaveBeenCalledTimes(1);
   });
 
   it('should be return throw Error if there is a problem with the deletePersonUser request', async () => {
@@ -253,7 +248,7 @@ describe('Person User Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreDelete.mockRejectedValueOnce(error);
+    firestore.doc().delete.mockRejectedValueOnce(error);
 
     await expect(
       personUserRepo.deletePersonUser({
