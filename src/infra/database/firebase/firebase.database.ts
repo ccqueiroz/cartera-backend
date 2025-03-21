@@ -1,13 +1,10 @@
-import admin from 'firebase-admin';
-import firebase from 'firebase';
-import {
-  clientFireBase,
-  clientFireBaseAdmin,
-} from '@/packages/clients/firebase';
+import * as admin from 'firebase-admin';
 
-const dbFirestore: firebase.firestore.Firestore = clientFireBase.firestore();
+import { clientFireBaseAdmin } from '@/packages/clients/firebase';
 
-const authFirebase: firebase.auth.Auth = clientFireBase.auth();
+const dbFirestore: admin.firestore.Firestore = clientFireBaseAdmin.firestore();
+
+const authFirebase: admin.auth.Auth = clientFireBaseAdmin.auth();
 
 const adminFirebase: admin.app.App = clientFireBaseAdmin;
 
