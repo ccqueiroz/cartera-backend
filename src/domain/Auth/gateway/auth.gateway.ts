@@ -7,12 +7,19 @@ export interface AuthGateway {
     firstName,
     lastName,
   }: Omit<AuthRegisterDTO, 'updatedAt'>): Promise<
-    AuthEntitieDTO & { id?: string }
+    Omit<
+      AuthEntitieDTO,
+      'accessToken' | 'refreshToken' | 'expirationTime' | 'lastLoginAt'
+    > & {
+      id?: string;
+    }
   >;
   loginWithEmail({
     email,
     password,
-  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<AuthEntitieDTO>;
+  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<
+    Omit<AuthEntitieDTO, 'lastLoginAt' | 'createdAt' | 'updatedAt'>
+  >;
   recoveryPassword({ email }: Pick<AuthEntitieDTO, 'email'>): Promise<void>;
   signout({ userId }: Pick<AuthEntitieDTO, 'userId'>): Promise<void>;
   getUserByEmail({
