@@ -1,11 +1,4 @@
 import { MergeSortGateway } from './../../domain/Auth/helpers/merge-sort.gateway';
-import {
-  mockFirestoreAdd,
-  mockFirestoreDelete,
-  mockFirestoreGet,
-  mockFirestoreUpdate,
-} from '@/test/mocks/firebase.mock';
-import firebase from 'firebase';
 import { ReceivablesRepositoryFirebase } from './receivables.repository.firebase';
 import { MargeSortHelper } from '../helpers/merge-sort.helpers';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
@@ -13,6 +6,8 @@ import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { dbFirestore } from '../database/firebase/firebase.database';
+import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 const receivablesItemsMocks = [
   {
@@ -91,16 +86,15 @@ describe('Receivable Repository Firebase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const dbFirestoreMock = firebase.firestore();
 
     receivableRepo = ReceivablesRepositoryFirebase.create(
-      dbFirestoreMock,
+      dbFirestore,
       mergeSortMock,
     );
   });
 
   it('should be return Receivables list when exist items in database', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -119,7 +113,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should return the number of items that specified in size attribute of the request', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -138,7 +132,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should return the page that specified in page attribute of the request', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -157,7 +151,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be ordering by "asc" or "desc" of the attribute passed in ordering param.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -183,7 +177,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be ordering by "asc" or "desc" of the attribute createdAt in ordering param.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -203,7 +197,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be search with all parameters availables (sort, sortByReceivables, searchByDate, ordering).', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -234,7 +228,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be search with searchByDate parameter with initial and final date request.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivablesItemsMocks,
     });
 
@@ -265,7 +259,7 @@ describe('Receivable Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.where().orderBy().get.mockRejectedValueOnce(error);
 
     await expect(
       receivableRepo.getReceivables({ page: 0, size: 10, userId: userIdMock }),
@@ -273,20 +267,23 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be return Receivable item when exist item in database', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
-      exists: true,
-      id: receivablesItemsMocks[0].id,
-      data: () => ({
-        ...receivablesItemsMocks[0].data(),
-      }),
-    });
+    firestore
+      .where()
+      .orderBy()
+      .get.mockResolvedValueOnce({
+        exists: true,
+        id: receivablesItemsMocks[0].id,
+        data: () => ({
+          ...receivablesItemsMocks[0].data(),
+        }),
+      });
 
     const result = await receivableRepo.getReceivableById({
       id: receivablesItemsMocks[0].id,
       userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
     });
 
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.where().orderBy().get).toHaveBeenCalledTimes(1);
     expect(result).not.toBeNull();
     expect(result?.id).toBe(receivablesItemsMocks[0].id);
     expect(result?.amount).toBe(receivablesItemsMocks[0].data().amount);
@@ -297,7 +294,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be return null when provided id param, but this item not exist in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.doc().get.mockResolvedValueOnce({
       exists: false,
       id: null,
       data: () => null,
@@ -308,7 +305,7 @@ describe('Receivable Repository Firebase', () => {
       userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
     });
 
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().get).toHaveBeenCalledTimes(1);
     expect(result).toBeNull();
   });
 
@@ -330,7 +327,7 @@ describe('Receivable Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.where().orderBy().get.mockRejectedValueOnce(error);
 
     await expect(
       receivableRepo.getReceivableById({
@@ -341,7 +338,7 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be create a new Receivable when all parameters are passed correctly', async () => {
-    mockFirestoreAdd.mockResolvedValueOnce({
+    firestore.add.mockResolvedValueOnce({
       id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
     });
 
@@ -352,7 +349,7 @@ describe('Receivable Repository Firebase', () => {
       receivableData: dataCreate,
     });
 
-    expect(mockFirestoreAdd).toHaveBeenCalledTimes(1);
+    expect(firestore.add).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0' });
   });
 
@@ -363,7 +360,7 @@ describe('Receivable Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreAdd.mockRejectedValueOnce(error);
+    firestore.add.mockRejectedValueOnce(error);
 
     const dataCreate = { ...receivablesItemsMocks[0].data() };
 
@@ -391,13 +388,13 @@ describe('Receivable Repository Firebase', () => {
       statusCode: 401,
     });
 
-    expect(mockFirestoreAdd).toHaveBeenCalledTimes(0);
+    expect(firestore.add).toHaveBeenCalledTimes(0);
   });
 
   it('should be update a Receivable when all parameters are passed correctly', async () => {
-    mockFirestoreUpdate.mockResolvedValueOnce({});
+    firestore.doc().update.mockResolvedValueOnce({});
 
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.doc().get.mockResolvedValueOnce({
       exists: true,
       id: receivablesItemsMocks[0].id,
       data: () => ({
@@ -417,8 +414,8 @@ describe('Receivable Repository Firebase', () => {
       userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
     });
 
-    expect(mockFirestoreUpdate).toHaveBeenCalledTimes(1);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().update).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().get).toHaveBeenCalledTimes(1);
     expect(result).not.toBeNull();
     expect(result?.id).toBe(receivablesItemsMocks[0].id);
     expect(result?.amount).toBe(receivablesItemsMocks[0].data().amount);
@@ -429,28 +426,36 @@ describe('Receivable Repository Firebase', () => {
   });
 
   it('should be throw an error if the userId to be different of the receivable item in updateReceivable', async () => {
-    const dataCreate = {
+    const dataUpdate = {
       id: receivablesItemsMocks[0].id,
       ...receivablesItemsMocks[0].data(),
     };
 
+    firestore.doc().get.mockResolvedValueOnce({
+      exists: true,
+      id: receivablesItemsMocks[0].id,
+      data: () => ({
+        ...receivablesItemsMocks[0].data(),
+      }),
+    });
+
     const error = await receivableRepo
       .updateReceivable({
         receivableId: receivablesItemsMocks[0].id,
-        receivableData: dataCreate,
+        receivableData: dataUpdate,
         userId: 'a1b2c3d4-e5f6',
       })
       .catch((err) => err);
 
-    expect(error).toBeInstanceOf(TypeError);
+    expect(error).toBeInstanceOf(ApiError);
 
-    expect(mockFirestoreAdd).toHaveBeenCalledTimes(0);
+    expect(firestore.doc().update).toHaveBeenCalledTimes(0);
   });
 
   it('should be delete a Receivable when all parameters to past correctly', async () => {
-    mockFirestoreDelete.mockResolvedValueOnce({});
+    firestore.doc().delete.mockResolvedValueOnce({});
 
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.doc().get.mockResolvedValueOnce({
       exists: true,
       id: receivablesItemsMocks[0].id,
       data: () => ({
@@ -463,7 +468,7 @@ describe('Receivable Repository Firebase', () => {
       userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
     });
 
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
-    expect(mockFirestoreDelete).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().get).toHaveBeenCalledTimes(1);
+    expect(firestore.doc().delete).toHaveBeenCalledTimes(1);
   });
 });
