@@ -1,20 +1,20 @@
-import { mockFirestoreGet } from '@/test/mocks/firebase.mock';
 import { PaymentStatusRepositoryFirebase } from './payment-status.repository.firebase';
-import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
+import { dbFirestore } from '../database/firebase/firebase.database';
+import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 describe('Payment Status Repository Firebase', () => {
   let paymentStatusRepo: PaymentStatusRepositoryFirebase;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const dbFirestoreMock = firebase.firestore();
-    paymentStatusRepo = PaymentStatusRepositoryFirebase.create(dbFirestoreMock);
+
+    paymentStatusRepo = PaymentStatusRepositoryFirebase.create(dbFirestore);
   });
 
   it('should be return Payment Status list when exist items in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       docs: [
         {
           id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
@@ -63,7 +63,7 @@ describe('Payment Status Repository Firebase', () => {
         }),
       ),
     );
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result.length).toEqual(4);
     expect(result.shift()).toEqual({
@@ -75,14 +75,14 @@ describe('Payment Status Repository Firebase', () => {
   });
 
   it('should be return Payment Status empty list when not exist items in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       docs: [],
     });
 
     const result = await paymentStatusRepo.getPaymentStatus();
 
     expect(result.length).toEqual(0);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
   it('should be return throw Error if there is a problem with the getPaymentStatus request', async () => {
@@ -92,13 +92,13 @@ describe('Payment Status Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.get.mockRejectedValueOnce(error);
 
     await expect(paymentStatusRepo.getPaymentStatus()).rejects.toThrow(error);
   });
 
   it('should be return Payment Status by id when exist this item in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       exists: true,
       id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
       data: () => ({
@@ -113,7 +113,7 @@ describe('Payment Status Repository Firebase', () => {
     });
 
     expect(result).toBeInstanceOf(PaymentStatusEntitie);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('0e8f775d-07c1-4ca1-abea-57157ff173b0');
     expect(result?.description).toBe('Pago');
@@ -122,7 +122,7 @@ describe('Payment Status Repository Firebase', () => {
   });
 
   it('should be return null when provided id param, but this item not exist in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       exists: false,
       id: null,
       data: () => null,
@@ -134,7 +134,7 @@ describe('Payment Status Repository Firebase', () => {
 
     expect(result).not.toBeInstanceOf(PaymentStatusEntitie);
     expect(result).toBeNull();
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
   it('should be return throw Error if there is a problem with the getPaymentStatusById request', async () => {
@@ -144,7 +144,7 @@ describe('Payment Status Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.get.mockRejectedValueOnce(error);
 
     await expect(
       paymentStatusRepo.getPaymentStatusById({

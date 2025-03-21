@@ -1,59 +1,62 @@
-import {
-  clientFireBase,
-  clientFireBaseAdmin,
-} from '@/packages/clients/firebase';
+import { authFirebase } from '../database/firebase/firebase.database';
 import { AuthRepositoryFirebase } from './auth.repository.firebase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { auth } from '@/test/mocks/firebase-admin.mock';
+import {
+  ResetPasswordUrl,
+  signInUrl,
+} from '@/packages/clients/firebase/urlToAuthFirebase';
 
 describe('Auth Repository Firebase', () => {
   let authRepo: AuthRepositoryFirebase;
-  let mockFirebaseAuth: jest.Mocked<any>;
-  let mockAdminAuth: jest.Mocked<any>;
+
+  const mockFetch = jest.fn();
+  global.fetch = mockFetch as jest.MockedFunction<typeof fetch>;
 
   beforeEach(() => {
-    mockFirebaseAuth = {
-      createUserWithEmailAndPassword: jest.fn(),
-      signInWithEmailAndPassword: jest.fn(),
-      sendPasswordResetEmail: jest.fn(),
-    };
+    jest.clearAllMocks();
 
-    mockAdminAuth = {
-      revokeRefreshTokens: jest.fn(),
-      getUserByEmail: jest.fn(),
-      deleteUser: jest.fn(),
-      verifyIdToken: jest.fn(),
-      createCustomToken: jest.fn(),
-    };
-
-    jest.spyOn(clientFireBase, 'auth').mockReturnValue(mockFirebaseAuth);
-    jest.spyOn(clientFireBaseAdmin, 'auth').mockReturnValue(mockAdminAuth);
-
-    authRepo = AuthRepositoryFirebase.create(
-      clientFireBase.auth(),
-      clientFireBaseAdmin,
-    );
+    authRepo = AuthRepositoryFirebase.create(authFirebase);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('should be register a user with email and password', async () => {
-    mockFirebaseAuth.createUserWithEmailAndPassword.mockResolvedValue({
-      user: {
-        email: 'jonh.doe@example.com',
+    auth.createUser.mockResolvedValue({
+      toJSON: () => ({
         uid: '12345',
-        stsTokenManager: {
-          accessToken: 'access-token',
-          refreshToken: 'refresh-token',
-          expirationTime: Date.now(),
+        email: 'jonh.doe@example.com',
+        emailVerified: false,
+        displayName: undefined,
+        photoURL: undefined,
+        phoneNumber: undefined,
+        disabled: false,
+        metadata: {
+          lastSignInTime: null,
+          creationTime: 'Thu, 20 Mar 2025 19:45:36 GMT',
+          lastRefreshTime: null,
         },
-        createdAt: Date.now(),
-        lastLoginAt: Date.now(),
-      },
+        passwordHash: undefined,
+        passwordSalt: undefined,
+        customClaims: undefined,
+        tokensValidAfterTime: 'Thu, 20 Mar 2025 19:45:36 GMT',
+        tenantId: undefined,
+        providerData: [
+          {
+            uid: 'jonh.doe@example.com',
+            displayName: undefined,
+            email: 'jonh.doe@example.com',
+            photoURL: undefined,
+            providerId: 'password',
+            phoneNumber: undefined,
+          },
+        ],
+      }),
     });
 
     const result = await authRepo.registerWithEmail({
@@ -66,27 +69,22 @@ describe('Auth Repository Firebase', () => {
     expect(result).toEqual({
       email: 'jonh.doe@example.com',
       userId: '12345',
-      accessToken: 'access-token',
-      refreshToken: 'refresh-token',
-      expirationTime: expect.any(Number),
       firstName: 'John',
       lastName: 'Doe',
       createdAt: expect.any(Number),
-      lastLoginAt: expect.any(Number),
       updatedAt: null,
     });
 
-    expect(
-      mockFirebaseAuth.createUserWithEmailAndPassword,
-    ).toHaveBeenCalledWith('jonh.doe@example.com', '121355');
+    expect(auth.createUser).toHaveBeenCalledWith({
+      email: 'jonh.doe@example.com',
+      password: '121355',
+    });
   });
 
   it('should be throw an error if user is not found during registration', async () => {
     const error = new ApiError('auth/user-not-found', 404);
 
-    mockFirebaseAuth.createUserWithEmailAndPassword.mockRejectedValueOnce(
-      error,
-    );
+    auth.createUser.mockRejectedValueOnce(error);
 
     jest.spyOn(ErrorsFirebase, 'presenterError').mockImplementation(() => {
       throw error;
@@ -101,13 +99,14 @@ describe('Auth Repository Firebase', () => {
       }),
     ).rejects.toThrow(ApiError);
 
-    expect(
-      mockFirebaseAuth.createUserWithEmailAndPassword,
-    ).toHaveBeenCalledWith('nonexistent@gmail.com', '121355');
+    expect(auth.createUser).toHaveBeenCalledWith({
+      email: 'nonexistent@gmail.com',
+      password: '121355',
+    });
   });
 
-  it('should throw a USER_NOT_FOUND error if auth?.user is not present in registerWithEmail method', async () => {
-    mockFirebaseAuth.createUserWithEmailAndPassword.mockResolvedValueOnce(null);
+  it('should throw a INTERNAL_SERVER_ERROR error if auth?.user is not present in registerWithEmail method', async () => {
+    auth.createUser.mockResolvedValueOnce(null);
 
     const error = await authRepo
       .registerWithEmail({
@@ -119,24 +118,26 @@ describe('Auth Repository Firebase', () => {
       .catch((er) => er);
 
     expect(convertOutputErrorToObject(error)).toEqual({
-      message: ERROR_MESSAGES.USER_NOT_FOUND,
-      statusCode: 404,
+      message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+      statusCode: 500,
     });
   });
 
   it('should login a user with email and password', async () => {
-    mockFirebaseAuth.signInWithEmailAndPassword.mockResolvedValue({
-      user: {
-        email: 'jonh.doe@example.com',
-        uid: '12345',
-        stsTokenManager: {
-          accessToken: 'access-token',
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          kind: 'kind',
+          localId: '1234562',
+          email: 'jonh.doe@example.com',
+          displayName: '',
+          idToken: 'access-token',
+          registered: true,
           refreshToken: 'refresh-token',
-          expirationTime: Date.now(),
-        },
-        lastLoginAt: Date.now(),
-      },
-    });
+          expiresIn: '3600',
+        }),
+    } as Response);
 
     const result = await authRepo.loginWithEmail({
       email: 'jonh.doe@example.com',
@@ -145,22 +146,24 @@ describe('Auth Repository Firebase', () => {
 
     expect(result).toEqual({
       email: 'jonh.doe@example.com',
-      userId: '12345',
+      userId: '1234562',
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
       expirationTime: expect.any(Number),
-      lastLoginAt: expect.any(Number),
-      updatedAt: null,
     });
 
-    expect(mockFirebaseAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(
-      'jonh.doe@example.com',
-      '121355',
-    );
+    expect(mockFetch).toHaveBeenCalledWith(signInUrl, {
+      body: '{"email":"jonh.doe@example.com","password":"121355","returnSecureToken":true}',
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    });
   });
 
-  it('should throw a USER_NOT_FOUND error if auth?.user is not present in loginWithEmail method', async () => {
-    mockFirebaseAuth.signInWithEmailAndPassword.mockResolvedValueOnce(null);
+  it('should throw a INVALID_LOGIN_CREDENTIALS error if invalid credentials error occurs', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(null),
+    } as Response);
 
     const error = await authRepo
       .loginWithEmail({
@@ -175,32 +178,63 @@ describe('Auth Repository Firebase', () => {
     });
   });
 
+  it('should throw a USER_NOT_FOUND error if user dont to be found', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          error: {
+            code: 400,
+            message: 'INVALID_LOGIN_CREDENTIALS',
+            errors: [],
+          },
+        }),
+    } as Response);
+
+    const error = await authRepo
+      .loginWithEmail({
+        email: 'jonh.doe@example.com',
+        password: '121355',
+      })
+      .catch((er) => er);
+
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+      statusCode: 401,
+    });
+  });
+
   it('should send a password recovery email', async () => {
-    mockFirebaseAuth.sendPasswordResetEmail.mockResolvedValue({});
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({}),
+    } as Response);
 
     await expect(
       authRepo.recoveryPassword({ email: 'jonh.doe@example.com' }),
     ).resolves.not.toThrow();
 
-    expect(mockFirebaseAuth.sendPasswordResetEmail).toHaveBeenCalledWith(
-      'jonh.doe@example.com',
-    );
+    expect(mockFetch).toHaveBeenCalledWith(ResetPasswordUrl, {
+      body: '{"email":"jonh.doe@example.com","returnSecureToken":true}',
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    });
   });
 
   it('should revoke refresh tokens during signout', async () => {
-    mockAdminAuth.revokeRefreshTokens.mockResolvedValue({});
+    auth.revokeRefreshTokens.mockResolvedValue({});
 
     await authRepo.signout({ userId: '12345' });
 
-    expect(mockAdminAuth.revokeRefreshTokens).toHaveBeenCalledWith('12345');
+    expect(auth.revokeRefreshTokens).toHaveBeenCalledWith('12345');
   });
 
   it('should delete a user by ID', async () => {
-    mockAdminAuth.deleteUser.mockResolvedValue({});
+    auth.deleteUser.mockResolvedValue({});
 
     await authRepo.deleteUser({ userId: '12345' });
 
-    expect(mockAdminAuth.deleteUser).toHaveBeenCalledWith('12345');
+    expect(auth.deleteUser).toHaveBeenCalledWith('12345');
   });
 
   it('should throw a MISSING_REQUIRED_PARAMETERS error if userId is not present in deleteUser method', async () => {
@@ -217,7 +251,7 @@ describe('Auth Repository Firebase', () => {
   });
 
   it('should verify an access token', async () => {
-    mockAdminAuth.verifyIdToken.mockResolvedValue({
+    auth.verifyIdToken.mockResolvedValue({
       uid: '12345',
       email: 'jonh.doe@example.com',
       exp: Date.now(),
@@ -231,23 +265,20 @@ describe('Auth Repository Firebase', () => {
       expirationTime: expect.any(Number),
     });
 
-    expect(mockAdminAuth.verifyIdToken).toHaveBeenCalledWith(
-      'access-token',
-      true,
-    );
+    expect(auth.verifyIdToken).toHaveBeenCalledWith('access-token', true);
   });
 
   it('should create a new token for a user', async () => {
-    mockAdminAuth.createCustomToken.mockResolvedValue('new-access-token');
+    auth.createCustomToken.mockResolvedValue('new-access-token');
 
     const result = await authRepo.createNewToken({ userId: '12345' });
 
     expect(result).toEqual({ accessToken: 'new-access-token' });
-    expect(mockAdminAuth.createCustomToken).toHaveBeenCalledWith('12345');
+    expect(auth.createCustomToken).toHaveBeenCalledWith('12345');
   });
 
   it('should return user data if email is found', async () => {
-    mockAdminAuth.getUserByEmail.mockResolvedValueOnce({
+    auth.getUserByEmail.mockResolvedValueOnce({
       toJSON: () => ({
         email: 'jonh.doe@gmail.com',
         uid: '12345',
@@ -267,7 +298,7 @@ describe('Auth Repository Firebase', () => {
   });
 
   it('should return null if the user is not found', async () => {
-    mockAdminAuth.getUserByEmail.mockRejectedValueOnce({
+    auth.getUserByEmail.mockRejectedValueOnce({
       code: 'auth/user-not-found',
     });
 
@@ -281,7 +312,7 @@ describe('Auth Repository Firebase', () => {
   it('should throw an error if another type of Firebase error occurs', async () => {
     const error = new Error('Unexpected error');
 
-    mockAdminAuth.getUserByEmail.mockRejectedValueOnce(error);
+    auth.getUserByEmail.mockRejectedValueOnce(error);
 
     jest.spyOn(ErrorsFirebase, 'presenterError').mockImplementation(() => {
       throw error;

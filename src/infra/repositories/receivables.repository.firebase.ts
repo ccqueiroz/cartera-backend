@@ -1,4 +1,4 @@
-import firebase from 'firebase';
+import * as admin from 'firebase-admin';
 import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import {
   CreateReceivableInputDTO,
@@ -21,11 +21,12 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { MaskAmountMaskService } from '../masks/mask-amount.mask';
 
 export class ReceivablesRepositoryFirebase implements ReceivableGateway {
-  private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+  private static instance: ReceivablesRepositoryFirebase;
+  private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Receivables';
 
   private constructor(
-    private readonly db: firebase.firestore.Firestore,
+    private readonly db: admin.firestore.Firestore,
     private mergeSortHelper: MergeSortGateway,
   ) {
     this.dbCollection = this.db.collection(this.collection);
@@ -33,10 +34,14 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   }
 
   public static create(
-    db: firebase.firestore.Firestore,
+    db: admin.firestore.Firestore,
     mergeSortHelper: MergeSortGateway,
   ) {
-    return new ReceivablesRepositoryFirebase(db, mergeSortHelper);
+    if (!ReceivablesRepositoryFirebase.instance) {
+      ReceivablesRepositoryFirebase.instance =
+        new ReceivablesRepositoryFirebase(db, mergeSortHelper);
+    }
+    return ReceivablesRepositoryFirebase.instance;
   }
 
   private applyFilterReceivables(
@@ -173,7 +178,7 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   ): Promise<ResponseListDTO<ReceivableDTO>> {
     const { ordering, userId } = input;
 
-    const query: firebase.firestore.Query<firebase.firestore.DocumentData> =
+    const query: admin.firestore.Query<admin.firestore.DocumentData> =
       this.dbCollection;
 
     const direction =

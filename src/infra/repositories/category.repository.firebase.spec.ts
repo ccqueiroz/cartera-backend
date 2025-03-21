@@ -1,21 +1,21 @@
-import { mockFirestoreGet } from '@/test/mocks/firebase.mock';
 import { CategoryRepositoryFirebase } from './category.repository.firebase';
-import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
+import { dbFirestore } from '../database/firebase/firebase.database';
+import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 describe('Category Repository Firebase', () => {
   let categoryRepo: CategoryRepositoryFirebase;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const dbFirestoreMock = firebase.firestore();
-    categoryRepo = CategoryRepositoryFirebase.create(dbFirestoreMock);
+
+    categoryRepo = CategoryRepositoryFirebase.create(dbFirestore);
   });
 
   it('should be return Categories list when exist items in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       docs: [
         {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
@@ -69,7 +69,7 @@ describe('Category Repository Firebase', () => {
         }),
       ),
     );
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result.length).toEqual(4);
     expect(result.shift()).toEqual({
@@ -82,18 +82,18 @@ describe('Category Repository Firebase', () => {
   });
 
   it('should be return Categories empty list when not exist items in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       docs: [],
     });
 
     const result = await categoryRepo.getCategories();
 
     expect(result.length).toEqual(0);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
   it('should be return Categories list with type BILLS when the type param to be receive', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       docs: [
         {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
@@ -135,7 +135,7 @@ describe('Category Repository Firebase', () => {
     });
 
     const categoryRepo = {
-      getCategories: mockFirestoreGet,
+      getCategories: firestore.get,
     };
 
     const type = CategoryType.BILLS;
@@ -151,13 +151,13 @@ describe('Category Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.get.mockRejectedValueOnce(error);
 
     await expect(categoryRepo.getCategories()).rejects.toThrow(error);
   });
 
   it('should be return Category by id when exist this item in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       exists: true,
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       data: () => ({
@@ -173,7 +173,7 @@ describe('Category Repository Firebase', () => {
     });
 
     expect(result).toBeInstanceOf(CategoryEntitie);
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
     expect(result?.description).toBe('App Mobilidade');
@@ -183,7 +183,7 @@ describe('Category Repository Firebase', () => {
   });
 
   it('should be return null when provided id param, but this item not exist in database.', async () => {
-    mockFirestoreGet.mockResolvedValueOnce({
+    firestore.get.mockResolvedValueOnce({
       exists: false,
       id: null,
       data: () => null,
@@ -195,7 +195,7 @@ describe('Category Repository Firebase', () => {
 
     expect(result).not.toBeInstanceOf(CategoryEntitie);
     expect(result).toBeNull();
-    expect(mockFirestoreGet).toHaveBeenCalledTimes(1);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
   it('should be return throw Error if there is a problem with the getCategoryById request', async () => {
@@ -205,7 +205,7 @@ describe('Category Repository Firebase', () => {
       throw error;
     });
 
-    mockFirestoreGet.mockRejectedValueOnce(error);
+    firestore.get.mockRejectedValueOnce(error);
 
     await expect(
       categoryRepo.getCategoryById({

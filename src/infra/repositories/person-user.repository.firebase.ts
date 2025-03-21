@@ -1,4 +1,4 @@
-import firebase from 'firebase';
+import * as admin from 'firebase-admin';
 import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import {
   CreatePersonUserOutputDTO,
@@ -10,14 +10,20 @@ import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.enti
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 
 export class PersonUserRepositoryFirebase implements PersonUserGateway {
-  private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+  private static instance: PersonUserRepositoryFirebase;
+  private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Person_User';
-  private constructor(private readonly db: firebase.firestore.Firestore) {
+  private constructor(private readonly db: admin.firestore.Firestore) {
     this.dbCollection = this.db.collection(this.collection);
   }
 
-  public static create(db: firebase.firestore.Firestore) {
-    return new PersonUserRepositoryFirebase(db);
+  public static create(db: admin.firestore.Firestore) {
+    if (!PersonUserRepositoryFirebase.instance) {
+      PersonUserRepositoryFirebase.instance = new PersonUserRepositoryFirebase(
+        db,
+      );
+    }
+    return PersonUserRepositoryFirebase.instance;
   }
 
   public async getPersonUserByEmail({
@@ -55,7 +61,9 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
 
   public async getPersonUserById({
     id,
-  }: Pick<PersonUserEntitieDTO, 'id'>): Promise<PersonUserEntitieDTO | null> {
+  }: Required<
+    Pick<PersonUserEntitieDTO, 'id'>
+  >): Promise<PersonUserEntitieDTO | null> {
     const personUser = await this.dbCollection
       .doc(id)
       .get()
@@ -131,7 +139,7 @@ export class PersonUserRepositoryFirebase implements PersonUserGateway {
 
   public async deletePersonUser({
     id,
-  }: Pick<PersonUserEntitieDTO, 'id'>): Promise<void> {
+  }: Required<Pick<PersonUserEntitieDTO, 'id'>>): Promise<void> {
     await this.dbCollection
       .doc(id)
       .delete()

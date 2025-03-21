@@ -1,19 +1,24 @@
+import * as admin from 'firebase-admin';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { PaymentMethodEntitie } from '@/domain/Payment_Method/entitie/payment-method.entitie';
 
 export class PaymentMethodRepositoryFirebase implements PaymentMethodGateway {
-  private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+  private static instance: PaymentMethodRepositoryFirebase;
+  private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Payment_Method';
 
-  private constructor(private readonly db: firebase.firestore.Firestore) {
+  private constructor(private readonly db: admin.firestore.Firestore) {
     this.dbCollection = this.db.collection(this.collection);
   }
 
-  public static create(db: firebase.firestore.Firestore) {
-    return new PaymentMethodRepositoryFirebase(db);
+  public static create(db: admin.firestore.Firestore) {
+    if (!PaymentMethodRepositoryFirebase.instance) {
+      PaymentMethodRepositoryFirebase.instance =
+        new PaymentMethodRepositoryFirebase(db);
+    }
+    return PaymentMethodRepositoryFirebase.instance;
   }
 
   public async getPaymentMethods(): Promise<Array<PaymentMethodDTO>> {

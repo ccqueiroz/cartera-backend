@@ -19,7 +19,6 @@ import { AuthRepositoryFirebase } from './src/infra/repositories/auth.repository
 import {
   authFirebase,
   dbFirestore,
-  adminFirebase,
 } from './src/infra/database/firebase/firebase.database';
 
 function main() {
@@ -27,10 +26,7 @@ function main() {
   const mergeSort = new MargeSortHelper();
 
   // ----- REPOSITORIES -----
-  const authRepository = AuthRepositoryFirebase.create(
-    authFirebase,
-    adminFirebase,
-  );
+  const authRepository = AuthRepositoryFirebase.create(authFirebase);
 
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);
 

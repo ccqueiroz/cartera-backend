@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import {
   CategoryDTO,
   GetCategoriesInputDTO,
@@ -7,14 +8,18 @@ import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 export class CategoryRepositoryFirebase implements CategoryGateway {
-  private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+  private static instance: CategoryRepositoryFirebase;
+  private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Category';
 
-  private constructor(private readonly db: firebase.firestore.Firestore) {
+  private constructor(private readonly db: admin.firestore.Firestore) {
     this.dbCollection = this.db.collection(this.collection);
   }
 
-  public static create(db: firebase.firestore.Firestore) {
+  public static create(db: admin.firestore.Firestore) {
+    if (!CategoryRepositoryFirebase.instance) {
+      CategoryRepositoryFirebase.instance = new CategoryRepositoryFirebase(db);
+    }
     return new CategoryRepositoryFirebase(db);
   }
 

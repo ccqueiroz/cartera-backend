@@ -89,7 +89,9 @@ export type GetReceivablesInputDTO = Omit<
   ordering?: OrderByGetReceivablesInputDTO;
 };
 
-export type GetReceivableByIdInputDTO = Pick<ReceivableDTO, 'id' | 'userId'>;
+export type GetReceivableByIdInputDTO = Required<
+  Pick<ReceivableDTO, 'id' | 'userId'>
+>;
 
 export type DataAuthByRequest = Pick<AuthEntitieDTO, 'userId' | 'email'>;
 

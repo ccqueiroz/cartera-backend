@@ -1,5 +1,4 @@
-import admin from 'firebase-admin';
-import firebase from 'firebase';
+import * as admin from 'firebase-admin';
 import { AuthGateway } from '@/domain/Auth/gateway/auth.gateway';
 import {
   AuthSignDTO,
@@ -10,19 +9,44 @@ import { AuthEntitie } from '@/domain/Auth/entitie/auth.entitie';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
-
+import {
+  ResetPasswordUrl,
+  signInUrl,
+} from '@/packages/clients/firebase/urlToAuthFirebase';
 export class AuthRepositoryFirebase implements AuthGateway {
-  private adminAuth: admin.auth.Auth;
+  private static instance: AuthRepositoryFirebase;
 
-  private constructor(
-    private readonly auth: firebase.auth.Auth,
-    private readonly adminFirebase: admin.app.App,
-  ) {
-    this.adminAuth = this.adminFirebase.auth();
+  private constructor(private readonly auth: admin.auth.Auth) {}
+
+  public static create(auth: admin.auth.Auth) {
+    if (!AuthRepositoryFirebase.instance) {
+      AuthRepositoryFirebase.instance = new AuthRepositoryFirebase(auth);
+    }
+    return AuthRepositoryFirebase.instance;
   }
 
-  public static create(auth: firebase.auth.Auth, adminFirebase: admin.app.App) {
-    return new AuthRepositoryFirebase(auth, adminFirebase);
+  private async handleUseAuthUrl<T>(url: string, body: T) {
+    let response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...body,
+          returnSecureToken: true,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (data?.error?.code) {
+        throw new ApiError(data?.error?.message, data?.error?.code);
+      }
+
+      return data;
+    } catch (error) {
+      return ErrorsFirebase.presenterError(error as unknown as object);
+    }
   }
 
   public async registerWithEmail({
@@ -30,29 +54,31 @@ export class AuthRepositoryFirebase implements AuthGateway {
     password,
     firstName,
     lastName,
-  }: Omit<
-    AuthRegisterDTO,
-    'createdAt' | 'updatedAt'
-  >): Promise<AuthEntitieDTO> {
+  }: Omit<AuthRegisterDTO, 'createdAt' | 'updatedAt'>): Promise<
+    Omit<
+      AuthEntitieDTO,
+      'accessToken' | 'refreshToken' | 'expirationTime' | 'lastLoginAt'
+    >
+  > {
     const auth = await this.auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((response) => response)
+      .createUser({ email, password })
+      .then((response) => response.toJSON())
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
       });
 
-    if (!auth?.user) throw new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404);
+    if (!auth) throw new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500);
 
-    const data = JSON.parse(JSON.stringify(auth.user) as unknown as string);
+    const data = JSON.parse(JSON.stringify(auth) as unknown as string);
 
     const authEntitie = AuthEntitie.with({
       email: data.email,
       userId: data.uid,
-      accessToken: data?.stsTokenManager.accessToken,
-      refreshToken: data?.stsTokenManager.refreshToken,
-      expirationTime: data?.stsTokenManager.expirationTime,
-      lastLoginAt: data.lastLoginAt,
-      createdAt: data.createdAt,
+      accessToken: '',
+      refreshToken: '',
+      expirationTime: null,
+      lastLoginAt: 0,
+      createdAt: new Date(data.metadata.creationTime).getTime(),
       updatedAt: null,
       firstName,
       lastName,
@@ -61,13 +87,9 @@ export class AuthRepositoryFirebase implements AuthGateway {
     return {
       email: authEntitie.email,
       userId: authEntitie.userId,
-      accessToken: authEntitie.accessToken,
-      refreshToken: authEntitie.refreshToken,
-      expirationTime: authEntitie.expirationTime,
       firstName: authEntitie.firstName,
       lastName: authEntitie.lastName,
       createdAt: authEntitie.createdAt,
-      lastLoginAt: authEntitie.lastLoginAt,
       updatedAt: null,
     };
   }
@@ -75,25 +97,20 @@ export class AuthRepositoryFirebase implements AuthGateway {
   public async loginWithEmail({
     email,
     password,
-  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<AuthEntitieDTO> {
-    const auth = await this.auth
-      .signInWithEmailAndPassword(email, password)
-      .then((response) => response)
-      .catch((error) => {
-        ErrorsFirebase.presenterError(error);
-      });
+  }: Omit<AuthSignDTO, 'updatedAt'>): Promise<
+    Omit<AuthEntitieDTO, 'lastLoginAt' | 'createdAt' | 'updatedAt'>
+  > {
+    const data = await this.handleUseAuthUrl(signInUrl, { email, password });
 
-    if (!auth?.user) throw new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404);
-
-    const data = JSON.parse(JSON.stringify(auth.user) as unknown as string);
+    if (!data) throw new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404);
 
     const authEntitie = AuthEntitie.with({
       email: data.email,
-      userId: data.uid,
-      accessToken: data?.stsTokenManager.accessToken,
-      refreshToken: data?.stsTokenManager.refreshToken,
-      expirationTime: data?.stsTokenManager.expirationTime,
-      lastLoginAt: data.lastLoginAt,
+      userId: data.localId,
+      accessToken: data?.idToken,
+      refreshToken: data?.refreshToken,
+      expirationTime: new Date().getTime() + +data?.expiresIn,
+      lastLoginAt: 0,
       updatedAt: null,
       createdAt: data?.createdAt,
     });
@@ -104,27 +121,19 @@ export class AuthRepositoryFirebase implements AuthGateway {
       accessToken: authEntitie.accessToken,
       refreshToken: authEntitie.refreshToken,
       expirationTime: authEntitie.expirationTime,
-      lastLoginAt: authEntitie.lastLoginAt,
-      createdAt: authEntitie.createdAt,
-      updatedAt: authEntitie.updatedAt,
     };
   }
 
   public async recoveryPassword({
     email,
   }: Pick<AuthEntitieDTO, 'email'>): Promise<void> {
-    await this.auth
-      .sendPasswordResetEmail(email)
-      .then((response) => response)
-      .catch((error) => {
-        ErrorsFirebase.presenterError(error);
-      });
+    await this.handleUseAuthUrl(ResetPasswordUrl, { email });
   }
 
   public async signout({
     userId,
   }: Pick<AuthEntitieDTO, 'userId'>): Promise<void> {
-    await this.adminAuth.revokeRefreshTokens(userId).catch((error) => {
+    await this.auth.revokeRefreshTokens(userId).catch((error) => {
       ErrorsFirebase.presenterError(error);
     });
   }
@@ -135,7 +144,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
     AuthEntitieDTO,
     'email' | 'userId' | 'lastLoginAt'
   > | null> {
-    const authUser = (await this.adminAuth
+    const authUser = (await this.auth
       .getUserByEmail(email)
       .then((response) => response.toJSON())
       .catch((error) => {
@@ -171,7 +180,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
     if (!userId)
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
 
-    await this.adminAuth
+    await this.auth
       .deleteUser(userId)
       .then()
       .catch((error) => ErrorsFirebase.presenterError(error));
@@ -180,7 +189,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
   public async verifyToken({
     accessToken,
   }: Pick<AuthEntitieDTO, 'accessToken'>) {
-    const decodeToken = await this.adminAuth
+    const decodeToken = await this.auth
       .verifyIdToken(accessToken, true)
       .then((response) => response)
       .catch((error) => {
@@ -208,7 +217,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
   }
 
   public async createNewToken({ userId }: Pick<AuthEntitieDTO, 'userId'>) {
-    const newToken = await this.adminAuth
+    const newToken = await this.auth
       .createCustomToken(userId)
       .then((response) => response)
       .catch((error) => ErrorsFirebase.presenterError(error));

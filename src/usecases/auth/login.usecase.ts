@@ -8,7 +8,9 @@ import { OutputDTO } from '@/domain/dtos/output.dto';
 
 export type LoginInputDTO = Omit<AuthSignDTO, 'updatedAt'>;
 
-export type LoginOutputDTO = OutputDTO<AuthEntitieDTO>;
+export type LoginOutputDTO = OutputDTO<
+  Omit<AuthEntitieDTO, 'lastLoginAt' | 'createdAt' | 'updatedAt'>
+>;
 
 export class LoginUseCase implements Usecase<LoginInputDTO, LoginOutputDTO> {
   private constructor(

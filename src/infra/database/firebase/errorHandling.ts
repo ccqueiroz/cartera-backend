@@ -31,6 +31,10 @@ const errorsFirebase = {
     message: ERROR_MESSAGES.INVALID_CREDENTIALS,
     httpCode: 401,
   },
+  'auth/argument-error': {
+    message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+    httpCode: 401,
+  },
   'auth/network-request-failed': {
     message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
     httpCode: 500,
@@ -57,6 +61,25 @@ const errorsFirebase = {
   },
 } as const;
 
+const errorsAuthUrlFirebase = {
+  INVALID_LOGIN_CREDENTIALS: {
+    message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+    httpCode: 401,
+  },
+  EMAIL_NOT_FOUND: {
+    message: ERROR_MESSAGES.EMAIL_NOT_FOUND,
+    httpCode: 404,
+  },
+  INVALID_PASSWORD: {
+    message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+    httpCode: 401,
+  },
+  USER_DISABLED: {
+    message: ERROR_MESSAGES.USER_DISABLED,
+    httpCode: 400,
+  },
+} as const;
+
 export class ErrorsFirebase {
   public static presenterError(error: object) {
     const parseError = JSON.parse(JSON.stringify(error) as unknown as string);
@@ -68,6 +91,19 @@ export class ErrorsFirebase {
 
       const getError = errorsFirebase[
         getMessageCode as keyof typeof errorsFirebase
+      ] || {
+        message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+        httpCode: 500,
+      };
+
+      throw new ApiError(getError.message, getError.httpCode);
+    } else if (
+      errorsAuthUrlFirebase[
+        parseError?.message as keyof typeof errorsAuthUrlFirebase
+      ]
+    ) {
+      const getError = errorsAuthUrlFirebase[
+        parseError?.message as keyof typeof errorsAuthUrlFirebase
       ] || {
         message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
         httpCode: 500,
