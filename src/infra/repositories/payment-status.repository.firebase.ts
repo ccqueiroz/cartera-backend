@@ -1,19 +1,24 @@
+import * as admin from 'firebase-admin';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
 import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
-import firebase from 'firebase';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 
 export class PaymentStatusRepositoryFirebase implements PaymentStatusGateway {
-  private dbCollection: firebase.firestore.CollectionReference<firebase.firestore.DocumentData>;
+  private static instance: PaymentStatusRepositoryFirebase;
+  private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Payment_Status';
 
-  private constructor(private readonly db: firebase.firestore.Firestore) {
+  private constructor(private readonly db: admin.firestore.Firestore) {
     this.dbCollection = this.db.collection(this.collection);
   }
 
-  public static create(db: firebase.firestore.Firestore) {
-    return new PaymentStatusRepositoryFirebase(db);
+  public static create(db: admin.firestore.Firestore) {
+    if (!PaymentStatusRepositoryFirebase.instance) {
+      PaymentStatusRepositoryFirebase.instance =
+        new PaymentStatusRepositoryFirebase(db);
+    }
+    return PaymentStatusRepositoryFirebase.instance;
   }
 
   public async getPaymentStatus(): Promise<Array<PaymentStatusDTO>> {
