@@ -37,6 +37,7 @@ const config: Config = {
     '!**/src/helpers/httpCodes.ts',
     '!./migrations-firebase/*ts',
     '!./scripts/*ts',
+    '!./src/packages/clients/firebase/urlToAuthFirebase.ts',
   ],
 
   // The directory where Jest should output its coverage files
@@ -147,10 +148,10 @@ const config: Config = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [],
+  setupFiles: ['<rootDir>/src/test/setup/jest.setup.ts'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['<rootDir>/src/test/setup/jest.setup.ts'],
+  // setupFilesAfterEnv: ['<rootDir>/src/test/setup/jest.setup.ts'],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,
