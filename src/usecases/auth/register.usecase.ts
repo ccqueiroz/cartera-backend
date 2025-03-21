@@ -12,7 +12,10 @@ export type RegisterUserInputDTO = Omit<
   'createdAt' | 'updatedAt'
 >;
 
-export type RegisterUserOutputDTO = OutputDTO<AuthEntitieDTO | null>;
+export type RegisterUserOutputDTO = OutputDTO<Omit<
+  AuthEntitieDTO,
+  'accessToken' | 'refreshToken' | 'expirationTime' | 'lastLoginAt'
+> | null>;
 
 export class RegisterUserUseCase
   implements Usecase<RegisterUserInputDTO, RegisterUserOutputDTO>
