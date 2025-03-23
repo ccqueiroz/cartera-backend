@@ -20,7 +20,7 @@ let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodSta
 
 const userIdMock = '1234567d';
 
-describe('Edit Receivable UseCase', () => {
+describe('EditReceivableUseCase', () => {
   beforeEach(() => {
     receivableGatewayMock = {
       createReceivable: jest.fn(),
@@ -159,7 +159,7 @@ describe('Edit Receivable UseCase', () => {
       message: ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.createReceivable).not.toHaveBeenCalled();
+    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
   });
 
   it('should throw an error if receivableId is not exist in data base.', async () => {

@@ -72,7 +72,7 @@ const receivablesItemsMocks = [
   },
 ];
 
-describe('Get Receivables UseCase', () => {
+describe('GetReceivablesUseCase', () => {
   let getReceivablesUseCase: GetReceivablesUseCase;
 
   beforeEach(() => {
