@@ -65,6 +65,79 @@
  *           nullable: true
  *           example: 1704067200000
  *
+ *     BillDTO:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
+ *         personUserId:
+ *           type: string
+ *           example: diWBib6eEDK490GGMngi
+ *         userId:
+ *           type: string
+ *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         descriptionBill:
+ *           type: string
+ *           example: Faculdade
+ *         fixedBill:
+ *           type: boolean
+ *           example: true
+ *         billDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         payDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         payOut:
+ *           type: boolean
+ *           example: true
+ *         icon:
+ *           type: string
+ *           nullable: true
+ *           example: https://example.com/icon.jpg
+ *         amount:
+ *           type: number
+ *           example: 1200.76
+ *         paymentStatusId:
+ *           type: string
+ *           example: 68e47c3b-6d34-4604-bf7c-f9e2da704107
+ *         paymentStatusDescription:
+ *           type: string
+ *           example: Pago
+ *         categoryId:
+ *           type: string
+ *           example: c2ecc075-82d2-406b-88cd-491c686654eb
+ *         categoryDescription:
+ *           type: string
+ *           example: Educação e Leitura
+ *         paymentMethodId:
+ *           type: string
+ *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
+ *         paymentMethodDescription:
+ *           type: string
+ *           example: Pix
+ *         isPaymentCardBill:
+ *           type: boolean
+ *           example: true
+ *         invoiceCarData:
+ *           $ref: '#/components/schemas/InvoiceCardData'
+ *         isShoppingListBill:
+ *           type: boolean
+ *           example: false
+ *         shoppingListData:
+ *           $ref: '#/components/schemas/ShoppingListData'
+ *         createdAt:
+ *           type: number
+ *           nullable: true
+ *           example: 1704067200000
+ *         updatedAt:
+ *           type: number
+ *           nullable: true
+ *           example: 1704067200000
+ *
  *     AuthDTO:
  *       type: object
  *       properties:
@@ -192,6 +265,22 @@
  *           enum: [asc, desc]
  *           example: desc
  *
+ *     OrderByBillDate:
+ *       type: object
+ *       properties:
+ *         billDate:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: desc
+ *
+ *     OrderByPayDate:
+ *       type: object
+ *       properties:
+ *         payDate:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: desc
+ *
  *     OrderByCategory:
  *       type: object
  *       properties:
@@ -231,4 +320,21 @@
  *           type: string
  *           enum: [asc, desc]
  *           example: desc
+ *
+ *     InvoiceCardData:
+ *       type: object
+ *       properties:
+ *         paymentCardId:
+ *           type: string
+ *           example: d2ecc072-82d2-406b-88cd-491c686654ez
+ *         invoiceCardId:
+ *           type: string
+ *           example: se2e2075-82d2-406b-88cd-491c686654ez
+ *
+ *     ShoppingListData:
+ *       type: object
+ *       properties:
+ *         shoppingListId:
+ *           type: string
+ *           example: d2kpc982-62z2-436b-88cd-491c68665ui8
  */
