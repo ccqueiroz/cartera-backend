@@ -8,7 +8,7 @@ import { GetReceivableByIdInputDTO } from '@/domain/Receivable/dtos/receivable.d
 
 /**
  * @swagger
- * /receivable/list-by-id/{id}:
+ * /api/receivable/list-by-id/{id}:
  *   get:
  *     summary: Pesquisa um dado de receita cadastrada para o usuário pelo id.
  *     description: Esta rota permite pesquisar um dado de receita cadastrada para o usuário pelo id no sistema.

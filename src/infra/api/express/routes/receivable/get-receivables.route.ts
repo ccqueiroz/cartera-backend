@@ -8,7 +8,7 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
 
 /**
  * @swagger
- * /receivable/list-all:
+ * /api/receivable/list-all:
  *   get:
  *     summary: Lista todas as receitas cadastradas para o usuário com filtros e paginação.
  *     description:

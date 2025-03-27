@@ -8,7 +8,7 @@ import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable
 
 /**
  * @swagger
- * /receivable/delete/{id}:
+ * /api/eceivable/delete/{id}:
  *   get:
  *     summary: Deleta um item de receita.
  *     description: Esta rota deleta um item de receita cadastrado para o usuário.

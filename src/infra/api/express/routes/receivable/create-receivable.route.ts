@@ -8,7 +8,7 @@ import { CreateReceivableUseCase } from '@/usecases/receivable/create-receivable
 
 /**
  * @swagger
- * /receivable/create:
+ * /api/receivable/create:
  *   post:
  *     summary: Cria um dado de receita para o usuário.
  *     description: Esta rota permite a criação de um dado de receita para o usuário.
