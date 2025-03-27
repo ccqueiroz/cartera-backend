@@ -38,6 +38,7 @@ const config: Config = {
     '!./migrations-firebase/*ts',
     '!./scripts/*ts',
     '!./src/packages/clients/firebase/urlToAuthFirebase.ts',
+    '!**/*.dto.ts',
   ],
 
   // The directory where Jest should output its coverage files

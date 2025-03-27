@@ -11,6 +11,11 @@ const categories = [
   },
   {
     id: randomUUID(),
+    description: 'Supermercado',
+    type: CategoryType.BILLS,
+  },
+  {
+    id: randomUUID(),
     description: 'Compras e Lazer',
     type: CategoryType.BILLS,
   },

@@ -3,65 +3,74 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetReceivableByIdUseCase } from '@/usecases/receivable/get-receivable-by-id.usecase';
-import { GetReceivableByIdInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import { EditBillUseCase } from '@/usecases/bill/edit-bill.usecase';
+import { EditBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
 
 /**
  * @swagger
- * /api/receivable/list-by-id/{id}:
- *   get:
- *     summary: Pesquisa um dado de receita cadastrada para o usuário pelo id.
- *     description: Esta rota permite pesquisar um dado de receita cadastrada para o usuário pelo id no sistema.
+ * /api/bill/edit/{id}:
+ *   put:
+ *     summary: Edita um dado de conta/despesa cadastrada para o usuário.
+ *     description: Esta rota permite a edição um dado de conta/despesa cadastrada para o usuário.
  *     tags:
- *       - Receivable
+ *       - Bill
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - name: id
- *         in: path
+ *       - in: path
+ *         name: id
  *         required: true
- *         description: ID da receita a ser pesquisada
+ *         description: ID da conta/despesa a ser editada
  *         schema:
  *           type: string
  *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *              payload:
+ *                $ref: '#/components/schemas/BillDTO'
  *     responses:
  *       200:
- *         description: Dados da receita cadastrada para o usuário atualizados com sucesso
+ *         description: Dados da conta/despesa cadastrada para o usuário atualizados com sucesso
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 data:
- *                  $ref: '#/components/schemas/ReceivableDTO'
+ *                  $ref: '#/components/schemas/BillDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
- *         description: Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.
+ *         description: Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.
  *       429:
  *         description: O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.
  *       500:
  *         description: Erro interno no servidor.
  */
 
-export class GetReceivableByIdRoute implements Route {
+export class EditBillRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly getReceivableByIdService: GetReceivableByIdUseCase,
+    private readonly editBillService: EditBillUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    getReceivableByIdService: GetReceivableByIdUseCase,
+    editBillService: EditBillUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new GetReceivableByIdRoute(
-      'receivable/list-by-id/:id',
-      HttpMethod.GET,
-      getReceivableByIdService,
+    return new EditBillRoute(
+      'bill/edit/:id',
+      HttpMethod.PUT,
+      editBillService,
       middlewares,
     );
   }
@@ -71,13 +80,15 @@ export class GetReceivableByIdRoute implements Route {
       try {
         const { user_auth } = request;
         const { id } = request.params;
+        const { payload } = request.body;
 
-        const receivables = await this.getReceivableByIdService.execute({
+        const bill = await this.editBillService.execute({
+          billId: id,
           userId: user_auth?.userId,
-          id,
-        } as unknown as GetReceivableByIdInputDTO);
+          billData: payload,
+        } as unknown as EditBillInputDTO);
 
-        response.status(200).json({ ...receivables });
+        response.status(200).json({ ...bill });
       } catch (error) {
         next(
           error instanceof ApiError

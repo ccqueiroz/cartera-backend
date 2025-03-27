@@ -15,7 +15,7 @@
     "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "test": "jest --silent --colors --noStackTrace",
+    "test": "jest --silent --colors --runInBand --noStackTrace",
     "test:coverage": "jest --coverage",
     "test:coverage:unit": "jest --config=jest-unit-config.ts --coverage",
     "test:unit": "yarn test -- --watch -c jest-unit-config.ts",

@@ -11,6 +11,7 @@ describe('Receivable Entitie', () => {
 
     ReceivableEntitie.setMaskAmountGateway(maskAmountGatewayMock);
   });
+
   it('should be return Receivable instance with mandatory attributes when call static method create of the ReceivableEntitie class', () => {
     maskAmountGatewayMock.mask.mockReturnValue({
       value: '8209,56',

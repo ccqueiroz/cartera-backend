@@ -37,7 +37,7 @@ describe('GetReceivableByIdUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
+    expect(receivableGatewayMock.getReceivableById).not.toHaveBeenCalled();
   });
 
   it('should return null if receivable is not found', async () => {

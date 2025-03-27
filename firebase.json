@@ -1,6 +1,6 @@
 {
   "firestore": {
-    "rules": "./src/packages/clients/firebase/firestore.rules",
-    "indexes": "./src/packages/clients/firebase/firestore.indexes.json"
+    "rules": "./src/infra/database/firebase/core/rules/firestore.rules",
+    "indexes": "./src/infra/database/firebase/core/indexes/firestore.indexes.json"
   }
 }

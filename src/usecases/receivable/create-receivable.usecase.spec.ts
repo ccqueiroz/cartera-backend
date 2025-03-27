@@ -20,7 +20,7 @@ let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodSta
 
 const userIdMock = '1234567d';
 
-describe('Create Receivable UseCase', () => {
+describe('CreateReceivableUseCase', () => {
   beforeEach(() => {
     receivableGatewayMock = {
       createReceivable: jest.fn(),

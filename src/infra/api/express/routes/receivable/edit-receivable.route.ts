@@ -8,7 +8,7 @@ import { EditReceivableUseCase } from '@/usecases/receivable/edit-receivable.use
 
 /**
  * @swagger
- * /receivable/edit/{id}:
+ * /api/receivable/edit/{id}:
  *   put:
  *     summary: Edita um dado de receita cadastrada para o usuário.
  *     description: Esta rota permite a edição um dado de receita cadastrada para o usuário.

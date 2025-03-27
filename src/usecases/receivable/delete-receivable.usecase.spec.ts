@@ -65,6 +65,7 @@ describe('DeleteReceivableUseCase', () => {
       id: receivableData.id,
       userId: userIdMock,
     });
+
     expect(receivableGatewayMock.deleteReceivable).toHaveBeenCalledWith({
       id: receivableData.id,
       userId: userIdMock,

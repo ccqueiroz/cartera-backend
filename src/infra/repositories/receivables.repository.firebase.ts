@@ -9,25 +9,30 @@ import {
   GetReceivablesInputDTO,
   OrderByGetReceivablesInputDTO,
   ReceivableDTO,
+  SearchByDateGetReceivablesInputDTO,
   SortByStatusReceivablesInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableEntitie } from '@/domain/Receivable/entitie/receivable.entitie';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
-import { MergeSortGateway } from '@/domain/Auth/helpers/merge-sort.gateway';
+import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { MaskAmountMaskService } from '../masks/mask-amount.mask';
+import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/applyPagination.gateway';
+import { HandleCanProgressToWriteOperationGateway } from '../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
 export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   private static instance: ReceivablesRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
-  private collection = 'Receivables';
+  private collection = 'Receivable';
 
   private constructor(
     private readonly db: admin.firestore.Firestore,
     private mergeSortHelper: MergeSortGateway,
+    private applayPaginationHelpers: ApplyPaginationGateway,
+    private handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
   ) {
     this.dbCollection = this.db.collection(this.collection);
     ReceivableEntitie.setMaskAmountGateway(new MaskAmountMaskService());
@@ -36,10 +41,17 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   public static create(
     db: admin.firestore.Firestore,
     mergeSortHelper: MergeSortGateway,
+    applayPaginationHelpers: ApplyPaginationGateway,
+    handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
   ) {
     if (!ReceivablesRepositoryFirebase.instance) {
       ReceivablesRepositoryFirebase.instance =
-        new ReceivablesRepositoryFirebase(db, mergeSortHelper);
+        new ReceivablesRepositoryFirebase(
+          db,
+          mergeSortHelper,
+          applayPaginationHelpers,
+          handleCanProgressToWritteOperation,
+        );
     }
     return ReceivablesRepositoryFirebase.instance;
   }
@@ -81,24 +93,29 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
     }
 
     if (searchByDate?.receivableDate) {
-      const dateFilter = searchByDate.receivableDate;
+      const key = Object.keys(searchByDate).find(
+        (k) =>
+          searchByDate[k as keyof SearchByDateGetReceivablesInputDTO] !==
+          undefined,
+      ) as keyof SearchByDateGetReceivablesInputDTO;
+      const dateFilter = searchByDate[key];
 
-      if ('exactlyDate' in dateFilter) {
-        const exactDate = Number(dateFilter.exactlyDate);
-        applyFiltersInData.push(
-          (item) => Number(item.receivableDate) === exactDate,
-        );
-      } else {
-        const initial = dateFilter.initialDate
-          ? Number(dateFilter.initialDate)
-          : -Infinity;
-        const final = dateFilter.finalDate
-          ? Number(dateFilter.finalDate)
-          : Infinity;
-        applyFiltersInData.push((item) => {
-          const date = Number(item.receivableDate);
-          return date >= initial && date <= final;
-        });
+      if (dateFilter) {
+        if ('exactlyDate' in dateFilter) {
+          const exactDate = Number(dateFilter.exactlyDate);
+          applyFiltersInData.push((item) => Number(item[key]) === exactDate);
+        } else {
+          const initial = dateFilter.initialDate
+            ? Number(dateFilter.initialDate)
+            : -Infinity;
+          const final = dateFilter.finalDate
+            ? Number(dateFilter.finalDate)
+            : Infinity;
+          applyFiltersInData.push((item) => {
+            const date = Number(item[key]);
+            return date >= initial && date <= final;
+          });
+        }
       }
     }
 
@@ -135,44 +152,6 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
     return dataOrdering;
   }
 
-  private applyPaginationReceivables(
-    input: GetReceivablesInputDTO,
-    data: Array<ReceivableDTO>,
-  ): ResponseListDTO<ReceivableDTO> {
-    const { page, size, ordering } = input;
-
-    const totalElements = data.length;
-
-    const totalPages = Math.ceil(data.length / size);
-
-    let content = [];
-
-    if (page > 0) {
-      content = data.slice(page * size, page * size + size);
-    } else {
-      content = data.slice(0, size);
-    }
-
-    const orderingKey = ordering
-      ? (Object.keys(ordering)[0] as keyof OrderByGetReceivablesInputDTO)
-      : undefined;
-
-    return {
-      content,
-      totalElements,
-      totalPages,
-      page: Number(page),
-      size: Number(size),
-      ordering:
-        orderingKey && ordering
-          ? {
-              [orderingKey as keyof OrderByGetReceivablesInputDTO]:
-                ordering[orderingKey],
-            }
-          : null,
-    };
-  }
-
   private async handleSearchReceivables(
     input: GetReceivablesInputDTO,
   ): Promise<ResponseListDTO<ReceivableDTO>> {
@@ -203,22 +182,11 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
 
     data = this.applyOrderingReceivables(input, data as Array<ReceivableDTO>);
 
-    return this.applyPaginationReceivables(input, data as Array<ReceivableDTO>);
-  }
-
-  private async handleCanProgressToOperation(
-    receivableId: string,
-    userId: string,
-  ) {
-    const canUpdate = await this.dbCollection
-      .doc(receivableId)
-      .get()
-      .then((response) => response.exists && response.data()?.userId === userId)
-      .catch((error) => {
-        ErrorsFirebase.presenterError(error);
-      });
-
-    if (!canUpdate) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
+    return this.applayPaginationHelpers.execute<
+      GetReceivablesInputDTO,
+      OrderByGetReceivablesInputDTO,
+      ReceivableDTO
+    >(input, data as Array<ReceivableDTO>);
   }
 
   public async getReceivables(
@@ -307,7 +275,11 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   }: EditReceivableInputDTO): Promise<ReceivableDTO> {
     const updatedAt = new Date().getTime();
 
-    await this.handleCanProgressToOperation(receivableId, userId);
+    await this.handleCanProgressToWritteOperation.execute(
+      this.dbCollection,
+      receivableId,
+      userId,
+    );
 
     const receivable = ReceivableEntitie.with({
       ...receivableData,
@@ -351,7 +323,11 @@ export class ReceivablesRepositoryFirebase implements ReceivableGateway {
     id,
     userId,
   }: DeleteReceivableInputDTO): Promise<void> {
-    await this.handleCanProgressToOperation(id, userId);
+    await this.handleCanProgressToWritteOperation.execute(
+      this.dbCollection,
+      id,
+      userId,
+    );
 
     await this.dbCollection
       .doc(id)

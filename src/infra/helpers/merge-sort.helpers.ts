@@ -1,4 +1,4 @@
-import { MergeSortGateway } from '@/domain/Auth/helpers/merge-sort.gateway';
+import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 
 export class MargeSortHelper implements MergeSortGateway {
   private merge<T>(left: Array<T>, right: Array<T>, key: keyof T) {

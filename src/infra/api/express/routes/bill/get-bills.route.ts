@@ -1,20 +1,20 @@
-import { GetReceivablesUseCase } from '@/usecases/receivable/get-receivables.usecase';
 import { HttpMethod, Route } from '../route';
 import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import { GetBillsUseCase } from '@/usecases/bill/get-bills.usecase';
+import { GetBillsInputDTO } from '@/domain/Bill/dtos/bill.dto';
 
 /**
  * @swagger
- * /api/receivable/list-all:
+ * /api/bill/list-all:
  *   get:
- *     summary: Lista todas as receitas cadastradas para o usuário com filtros e paginação.
+ *     summary: Lista todas as contas/despesas cadastradas para o usuário com filtros e paginação.
  *     description:
- *       Retorna uma lista paginada de receitas com base nos critérios de filtro, ordenação e parâmetros de paginação.
+ *       Retorna uma lista paginada de contas/despesas com base nos critérios de filtro, ordenação e parâmetros de paginação.
  *     tags:
- *       - Receivable
+ *       - Bill
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -39,23 +39,29 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *           schema:
  *             type: object
  *             properties:
- *               sortByReceivables:
+ *               sortByBills:
  *                 type: object
  *                 properties:
- *                   fixedReceivable:
+ *                   fixedBill:
  *                     type: boolean
  *                     example: true
- *                   receival:
+ *                   payOut:
  *                     type: boolean
  *                     example: false
  *                   amount:
  *                     type: number
  *                     example: 1000.50
+ *                   isShoppingListBill:
+ *                     type: boolean
+ *                     example: true
+ *                   isPaymentCardBill:
+ *                     type: boolean
+ *                     example: true
  *               searchByDate:
  *                 oneOf:
  *                   - type: object
  *                     properties:
- *                       receivableDate:
+ *                       billDate:
  *                         type: object
  *                         properties:
  *                           initialDate:
@@ -69,7 +75,7 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *                             example: 1739751148154
  *                   - type: object
  *                     properties:
- *                       receivalDate:
+ *                       payDate:
  *                         type: object
  *                         properties:
  *                           initialDate:
@@ -103,8 +109,8 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *                 type: object
  *                 oneOf:
  *                   - $ref: '#/components/schemas/OrderByAmount'
- *                   - $ref: '#/components/schemas/OrderByReceivableDate'
- *                   - $ref: '#/components/schemas/OrderByReceivalDate'
+ *                   - $ref: '#/components/schemas/OrderByBillDate'
+ *                   - $ref: '#/components/schemas/OrderByPayDate'
  *                   - $ref: '#/components/schemas/OrderByCategory'
  *                   - $ref: '#/components/schemas/OrderByPaymentMethod'
  *                   - $ref: '#/components/schemas/OrderByPaymentStatus'
@@ -112,7 +118,7 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *                   - $ref: '#/components/schemas/OrderByUpdated'
  *     responses:
  *       200:
- *         description: Lista de receitas retornada com sucesso.
+ *         description: Lista de contas/despesas retornada com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -124,7 +130,7 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *                    content:
  *                      type: array
  *                      items:
- *                        $ref: '#/components/schemas/ReceivableDTO'
+ *                        $ref: '#/components/schemas/BillDTO'
  *                    page:
  *                      type: number
  *                      example: 0
@@ -141,28 +147,26 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *         description: Parâmetros inválidos ou ausentes.
  *       401:
  *         description: Token de autenticação inválido ou ausente.
- *       404:
- *         description: Nenhuma receita encontrada com os critérios fornecidos.
  *       500:
  *         description: Erro interno no servidor.
  */
 
-export class GetReceivablesRoute implements Route {
+export class GetBillsRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly getReceivablesService: GetReceivablesUseCase,
+    private readonly getBillsService: GetBillsUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    getReceivablesService: GetReceivablesUseCase,
+    getBillsService: GetBillsUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new GetReceivablesRoute(
-      'receivable/list-all',
+    return new GetBillsRoute(
+      'bill/list-all',
       HttpMethod.GET,
-      getReceivablesService,
+      getBillsService,
       middlewares,
     );
   }
@@ -172,20 +176,19 @@ export class GetReceivablesRoute implements Route {
       try {
         const { user_auth } = request;
         const { page, size } = request.query;
-        const { sortByReceivables, searchByDate, ordering, sort } =
-          request.body;
+        const { sortByBills, searchByDate, ordering, sort } = request.body;
 
-        const receivables = await this.getReceivablesService.execute({
+        const bills = await this.getBillsService.execute({
           userId: user_auth?.userId,
-          sortByReceivables,
+          sortByBills,
           searchByDate,
           ordering,
           page,
           size,
           sort,
-        } as unknown as GetReceivablesInputDTO);
+        } as unknown as GetBillsInputDTO);
 
-        response.status(200).json({ ...receivables });
+        response.status(200).json({ ...bills });
       } catch (error) {
         next(
           error instanceof ApiError

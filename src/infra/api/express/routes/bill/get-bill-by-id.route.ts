@@ -3,59 +3,65 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { DeleteReceivableInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
-import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable.usecase';
+import { GetBillByIdInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { GetBillByIdUseCase } from '@/usecases/bill/get-bill-by-id.usecase';
 
 /**
  * @swagger
- * /api/eceivable/delete/{id}:
+ * /api/bill/list-by-id/{id}:
  *   get:
- *     summary: Deleta um item de receita.
- *     description: Esta rota deleta um item de receita cadastrado para o usuário.
+ *     summary: Pesquisa um dado de conta/despesa cadastrada para o usuário pelo id.
+ *     description: Esta rota permite pesquisar um dado de conta/despesa cadastrada para o usuário pelo id no sistema.
  *     tags:
- *       - Receivable
+ *       - Bill
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
- *         description: ID da receita a ser deletada
+ *         description: ID da conta/despesa a ser pesquisada
  *         schema:
  *           type: string
  *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
  *     responses:
- *       204:
- *         description: Receita deletada com sucesso.
- *         content: {}
+ *       200:
+ *         description: Dados da conta/despesa cadastrada para o usuário atualizados com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                  $ref: '#/components/schemas/BillDTO'
  *       400:
  *         description: Parâmetros obrigatórios ausentes.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
- *         description: Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.
+ *         description: Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.
  *       429:
  *         description: O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.
  *       500:
  *         description: Erro interno no servidor.
  */
 
-export class DeleteReceivableRoute implements Route {
+export class GetBillByIdRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly deleteReceivableService: DeleteReceivableUseCase,
+    private readonly getBillByIdService: GetBillByIdUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    deleteReceivableService: DeleteReceivableUseCase,
+    getBillByIdService: GetBillByIdUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new DeleteReceivableRoute(
-      'receivable/delete/:id',
-      HttpMethod.DELETE,
-      deleteReceivableService,
+    return new GetBillByIdRoute(
+      'bill/list-by-id/:id',
+      HttpMethod.GET,
+      getBillByIdService,
       middlewares,
     );
   }
@@ -66,12 +72,12 @@ export class DeleteReceivableRoute implements Route {
         const { user_auth } = request;
         const { id } = request.params;
 
-        await this.deleteReceivableService.execute({
-          id,
+        const bill = await this.getBillByIdService.execute({
           userId: user_auth?.userId,
-        } as unknown as DeleteReceivableInputDTO);
+          id,
+        } as unknown as GetBillByIdInputDTO);
 
-        response.status(204).send();
+        response.status(200).json({ ...bill });
       } catch (error) {
         next(
           error instanceof ApiError

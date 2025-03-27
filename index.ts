@@ -1,5 +1,6 @@
+import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
+import { BillsRepositoryFirebase } from './src/infra/repositories/bill.repository.firebase';
 import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
-import { MargeSortHelper } from './src/infra/helpers/merge-sort.helpers';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
 import { ReceivablesRepositoryFirebase } from './src/infra/repositories/receivables.repository.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
@@ -9,7 +10,12 @@ import { CategoryRepositoryFirebase } from './src/infra/repositories/category.re
 import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/payment-method.repository.firebase';
 import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
-import { checkIfIsNecessaryCreateNewTokenHelpers } from './src/infra/helpers';
+import {
+  applayPaginationHelpers,
+  checkIfIsNecessaryCreateNewTokenHelpers,
+  handleCanProgressToWritteOperation,
+  mergeSortHelpers,
+} from './src/infra/helpers';
 import { VerifyTokenMiddleware } from './src/infra/api/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from './src/infra/api/express/middlewares/error.middleware';
 import { ApiExpress } from './src/infra/api/express/api.express';
@@ -22,9 +28,6 @@ import {
 } from './src/infra/database/firebase/firebase.database';
 
 function main() {
-  // ----- HELPERS ---------
-  const mergeSort = new MargeSortHelper();
-
   // ----- REPOSITORIES -----
   const authRepository = AuthRepositoryFirebase.create(authFirebase);
 
@@ -40,7 +43,16 @@ function main() {
 
   const receivableRepository = ReceivablesRepositoryFirebase.create(
     dbFirestore,
-    mergeSort,
+    mergeSortHelpers,
+    applayPaginationHelpers,
+    handleCanProgressToWritteOperation,
+  );
+
+  const billRepository = BillsRepositoryFirebase.create(
+    dbFirestore,
+    mergeSortHelpers,
+    applayPaginationHelpers,
+    handleCanProgressToWritteOperation,
   );
   //
 
@@ -91,6 +103,12 @@ function main() {
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
+
+  const billRoutes = BillRoute.create(
+    billRepository,
+    authVerifyTokenMiddleware,
+    validateCategoryPaymentMethodStatusUseCase,
+  ).execute();
   //
 
   //  ----- ERROR MIDDLEWARE -----
@@ -104,6 +122,7 @@ function main() {
       ...categoryRoutes,
       ...paymentStatusRoutes,
       ...receivableRoutes,
+      ...billRoutes,
     ],
     errorMiddleware,
   );

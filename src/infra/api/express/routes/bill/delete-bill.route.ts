@@ -3,59 +3,59 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { DeleteReceivableInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
-import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable.usecase';
+import { DeleteBillUseCase } from '@/usecases/bill/delete-bill.usecase';
+import { DeleteBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
 
 /**
  * @swagger
- * /api/eceivable/delete/{id}:
+ * /api/bill/delete/{id}:
  *   get:
- *     summary: Deleta um item de receita.
- *     description: Esta rota deleta um item de receita cadastrado para o usuário.
+ *     summary: Deleta um item de conta/despesa.
+ *     description: Esta rota deleta um item de conta/despesa cadastrado para o usuário.
  *     tags:
- *       - Receivable
+ *       - Bill
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
  *         required: true
- *         description: ID da receita a ser deletada
+ *         description: ID da conta/despesa a ser deletada
  *         schema:
  *           type: string
  *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
  *     responses:
  *       204:
- *         description: Receita deletada com sucesso.
+ *         description: conta/despesa deletada com sucesso.
  *         content: {}
  *       400:
  *         description: Parâmetros obrigatórios ausentes.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
- *         description: Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.
+ *         description: Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.
  *       429:
  *         description: O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.
  *       500:
  *         description: Erro interno no servidor.
  */
 
-export class DeleteReceivableRoute implements Route {
+export class DeleteBillRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly deleteReceivableService: DeleteReceivableUseCase,
+    private readonly deleteBillService: DeleteBillUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    deleteReceivableService: DeleteReceivableUseCase,
+    deleteBillService: DeleteBillUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new DeleteReceivableRoute(
-      'receivable/delete/:id',
+    return new DeleteBillRoute(
+      'bill/delete/:id',
       HttpMethod.DELETE,
-      deleteReceivableService,
+      deleteBillService,
       middlewares,
     );
   }
@@ -66,10 +66,10 @@ export class DeleteReceivableRoute implements Route {
         const { user_auth } = request;
         const { id } = request.params;
 
-        await this.deleteReceivableService.execute({
+        await this.deleteBillService.execute({
           id,
           userId: user_auth?.userId,
-        } as unknown as DeleteReceivableInputDTO);
+        } as unknown as DeleteBillInputDTO);
 
         response.status(204).send();
       } catch (error) {

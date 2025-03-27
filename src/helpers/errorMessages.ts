@@ -25,4 +25,6 @@ export const ERROR_MESSAGES = {
     'Categoria, Método de Pagamento ou Status de Pagamento inválidos.',
   RECEIVABLE_NOT_FOUND:
     'Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.',
+  BILL_NOT_FOUND:
+    'Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.',
 } as const;
