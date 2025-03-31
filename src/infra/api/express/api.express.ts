@@ -1,4 +1,4 @@
-import { ErrorMiddleware } from './middlewares/middleware';
+import { ErrorMiddleware, Middleware } from './middlewares/middleware';
 import express, { Express, json } from 'express';
 import { Api } from './api';
 import { Route } from './routes/route';
@@ -9,19 +9,36 @@ import {
   swaggerSpecInstance,
 } from '@/packages/clients/swagger';
 export class ApiExpress implements Api {
+  private static instance: ApiExpress;
   private app: Express;
 
-  private constructor(routes: Array<Route>, errorMiddleware: ErrorMiddleware) {
+  private constructor(
+    routes: Array<Route>,
+    globalMiddlewares: Array<Middleware>,
+    errorMiddleware: ErrorMiddleware,
+  ) {
     this.app = express();
     this.app.use(json());
     this.app.set('x-powered-by', false);
+    this.addGlobalMiddlewares(globalMiddlewares);
     this.addSwagger();
     this.addRoutes(routes);
     this.addErrorHandling(errorMiddleware);
   }
 
-  public static create(routes: Array<Route>, errorMiddleware: ErrorMiddleware) {
-    return new ApiExpress(routes, errorMiddleware);
+  public static create(
+    routes: Array<Route>,
+    globalMiddlewares: Array<Middleware>,
+    errorMiddleware: ErrorMiddleware,
+  ) {
+    if (!ApiExpress.instance) {
+      ApiExpress.instance = new ApiExpress(
+        routes,
+        globalMiddlewares,
+        errorMiddleware,
+      );
+    }
+    return ApiExpress.instance;
   }
 
   private addRoutes(routes: Array<Route>) {
@@ -32,6 +49,12 @@ export class ApiExpress implements Api {
       const middlewares = route.getMiddlewares();
 
       this.app[method](`/api/${path}`, [...middlewares], handler);
+    });
+  }
+
+  private addGlobalMiddlewares(middlewares: Array<Middleware>) {
+    middlewares.forEach((middleware) => {
+      this.app.use(middleware.getHandler());
     });
   }
 
