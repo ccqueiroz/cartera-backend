@@ -20,6 +20,7 @@ export class ApiExpress implements Api {
     this.app = express();
     this.app.use(json());
     this.app.set('x-powered-by', false);
+    this.app.set('trust proxy', true);
     this.addGlobalMiddlewares(globalMiddlewares);
     this.addSwagger();
     this.addRoutes(routes);
