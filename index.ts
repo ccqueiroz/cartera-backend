@@ -1,3 +1,4 @@
+import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
 import { BillsRepositoryFirebase } from './src/infra/repositories/bill.repository.firebase';
 import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
@@ -111,6 +112,9 @@ function main() {
   ).execute();
   //
 
+  // ----- GLOBAL MIDDLEWARES ----
+  const cors = new CorsMiddleware();
+
   //  ----- ERROR MIDDLEWARE -----
   const errorMiddleware = new ErrorMiddleware();
 
@@ -124,6 +128,7 @@ function main() {
       ...receivableRoutes,
       ...billRoutes,
     ],
+    [cors],
     errorMiddleware,
   );
   const port = 8889;
