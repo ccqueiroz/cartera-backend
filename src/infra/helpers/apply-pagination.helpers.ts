@@ -3,7 +3,7 @@ import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import {
   ApplyPaginationGateway,
   InputDTO,
-} from '@/domain/Helpers/gateway/applyPagination.gateway';
+} from '@/domain/Helpers/gateway/apply-pagination.gateway';
 
 export class ApplyPaginationHelper implements ApplyPaginationGateway {
   execute<I, O, T>(input: InputDTO<I, O>, data: Array<T>): ResponseListDTO<T> {
