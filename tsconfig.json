@@ -12,6 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "baseUrl": "./",
+    "skipLibCheck": true,
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["./src/*"]
     },
