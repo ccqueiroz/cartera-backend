@@ -15,7 +15,8 @@
     "skipLibCheck": true,
     "types": ["node", "jest"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/packages/clients/firebase/*": ["./src/packages/clients/firebase/*"]
     },
     "typeRoots": ["./node_modules/@types", "src/infra/api/express/@types"]
   },

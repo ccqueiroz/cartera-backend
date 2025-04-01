@@ -26,4 +26,5 @@ const clientFireBaseAdmin: admin.app.App = admin.initializeApp(
       },
 );
 
+export * from './urlToAuthFirebase';
 export { clientFireBaseAdmin };
