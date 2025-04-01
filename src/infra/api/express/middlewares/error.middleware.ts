@@ -14,6 +14,8 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
       const message = error.message;
 
       response.status(statusCode).json({ message });
+
+      next(error);
     };
   }
 }

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
@@ -134,7 +135,7 @@ function main() {
     [cors, ipControll],
     errorMiddleware,
   );
-  const port = 8889;
+  const port = Number(process.env.PORT) || 8000;
   api.start(port);
 }
 

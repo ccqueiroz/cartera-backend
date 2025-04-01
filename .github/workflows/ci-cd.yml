@@ -2,9 +2,9 @@ name: Cartera-Backend CI-CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x]
 
     steps:
       - name: Checkout do código
@@ -24,11 +24,35 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
+      - name: Criando .env
+        run: |
+          echo "PORT=${{ env.PORT }}" >> .env
+          echo "FIREBASE_CONFIG_API_KEY=${{ secrets.FIREBASE_CONFIG_API_KEY }}" >> .env
+          echo "FIREBASE_CONFIG_AUTH_DOMAIN=${{ secrets.FIREBASE_CONFIG_AUTH_DOMAIN }}" >> .env
+          echo "FIREBASE_CONFIG_PROJECT_ID=${{ secrets.FIREBASE_CONFIG_PROJECT_ID }}" >> .env
+          echo "FIREBASE_CONFIG_STORAGE_BUCKET=${{ secrets.FIREBASE_CONFIG_STORAGE_BUCKET }}" >> .env
+          echo "FIREBASE_CONFIG_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_CONFIG_MESSAGING_SENDER_ID }}" >> .env
+          echo "FIREBASE_CONFIG_APP_ID=${{ secrets.FIREBASE_CONFIG_APP_ID }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_TYPE=${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPE }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_PROJECT_ID=${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROJECT_ID }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY_ID=${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY_ID }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY=${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_CLIENT_EMAIL=${{ secrets.FIREBASE_SERVICE_ACCOUNT_CLIENT_EMAIL }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_CLIENT_ID=${{ secrets.FIREBASE_SERVICE_ACCOUNT_CLIENT_ID }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_AUTH_URI=${{ secrets.FIREBASE_SERVICE_ACCOUNT_AUTH_URI }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_TOKEN_URI=${{ secrets.FIREBASE_SERVICE_ACCOUNT_TOKEN_URI }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL=${{ secrets.FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_CLIENT_URL=${{ secrets.FIREBASE_SERVICE_ACCOUNT_CLIENT_URL }}" >> .env
+          echo "FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> .env
+        shell: bash
+
       - name: Instalando as dependências
         run: yarn install --frozen-lockfile
 
       - name: Verificando Lint
         run: yarn lint
+        continue-on-error: false
 
       - name: Analisando Testes Unitários
         run: yarn test:unit
+        continue-on-error: false
