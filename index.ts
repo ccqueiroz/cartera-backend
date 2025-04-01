@@ -1,3 +1,5 @@
+import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
+import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
 import { BillsRepositoryFirebase } from './src/infra/repositories/bill.repository.firebase';
 import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
@@ -15,6 +17,7 @@ import {
   checkIfIsNecessaryCreateNewTokenHelpers,
   handleCanProgressToWritteOperation,
   mergeSortHelpers,
+  normalizeIp,
 } from './src/infra/helpers';
 import { VerifyTokenMiddleware } from './src/infra/api/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from './src/infra/api/express/middlewares/error.middleware';
@@ -111,6 +114,10 @@ function main() {
   ).execute();
   //
 
+  // ----- GLOBAL MIDDLEWARES ----
+  const cors = new CorsMiddleware();
+  const ipControll = new IpControllMiddleware(normalizeIp);
+
   //  ----- ERROR MIDDLEWARE -----
   const errorMiddleware = new ErrorMiddleware();
 
@@ -124,6 +131,7 @@ function main() {
       ...receivableRoutes,
       ...billRoutes,
     ],
+    [cors, ipControll],
     errorMiddleware,
   );
   const port = 8889;

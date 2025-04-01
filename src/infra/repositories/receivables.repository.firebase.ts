@@ -20,7 +20,7 @@ import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { MaskAmountMaskService } from '../masks/mask-amount.mask';
-import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/applyPagination.gateway';
+import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
 import { HandleCanProgressToWriteOperationGateway } from '../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
 export class ReceivablesRepositoryFirebase implements ReceivableGateway {

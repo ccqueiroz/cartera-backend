@@ -17,7 +17,7 @@ import {
 } from '@/domain/Bill/dtos/bill.dto';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
-import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/applyPagination.gateway';
+import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
