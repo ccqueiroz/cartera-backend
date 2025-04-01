@@ -120,5 +120,3 @@ configRedis.json
 timeline-cartera
 
 lib
-
-src/packages/clients/firebase/urlToAuthFirebase.ts

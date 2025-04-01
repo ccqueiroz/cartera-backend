@@ -6,8 +6,10 @@ on:
 
 jobs:
   build:
+    name: "🚀 Build & Test"
     runs-on: ubuntu-latest
-
+    outputs:
+      tests-passed: ${{ steps.unit-tests.outcome == 'success' }}
     strategy:
       matrix:
         node-version: [18.x]
@@ -54,3 +56,13 @@ jobs:
       - name: Analisando Testes Unitários
         run: yarn test:unit
         continue-on-error: false
+
+  check-results:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ needs.build.outputs.tests-passed != 'true' }}
+    steps:
+      - name: Bloquear Merge
+        run: |
+          echo "Os Testes falharam! Corrija antes de mergear."
+          exit 1
