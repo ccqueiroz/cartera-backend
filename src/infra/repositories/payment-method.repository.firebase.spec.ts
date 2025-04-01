@@ -8,9 +8,15 @@ describe('Payment Method Repository Firebase', () => {
   let paymentMethodRepo: PaymentMethodRepositoryFirebase;
 
   beforeEach(() => {
+    process.env.NODE_ENV = 'test';
     jest.clearAllMocks();
 
     paymentMethodRepo = PaymentMethodRepositoryFirebase.create(dbFirestore);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return Payment Methods list when exist items in database.', async () => {

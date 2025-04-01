@@ -9,8 +9,14 @@ describe('Payment Status Repository Firebase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
     paymentStatusRepo = PaymentStatusRepositoryFirebase.create(dbFirestore);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return Payment Status list when exist items in database.', async () => {

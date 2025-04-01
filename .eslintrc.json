@@ -14,11 +14,20 @@
       {
         "endOfLine": "auto"
       }
+    ],
+    "import/namespace": [
+      "warn",
+      {
+        "allowComputed": true
+      }
     ]
   },
   "settings": {
     "import/resolver": {
-      "typescript": { "alwaysTryTypes": true }
+      "typescript": { "project": "./tsconfig.json" },
+      "node": {
+        "extensions": [".ts", ".tsx"]
+      }
     }
   }
 }

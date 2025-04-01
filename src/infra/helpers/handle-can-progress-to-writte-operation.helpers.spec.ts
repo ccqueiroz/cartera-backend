@@ -24,11 +24,17 @@ const responseMock = {
 describe('Handle Can Progress to Writte Helper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
     dbMock = dbFirestore.collection('collection-test');
 
     handleCanProgressToWritteOperationMock =
       new HandleCanProgressToWritteOperationHelper();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should finish the method without presenting errors when all parameters are passed correctly and call the search get method.', async () => {

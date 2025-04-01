@@ -96,6 +96,7 @@ const handleCanProgressToWritteOperation: HandleCanProgressToWritteOperationHelp
 
 describe('Bill Repository Firebase', () => {
   beforeEach(() => {
+    process.env.NODE_ENV = 'test';
     jest.clearAllMocks();
 
     billRepo = BillsRepositoryFirebase.create(
@@ -104,6 +105,11 @@ describe('Bill Repository Firebase', () => {
       applayPagination,
       handleCanProgressToWritteOperation,
     );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return Bills list when exist items in database', async () => {
