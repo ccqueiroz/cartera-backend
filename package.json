@@ -29,6 +29,7 @@
     "@utils-fns/mask": "^5.1.0",
     "@utils-fns/validators": "^10.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "firebase": "^8.0.0",
     "firebase-admin": "^12.4.0",
