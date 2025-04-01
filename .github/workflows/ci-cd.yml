@@ -1,0 +1,34 @@
+name: Cartera-Backend CI-CD
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configuração do Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Instalando as dependências
+        run: yarn install --frozen-lockfile
+
+      - name: Verificando Lint
+        run: yarn lint
+
+      - name: Analisando Testes Unitários
+        run: yarn test:unit
