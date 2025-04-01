@@ -69,7 +69,7 @@ describe('Get Categories', () => {
 
     expect(result.data.length).toEqual(0);
     expect(categoryUserGatewayMock.getCategories).toHaveBeenCalledWith({
-      type: CategoryType.RECEIVABLE,
+      type: undefined,
     });
   });
 
