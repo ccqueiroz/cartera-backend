@@ -18,12 +18,14 @@ describe('Auth Repository Firebase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
     authRepo = AuthRepositoryFirebase.create(authFirebase);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be register a user with email and password', async () => {

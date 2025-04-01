@@ -9,8 +9,14 @@ describe('Person User Repository Firebase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
     personUserRepo = PersonUserRepositoryFirebase.create(dbFirestore);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return user data if email found when this search to be by email', async () => {

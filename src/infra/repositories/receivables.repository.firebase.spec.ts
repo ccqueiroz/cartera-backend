@@ -91,6 +91,7 @@ describe('Receivable Repository Firebase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
     receivableRepo = ReceivablesRepositoryFirebase.create(
       dbFirestore,
@@ -98,6 +99,11 @@ describe('Receivable Repository Firebase', () => {
       applayPagination,
       handleCanProgressToWritteOperation,
     );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return Receivables list when exist items in database', async () => {

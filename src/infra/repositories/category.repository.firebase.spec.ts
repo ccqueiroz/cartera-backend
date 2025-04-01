@@ -9,9 +9,14 @@ describe('Category Repository Firebase', () => {
   let categoryRepo: CategoryRepositoryFirebase;
 
   beforeEach(() => {
+    process.env.NODE_ENV = 'test';
     jest.clearAllMocks();
-
     categoryRepo = CategoryRepositoryFirebase.create(dbFirestore);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    process.env.NODE_ENV = 'development';
   });
 
   it('should be return Categories list when exist items in database.', async () => {
