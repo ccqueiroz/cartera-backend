@@ -54,7 +54,8 @@ jobs:
         continue-on-error: false
 
       - name: Analisando Testes Unitários
-        run: yarn test:unit
+        id: unit-tests
+        run: yarn test:ci
         continue-on-error: false
 
   check-results:
