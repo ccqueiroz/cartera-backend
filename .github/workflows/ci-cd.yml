@@ -8,6 +8,9 @@ jobs:
   build:
     name: "🚀 Build & Test"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: true
     outputs:
       tests-passed: ${{ steps.unit-tests.outcome == 'success' }}
     strategy:
