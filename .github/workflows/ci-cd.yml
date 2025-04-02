@@ -55,7 +55,7 @@ jobs:
 
       - name: Analisando Testes Unitários
         id: unit-tests
-        run: yarn test:ci
+        run: yarn test:ci:unit
         continue-on-error: false
 
   check-results:
