@@ -57,13 +57,3 @@ jobs:
         id: unit-tests
         run: yarn test:ci:unit
         continue-on-error: false
-
-  check-results:
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ needs.build.outputs.tests-passed != 'true' }}
-    steps:
-      - name: Bloquear Merge
-        run: |
-          echo "Os Testes falharam! Corrija antes de mergear."
-          exit 1
