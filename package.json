@@ -19,7 +19,7 @@
     "test:coverage": "dotenv -e .env.test jest --coverage",
     "test:coverage:unit": "dotenv -e .env.test jest --config=jest-unit-config.ts --coverage",
     "test:unit": "yarn test -- --watch -c jest-unit-config.ts",
-    "test:ci": "yarn test -- --coverage",
+    "test:ci:unit": "yarn test -- jest-unit-config.ts --coverage",
     "migrate": "ts-node scripts/run-migrations-firebase.ts"
   },
   "engines": {

@@ -8,6 +8,9 @@ jobs:
   build:
     name: "🚀 Build & Test"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: true
     outputs:
       tests-passed: ${{ steps.unit-tests.outcome == 'success' }}
     strategy:
@@ -54,15 +57,6 @@ jobs:
         continue-on-error: false
 
       - name: Analisando Testes Unitários
-        run: yarn test:unit
+        id: unit-tests
+        run: yarn test:ci:unit
         continue-on-error: false
-
-  check-results:
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ needs.build.outputs.tests-passed != 'true' }}
-    steps:
-      - name: Bloquear Merge
-        run: |
-          echo "Os Testes falharam! Corrija antes de mergear."
-          exit 1
