@@ -5,6 +5,7 @@ import { BillEntitie } from '@/domain/Bill/entitie/bill.entitie';
 import { MaskAmountMaskService } from '../masks/mask-amount.mask';
 import {
   BillDTO,
+  BillsPayableMonthInputDTO,
   CreateBillInputDTO,
   CreateBillOutputDTO,
   DeleteBillInputDTO,
@@ -13,6 +14,7 @@ import {
   GetBillsInputDTO,
   OrderByGetBillsInputDTO,
   SearchByDateGetBillsInputDTO,
+  SortByBillTypeInputDTO,
   SortByStatusBillsInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
@@ -150,20 +152,17 @@ export class BillsRepositoryFirebase implements BillGateway {
     return dataOrdering;
   }
 
-  private async handleSearchBills(
-    input: GetBillsInputDTO,
-  ): Promise<ResponseListDTO<BillDTO>> {
-    const { ordering, userId } = input;
-
+  private async handleQueryBills({
+    userId,
+    direction,
+  }: {
+    userId: string;
+    direction: SortOrder;
+  }) {
     const query: admin.firestore.Query<admin.firestore.DocumentData> =
       this.dbCollection;
 
-    const direction =
-      ordering && Object.prototype.hasOwnProperty.call(ordering, 'createdAt')
-        ? ordering['createdAt']
-        : SortOrder.ASC;
-
-    let data = await query
+    const data = await query
       .where('userId', '==', userId)
       .orderBy('createdAt', direction)
       .get()
@@ -175,6 +174,22 @@ export class BillsRepositoryFirebase implements BillGateway {
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
       });
+
+    return data as Array<BillDTO>;
+  }
+
+  private async handleBuildSearchBills(
+    input: GetBillsInputDTO,
+  ): Promise<ResponseListDTO<BillDTO>> {
+    const { ordering, userId } = input;
+
+    const direction = (
+      ordering && Object.prototype.hasOwnProperty.call(ordering, 'createdAt')
+        ? ordering['createdAt']
+        : SortOrder.ASC
+    ) as SortOrder;
+
+    let data = await this.handleQueryBills({ userId, direction });
 
     data = this.applyFilterBills(input, data as Array<BillDTO>);
 
@@ -190,7 +205,7 @@ export class BillsRepositoryFirebase implements BillGateway {
   public async getBills(
     input: GetBillsInputDTO,
   ): Promise<ResponseListDTO<BillDTO>> {
-    const data = await this.handleSearchBills(input);
+    const data = await this.handleBuildSearchBills(input);
 
     return data;
   }
@@ -338,5 +353,40 @@ export class BillsRepositoryFirebase implements BillGateway {
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
       });
+  }
+
+  public async billsPayableMonth({
+    period,
+    userId,
+  }: BillsPayableMonthInputDTO): Promise<Array<BillDTO>> {
+    if (!userId) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
+
+    if (!period || !period?.initialDate || !period?.finalDate) {
+      throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 401);
+    }
+
+    let data = await this.handleQueryBills({
+      userId,
+      direction: SortOrder.ASC,
+    });
+
+    const searchByDate: SearchByDateGetBillsInputDTO = {
+      billDate: period,
+    };
+
+    const sortByBills: SortByBillTypeInputDTO = {
+      payOut: false,
+    };
+
+    const ordering: OrderByGetBillsInputDTO = {
+      billDate: SortOrder.DESC,
+    };
+
+    data = this.applyOrderingBills(
+      { userId, sortByBills, searchByDate, ordering } as GetBillsInputDTO,
+      data as Array<BillDTO>,
+    );
+
+    return data;
   }
 }

@@ -118,3 +118,8 @@ export type EditBillInputDTO = {
 };
 
 export type DeleteBillInputDTO = Required<Pick<BillDTO, 'id' | 'userId'>>;
+
+export type BillsPayableMonthInputDTO = {
+  period: { initialDate: number; finalDate: number };
+  userId: string;
+};
