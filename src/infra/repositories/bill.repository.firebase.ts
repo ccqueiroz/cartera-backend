@@ -361,8 +361,14 @@ export class BillsRepositoryFirebase implements BillGateway {
   }: BillsPayableMonthInputDTO): Promise<Array<BillDTO>> {
     if (!userId) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
 
-    if (!period || !period?.initialDate || !period?.finalDate) {
-      throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 401);
+    if (
+      !period ||
+      !period?.initialDate ||
+      !period?.finalDate ||
+      isNaN(period.initialDate) ||
+      isNaN(period.finalDate)
+    ) {
+      throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
     }
 
     let data = await this.handleQueryBills({
@@ -379,8 +385,13 @@ export class BillsRepositoryFirebase implements BillGateway {
     };
 
     const ordering: OrderByGetBillsInputDTO = {
-      billDate: SortOrder.DESC,
+      billDate: SortOrder.ASC,
     };
+
+    data = this.applyFilterBills(
+      { userId, sortByBills, searchByDate, ordering } as GetBillsInputDTO,
+      data as Array<BillDTO>,
+    );
 
     data = this.applyOrderingBills(
       { userId, sortByBills, searchByDate, ordering } as GetBillsInputDTO,
