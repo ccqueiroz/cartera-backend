@@ -18,7 +18,7 @@
     "test": "dotenv -e .env.test jest --silent --colors --runInBand --noStackTrace",
     "test:coverage": "dotenv -e .env.test jest --coverage",
     "test:coverage:unit": "dotenv -e .env.test jest --config=jest-unit-config.ts --coverage",
-    "test:unit": "yarn test -- --watch -c jest-unit-config.ts",
+    "test:unit": "npx jest --watch -c jest-unit-config.ts",
     "test:ci:unit": "yarn test -- jest-unit-config.ts --coverage",
     "migrate": "ts-node scripts/run-migrations-firebase.ts"
   },
