@@ -17,6 +17,7 @@ describe('DeleteBillUseCase', () => {
       createBill: jest.fn(),
       updateBill: jest.fn(),
       deleteBill: jest.fn(),
+      billsPayableMonth: jest.fn(),
     };
 
     deletebillUseCase = DeleteBillUseCase.create({

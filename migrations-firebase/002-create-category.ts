@@ -41,6 +41,11 @@ const categories = [
   },
   {
     id: randomUUID(),
+    description: 'Assinatura de Internet, Telefonia e Streamings',
+    type: CategoryType.BILLS,
+  },
+  {
+    id: randomUUID(),
     description: 'Serviços e Utilidades Públicas',
     type: CategoryType.BILLS,
   },
@@ -107,6 +112,11 @@ const categories = [
   {
     id: randomUUID(),
     description: 'Artigos Esportivos e Hobbies',
+    type: CategoryType.BILLS,
+  },
+  {
+    id: randomUUID(),
+    description: 'Despesa com Cartão de Crédito',
     type: CategoryType.BILLS,
   },
   {

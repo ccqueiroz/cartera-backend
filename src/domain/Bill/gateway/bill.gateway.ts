@@ -1,6 +1,7 @@
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import {
   BillDTO,
+  BillsPayableMonthInputDTO,
   CreateBillInputDTO,
   CreateBillOutputDTO,
   DeleteBillInputDTO,
@@ -22,4 +23,6 @@ export interface BillGateway {
   updateBill({ billId, billData, userId }: EditBillInputDTO): Promise<BillDTO>;
 
   deleteBill({ id, userId }: DeleteBillInputDTO): Promise<void>;
+
+  billsPayableMonth(input: BillsPayableMonthInputDTO): Promise<Array<BillDTO>>;
 }

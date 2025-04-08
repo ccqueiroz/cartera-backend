@@ -27,4 +27,6 @@ export const ERROR_MESSAGES = {
     'Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.',
   BILL_NOT_FOUND:
     'Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.',
+  INVALID_PERIOD:
+    'Período de pesquisa inválido. Por favor, informe o período de análise.',
 } as const;

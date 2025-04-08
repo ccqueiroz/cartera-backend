@@ -27,6 +27,7 @@ describe('EditBillUseCase', () => {
       createBill: jest.fn(),
       updateBill: jest.fn(),
       deleteBill: jest.fn(),
+      billsPayableMonth: jest.fn(),
     };
 
     categoryGatewayMock = {
