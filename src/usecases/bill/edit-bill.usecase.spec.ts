@@ -30,7 +30,6 @@ describe('EditBillUseCase', () => {
       billsPayableMonth: jest.fn(),
     };
 
-
     categoryGatewayMock = {
       getCategories: jest.fn(),
       getCategoryById: jest.fn(),
