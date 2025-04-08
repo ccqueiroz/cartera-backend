@@ -123,3 +123,20 @@ export type BillsPayableMonthInputDTO = {
   period: { initialDate: number; finalDate: number };
   userId: string;
 };
+
+export const StatusBill = {
+  PENDING: 'PENDING',
+  DUE_SOON: 'DUE_SOON',
+  DUE_DAY: 'DUE_DAY',
+  OVERDUE: 'OVERDUE',
+  PAID: 'PAID',
+} as const;
+
+export type BillsPayableMonthOutPutDTO = {
+  id: string;
+  amount: number;
+  billDate: number;
+  categoryId: CategoryId;
+  categoryDescription: CategoryDescription;
+  status: (typeof StatusBill)[keyof typeof StatusBill];
+};
