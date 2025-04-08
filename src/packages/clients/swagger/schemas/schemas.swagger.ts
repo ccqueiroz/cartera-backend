@@ -241,6 +241,34 @@
  *           type: number
  *           example: 1724144869975
  *
+ *     BillsPayableMonthOutPutDTO:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         amount:
+ *           type: number
+ *           example: 1200.00
+ *         billDate:
+ *           type: number
+ *           example: 1743390000000
+ *         categoryId:
+ *           type: string
+ *           example: 7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e
+ *         categoryDescription:
+ *           type: string
+ *           example: Supermercado
+ *         status:
+ *           type: string
+ *           enum:
+ *             - PENDING
+ *             - DUE_SOON
+ *             - DUE_DAY
+ *             - OVERDUE
+ *             - PAID
+ *           example: DUE_SOON
+ *
  *     OrderByAmount:
  *       type: object
  *       properties:
