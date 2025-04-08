@@ -12,6 +12,8 @@ import { EditBillUseCase } from '@/usecases/bill/edit-bill.usecase';
 import { EditBillRoute } from './edit-bill.route';
 import { DeleteBillUseCase } from '@/usecases/bill/delete-bill.usecase';
 import { DeleteBillRoute } from './delete-bill.route';
+import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month';
+import { GetBillsPayableMonthRoute } from './get-bills-payable-month.route';
 
 export class BillRoute implements MapRoutes {
   private constructor(
@@ -89,12 +91,24 @@ export class BillRoute implements MapRoutes {
     this.routes.push(deleteBillRoute);
   }
 
+  private factoryGetBillsPayableMonth() {
+    const getBillsPayableMonthService = GetBillsPayableMonthUseCase.create({
+      billGateway: this.billGateway,
+    });
+    const getBillsPayableMonthServiceRoute = GetBillsPayableMonthRoute.create(
+      getBillsPayableMonthService,
+      [this.authVerifyMiddleware.getHandler()],
+    );
+    this.routes.push(getBillsPayableMonthServiceRoute);
+  }
+
   private joinRoutes() {
     this.factoryGetBills();
     this.factoryGetBillById();
     this.factoryCreateBill();
     this.factoryUpdateBill();
     this.factoryDeleteBill();
+    this.factoryGetBillsPayableMonth();
   }
 
   public execute() {
