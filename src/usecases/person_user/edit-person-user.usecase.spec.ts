@@ -10,12 +10,9 @@ describe('Edit Person User Usecase', () => {
 
   beforeEach(() => {
     personUserGatewayMock = {
-      getPersonUserByEmail: jest.fn(),
-      createPersonUser: jest.fn(),
       getPersonUserById: jest.fn(),
       editPersonUser: jest.fn(),
-      deletePersonUser: jest.fn(),
-    };
+    } as any;
 
     editPersonUserUseCase = EditPersonUserUseCase.create({
       personUserGateway: personUserGatewayMock,

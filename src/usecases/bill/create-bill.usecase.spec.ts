@@ -22,28 +22,20 @@ let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodSta
 describe('CreateBillUseCase', () => {
   beforeEach(() => {
     billGatewayMock = {
-      getBills: jest.fn(),
-      getBillById: jest.fn(),
       createBill: jest.fn(),
-      updateBill: jest.fn(),
-      deleteBill: jest.fn(),
-      billsPayableMonth: jest.fn(),
-    };
+    } as any;
 
     categoryGatewayMock = {
       getCategories: jest.fn(),
-      getCategoryById: jest.fn(),
-    };
+    } as any;
 
     paymentMethodGatewayMock = {
-      getPaymentMethodById: jest.fn(),
       getPaymentMethods: jest.fn(),
-    };
+    } as any;
 
     paymentStatusGatewayMock = {
       getPaymentStatus: jest.fn(),
-      getPaymentStatusById: jest.fn(),
-    };
+    } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({

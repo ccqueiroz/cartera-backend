@@ -8,15 +8,8 @@ describe('Signout Usecase', () => {
 
   beforeEach(() => {
     authGatewayMock = {
-      loginWithEmail: jest.fn(),
-      registerWithEmail: jest.fn(),
-      recoveryPassword: jest.fn(),
       signout: jest.fn(),
-      getUserByEmail: jest.fn(),
-      deleteUser: jest.fn(),
-      verifyToken: jest.fn(),
-      createNewToken: jest.fn(),
-    };
+    } as any;
 
     signOutUseCase = SignoutUseCase.create(authGatewayMock);
   });
@@ -26,8 +19,6 @@ describe('Signout Usecase', () => {
   });
 
   it('should call execute method when valid userId are provided', async () => {
-    authGatewayMock.recoveryPassword.mockResolvedValue();
-
     await signOutUseCase.execute({
       userId: '1212121212',
     });

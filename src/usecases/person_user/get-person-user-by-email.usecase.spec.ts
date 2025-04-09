@@ -14,15 +14,11 @@ describe('Get Person User By Email', () => {
   beforeEach(() => {
     personUserGatewayMock = {
       getPersonUserByEmail: jest.fn(),
-      createPersonUser: jest.fn(),
-      getPersonUserById: jest.fn(),
-      editPersonUser: jest.fn(),
-      deletePersonUser: jest.fn(),
-    };
+    } as any;
 
     emailValidatorGatewayMock = {
       validate: jest.fn(),
-    };
+    } as any;
 
     getPersonUserByEmailUseCase = GetPersonUserByEmailUseCase.create({
       personUserGateway: personUserGatewayMock,

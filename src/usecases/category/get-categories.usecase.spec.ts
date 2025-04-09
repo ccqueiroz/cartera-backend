@@ -10,8 +10,7 @@ describe('Get Categories', () => {
   beforeEach(() => {
     categoryUserGatewayMock = {
       getCategories: jest.fn(),
-      getCategoryById: jest.fn(),
-    };
+    } as any;
 
     getCategoriesUseCase = GetCategoriesUseCase.create({
       categoryGateway: categoryUserGatewayMock,
