@@ -7,3 +7,8 @@ export type CashFlowDTO = {
   expenses: number;
   profit: number;
 };
+
+export type GetConsolidatedCashFlowByYearInputDTO = {
+  year: number;
+  userId: string;
+};
