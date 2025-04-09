@@ -6,6 +6,8 @@ export const Months = {
   MAI: 'MAI',
   JUN: 'JUN',
   JUL: 'JUL',
+  AGO: 'AGO',
+  SET: 'SET',
   OUT: 'OUT',
   NOV: 'NOV',
   DEZ: 'DEZ',
