@@ -115,11 +115,34 @@ export class GetConsolidatedCashFlowByYearUseCase
     return listWithSeparatedItems;
   }
 
-  private async getListBillsAndReceivables(userId: string) {
+  private async getListBillsAndReceivables(userId: string, year: number) {
+    const initialPeriod = `01-01-${year}`;
+    const finalPeriod = `12-31-${year}`;
+
     const [listBillsByGateway, listReceivablesByGateway] =
       await Promise.allSettled([
-        this.billGateway.getBills({ userId, page: 0, size: 99999 }),
-        this.receivableGateway.getReceivables({ userId, page: 0, size: 99999 }),
+        this.billGateway.getBills({
+          userId,
+          page: 0,
+          size: 99999,
+          searchByDate: {
+            billDate: {
+              initialDate: new Date(initialPeriod).getTime(),
+              finalDate: new Date(finalPeriod).getTime(),
+            },
+          },
+        }),
+        this.receivableGateway.getReceivables({
+          userId,
+          page: 0,
+          size: 99999,
+          searchByDate: {
+            receivableDate: {
+              initialDate: new Date(initialPeriod).getTime(),
+              finalDate: new Date(finalPeriod).getTime(),
+            },
+          },
+        }),
       ]);
 
     if (
@@ -148,7 +171,7 @@ export class GetConsolidatedCashFlowByYearUseCase
     }
 
     const { listBills, listReceivables } =
-      await this.getListBillsAndReceivables(userId);
+      await this.getListBillsAndReceivables(userId, year);
 
     const [listExpensesBillDate, listIncomesReceivableDate] =
       await Promise.allSettled([
