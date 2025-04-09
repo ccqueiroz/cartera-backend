@@ -1,3 +1,4 @@
+import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import 'dotenv/config';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
@@ -113,6 +114,12 @@ function main() {
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
+
+  const cashFlowRoutes = CashFlowRoute.create(
+    billRepository,
+    receivableRepository,
+    authVerifyTokenMiddleware,
+  ).execute();
   //
 
   // ----- GLOBAL MIDDLEWARES ----
@@ -131,6 +138,7 @@ function main() {
       ...paymentStatusRoutes,
       ...receivableRoutes,
       ...billRoutes,
+      ...cashFlowRoutes,
     ],
     [cors, ipControll],
     errorMiddleware,
