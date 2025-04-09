@@ -22,7 +22,7 @@ type ListWithSeparatedItems<T = BillDTO | ReceivableDTO> = {
   list: Array<T>;
 };
 
-export class GetConsolidatedCashFlowByYear
+export class GetConsolidatedCashFlowByYearUseCase
   implements
     Usecase<
       GetConsolidatedCashFlowByYearInputDTO,
@@ -46,7 +46,10 @@ export class GetConsolidatedCashFlowByYear
     receivableGateway: ReceivableGateway;
     billGateway: BillGateway;
   }) {
-    return new GetConsolidatedCashFlowByYear(receivableGateway, billGateway);
+    return new GetConsolidatedCashFlowByYearUseCase(
+      receivableGateway,
+      billGateway,
+    );
   }
 
   private getInitialAndFinalPeriod(month: number, year: number) {

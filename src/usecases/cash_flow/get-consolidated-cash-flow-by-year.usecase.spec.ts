@@ -1,6 +1,6 @@
 import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
-import { GetConsolidatedCashFlowByYear } from './get-consolidated-cash-flow-by-year.usecase';
+import { GetConsolidatedCashFlowByYearUseCase } from './get-consolidated-cash-flow-by-year.usecase';
 import { Months } from '@/domain/dtos/months.dto';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
@@ -8,7 +8,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 
 let billGatewayMock: jest.Mocked<BillGateway>;
 let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
-let getConsolidatedCashFlow: GetConsolidatedCashFlowByYear;
+let getConsolidatedCashFlow: GetConsolidatedCashFlowByYearUseCase;
 
 const billsItemsMock = [
   {
@@ -156,15 +156,15 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       getReceivables: jest.fn(),
     } as any;
 
-    getConsolidatedCashFlow = GetConsolidatedCashFlowByYear.create({
+    getConsolidatedCashFlow = GetConsolidatedCashFlowByYearUseCase.create({
       billGateway: billGatewayMock,
       receivableGateway: receivableGatewayMock,
     });
   });
 
-  it('should be create a instance of the GetConsolidatedCashFlowByYear class when will be use create method.', () => {
+  it('should be create a instance of the GetConsolidatedCashFlowByYearUseCase class when will be use create method.', () => {
     expect(getConsolidatedCashFlow).toBeInstanceOf(
-      GetConsolidatedCashFlowByYear,
+      GetConsolidatedCashFlowByYearUseCase,
     );
   });
 
