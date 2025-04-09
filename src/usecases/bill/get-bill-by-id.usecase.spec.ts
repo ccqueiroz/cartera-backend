@@ -11,13 +11,8 @@ const userIdMock = '1234567d';
 describe('GetBillByIdUseCase', () => {
   beforeEach(() => {
     billGatewayMock = {
-      getBills: jest.fn(),
       getBillById: jest.fn(),
-      createBill: jest.fn(),
-      updateBill: jest.fn(),
-      deleteBill: jest.fn(),
-      billsPayableMonth: jest.fn(),
-    };
+    } as any;
 
     getBillByIdUseCase = GetBillByIdUseCase.create({
       billGateway: billGatewayMock,

@@ -12,12 +12,9 @@ const userIdMock = '1234567d';
 describe('DeleteReceivableUseCase', () => {
   beforeEach(() => {
     receivableGatewayMock = {
-      createReceivable: jest.fn(),
       deleteReceivable: jest.fn(),
       getReceivableById: jest.fn(),
-      getReceivables: jest.fn(),
-      updateReceivable: jest.fn(),
-    };
+    } as any;
 
     deleteReceivableUseCase = DeleteReceivableUseCase.create({
       receivableGateway: receivableGatewayMock,

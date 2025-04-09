@@ -12,12 +12,8 @@ describe('GetReceivableByIdUseCase', () => {
 
   beforeEach(() => {
     receivableGatewayMock = {
-      createReceivable: jest.fn(),
-      deleteReceivable: jest.fn(),
       getReceivableById: jest.fn(),
-      getReceivables: jest.fn(),
-      updateReceivable: jest.fn(),
-    };
+    } as any;
 
     getReceivableByIdUseCase = GetReceivableByIdUseCase.create({
       receivableGateway: receivableGatewayMock,

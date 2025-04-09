@@ -14,19 +14,16 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
 
   beforeEach(() => {
     categoryGatewayMock = {
-      getCategories: jest.fn(),
       getCategoryById: jest.fn(),
-    };
+    } as any;
 
     paymentMethodGatewayMock = {
       getPaymentMethodById: jest.fn(),
-      getPaymentMethods: jest.fn(),
-    };
+    } as any;
 
     paymentStatusGatewayMock = {
-      getPaymentStatus: jest.fn(),
       getPaymentStatusById: jest.fn(),
-    };
+    } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({

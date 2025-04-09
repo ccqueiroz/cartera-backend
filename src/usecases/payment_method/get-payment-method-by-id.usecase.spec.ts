@@ -11,9 +11,8 @@ describe('Get Payment Method By Id', () => {
 
   beforeEach(() => {
     paymentMethodUserGatewayMock = {
-      getPaymentMethods: jest.fn(),
       getPaymentMethodById: jest.fn(),
-    };
+    } as any;
 
     getPaymentMethodByIdUseCase = GetPaymentMethodByIdUseCase.create({
       paymentMethodGateway: paymentMethodUserGatewayMock,

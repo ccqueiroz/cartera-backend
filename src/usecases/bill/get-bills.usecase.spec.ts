@@ -82,12 +82,7 @@ describe('Get Bills UseCase', () => {
   beforeEach(() => {
     billGatewayMock = {
       getBills: jest.fn(),
-      getBillById: jest.fn(),
-      createBill: jest.fn(),
-      updateBill: jest.fn(),
-      deleteBill: jest.fn(),
-      billsPayableMonth: jest.fn(),
-    };
+    } as any;
 
     getBillsUseCase = GetBillsUseCase.create({
       billGateway: billGatewayMock,

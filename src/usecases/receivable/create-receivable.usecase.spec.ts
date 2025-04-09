@@ -24,26 +24,19 @@ describe('CreateReceivableUseCase', () => {
   beforeEach(() => {
     receivableGatewayMock = {
       createReceivable: jest.fn(),
-      deleteReceivable: jest.fn(),
-      getReceivableById: jest.fn(),
-      getReceivables: jest.fn(),
-      updateReceivable: jest.fn(),
-    };
+    } as any;
 
     categoryGatewayMock = {
       getCategories: jest.fn(),
-      getCategoryById: jest.fn(),
-    };
+    } as any;
 
     paymentMethodGatewayMock = {
-      getPaymentMethodById: jest.fn(),
       getPaymentMethods: jest.fn(),
-    };
+    } as any;
 
     paymentStatusGatewayMock = {
       getPaymentStatus: jest.fn(),
-      getPaymentStatusById: jest.fn(),
-    };
+    } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({

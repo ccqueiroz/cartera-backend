@@ -19,19 +19,12 @@ describe('Recovery Password Usecase', () => {
 
   beforeEach(() => {
     authGatewayMock = {
-      loginWithEmail: jest.fn(),
-      registerWithEmail: jest.fn(),
       recoveryPassword: jest.fn(),
-      signout: jest.fn(),
-      getUserByEmail: jest.fn(),
-      deleteUser: jest.fn(),
-      verifyToken: jest.fn(),
-      createNewToken: jest.fn(),
-    };
+    } as any;
 
     emailValidatorGatewayMock = {
       validate: jest.fn(),
-    };
+    } as any;
 
     getPersonUserByEmailUseCase = {
       execute: jest.fn<
