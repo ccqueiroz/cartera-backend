@@ -3,51 +3,70 @@ import { CashFlowDTO } from '../dtos/cash-flow.dto';
 import { ReceivableDTO } from '@/domain/Receivable/dtos/receivable.dto';
 
 export type CashFlowEntitieProps = CashFlowDTO & {
-  listExpenses: Array<BillDTO>;
-  listIncomes: Array<ReceivableDTO>;
+  listGeneralExpenses: Array<BillDTO>;
+  listPaidExpenses: Array<BillDTO>;
+  listGeneralIncomes: Array<ReceivableDTO>;
+  listPaidIncomes: Array<ReceivableDTO>;
 };
 
 export class CashFlowEntitie {
   private constructor(private props: CashFlowEntitieProps) {
-    this.setExpenses(this.props.listExpenses);
-    this.setIncomes(this.props.listIncomes);
+    this.setExpenses(
+      this.props.listGeneralExpenses,
+      this.props.listPaidExpenses,
+    );
+    this.setIncomes(this.props.listGeneralIncomes, this.props.listPaidIncomes);
   }
 
   public static create({
     year,
     month,
-    listExpenses,
-    listIncomes,
-  }: Omit<CashFlowEntitieProps, 'profit' | 'expenses' | 'incomes'>) {
+    listGeneralExpenses,
+    listPaidExpenses,
+    listGeneralIncomes,
+    listPaidIncomes,
+  }: Omit<
+    CashFlowEntitieProps,
+    | 'generalProfit'
+    | 'paidProfit'
+    | 'generalExpenses'
+    | 'paidExpenses'
+    | 'generalIncomes'
+    | 'paidIncomes'
+  >) {
     return new CashFlowEntitie({
       year,
       month,
-      listExpenses,
-      listIncomes,
-      expenses: 0,
-      incomes: 0,
-      profit: 0,
+      listGeneralExpenses,
+      listPaidExpenses,
+      listGeneralIncomes,
+      listPaidIncomes,
+      generalExpenses: 0,
+      generalIncomes: 0,
+      paidExpenses: 0,
+      paidIncomes: 0,
+      generalProfit: 0,
+      paidProfit: 0,
     });
   }
 
-  private setExpenses(listExpenses: Array<BillDTO>) {
-    let total = 0;
-
-    listExpenses.forEach((i) => {
-      total += i.amount;
-    });
-
-    this.props.expenses = total;
+  private setExpenses(generalList: Array<BillDTO>, paidList: Array<BillDTO>) {
+    this.props.generalExpenses = generalList.reduce(
+      (acc, i) => acc + i.amount,
+      0,
+    );
+    this.props.paidExpenses = paidList.reduce((acc, i) => acc + i.amount, 0);
   }
 
-  private setIncomes(listIncomes: Array<ReceivableDTO>) {
-    let total = 0;
-
-    listIncomes.forEach((i) => {
-      total += i.amount;
-    });
-
-    this.props.incomes = total;
+  private setIncomes(
+    generalList: Array<ReceivableDTO>,
+    paidList: Array<ReceivableDTO>,
+  ) {
+    this.props.generalIncomes = generalList.reduce(
+      (acc, i) => acc + i.amount,
+      0,
+    );
+    this.props.paidIncomes = paidList.reduce((acc, i) => acc + i.amount, 0);
   }
 
   public get year() {
@@ -58,15 +77,27 @@ export class CashFlowEntitie {
     return this.props.month;
   }
 
-  public get incomes() {
-    return this.props.incomes;
+  public get generalIncomes() {
+    return this.props.generalIncomes;
   }
 
-  public get expenses() {
-    return this.props.expenses;
+  public get paidIncomes() {
+    return this.props.paidIncomes;
   }
 
-  public get profit() {
-    return this.incomes - this.expenses;
+  public get generalExpenses() {
+    return this.props.generalExpenses;
+  }
+
+  public get paidExpenses() {
+    return this.props.paidExpenses;
+  }
+
+  public get generalProfit() {
+    return this.generalIncomes - this.generalExpenses;
+  }
+
+  public get paidProfit() {
+    return this.paidIncomes - this.paidExpenses;
   }
 }
