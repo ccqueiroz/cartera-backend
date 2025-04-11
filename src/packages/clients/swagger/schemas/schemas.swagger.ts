@@ -388,15 +388,24 @@
  *             - NOV
  *             - DEZ
  *           example: ABR
- *         incomes:
+ *         generalIncomes:
  *           type: number
  *           example: 1000.0
- *         expenses:
+ *         paidIncomes:
+ *           type: number
+ *           example: 900.0
+ *         generalExpenses:
  *           type: number
  *           example: 500.0
- *         profit:
+ *         paidExpenses:
  *           type: number
  *           example: 500.0
+ *         generalProfit:
+ *           type: number
+ *           example: 100.0
+ *         paidProfit:
+ *           type: number
+ *           example: 400.0
  *
  *     CashFlowDTOListResponse:
  *       type: object
@@ -408,62 +417,98 @@
  *           example:
  *             - year: 2025
  *               month: JAN
- *               incomes: 3000.0
- *               expenses: 1200.0
- *               profit: 1800.0
+ *               generalIncomes: 3000.0
+ *               generalExpenses: 1200.0
+ *               generalProfit: 1800.0
+ *               paidIncomes: 3000.0
+ *               paidExpenses: 1200.0
+ *               paidProfit: 1800.0
  *             - year: 2025
  *               month: FEV
- *               incomes: 2500.0
- *               expenses: 1500.0
- *               profit: 1000.0
+ *               generalIncomes: 2500.0
+ *               generalExpenses: 1500.0
+ *               generalProfit: 1000.0
+ *               paidIncomes: 2500.0
+ *               paidExpenses: 1500.0
+ *               paidProfit: 1000.0
  *             - year: 2025
  *               month: MAR
- *               incomes: 2800.0
- *               expenses: 1600.0
- *               profit: 1200.0
+ *               generalIncomes: 2800.0
+ *               generalExpenses: 1600.0
+ *               generalProfit: 1200.0
+ *               paidIncomes: 2800.0
+ *               paidExpenses: 1600.0
+ *               paidProfit: 1200.0
  *             - year: 2025
  *               month: ABR
- *               incomes: 2600.0
- *               expenses: 1300.0
- *               profit: 1300.0
+ *               generalIncomes: 2600.0
+ *               generalExpenses: 1300.0
+ *               generalProfit: 1300.0
+ *               paidIncomes: 2600.0
+ *               paidExpenses: 1300.0
+ *               paidProfit: 1300.0
  *             - year: 2025
  *               month: MAI
- *               incomes: 3200.0
- *               expenses: 2000.0
- *               profit: 1200.0
+ *               generalIncomes: 3200.0
+ *               generalExpenses: 2000.0
+ *               generalProfit: 1200.0
+ *               paidIncomes: 3200.0
+ *               paidExpenses: 2000.0
+ *               paidProfit: 1200.0
  *             - year: 2025
  *               month: JUN
- *               incomes: 3100.0
- *               expenses: 1500.0
- *               profit: 1600.0
+ *               generalIncomes: 3100.0
+ *               generalExpenses: 1500.0
+ *               generalProfit: 1600.0
+ *               paidIncomes: 3100.0
+ *               paidExpenses: 1500.0
+ *               paidProfit: 1600.0
  *             - year: 2025
  *               month: JUL
- *               incomes: 3300.0
- *               expenses: 1800.0
- *               profit: 1500.0
+ *               generalIncomes: 3300.0
+ *               generalExpenses: 1800.0
+ *               generalProfit: 1500.0
+ *               paidIncomes: 3300.0
+ *               paidExpenses: 1800.0
+ *               paidProfit: 1500.0
  *             - year: 2025
  *               month: AGO
- *               incomes: 2900.0
- *               expenses: 1200.0
- *               profit: 1700.0
+ *               generalIncomes: 2900.0
+ *               generalExpenses: 1200.0
+ *               generalProfit: 1700.0
+ *               paidIncomes: 2900.0
+ *               paidExpenses: 1200.0
+ *               paidProfit: 1700.0
  *             - year: 2025
  *               month: SET
- *               incomes: 3000.0
- *               expenses: 1100.0
- *               profit: 1900.0
+ *               generalIncomes: 3000.0
+ *               generalExpenses: 1100.0
+ *               generalProfit: 1900.0
+ *               paidIncomes: 3000.0
+ *               paidExpenses: 1100.0
+ *               paidProfit: 1900.0
  *             - year: 2025
  *               month: OUT
- *               incomes: 2700.0
- *               expenses: 1400.0
- *               profit: 1300.0
+ *               generalIncomes: 2700.0
+ *               generalExpenses: 1400.0
+ *               generalProfit: 1300.0
+ *               paidIncomes: 2700.0
+ *               paidExpenses: 1400.0
+ *               paidProfit: 1300.0
  *             - year: 2025
  *               month: NOV
- *               incomes: 2600.0
- *               expenses: 1500.0
- *               profit: 1100.0
+ *               generalIncomes: 2600.0
+ *               generalExpenses: 1500.0
+ *               generalProfit: 1100.0
+ *               paidIncomes: 2600.0
+ *               paidExpenses: 1500.0
+ *               paidProfit: 1100.0
  *             - year: 2025
  *               month: DEZ
- *               incomes: 3500.0
- *               expenses: 2000.0
- *               profit: 1500.0
+ *               generalIncomes: 3500.0
+ *               generalExpenses: 2000.0
+ *               generalProfit: 1500.0
+ *               paidIncomes: 3500.0
+ *               paidExpenses: 2000.0
+ *               paidProfit: 1500.0
  */

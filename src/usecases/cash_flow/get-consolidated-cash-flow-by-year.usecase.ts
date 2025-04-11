@@ -77,6 +77,7 @@ export class GetConsolidatedCashFlowByYearUseCase
 
     applyFiltersInList.push((item) => {
       const date = Number((item as any)[key]);
+
       return date >= initalDate && date <= finalDate;
     });
 
@@ -107,7 +108,7 @@ export class GetConsolidatedCashFlowByYearUseCase
       );
 
       listWithSeparatedItems.push({
-        month: this.LIST_MONTHS[currentMonth],
+        month: this.LIST_MONTHS[currentMonth - 1],
         list: listByMonth,
       });
     }
@@ -173,37 +174,64 @@ export class GetConsolidatedCashFlowByYearUseCase
     const { listBills, listReceivables } =
       await this.getListBillsAndReceivables(userId, year);
 
-    const [listExpensesBillDate, listIncomesReceivableDate] =
-      await Promise.allSettled([
-        this.separateItemsByMonthPeriod<BillDTO>(year, 'billDate', listBills),
-        this.separateItemsByMonthPeriod<ReceivableDTO>(
-          year,
-          'receivableDate',
-          listReceivables,
-        ),
-      ]);
+    const paidBills = listBills.filter((bill) => bill.payOut);
+    const receivedReceivables = listReceivables.filter(
+      (receivable) => receivable.receival,
+    );
+
+    const [
+      listGeneralExpenses,
+      listPaidExpenses,
+      listGeneralIncomes,
+      listPaidIncomes,
+    ] = await Promise.allSettled([
+      this.separateItemsByMonthPeriod<BillDTO>(year, 'billDate', listBills),
+      this.separateItemsByMonthPeriod<BillDTO>(year, 'payDate', paidBills),
+      this.separateItemsByMonthPeriod<ReceivableDTO>(
+        year,
+        'receivableDate',
+        listReceivables,
+      ),
+      this.separateItemsByMonthPeriod<ReceivableDTO>(
+        year,
+        'receivalDate',
+        receivedReceivables,
+      ),
+    ]);
 
     if (
-      listExpensesBillDate.status === 'rejected' ||
-      listIncomesReceivableDate.status === 'rejected'
+      listGeneralExpenses.status === 'rejected' ||
+      listPaidExpenses.status === 'rejected' ||
+      listGeneralIncomes.status === 'rejected' ||
+      listPaidIncomes.status === 'rejected'
     ) {
       throw new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500);
     }
 
     const cashFlow = this.LIST_MONTHS.map((month, index) => {
+      const generalExpenses = listGeneralExpenses.value[index].list;
+      const paidExpenses = listPaidExpenses.value[index].list;
+      const generalIncomes = listGeneralIncomes.value[index].list;
+      const paidIncomes = listPaidIncomes.value[index].list;
+
       const cashFlowByMonth = CashFlowEntitie.create({
         year,
         month,
-        listExpenses: listExpensesBillDate.value[index].list,
-        listIncomes: listIncomesReceivableDate.value[index].list,
+        listGeneralExpenses: generalExpenses,
+        listPaidExpenses: paidExpenses,
+        listGeneralIncomes: generalIncomes,
+        listPaidIncomes: paidIncomes,
       });
 
       return {
         year: cashFlowByMonth.year,
         month: cashFlowByMonth.month,
-        incomes: cashFlowByMonth.incomes,
-        expenses: cashFlowByMonth.expenses,
-        profit: cashFlowByMonth.profit,
+        generalIncomes: cashFlowByMonth.generalIncomes,
+        paidIncomes: cashFlowByMonth.paidIncomes,
+        generalExpenses: cashFlowByMonth.generalExpenses,
+        paidExpenses: cashFlowByMonth.paidExpenses,
+        generalProfit: cashFlowByMonth.generalProfit,
+        paidProfit: cashFlowByMonth.paidProfit,
       } as CashFlowDTO;
     });
 

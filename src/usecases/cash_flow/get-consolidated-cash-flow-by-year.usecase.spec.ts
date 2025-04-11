@@ -18,8 +18,8 @@ const billsItemsMock = [
     descriptionBill: 'Faculdade',
     fixedBill: false,
     billDate: new Date('04-09-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: true,
+    payDate: null,
+    payOut: false,
     icon: null,
     amount: 8209.56,
     paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
@@ -40,8 +40,8 @@ const billsItemsMock = [
     descriptionBill: 'Supermercado',
     fixedBill: false,
     billDate: new Date('04-01-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: true,
+    payDate: null,
+    payOut: false,
     icon: null,
     amount: 1200.0,
     paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
@@ -62,7 +62,7 @@ const billsItemsMock = [
     descriptionBill: 'Energia',
     fixedBill: false,
     billDate: new Date('02-09-2025').getTime(),
-    payDate: new Date().getTime(),
+    payDate: new Date('03-01-2025').getTime(),
     payOut: true,
     icon: null,
     amount: 148.0,
@@ -116,8 +116,8 @@ const receivablesItemsMocks = [
     paymentMethodDescription: 'Test Payment Method 1',
     paymentStatusDescription: 'Pending',
     createdAt: new Date().getTime(),
-    receivalDate: null,
-    receival: false,
+    receivalDate: new Date('05-09-2025').getTime(),
+    receival: true,
     updatedAt: null,
   },
   {
@@ -197,19 +197,36 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
     expect(Object.keys(result.data[0])).toEqual([
       'year',
       'month',
-      'incomes',
-      'expenses',
-      'profit',
+      'generalIncomes',
+      'paidIncomes',
+      'generalExpenses',
+      'paidExpenses',
+      'generalProfit',
+      'paidProfit',
     ]);
-    expect(result.data[0].incomes).toBe(0);
-    expect(result.data[0].expenses).toBe(0);
-    expect(result.data[0].profit).toBe(0);
+    expect(result.data[0].generalIncomes).toBe(0);
+    expect(result.data[0].paidIncomes).toBe(0);
+    expect(result.data[0].generalExpenses).toBe(0);
+    expect(result.data[0].paidExpenses).toBe(0);
+    expect(result.data[0].generalProfit).toBe(0);
+    expect(result.data[0].paidProfit).toBe(0);
     expect(result.data[0].month).toBe(Months.JAN);
 
-    expect(result.data[1].incomes).toBe(100);
-    expect(result.data[1].expenses).toBe(148);
-    expect(result.data[1].profit).toBe(-48);
-    expect(result.data[1].month).toBe(Months.FEV);
+    expect(result.data[2].generalIncomes).toBe(300);
+    expect(result.data[2].paidIncomes).toBe(0);
+    expect(result.data[2].generalExpenses).toBe(0);
+    expect(result.data[2].paidExpenses).toBe(148);
+    expect(result.data[2].generalProfit).toBe(300);
+    expect(result.data[2].paidProfit).toBe(-148);
+
+    expect(result.data[3].month).toBe(Months.ABR);
+    expect(result.data[3].generalIncomes).toBe(200);
+    expect(result.data[3].paidIncomes).toBe(0);
+    expect(result.data[3].generalExpenses).toBe(9409.56);
+    expect(result.data[3].paidExpenses).toBe(0);
+    expect(result.data[3].generalProfit).toBe(-9209.56);
+    expect(result.data[3].paidProfit).toBe(0);
+    expect(result.data[3].month).toBe(Months.ABR);
   });
 
   it('should throw an error if userId is not provided', async () => {
