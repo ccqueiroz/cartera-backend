@@ -31,6 +31,7 @@ import {
   authFirebase,
   dbFirestore,
 } from './src/infra/database/firebase/firebase.database';
+import { logger } from './src/infra/logger';
 
 function main() {
   // ----- REPOSITORIES -----
@@ -127,7 +128,7 @@ function main() {
   const ipControll = new IpControllMiddleware(normalizeIp);
 
   //  ----- ERROR MIDDLEWARE -----
-  const errorMiddleware = new ErrorMiddleware();
+  const errorMiddleware = new ErrorMiddleware(logger.error);
 
   const api = ApiExpress.create(
     [
@@ -142,6 +143,7 @@ function main() {
     ],
     [cors, ipControll],
     errorMiddleware,
+    logger,
   );
   const port = Number(process.env.PORT) || 8000;
   api.start(port);
