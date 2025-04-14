@@ -8,15 +8,19 @@ import {
   swaggerSetup,
   swaggerSpecInstance,
 } from '@/packages/clients/swagger';
+import { LoggerGateway } from '@/domain/Helpers/gateway/logger.gateway';
 export class ApiExpress implements Api {
   private static instance: ApiExpress;
   private app: Express;
+  private logger: LoggerGateway;
 
   private constructor(
     routes: Array<Route>,
     globalMiddlewares: Array<Middleware>,
     errorMiddleware: ErrorMiddleware,
+    logger: LoggerGateway,
   ) {
+    this.logger = logger;
     this.app = express();
     this.app.use(json());
     this.app.set('x-powered-by', false);
@@ -31,12 +35,14 @@ export class ApiExpress implements Api {
     routes: Array<Route>,
     globalMiddlewares: Array<Middleware>,
     errorMiddleware: ErrorMiddleware,
+    logger: LoggerGateway,
   ) {
     if (!ApiExpress.instance) {
       ApiExpress.instance = new ApiExpress(
         routes,
         globalMiddlewares,
         errorMiddleware,
+        logger,
       );
     }
     return ApiExpress.instance;
@@ -69,7 +75,7 @@ export class ApiExpress implements Api {
 
   public start(port: number) {
     this.app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+      this.logger.info(`Server running on port ${port}`);
       this.listRoutes(port);
     });
   }
@@ -83,8 +89,7 @@ export class ApiExpress implements Api {
           method: route.route.stack[0].method,
         };
       });
-
-    console.log('Swagger UI -> ', `http://localhost:${port}${API_DOC}/#/`);
+    this.logger.info(`Swagger UI ->  http://localhost:${port}${API_DOC}/#/`);
     console.log(routes);
   }
 }
