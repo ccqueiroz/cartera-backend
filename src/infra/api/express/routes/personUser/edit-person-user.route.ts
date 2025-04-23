@@ -4,6 +4,8 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { Request, Response, NextFunction } from 'express';
+import { runValidate } from '@/packages/clients/class-validator';
+import { EditPersonUserValidationDTO } from '../../schema_validations/PersonUser/person-user.schema';
 
 /**
  * @swagger
@@ -43,7 +45,7 @@ import { Request, Response, NextFunction } from 'express';
  *                 data:
  *                   $ref: '#/components/schemas/PersonUserDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais Inválidas.
  *       404:
@@ -85,6 +87,18 @@ export class EditPersonUserRoute implements Route {
 
         if (!id || !email || !userId || !firstName || !lastName)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
+
+        const errors = await runValidate(EditPersonUserValidationDTO, {
+          id,
+          userId,
+          email,
+          firstName,
+          lastName,
+        });
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const personUser = await this.EditPersonUserService.execute({
           personId: id,
