@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { CreateBillUseCase } from '@/usecases/bill/create-bill.usecase';
 import { CreateBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { runValidate } from '@/packages/clients/class-validator';
+import { CreateBillValidationDTO } from '../../schema_validations/Bill/bill.schema';
 
 /**
  * @swagger
@@ -40,7 +42,7 @@ import { CreateBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *                       type: string
  *                       example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
  *       400:
- *         description: Categoria, Método de Pagamento ou Status de Pagamento inválidos.
+ *         description: Categoria, Método de Pagamento ou Status de Pagamento inválidos. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       429:
@@ -74,6 +76,18 @@ export class CreateBillRoute implements Route {
       try {
         const { user_auth } = request;
         const { payload } = request.body;
+
+        const errors = await runValidate<CreateBillValidationDTO>(
+          CreateBillValidationDTO,
+          {
+            ...payload,
+            authUserId: user_auth?.userId,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const bill = await this.createBillService.execute({
           userId: user_auth?.userId,

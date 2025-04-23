@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetBillsUseCase } from '@/usecases/bill/get-bills.usecase';
 import { GetBillsInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetBillsInputValidationDTO } from '../../schema_validations/Bill/bill.schema';
 
 /**
  * @swagger
@@ -144,7 +146,7 @@ import { GetBillsInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *                      type: number
  *                      example: 5
  *       400:
- *         description: Parâmetros inválidos ou ausentes.
+ *         description: Parâmetros inválidos ou ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Token de autenticação inválido ou ausente.
  *       500:
@@ -177,6 +179,23 @@ export class GetBillsRoute implements Route {
         const { user_auth } = request;
         const { page, size } = request.query;
         const { sortByBills, searchByDate, ordering, sort } = request.body;
+
+        const errors = await runValidate<GetBillsInputValidationDTO>(
+          GetBillsInputValidationDTO,
+          {
+            page: page as unknown as number,
+            size: size as unknown as number,
+            sort,
+            ordering,
+            searchByDate,
+            sortByBills,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const bills = await this.getBillsService.execute({
           userId: user_auth?.userId,

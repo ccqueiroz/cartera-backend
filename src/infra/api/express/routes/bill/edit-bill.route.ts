@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { EditBillUseCase } from '@/usecases/bill/edit-bill.usecase';
 import { EditBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { EditBillValidationDTO } from '../../schema_validations/Bill/bill.schema';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -44,7 +46,7 @@ import { EditBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *                 data:
  *                  $ref: '#/components/schemas/BillDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos.
+ *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -81,6 +83,19 @@ export class EditBillRoute implements Route {
         const { user_auth } = request;
         const { id } = request.params;
         const { payload } = request.body;
+
+        const errors = await runValidate<EditBillValidationDTO>(
+          EditBillValidationDTO,
+          {
+            id,
+            ...payload,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const bill = await this.editBillService.execute({
           billId: id,
