@@ -1,5 +1,11 @@
 import { runValidate } from '@/packages/clients/class-validator';
-import { GetReceivablesInputValidationDTO } from './receivable.schema';
+import {
+  CreateReceivableValidationDTO,
+  DeleteReceivableValidationDTO,
+  EditReceivableValidationDTO,
+  GetReceivableByIdValidationDTO,
+  GetReceivablesInputValidationDTO,
+} from './receivable.schema';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 
 describe('Receivable Schema', () => {
@@ -218,6 +224,186 @@ describe('Receivable Schema', () => {
         sort: {
           categoryId: '2000',
         },
+      },
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the input attributes of the GetReceivableByIdValidationDTO withou errors', async () => {
+    return runValidate<GetReceivableByIdValidationDTO>(
+      GetReceivableByIdValidationDTO,
+      {
+        id: '1900',
+        authUserId: '20000',
+      },
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the input attributes of the GetReceivableByIdValidationDTO with errors when dont passing correctly id.', async () => {
+    return runValidate<GetReceivableByIdValidationDTO>(
+      GetReceivableByIdValidationDTO,
+      {
+        id: undefined as any,
+        authUserId: '20000',
+      },
+    ).then((errors) => {
+      expect(errors.length).toEqual(1);
+    });
+  });
+
+  it('should be validate the input attributes of the CreateReceivableValidationDTO withou errors', async () => {
+    const model: CreateReceivableValidationDTO = {
+      authUserId: '2991',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: 'https://wwww.teste-icon.com',
+      amount: 7627.89,
+      paymentStatusId: '267890',
+      paymentStatusDescription: 'paymentStatus',
+      categoryId: '267890',
+      categoryDescription: 'category',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+    };
+    return runValidate<CreateReceivableValidationDTO>(
+      CreateReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the icon input attribute with not url.', async () => {
+    const model: CreateReceivableValidationDTO = {
+      authUserId: '2991',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: 'this-is-not-url',
+      amount: 7627.89,
+      paymentStatusId: '267890',
+      paymentStatusDescription: 'paymentStatus',
+      categoryId: '267890',
+      categoryDescription: 'category',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+    };
+    return runValidate<CreateReceivableValidationDTO>(
+      CreateReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(1);
+      expect(errors[0].constraints).toEqual({
+        isUrl: 'icon must be a URL address',
+      });
+    });
+  });
+
+  it('should be validate the icon input attribute with null.', async () => {
+    const model: CreateReceivableValidationDTO = {
+      authUserId: '2991',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: null,
+      amount: 7627.89,
+      paymentStatusId: '267890',
+      paymentStatusDescription: 'paymentStatus',
+      categoryId: '267890',
+      categoryDescription: 'category',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+    };
+    return runValidate<CreateReceivableValidationDTO>(
+      CreateReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the input attributes of the EditReceivableValidationDTO withou errors.', async () => {
+    const model: EditReceivableValidationDTO = {
+      authUserId: '2991',
+      id: '7282929',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: 'https://wwww.teste-icon.com',
+      amount: 7627.89,
+      paymentStatusId: '267890',
+      paymentStatusDescription: 'paymentStatus',
+      categoryId: '267890',
+      categoryDescription: 'category',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+      createdAt: 18783929293293,
+      updatedAt: 127899999939339,
+    };
+    return runValidate<EditReceivableValidationDTO>(
+      EditReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the updatedAt input attribute with null.', async () => {
+    const model: EditReceivableValidationDTO = {
+      authUserId: '2991',
+      id: '7282929',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: 'https://wwww.teste-icon.com',
+      amount: 7627.89,
+      paymentStatusId: '267890',
+      paymentStatusDescription: 'paymentStatus',
+      categoryId: '267890',
+      categoryDescription: 'category',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+      createdAt: 18783929293293,
+      updatedAt: null,
+    };
+    return runValidate<EditReceivableValidationDTO>(
+      EditReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the input attributes of the DeleteReceivableValidationDTO withou errors', async () => {
+    return runValidate<DeleteReceivableValidationDTO>(
+      DeleteReceivableValidationDTO,
+      {
+        id: '1900',
+        authUserId: '20000',
       },
     ).then((errors) => {
       expect(errors.length).toEqual(0);
