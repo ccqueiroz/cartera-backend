@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetPaymentMethodByIdUseCase } from '@/usecases/payment_method/get-payment-method-by-id.usecase';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetPaymentMethodByIdValidationDTO } from '../../schema_validations/PaymentMethod/payment-method.schema';
 
 /**
  * @swagger
@@ -33,6 +35,8 @@ import { GetPaymentMethodByIdUseCase } from '@/usecases/payment_method/get-payme
  *               properties:
  *                 data:
  *                  $ref: '#/components/schemas/PaymentMethodDTO'
+ *       400:
+ *         description: Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -69,6 +73,15 @@ export class GetPaymentMethodByIdRoute implements Route {
 
         if (!id)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
+
+        const errors = await runValidate<GetPaymentMethodByIdValidationDTO>(
+          GetPaymentMethodByIdValidationDTO,
+          { id },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const paymentMethod = await this.getPaymentMethodByIdService.execute({
           id,
