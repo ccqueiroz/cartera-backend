@@ -5,7 +5,7 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
 import { LoginValidation } from '../../schema_validations/Auth/auth.schema';
-import { validate } from '@/packages/clients/class-validator';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -78,9 +78,10 @@ export class LoginRoute implements Route {
       try {
         const { email, password } = request.body;
 
-        const requestDataValidation = new LoginValidation({ email, password });
-
-        const errors = await validate(requestDataValidation);
+        const errors = await runValidate<LoginValidation>(LoginValidation, {
+          email,
+          password,
+        });
 
         if (errors?.length > 0) {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);

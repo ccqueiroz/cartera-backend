@@ -5,7 +5,7 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
 import { RegisterValidation } from '../../schema_validations/Auth/auth.schema';
-import { validate } from '@/packages/clients/class-validator';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -86,15 +86,16 @@ export class RegisterRoute implements Route {
         if (!email || !password || !confirmPassword || !firstName || !lastName)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
 
-        const requestDataValidation = new RegisterValidation({
-          email,
-          password,
-          confirmPassword,
-          firstName,
-          lastName,
-        });
-
-        const errors = await validate(requestDataValidation);
+        const errors = await runValidate<RegisterValidation>(
+          RegisterValidation,
+          {
+            email,
+            password,
+            confirmPassword,
+            firstName,
+            lastName,
+          },
+        );
 
         if (errors?.length > 0) {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);

@@ -5,7 +5,7 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
 import { RecoveryPasswordValidation } from '../../schema_validations/Auth/auth.schema';
-import { validate } from '@/packages/clients/class-validator';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -67,11 +67,12 @@ export class RecoveryPasswordRoute implements Route {
       try {
         const { email } = request.body;
 
-        const requestDataValidation = new RecoveryPasswordValidation({
-          email,
-        });
-
-        const errors = await validate(requestDataValidation);
+        const errors = await runValidate<RecoveryPasswordValidation>(
+          RecoveryPasswordValidation,
+          {
+            email,
+          },
+        );
 
         if (errors?.length > 0) {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);

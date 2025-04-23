@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
-import { validate } from '@/packages/clients/class-validator';
+import { runValidate } from '@/packages/clients/class-validator';
 import { SignoutValidation } from '../../schema_validations/Auth/auth.schema';
 
 /**
@@ -55,11 +55,9 @@ export class SignoutRoute implements Route {
         if (!user_auth?.userId)
           new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500);
 
-        const requestDataValidation = new SignoutValidation({
+        const errors = await runValidate<SignoutValidation>(SignoutValidation, {
           userId: user_auth!.userId,
         });
-
-        const errors = await validate(requestDataValidation);
 
         if (errors?.length > 0) {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
