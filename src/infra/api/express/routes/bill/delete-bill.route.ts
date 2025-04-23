@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { DeleteBillUseCase } from '@/usecases/bill/delete-bill.usecase';
 import { DeleteBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { runValidate } from '@/packages/clients/class-validator';
+import { DeleteBillValidationDTO } from '../../schema_validations/Bill/bill.schema';
 
 /**
  * @swagger
@@ -29,7 +31,7 @@ import { DeleteBillInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *         description: conta/despesa deletada com sucesso.
  *         content: {}
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -65,6 +67,18 @@ export class DeleteBillRoute implements Route {
       try {
         const { user_auth } = request;
         const { id } = request.params;
+
+        const errors = await runValidate<DeleteBillValidationDTO>(
+          DeleteBillValidationDTO,
+          {
+            id,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         await this.deleteBillService.execute({
           id,

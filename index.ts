@@ -1,5 +1,5 @@
-import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import 'dotenv/config';
+import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';

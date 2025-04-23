@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month';
 import { BillsPayableMonthInputDTO } from '@/domain/Bill/dtos/bill.dto';
+import { GetBillsPayableMonthDTO } from '../../schema_validations/Bill/bill.schema';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -46,7 +48,7 @@ import { BillsPayableMonthInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *                    $ref: '#/components/schemas/BillsPayableMonthOutPutDTO'
  *
  *       400:
- *         description: Período de pesquisa inválido. Por favor, informe o período de análise.
+ *         description: Período de pesquisa inválido. Por favor, informe o período de análise. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais Inválidas.
  *       500:
@@ -78,6 +80,19 @@ export class GetBillsPayableMonthRoute implements Route {
       try {
         const { user_auth } = request;
         const { initialDate, finalDate } = request.query;
+
+        const errors = await runValidate<GetBillsPayableMonthDTO>(
+          GetBillsPayableMonthDTO,
+          {
+            initialDate: initialDate as unknown as number,
+            finalDate: finalDate as unknown as number,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const bills = await this.getBillsPayableMonth.execute({
           userId: user_auth?.userId,

@@ -18,11 +18,11 @@ type PaymentMethodId = PaymentMethodDTO['id'];
 type PaymentMethodDescription = CategoryDTO['description'];
 type PaymentStatusId = PaymentStatusDTO['id'];
 type PaymentStatusDescription = PaymentStatusDTO['description'];
-type InvoiceCardData = {
+export type InvoiceCardData = {
   paymentCardId: string;
   invoiceCardId: string;
 };
-type ShoppingListData = {
+export type ShoppingListData = {
   shoppingListId: string;
 };
 

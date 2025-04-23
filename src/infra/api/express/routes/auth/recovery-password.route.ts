@@ -4,6 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
+import { RecoveryPasswordValidation } from '../../schema_validations/Auth/auth.schema';
+import { runValidate } from '@/packages/clients/class-validator';
+
 /**
  * @swagger
  * /api/auth/recovery-password:
@@ -28,6 +31,8 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *       204:
  *         description: E-mail enviado com sucesso.
  *         content: {}
+ *       400:
+ *         description: Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais Inválidas.
  *       404:
@@ -61,6 +66,17 @@ export class RecoveryPasswordRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { email } = request.body;
+
+        const errors = await runValidate<RecoveryPasswordValidation>(
+          RecoveryPasswordValidation,
+          {
+            email,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         await this.recoveryPasswordService.execute({ email });
         response.status(204).send();

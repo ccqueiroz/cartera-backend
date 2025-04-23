@@ -5,6 +5,11 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
+import { runValidate } from '@/packages/clients/class-validator';
+import {
+  CategoryTypeEnum,
+  GetCategoriesValidationDTO,
+} from '../../schema_validations/Category/category.schema';
 
 /**
  * @swagger
@@ -38,7 +43,7 @@ import { CategoryType } from '@/domain/Category/enums/category-type.enum';
  *                   items:
  *                     $ref: '#/components/schemas/CategoryDTO'
  *       400:
- *         description: O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida.
+ *         description: O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       429:
@@ -70,6 +75,17 @@ export class GetCategoriesRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { type } = request.query;
+
+        const errors = await runValidate<GetCategoriesValidationDTO>(
+          GetCategoriesValidationDTO,
+          {
+            type: type as unknown as CategoryTypeEnum,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         if (
           type &&

@@ -4,6 +4,9 @@ import { RegisterUserUseCase } from '@/usecases/auth/register.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
+import { RegisterValidation } from '../../schema_validations/Auth/auth.schema';
+import { runValidate } from '@/packages/clients/class-validator';
+
 /**
  * @swagger
  * /api/auth/register-account:
@@ -46,7 +49,7 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *                 data:
  *                   $ref: '#/components/schemas/AuthDTO'
  *       400:
- *         description: O e-mail fornecido já está em uso por outra conta. | A senha e a confirmação de senha não conferem.
+ *         description: O e-mail fornecido já está em uso por outra conta. | A senha e a confirmação de senha não conferem | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais Inválidas.
  *       429:
@@ -83,6 +86,21 @@ export class RegisterRoute implements Route {
         if (!email || !password || !confirmPassword || !firstName || !lastName)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
 
+        const errors = await runValidate<RegisterValidation>(
+          RegisterValidation,
+          {
+            email,
+            password,
+            confirmPassword,
+            firstName,
+            lastName,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
+
         if (password !== confirmPassword)
           throw new ApiError(
             ERROR_MESSAGES.PASSWORD_IS_DIFERENT_CONFIRM_PASSWORD,
@@ -95,6 +113,7 @@ export class RegisterRoute implements Route {
           firstName,
           lastName,
         });
+
         response.status(201).json({ ...userLogin });
       } catch (error) {
         next(

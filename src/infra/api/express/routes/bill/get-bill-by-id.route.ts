@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetBillByIdInputDTO } from '@/domain/Bill/dtos/bill.dto';
 import { GetBillByIdUseCase } from '@/usecases/bill/get-bill-by-id.usecase';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetBillByIdValidationDTO } from '../../schema_validations/Bill/bill.schema';
 
 /**
  * @swagger
@@ -35,7 +37,7 @@ import { GetBillByIdUseCase } from '@/usecases/bill/get-bill-by-id.usecase';
  *                 data:
  *                  $ref: '#/components/schemas/BillDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -71,6 +73,18 @@ export class GetBillByIdRoute implements Route {
       try {
         const { user_auth } = request;
         const { id } = request.params;
+
+        const errors = await runValidate<GetBillByIdValidationDTO>(
+          GetBillByIdValidationDTO,
+          {
+            id,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const bill = await this.getBillByIdService.execute({
           userId: user_auth?.userId,

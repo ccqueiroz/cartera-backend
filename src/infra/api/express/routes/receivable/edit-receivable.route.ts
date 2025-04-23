@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { EditReceivableInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
 import { EditReceivableUseCase } from '@/usecases/receivable/edit-receivable.usecase';
+import { EditReceivableValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -44,7 +46,7 @@ import { EditReceivableUseCase } from '@/usecases/receivable/edit-receivable.use
  *                 data:
  *                  $ref: '#/components/schemas/ReceivableDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos.
+ *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -81,6 +83,19 @@ export class EditReceivableRoute implements Route {
         const { user_auth } = request;
         const { id } = request.params;
         const { payload } = request.body;
+
+        const errors = await runValidate<EditReceivableValidationDTO>(
+          EditReceivableValidationDTO,
+          {
+            id,
+            ...payload,
+            authUserId: user_auth?.userId,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const receivables = await this.editReceivableService.execute({
           receivableId: id,

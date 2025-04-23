@@ -4,6 +4,9 @@ import { LoginUseCase } from '@/usecases/auth/login.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
+import { LoginValidation } from '../../schema_validations/Auth/auth.schema';
+import { runValidate } from '@/packages/clients/class-validator';
+
 /**
  * @swagger
  * /api/auth/login:
@@ -41,6 +44,8 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/AuthDTO'
+ *       400:
+ *         description: Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais Inválidas.
  *       429:
@@ -72,6 +77,15 @@ export class LoginRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { email, password } = request.body;
+
+        const errors = await runValidate<LoginValidation>(LoginValidation, {
+          email,
+          password,
+        });
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const userLogin = await this.loginService.execute({ email, password });
 

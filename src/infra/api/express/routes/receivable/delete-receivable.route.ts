@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { DeleteReceivableInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
 import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable.usecase';
+import { runValidate } from '@/packages/clients/class-validator';
+import { DeleteReceivableValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
 
 /**
  * @swagger
@@ -29,7 +31,7 @@ import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable
  *         description: Receita deletada com sucesso.
  *         content: {}
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -65,6 +67,18 @@ export class DeleteReceivableRoute implements Route {
       try {
         const { user_auth } = request;
         const { id } = request.params;
+
+        const errors = await runValidate<DeleteReceivableValidationDTO>(
+          DeleteReceivableValidationDTO,
+          {
+            id,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         await this.deleteReceivableService.execute({
           id,

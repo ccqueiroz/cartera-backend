@@ -29,4 +29,5 @@ export const ERROR_MESSAGES = {
     'Nenhum conta/despesa foi encontrada para o "id" fornecido. Verifique se o identificador está correto.',
   INVALID_PERIOD:
     'Período de pesquisa inválido. Por favor, informe o período de análise.',
+  INVALID_PARAMETERS: 'Parâmetros de entrada inválidos',
 } as const;

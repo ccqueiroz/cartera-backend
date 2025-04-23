@@ -5,6 +5,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetReceivablesInputValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
 
 /**
  * @swagger
@@ -138,7 +140,7 @@ import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto'
  *                      type: number
  *                      example: 5
  *       400:
- *         description: Parâmetros inválidos ou ausentes.
+ *         description: Parâmetros inválidos ou ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Token de autenticação inválido ou ausente.
  *       404:
@@ -174,6 +176,23 @@ export class GetReceivablesRoute implements Route {
         const { page, size } = request.query;
         const { sortByReceivables, searchByDate, ordering, sort } =
           request.body;
+
+        const errors = await runValidate<GetReceivablesInputValidationDTO>(
+          GetReceivablesInputValidationDTO,
+          {
+            page: page as unknown as number,
+            size: size as unknown as number,
+            sort,
+            ordering,
+            searchByDate,
+            sortByReceivables,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const receivables = await this.getReceivablesService.execute({
           userId: user_auth?.userId,

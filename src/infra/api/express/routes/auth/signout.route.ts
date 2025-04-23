@@ -4,6 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HttpMiddleware } from '../../middlewares/middleware';
+import { runValidate } from '@/packages/clients/class-validator';
+import { SignoutValidation } from '../../schema_validations/Auth/auth.schema';
+
 /**
  * @swagger
  * /api/auth/signout:
@@ -19,6 +22,8 @@ import { HttpMiddleware } from '../../middlewares/middleware';
  *       204:
  *         description: Usuário deslogado com sucesso.
  *         content: {}
+ *       400:
+ *         description: Parâmetros de entrada inválidos.
  *       500:
  *         description: Erro interno no servidor.
  */
@@ -49,6 +54,14 @@ export class SignoutRoute implements Route {
       try {
         if (!user_auth?.userId)
           new ApiError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, 500);
+
+        const errors = await runValidate<SignoutValidation>(SignoutValidation, {
+          userId: user_auth!.userId,
+        });
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         await this.signoutService.execute({
           userId: String(user_auth?.userId),
