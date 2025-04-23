@@ -5,6 +5,8 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetReceivableByIdUseCase } from '@/usecases/receivable/get-receivable-by-id.usecase';
 import { GetReceivableByIdInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import { GetReceivableByIdValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
+import { runValidate } from '@/packages/clients/class-validator';
 
 /**
  * @swagger
@@ -35,7 +37,7 @@ import { GetReceivableByIdInputDTO } from '@/domain/Receivable/dtos/receivable.d
  *                 data:
  *                  $ref: '#/components/schemas/ReceivableDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes.
+ *         description: Parâmetros obrigatórios ausentes. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -71,6 +73,18 @@ export class GetReceivableByIdRoute implements Route {
       try {
         const { user_auth } = request;
         const { id } = request.params;
+
+        const errors = await runValidate<GetReceivableByIdValidationDTO>(
+          GetReceivableByIdValidationDTO,
+          {
+            id,
+            authUserId: user_auth?.userId as string,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const receivables = await this.getReceivableByIdService.execute({
           userId: user_auth?.userId,
