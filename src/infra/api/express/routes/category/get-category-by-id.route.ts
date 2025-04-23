@@ -4,6 +4,8 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.usecase';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetCategoryByIdValidationDTO } from '../../schema_validations/Category/category.schema';
 
 /**
  * @swagger
@@ -33,6 +35,8 @@ import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.u
  *               properties:
  *                 data:
  *                  $ref: '#/components/schemas/CategoryDTO'
+ *       400:
+ *         description: Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       404:
@@ -69,6 +73,17 @@ export class GetCategoryByIdRoute implements Route {
 
         if (!id)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
+
+        const errors = await runValidate<GetCategoryByIdValidationDTO>(
+          GetCategoryByIdValidationDTO,
+          {
+            id,
+          },
+        );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const category = await this.getCategoryByIdService.execute({
           id,
