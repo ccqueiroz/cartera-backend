@@ -5,6 +5,9 @@ import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { GetConsolidatedCashFlowByYearInputDTO } from '@/domain/Cash_Flow/dtos/cash-flow.dto';
+import { runValidate } from '@/packages/clients/class-validator';
+import { GetConsolidatedCashFlowByYearValidationDTO } from '../../schema_validations/CashFlow/cash-flow.schema';
+
 /**
  * @swagger
  * /api/cash-flow/summary/{year}:
@@ -31,7 +34,7 @@ import { GetConsolidatedCashFlowByYearInputDTO } from '@/domain/Cash_Flow/dtos/c
  *             schema:
  *                $ref: '#/components/schemas/CashFlowDTOListResponse'
  *       400:
- *         description: Período de pesquisa inválido. Por favor, informe o ano corretamente.
+ *         description: Período de pesquisa inválido. Por favor, informe o ano corretamente. | Parâmetros de entrada inválidos.
  *       401:
  *         description: Credenciais inválidas.
  *       500:
@@ -63,6 +66,19 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
       try {
         const { user_auth } = request;
         const { year } = request.params;
+
+        const errors =
+          await runValidate<GetConsolidatedCashFlowByYearValidationDTO>(
+            GetConsolidatedCashFlowByYearValidationDTO,
+            {
+              year: +year,
+              authUserId: user_auth?.userId as string,
+            },
+          );
+
+        if (errors?.length > 0) {
+          throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
+        }
 
         const cashFlow =
           await this.getConsolidatedCashFlowByYearService.execute({
