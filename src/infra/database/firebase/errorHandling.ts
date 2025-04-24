@@ -96,7 +96,11 @@ export class ErrorsFirebase {
         httpCode: 500,
       };
 
-      throw new ApiError(getError.message, getError.httpCode);
+      throw new ApiError(
+        getError.message,
+        getError.httpCode,
+        parseError?.details,
+      );
     } else if (
       errorsAuthUrlFirebase[
         parseError?.message as keyof typeof errorsAuthUrlFirebase
@@ -109,7 +113,11 @@ export class ErrorsFirebase {
         httpCode: 500,
       };
 
-      throw new ApiError(getError.message, getError.httpCode);
+      throw new ApiError(
+        getError.message,
+        getError.httpCode,
+        parseError?.details,
+      );
     } else {
       const getError = errorsFirebase[
         parseError?.code as keyof typeof errorsFirebase
@@ -118,10 +126,9 @@ export class ErrorsFirebase {
         httpCode: 500,
       };
       throw new ApiError(
-        parseError?.details
-          ? `${parseError?.details} - ${getError.message}`
-          : getError.message,
+        getError.message,
         getError.httpCode,
+        parseError?.details,
       );
     }
   }

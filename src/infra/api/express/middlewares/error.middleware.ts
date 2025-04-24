@@ -16,7 +16,11 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
       const statusCode = error.statusCode ?? 500;
       const message = error.message;
 
-      this.loggerError(`{[STATUS]: ${statusCode}}: ${error.stack}`);
+      this.loggerError(
+        `{[STATUS]: ${statusCode}}: ${
+          error?.details ? `[DETAILS]: ${error?.details} - ` : ''
+        }${error.stack}`,
+      );
 
       response.status(statusCode).json({ message });
 
