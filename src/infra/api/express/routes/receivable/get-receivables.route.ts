@@ -4,17 +4,23 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import {
+  GetReceivablesInputDTO,
+  OrderByGetReceivablesInputDTO,
+  SearchByDateGetReceivablesInputDTO,
+  SortByReceivableTypeInputDTO,
+  SortByStatusReceivablesInputDTO,
+} from '@/domain/Receivable/dtos/receivable.dto';
 import { runValidate } from '@/packages/clients/class-validator';
 import { GetReceivablesInputValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
+import { GetReceivablesInputRouteDTO } from '../../dtos/get-receivables-input-route.dto';
 
 /**
  * @swagger
  * /api/receivable/list-all:
  *   get:
  *     summary: Lista todas as receitas cadastradas para o usuário com filtros e paginação.
- *     description:
- *       Retorna uma lista paginada de receitas com base nos critérios de filtro, ordenação e parâmetros de paginação.
+ *     description: Retorna uma lista paginada de receitas com base nos critérios de filtro, ordenação e parâmetros de paginação.
  *     tags:
  *       - Receivable
  *     security:
@@ -34,84 +40,73 @@ import { GetReceivablesInputValidationDTO } from '../../schema_validations/Recei
  *           type: number
  *           example: 10
  *         description: Quantidade de itens por página.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               sortByReceivables:
- *                 type: object
- *                 properties:
- *                   fixedReceivable:
- *                     type: boolean
- *                     example: true
- *                   receival:
- *                     type: boolean
- *                     example: false
- *                   amount:
- *                     type: number
- *                     example: 1000.50
- *               searchByDate:
- *                 oneOf:
- *                   - type: object
- *                     properties:
- *                       receivableDate:
- *                         type: object
- *                         properties:
- *                           initialDate:
- *                             type: number
- *                             example: 1739751148154
- *                           finalDate:
- *                             type: number
- *                             example: 1739837548154
- *                           exactlyDate:
- *                             type: number
- *                             example: 1739751148154
- *                   - type: object
- *                     properties:
- *                       receivalDate:
- *                         type: object
- *                         properties:
- *                           initialDate:
- *                             type: number
- *                             example: 1739751148154
- *                           finalDate:
- *                             type: number
- *                             example: 1739837548154
- *                           exactlyDate:
- *                             type: number
- *                             example: 1739751148154
- *               sort:
- *                 type: object
- *                 oneOf:
- *                   - properties:
- *                       paymentStatusId:
- *                         type: string
- *                         example: 68e47c3b-6d34-4604-bf7c-f9e2da704107
- *                     required: [paymentStatusId]
- *                   - properties:
- *                       categoryId:
- *                         type: string
- *                         example: c2ecc075-82d2-406b-88cd-491c686654eb
- *                     required: [categoryId]
- *                   - properties:
- *                       paymentMethodId:
- *                         type: string
- *                         example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
- *                     required: [paymentMethodId]
- *               ordering:
- *                 type: object
- *                 oneOf:
- *                   - $ref: '#/components/schemas/OrderByAmount'
- *                   - $ref: '#/components/schemas/OrderByReceivableDate'
- *                   - $ref: '#/components/schemas/OrderByReceivalDate'
- *                   - $ref: '#/components/schemas/OrderByCategory'
- *                   - $ref: '#/components/schemas/OrderByPaymentMethod'
- *                   - $ref: '#/components/schemas/OrderByPaymentStatus'
- *                   - $ref: '#/components/schemas/OrderByCreated'
- *                   - $ref: '#/components/schemas/OrderByUpdated'
+ *       - in: query
+ *         name: fixedReceivable
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *         description: Filtra receitas fixas.
+ *       - in: query
+ *         name: receival
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: false
+ *         description: Filtra receitas a receber.
+ *       - in: query
+ *         name: amount
+ *         required: false
+ *         schema:
+ *           type: number
+ *           example: 1293.89
+ *         description: Valor específico da receita.
+ *       - in: query
+ *         name: sort
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [categoryId, paymentMethodId, paymentStatusId]
+ *           example: categoryId
+ *         description: Filtra por uma categoria de status usando o ID.
+ *       - in: query
+ *         name: sort_value
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: 12zgh2822-9863abs-7zhts
+ *         description: Valor correspondente ao campo de filtro.
+ *       - in: query
+ *         name: search_by_date
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [receivalDate, receivableDate]
+ *           example: receivalDate
+ *         description: Tipo de data usada na filtragem.
+ *       - in: query
+ *         name: search_by_date_value
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: "1735689600000-1743465600000"
+ *         description: Valor da data. Pode ser um único timestamp ou dois separados por hífen (initialDate-finalDate).
+ *       - in: query
+ *         name: ordering
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [amount, receivableDate, receivalDate, categoryId, paymentMethodId, paymentStatusId, createdAt, updatedAt]
+ *           example: amount
+ *         description: Ordena em função do atributo escolhido.
+ *       - in: query
+ *         name: direction_order
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: asc
+ *         description: Direção que a ordenação deve seguir.
  *     responses:
  *       200:
  *         description: Lista de receitas retornada com sucesso.
@@ -123,22 +118,22 @@ import { GetReceivablesInputValidationDTO } from '../../schema_validations/Recei
  *                 data:
  *                   type: object
  *                   properties:
- *                    content:
- *                      type: array
- *                      items:
- *                        $ref: '#/components/schemas/ReceivableDTO'
- *                    page:
- *                      type: number
- *                      example: 0
- *                    size:
- *                      type: number
- *                      example: 10
- *                    totalElements:
- *                      type: number
- *                      example: 50
- *                    totalPages:
- *                      type: number
- *                      example: 5
+ *                     content:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/ReceivableDTO'
+ *                     page:
+ *                       type: number
+ *                       example: 0
+ *                     size:
+ *                       type: number
+ *                       example: 10
+ *                     totalElements:
+ *                       type: number
+ *                       example: 50
+ *                     totalPages:
+ *                       type: number
+ *                       example: 5
  *       400:
  *         description: Parâmetros inválidos ou ausentes. | Parâmetros de entrada inválidos.
  *       401:
@@ -148,7 +143,6 @@ import { GetReceivablesInputValidationDTO } from '../../schema_validations/Recei
  *       500:
  *         description: Erro interno no servidor.
  */
-
 export class GetReceivablesRoute implements Route {
   private constructor(
     private readonly path: string,
@@ -169,25 +163,99 @@ export class GetReceivablesRoute implements Route {
     );
   }
 
+  private handleBuildInputDTO({
+    userId,
+    page,
+    size,
+    fixedReceivable,
+    receival,
+    amount,
+    sort,
+    sort_value,
+    search_by_date,
+    search_by_date_value,
+    ordering,
+    direction_order,
+  }: GetReceivablesInputRouteDTO) {
+    const sortByParams =
+      sort && sort_value
+        ? {
+            sort: {
+              [sort]: sort_value,
+            } as Partial<SortByStatusReceivablesInputDTO>,
+          }
+        : {};
+
+    const sortByReceivables: Partial<SortByReceivableTypeInputDTO> = {
+      ...(fixedReceivable !== undefined && { fixedReceivable }),
+      ...(receival !== undefined && { receival }),
+      ...(amount !== undefined && { amount }),
+    };
+
+    let searchByDate: Partial<SearchByDateGetReceivablesInputDTO> = {};
+    if (search_by_date && search_by_date_value) {
+      const [startDate, endDate] = search_by_date_value.split('-');
+      searchByDate = {
+        [search_by_date]: endDate
+          ? { initialDate: +startDate, finalDate: +endDate }
+          : { exactlyDate: +startDate },
+      };
+    }
+
+    const orderingByParams =
+      ordering && direction_order
+        ? ({
+            ordering: { [ordering]: direction_order },
+          } as Partial<OrderByGetReceivablesInputDTO>)
+        : {};
+
+    return {
+      authUserId: userId,
+      page: +page,
+      size: +size,
+      ...sortByReceivables,
+      ...sortByParams,
+      ...(Object.keys(searchByDate).length && { searchByDate }),
+      ...orderingByParams,
+    };
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
-        const { page, size } = request.query;
-        const { sortByReceivables, searchByDate, ordering, sort } =
-          request.body;
+        const {
+          page,
+          size,
+          fixedReceivable,
+          receival,
+          amount,
+          sort,
+          sort_value,
+          search_by_date,
+          search_by_date_value,
+          ordering,
+          direction_order,
+        } = request.query;
+
+        const buildDTO = this.handleBuildInputDTO({
+          userId: user_auth?.userId,
+          page,
+          size,
+          fixedReceivable,
+          receival,
+          amount,
+          sort,
+          sort_value,
+          search_by_date,
+          search_by_date_value,
+          ordering,
+          direction_order,
+        } as unknown as GetReceivablesInputRouteDTO);
 
         const errors = await runValidate<GetReceivablesInputValidationDTO>(
           GetReceivablesInputValidationDTO,
-          {
-            page: page as unknown as number,
-            size: size as unknown as number,
-            sort,
-            ordering,
-            searchByDate,
-            sortByReceivables,
-            authUserId: user_auth?.userId as string,
-          },
+          buildDTO,
         );
 
         if (errors?.length > 0) {
@@ -195,14 +263,9 @@ export class GetReceivablesRoute implements Route {
         }
 
         const receivables = await this.getReceivablesService.execute({
-          userId: user_auth?.userId,
-          sortByReceivables,
-          searchByDate,
-          ordering,
-          page,
-          size,
-          sort,
-        } as unknown as GetReceivablesInputDTO);
+          ...buildDTO,
+          userId: buildDTO?.authUserId,
+        } as GetReceivablesInputDTO);
 
         response.status(200).json({ ...receivables });
       } catch (error) {
