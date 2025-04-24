@@ -117,7 +117,12 @@ export class ErrorsFirebase {
         message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
         httpCode: 500,
       };
-      throw new ApiError(getError.message, getError.httpCode);
+      throw new ApiError(
+        parseError?.details
+          ? `${parseError?.details} - ${getError.message}`
+          : getError.message,
+        getError.httpCode,
+      );
     }
   }
 }
