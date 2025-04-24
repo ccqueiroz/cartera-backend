@@ -90,7 +90,7 @@ import { GetReceivablesInputRouteDTO } from '../../dtos/get-receivables-input-ro
  *         schema:
  *           type: string
  *           example: "1735689600000-1743465600000"
- *         description: Valor da data. Pode ser um único timestamp ou dois separados por vírgula (initialDate,finalDate).
+ *         description: Valor da data. Pode ser um único timestamp ou dois separados por hífen (initialDate-finalDate).
  *       - in: query
  *         name: ordering
  *         required: false
@@ -252,7 +252,7 @@ export class GetReceivablesRoute implements Route {
           ordering,
           direction_order,
         } as unknown as GetReceivablesInputRouteDTO);
-        console.log('buildDTO', buildDTO);
+
         const errors = await runValidate<GetReceivablesInputValidationDTO>(
           GetReceivablesInputValidationDTO,
           buildDTO,

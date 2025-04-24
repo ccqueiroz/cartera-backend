@@ -10,7 +10,7 @@ import { DeleteReceivableValidationDTO } from '../../schema_validations/Receivab
 
 /**
  * @swagger
- * /api/eceivable/delete/{id}:
+ * /api/receivable/delete/{id}:
  *   get:
  *     summary: Deleta um item de receita.
  *     description: Esta rota deleta um item de receita cadastrado para o usuário.
