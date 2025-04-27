@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentMethodEntitie } from '@/domain/Payment_Method/entitie/payment-method.entitie';
 
 export class PaymentMethodRepositoryFirebase implements PaymentMethodGateway {

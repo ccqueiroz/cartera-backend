@@ -1,7 +1,7 @@
 import { PersonUserRepositoryFirebase } from './person-user.repository.firebase';
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
-import { dbFirestore } from '../database/firebase/firebase.database';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
+import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 describe('Person User Repository Firebase', () => {

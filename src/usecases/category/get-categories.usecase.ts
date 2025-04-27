@@ -31,3 +31,5 @@ export class GetCategoriesUseCase
     };
   }
 }
+
+// O usecase chama o service -> service verifica se existe o dado no cache, caso não tenha, chama o banco de dados, salva o dado em cache e depois envia os dados para o usecase.

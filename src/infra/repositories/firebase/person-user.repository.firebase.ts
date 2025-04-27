@@ -7,7 +7,7 @@ import {
   PersonUserEntitieDTO,
 } from '@/domain/Person_User/dtos/person-user.dto';
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 
 export class PersonUserRepositoryFirebase implements PersonUserGateway {
   private static instance: PersonUserRepositoryFirebase;

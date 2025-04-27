@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 import { BillEntitie } from '@/domain/Bill/entitie/bill.entitie';
-import { MaskAmountMaskService } from '../masks/mask-amount.mask';
+import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import {
   BillDTO,
   BillsPayableMonthInputDTO,
@@ -20,10 +20,10 @@ import {
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { HandleCanProgressToWriteOperationGateway } from '../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
+import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
 export class BillsRepositoryFirebase implements BillGateway {
   private static instance: BillsRepositoryFirebase;

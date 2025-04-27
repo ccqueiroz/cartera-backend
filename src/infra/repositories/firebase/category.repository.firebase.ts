@@ -5,7 +5,7 @@ import {
 } from '@/domain/Category/dtos/category.dto';
 import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
 import firebase from 'firebase';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 export class CategoryRepositoryFirebase implements CategoryGateway {
   private static instance: CategoryRepositoryFirebase;

@@ -8,7 +8,7 @@ import {
 import { AuthEntitie } from '@/domain/Auth/entitie/auth.entitie';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { ResetPasswordUrl, signInUrl } from '@/packages/clients/firebase';
 export class AuthRepositoryFirebase implements AuthGateway {
   private static instance: AuthRepositoryFirebase;

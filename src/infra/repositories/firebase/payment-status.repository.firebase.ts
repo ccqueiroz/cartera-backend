@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
 import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 
 export class PaymentStatusRepositoryFirebase implements PaymentStatusGateway {

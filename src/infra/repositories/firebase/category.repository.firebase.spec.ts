@@ -1,8 +1,8 @@
 import { CategoryRepositoryFirebase } from './category.repository.firebase';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
-import { dbFirestore } from '../database/firebase/firebase.database';
+import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
 
 describe('Category Repository Firebase', () => {

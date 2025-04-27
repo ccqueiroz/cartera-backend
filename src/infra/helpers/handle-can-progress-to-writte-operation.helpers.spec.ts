@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
 import { HandleCanProgressToWritteOperationHelper } from './handle-can-progress-to-writte-operation.helpers';
-import { dbFirestore } from '../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { dbFirestore } from '../database/firebase/firebase.database';
 import { ErrorsFirebase } from '../database/firebase/errorHandling';
 
 let handleCanProgressToWritteOperationMock: HandleCanProgressToWritteOperationHelper;

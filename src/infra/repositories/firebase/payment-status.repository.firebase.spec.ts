@@ -1,17 +1,17 @@
-import { PaymentMethodRepositoryFirebase } from './payment-method.repository.firebase';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
-import { PaymentMethodEntitie } from '@/domain/Payment_Method/entitie/payment-method.entitie';
-import { dbFirestore } from '../database/firebase/firebase.database';
+import { PaymentStatusRepositoryFirebase } from './payment-status.repository.firebase';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
+import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
+import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
 
-describe('Payment Method Repository Firebase', () => {
-  let paymentMethodRepo: PaymentMethodRepositoryFirebase;
+describe('Payment Status Repository Firebase', () => {
+  let paymentStatusRepo: PaymentStatusRepositoryFirebase;
 
   beforeEach(() => {
-    process.env.NODE_ENV = 'test';
     jest.clearAllMocks();
+    process.env.NODE_ENV = 'test';
 
-    paymentMethodRepo = PaymentMethodRepositoryFirebase.create(dbFirestore);
+    paymentStatusRepo = PaymentStatusRepositoryFirebase.create(dbFirestore);
   });
 
   afterEach(() => {
@@ -19,37 +19,37 @@ describe('Payment Method Repository Firebase', () => {
     process.env.NODE_ENV = 'development';
   });
 
-  it('should be return Payment Methods list when exist items in database.', async () => {
+  it('should be return Payment Status list when exist items in database.', async () => {
     firestore.get.mockResolvedValueOnce({
       docs: [
         {
-          id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+          id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
           data: () => ({
-            description: 'Cartão de crédito',
+            description: 'Pago',
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
         },
         {
-          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+          id: '17de6833-1e75-40d3-afc3-3249c4da184f',
           data: () => ({
-            description: 'Cartão de débito',
+            description: 'A pagar',
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
         },
         {
-          id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+          id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
           data: () => ({
-            description: 'Pix',
+            description: 'A receber',
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
         },
         {
-          id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
+          id: '2b8c9278-f5c6-439d-995e-20d30c2871a5',
           data: () => ({
-            description: 'Dinheiro',
+            description: 'Recebido',
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -57,7 +57,7 @@ describe('Payment Method Repository Firebase', () => {
       ],
     });
 
-    const result = await paymentMethodRepo.getPaymentMethods();
+    const result = await paymentStatusRepo.getPaymentStatus();
 
     result.forEach((i) =>
       expect(i).toEqual(
@@ -73,25 +73,25 @@ describe('Payment Method Repository Firebase', () => {
 
     expect(result.length).toEqual(4);
     expect(result.shift()).toEqual({
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      description: 'Cartão de crédito',
+      id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
+      description: 'Pago',
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
   });
 
-  it('should be return Payment Methods empty list when not exist items in database.', async () => {
+  it('should be return Payment Status empty list when not exist items in database.', async () => {
     firestore.get.mockResolvedValueOnce({
       docs: [],
     });
 
-    const result = await paymentMethodRepo.getPaymentMethods();
+    const result = await paymentStatusRepo.getPaymentStatus();
 
     expect(result.length).toEqual(0);
     expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
-  it('should be return throw Error if there is a problem with the getPaymentMethods request', async () => {
+  it('should be return throw Error if there is a problem with the getPaymentStatus request', async () => {
     const error = new Error('Unexpected error');
 
     jest.spyOn(ErrorsFirebase, 'presenterError').mockImplementation(() => {
@@ -100,28 +100,29 @@ describe('Payment Method Repository Firebase', () => {
 
     firestore.get.mockRejectedValueOnce(error);
 
-    await expect(paymentMethodRepo.getPaymentMethods()).rejects.toThrow(error);
+    await expect(paymentStatusRepo.getPaymentStatus()).rejects.toThrow(error);
   });
 
-  it('should be return Payment Methods by id when exist this item in database.', async () => {
+  it('should be return Payment Status by id when exist this item in database.', async () => {
     firestore.get.mockResolvedValueOnce({
       exists: true,
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+      id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
       data: () => ({
-        description: 'Cartão de crédito',
+        description: 'Pago',
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       }),
     });
 
-    const result = await paymentMethodRepo.getPaymentMethodById({
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+    const result = await paymentStatusRepo.getPaymentStatusById({
+      id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
     });
 
+    expect(result).toBeInstanceOf(PaymentStatusEntitie);
     expect(firestore.get).toHaveBeenCalledTimes(1);
 
-    expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
-    expect(result?.description).toBe('Cartão de crédito');
+    expect(result?.id).toBe('0e8f775d-07c1-4ca1-abea-57157ff173b0');
+    expect(result?.description).toBe('Pago');
     expect(result?.createdAt).toEqual(expect.any(Number));
     expect(result?.updatedAt).toEqual(expect.any(Number));
   });
@@ -133,16 +134,16 @@ describe('Payment Method Repository Firebase', () => {
       data: () => null,
     });
 
-    const result = await paymentMethodRepo.getPaymentMethodById({
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+    const result = await paymentStatusRepo.getPaymentStatusById({
+      id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
     });
 
-    expect(result).not.toBeInstanceOf(PaymentMethodEntitie);
+    expect(result).not.toBeInstanceOf(PaymentStatusEntitie);
     expect(result).toBeNull();
     expect(firestore.get).toHaveBeenCalledTimes(1);
   });
 
-  it('should be return throw Error if there is a problem with the getPaymentMethodById request', async () => {
+  it('should be return throw Error if there is a problem with the getPaymentStatusById request', async () => {
     const error = new Error('Unexpected error');
 
     jest.spyOn(ErrorsFirebase, 'presenterError').mockImplementation(() => {
@@ -152,8 +153,8 @@ describe('Payment Method Repository Firebase', () => {
     firestore.get.mockRejectedValueOnce(error);
 
     await expect(
-      paymentMethodRepo.getPaymentMethodById({
-        id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+      paymentStatusRepo.getPaymentStatusById({
+        id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
       }),
     ).rejects.toThrow(error);
   });

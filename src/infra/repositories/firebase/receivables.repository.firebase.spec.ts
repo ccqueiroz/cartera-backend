@@ -1,15 +1,15 @@
-import { MergeSortGateway } from '../../domain/Helpers/gateway/merge-sort.gateway';
+import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 import { ReceivablesRepositoryFirebase } from './receivables.repository.firebase';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { dbFirestore } from '../database/firebase/firebase.database';
+import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
-import { MargeSortHelper } from '../helpers/merge-sort.helpers';
-import { ApplyPaginationHelper } from '../helpers/apply-pagination.helpers';
-import { HandleCanProgressToWritteOperationHelper } from '../helpers/handle-can-progress-to-writte-operation.helpers';
+import { MargeSortHelper } from '../../helpers/merge-sort.helpers';
+import { ApplyPaginationHelper } from '../../helpers/apply-pagination.helpers';
+import { HandleCanProgressToWritteOperationHelper } from '../../helpers/handle-can-progress-to-writte-operation.helpers';
 
 const receivablesItemsMocks = [
   {

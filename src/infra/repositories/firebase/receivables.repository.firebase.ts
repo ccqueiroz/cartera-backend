@@ -13,15 +13,15 @@ import {
   SortByStatusReceivablesInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableEntitie } from '@/domain/Receivable/entitie/receivable.entitie';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { MaskAmountMaskService } from '../masks/mask-amount.mask';
+import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
-import { HandleCanProgressToWriteOperationGateway } from '../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
+import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
 export class ReceivablesRepositoryFirebase implements ReceivableGateway {
   private static instance: ReceivablesRepositoryFirebase;

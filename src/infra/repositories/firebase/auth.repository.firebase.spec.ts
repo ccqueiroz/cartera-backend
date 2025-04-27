@@ -1,9 +1,9 @@
-import { authFirebase } from '../database/firebase/firebase.database';
+import { authFirebase } from '../../database/firebase/firebase.database';
 import { AuthRepositoryFirebase } from './auth.repository.firebase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
-import { ErrorsFirebase } from '../database/firebase/errorHandling';
+import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { auth } from '@/test/mocks/firebase-admin.mock';
 import { ResetPasswordUrl, signInUrl } from '@/packages/clients/firebase';
 
