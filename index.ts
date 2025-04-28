@@ -1,6 +1,6 @@
-import { clientRedis } from './src/packages/clients/redis';
-import { RedisCache } from './src/infra/database/redis/redis.database.cache';
 import 'dotenv/config';
+import { RedisCacheRepository } from './src/infra/repositories/reddis/cache.repository.redis';
+import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
@@ -37,7 +37,8 @@ import { logger } from './src/infra/logger';
 
 function main() {
   // ----- REPOSITORIES -----
-  const redisCacheRepository = RedisCache.create(clientRedis, logger);
+  const redisCacheRepository = RedisCacheRepository.create(clientRedis, logger);
+
   const authRepository = AuthRepositoryFirebase.create(authFirebase);
 
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);

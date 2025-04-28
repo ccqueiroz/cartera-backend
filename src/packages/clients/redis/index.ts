@@ -9,6 +9,5 @@ const clientRedis = createClient({
     },
   },
 });
-type TypeOfClientRedis = typeof clientRedis;
 
-export { clientRedis, TypeOfClientRedis };
+export { clientRedis };
