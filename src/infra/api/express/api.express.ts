@@ -9,17 +9,23 @@ import {
   swaggerSpecInstance,
 } from '@/packages/clients/swagger';
 import { LoggerGateway } from '@/domain/Helpers/gateway/logger.gateway';
+import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
+import { Server } from 'http';
 export class ApiExpress implements Api {
   private static instance: ApiExpress;
   private app: Express;
   private logger: LoggerGateway;
+  private cache: CacheGateway;
+  private serverListner!: Server;
 
   private constructor(
     routes: Array<Route>,
     globalMiddlewares: Array<Middleware>,
     errorMiddleware: ErrorMiddleware,
     logger: LoggerGateway,
+    cache: CacheGateway,
   ) {
+    this.cache = cache;
     this.logger = logger;
     this.app = express();
     this.app.use(json());
@@ -36,6 +42,7 @@ export class ApiExpress implements Api {
     globalMiddlewares: Array<Middleware>,
     errorMiddleware: ErrorMiddleware,
     logger: LoggerGateway,
+    cache: CacheGateway,
   ) {
     if (!ApiExpress.instance) {
       ApiExpress.instance = new ApiExpress(
@@ -43,6 +50,7 @@ export class ApiExpress implements Api {
         globalMiddlewares,
         errorMiddleware,
         logger,
+        cache,
       );
     }
     return ApiExpress.instance;
@@ -73,11 +81,29 @@ export class ApiExpress implements Api {
     this.app.use(API_DOC, swaggerServer, swaggerSetup(swaggerSpecInstance));
   }
 
-  public start(port: number) {
-    this.app.listen(port, () => {
+  private async shutdown(signal: string) {
+    this.logger.info(`${signal}: Safely closing application!`);
+
+    await this.cache.disconnect();
+    this.serverListner.close();
+
+    this.logger.info('Complete shutdown.');
+  }
+
+  public async start(port: number) {
+    await this.cache.connect();
+
+    this.serverListner = this.app.listen(port, () => {
       this.logger.info(`Server running on port ${port}`);
       this.listRoutes(port);
     });
+
+    this.serverListner.on('error', async () => {
+      await this.shutdown('SERVER_ERROR');
+    });
+
+    process.on('SIGINT', this.shutdown.bind(this));
+    process.on('SIGTERM', this.shutdown.bind(this));
   }
 
   private listRoutes(port: number) {
