@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
+import { BillRepositoryGateway } from '@/domain/Bill/gateway/bill.repository.gateway';
 import { MergeSortGateway } from '@/domain/Helpers/gateway/merge-sort.gateway';
 import { BillEntitie } from '@/domain/Bill/entitie/bill.entitie';
 import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
@@ -25,7 +25,7 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
-export class BillsRepositoryFirebase implements BillGateway {
+export class BillsRepositoryFirebase implements BillRepositoryGateway {
   private static instance: BillsRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Bill';
