@@ -1,7 +1,7 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { Usecase } from '../usecase';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 
 export type GetPaymentMethodsInputDTO = void;
 
@@ -11,19 +11,19 @@ export class GetPaymentMethodsUseCase
   implements Usecase<GetPaymentMethodsInputDTO, GetPaymentMethodsOutputDTO>
 {
   private constructor(
-    private readonly paymentMethodGateway: PaymentMethodGateway,
+    private readonly paymentMethodService: PaymentMethodServiceGateway,
   ) {}
 
   public static create({
-    paymentMethodGateway,
+    paymentMethodService,
   }: {
-    paymentMethodGateway: PaymentMethodGateway;
+    paymentMethodService: PaymentMethodServiceGateway;
   }) {
-    return new GetPaymentMethodsUseCase(paymentMethodGateway);
+    return new GetPaymentMethodsUseCase(paymentMethodService);
   }
 
   public async execute(): Promise<GetPaymentMethodsOutputDTO> {
-    const paymentMethods = await this.paymentMethodGateway.getPaymentMethods();
+    const paymentMethods = await this.paymentMethodService.getPaymentMethods();
 
     return {
       data: paymentMethods,

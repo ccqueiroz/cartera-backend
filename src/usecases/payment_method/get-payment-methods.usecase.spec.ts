@@ -1,18 +1,18 @@
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { GetPaymentMethodsUseCase } from './get-payment-methods.usecase';
 
-let paymentMethodUserGatewayMock: jest.Mocked<PaymentMethodGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
 
 describe('Get Payment Methods', () => {
   let getPaymentMethodsUseCase: GetPaymentMethodsUseCase;
 
   beforeEach(() => {
-    paymentMethodUserGatewayMock = {
+    paymentMethodServiceGatewayMock = {
       getPaymentMethods: jest.fn(),
     } as any;
 
     getPaymentMethodsUseCase = GetPaymentMethodsUseCase.create({
-      paymentMethodGateway: paymentMethodUserGatewayMock,
+      paymentMethodService: paymentMethodServiceGatewayMock,
     });
   });
 
@@ -21,7 +21,7 @@ describe('Get Payment Methods', () => {
   });
 
   it('should be call execute method and return the payment methods filled list with PaymentMethodDTO objects types', async () => {
-    paymentMethodUserGatewayMock.getPaymentMethods.mockResolvedValue([
+    paymentMethodServiceGatewayMock.getPaymentMethods.mockResolvedValue([
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
         description: 'Cartão de crédito',
@@ -54,7 +54,7 @@ describe('Get Payment Methods', () => {
   });
 
   it('should be call execute method and return the payment methods empty list', async () => {
-    paymentMethodUserGatewayMock.getPaymentMethods.mockResolvedValue([]);
+    paymentMethodServiceGatewayMock.getPaymentMethods.mockResolvedValue([]);
 
     const result = await getPaymentMethodsUseCase.execute();
 
