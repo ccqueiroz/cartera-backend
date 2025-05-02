@@ -3,19 +3,20 @@ import {
   CategoryDTO,
 } from './../domain/Category/dtos/category.dto';
 import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryRepositoryGateway } from '@/domain/Category/gateway/category.repository.gateway';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 
-export class CategoryService implements CategoryGateway {
+export class CategoryService implements CategoryServiceGateway {
   private static instance: CategoryService;
   private keyController = 'category';
   private TTL = 10 * 60; // 10 minutes;
 
   private constructor(
-    private readonly db: CategoryGateway,
+    private readonly db: CategoryRepositoryGateway,
     private readonly cache: CacheGateway,
   ) {}
 
-  public static create(db: CategoryGateway, cache: CacheGateway) {
+  public static create(db: CategoryRepositoryGateway, cache: CacheGateway) {
     if (!CategoryService.instance) {
       CategoryService.instance = new CategoryService(db, cache);
     }
