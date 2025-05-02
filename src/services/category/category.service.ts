@@ -1,7 +1,7 @@
 import {
   GetCategoriesInputDTO,
   CategoryDTO,
-} from './../domain/Category/dtos/category.dto';
+} from '../../domain/Category/dtos/category.dto';
 import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
 import { CategoryRepositoryGateway } from '@/domain/Category/gateway/category.repository.gateway';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
