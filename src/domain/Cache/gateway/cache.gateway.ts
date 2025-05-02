@@ -1,3 +1,5 @@
+import { Scan } from '../dtos/cache.dto';
+
 export interface CacheGateway {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
@@ -5,5 +7,7 @@ export interface CacheGateway {
   providerIsAlreadyConected(): boolean;
   recover<T>(key: string): Promise<T | null>;
   save<T>(key: string, data: T, ttl: number): Promise<void>;
-  delete(key: string): Promise<void>;
+  delete(key: string | Array<string>): Promise<void>;
+  deleteWithPattern(pattern: string): Promise<void>;
+  scan(cursor: number, pattern: string): Promise<Scan>;
 }
