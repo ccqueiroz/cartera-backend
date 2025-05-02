@@ -25,7 +25,7 @@ export class CategoryRepositoryFirebase implements CategoryGateway {
 
   public async getCategories({
     type,
-  }: Partial<GetCategoriesInputDTO> = {}): Promise<Array<CategoryDTO>> {
+  }: GetCategoriesInputDTO): Promise<Array<CategoryDTO>> {
     let query = this
       .dbCollection as unknown as firebase.firestore.Query<firebase.firestore.DocumentData>;
 
