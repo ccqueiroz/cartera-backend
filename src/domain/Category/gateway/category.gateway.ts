@@ -5,8 +5,6 @@ import {
 } from '../dtos/category.dto';
 
 export interface CategoryGateway {
-  getCategories(
-    type: Partial<GetCategoriesInputDTO>,
-  ): Promise<Array<CategoryDTO>>;
+  getCategories(type: GetCategoriesInputDTO): Promise<Array<CategoryDTO>>;
   getCategoryById({ id }: GetCategoryByIdInputDTO): Promise<CategoryDTO | null>;
 }
