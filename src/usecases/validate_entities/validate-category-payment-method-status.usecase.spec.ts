@@ -1,35 +1,35 @@
 import { ValidateCategoryPaymentMethodStatusUseCase } from './validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
-let categoryGatewayMock: jest.Mocked<CategoryGateway>;
-let paymentMethodGatewayMock: jest.Mocked<PaymentMethodGateway>;
-let paymentStatusGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
   let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase;
 
   beforeEach(() => {
-    categoryGatewayMock = {
+    categoryServiceGatewayMock = {
       getCategoryById: jest.fn(),
     } as any;
 
-    paymentMethodGatewayMock = {
+    paymentMethodServiceGatewayMock = {
       getPaymentMethodById: jest.fn(),
     } as any;
 
-    paymentStatusGatewayMock = {
+    paymentStatusServiceGatewayMock = {
       getPaymentStatusById: jest.fn(),
     } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({
-        categoryGateway: categoryGatewayMock,
-        paymentMethodGateway: paymentMethodGatewayMock,
-        paymentStatusGateway: paymentStatusGatewayMock,
+        categoryService: categoryServiceGatewayMock,
+        paymentMethodService: paymentMethodServiceGatewayMock,
+        paymentStatusServiceGateway: paymentStatusServiceGatewayMock,
       });
   });
 
@@ -40,7 +40,7 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
   });
 
   it('should return true if all entities (category, payment method, and payment status) are valid', async () => {
-    categoryGatewayMock.getCategoryById = jest.fn().mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryById = jest.fn().mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Receitas Diversas',
       type: CategoryType.BILLS,
@@ -48,7 +48,7 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
       updatedAt: new Date().getTime(),
     });
 
-    paymentMethodGatewayMock.getPaymentMethodById = jest
+    paymentMethodServiceGatewayMock.getPaymentMethodById = jest
       .fn()
       .mockResolvedValue({
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
@@ -57,7 +57,7 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
         updatedAt: new Date().getTime(),
       });
 
-    paymentStatusGatewayMock.getPaymentStatusById = jest
+    paymentStatusServiceGatewayMock.getPaymentStatusById = jest
       .fn()
       .mockResolvedValue({
         id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
@@ -74,21 +74,27 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
 
     expect(result).toBe(true);
 
-    expect(categoryGatewayMock.getCategoryById).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategoryById).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
     });
-    expect(paymentMethodGatewayMock.getPaymentMethodById).toHaveBeenCalledWith({
+    expect(
+      paymentMethodServiceGatewayMock.getPaymentMethodById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
     });
-    expect(paymentStatusGatewayMock.getPaymentStatusById).toHaveBeenCalledWith({
+    expect(
+      paymentStatusServiceGatewayMock.getPaymentStatusById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
     });
   });
 
   it('should return false if any entity (category, payment method, or payment status) is invalid', async () => {
-    categoryGatewayMock.getCategoryById = jest.fn().mockResolvedValue(null);
+    categoryServiceGatewayMock.getCategoryById = jest
+      .fn()
+      .mockResolvedValue(null);
 
-    paymentMethodGatewayMock.getPaymentMethodById = jest
+    paymentMethodServiceGatewayMock.getPaymentMethodById = jest
       .fn()
       .mockResolvedValue({
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
@@ -97,7 +103,7 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
         updatedAt: new Date().getTime(),
       });
 
-    paymentStatusGatewayMock.getPaymentStatusById = jest
+    paymentStatusServiceGatewayMock.getPaymentStatusById = jest
       .fn()
       .mockResolvedValue({
         id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
@@ -114,19 +120,23 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
 
     expect(result).toBe(false);
 
-    expect(categoryGatewayMock.getCategoryById).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategoryById).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
     });
-    expect(paymentMethodGatewayMock.getPaymentMethodById).toHaveBeenCalledWith({
+    expect(
+      paymentMethodServiceGatewayMock.getPaymentMethodById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
     });
-    expect(paymentStatusGatewayMock.getPaymentStatusById).toHaveBeenCalledWith({
+    expect(
+      paymentStatusServiceGatewayMock.getPaymentStatusById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
     });
   });
 
   it('should return false if one of the services throws an error', async () => {
-    categoryGatewayMock.getCategoryById = jest.fn().mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryById = jest.fn().mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Receitas Diversas',
       type: CategoryType.BILLS,
@@ -134,11 +144,11 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
       updatedAt: new Date().getTime(),
     });
 
-    paymentMethodGatewayMock.getPaymentMethodById = jest
+    paymentMethodServiceGatewayMock.getPaymentMethodById = jest
       .fn()
       .mockRejectedValue(new ApiError('Service Error', 500));
 
-    paymentStatusGatewayMock.getPaymentStatusById = jest
+    paymentStatusServiceGatewayMock.getPaymentStatusById = jest
       .fn()
       .mockResolvedValue({
         id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
@@ -155,25 +165,31 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
 
     expect(result).toBe(false);
 
-    expect(categoryGatewayMock.getCategoryById).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategoryById).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
     });
-    expect(paymentMethodGatewayMock.getPaymentMethodById).toHaveBeenCalledWith({
+    expect(
+      paymentMethodServiceGatewayMock.getPaymentMethodById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
     });
-    expect(paymentStatusGatewayMock.getPaymentStatusById).toHaveBeenCalledWith({
+    expect(
+      paymentStatusServiceGatewayMock.getPaymentStatusById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
     });
   });
 
   it('should return false if all entities are invalid', async () => {
-    categoryGatewayMock.getCategoryById = jest.fn().mockResolvedValue(null);
-
-    paymentMethodGatewayMock.getPaymentMethodById = jest
+    categoryServiceGatewayMock.getCategoryById = jest
       .fn()
       .mockResolvedValue(null);
 
-    paymentStatusGatewayMock.getPaymentStatusById = jest
+    paymentMethodServiceGatewayMock.getPaymentMethodById = jest
+      .fn()
+      .mockResolvedValue(null);
+
+    paymentStatusServiceGatewayMock.getPaymentStatusById = jest
       .fn()
       .mockResolvedValue(null);
 
@@ -185,13 +201,17 @@ describe('ValidateCategoryPaymentMethodStatusUseCase', () => {
 
     expect(result).toBe(false);
 
-    expect(categoryGatewayMock.getCategoryById).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategoryById).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
     });
-    expect(paymentMethodGatewayMock.getPaymentMethodById).toHaveBeenCalledWith({
+    expect(
+      paymentMethodServiceGatewayMock.getPaymentMethodById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
     });
-    expect(paymentStatusGatewayMock.getPaymentStatusById).toHaveBeenCalledWith({
+    expect(
+      paymentStatusServiceGatewayMock.getPaymentStatusById,
+    ).toHaveBeenCalledWith({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
     });
   });

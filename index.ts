@@ -1,5 +1,7 @@
 import 'dotenv/config';
-import { CategoryService } from './src/services/category.service';
+import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
+import { PaymentMethodService } from './src/services/payment_method/payment-method.service';
+import { CategoryService } from './src/services/category/category.service';
 import { RedisCacheRepository } from './src/infra/repositories/reddis/cache.repository.redis';
 import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
@@ -73,12 +75,22 @@ function main() {
     redisCacheRepository,
   );
 
+  const paymentMethodService = PaymentMethodService.create(
+    paymentMethodRepository,
+    redisCacheRepository,
+  );
+
+  const paymentStatusService = PaymentStatusService.create(
+    paymentStatusRepository,
+    redisCacheRepository,
+  );
+
   // ------- VALIDATION - CASES -----------
   const validateCategoryPaymentMethodStatusUseCase =
     ValidateCategoryPaymentMethodStatusUseCase.create({
       categoryService: categoryService,
-      paymentMethodGateway: paymentMethodRepository,
-      paymentStatusGateway: paymentStatusRepository,
+      paymentMethodService: paymentMethodService,
+      paymentStatusServiceGateway: paymentStatusService,
     });
 
   //MIDDLEWARES
@@ -101,7 +113,7 @@ function main() {
   ).execute();
 
   const paymentMethodRoutes = PaymentMethodRoute.create(
-    paymentMethodRepository,
+    paymentMethodService,
     authVerifyTokenMiddleware,
   ).execute();
 
@@ -111,7 +123,7 @@ function main() {
   ).execute();
 
   const paymentStatusRoutes = PaymentStatusRoute.create(
-    paymentStatusRepository,
+    paymentStatusService,
     authVerifyTokenMiddleware,
   ).execute();
 
