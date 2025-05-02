@@ -1,8 +1,8 @@
 import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 import { EditReceivableUseCase } from './edit-receivable.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
@@ -12,9 +12,9 @@ let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
 
 let editReceivableUseCase: EditReceivableUseCase;
 
-let categoryGatewayMock: jest.Mocked<CategoryGateway>;
-let paymentMethodGatewayMock: jest.Mocked<PaymentMethodGateway>;
-let paymentStatusGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase;
 
@@ -27,23 +27,23 @@ describe('EditReceivableUseCase', () => {
       updateReceivable: jest.fn(),
     } as any;
 
-    categoryGatewayMock = {
-      getCategoryById: jest.fn(),
+    categoryServiceGatewayMock = {
+      getCategories: jest.fn(),
     } as any;
 
-    paymentMethodGatewayMock = {
-      getPaymentMethodById: jest.fn(),
+    paymentMethodServiceGatewayMock = {
+      getPaymentMethods: jest.fn(),
     } as any;
 
-    paymentStatusGatewayMock = {
-      getPaymentStatusById: jest.fn(),
+    paymentStatusServiceGatewayMock = {
+      getPaymentStatus: jest.fn(),
     } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({
-        categoryGateway: categoryGatewayMock,
-        paymentMethodGateway: paymentMethodGatewayMock,
-        paymentStatusGateway: paymentStatusGatewayMock,
+        categoryService: categoryServiceGatewayMock,
+        paymentMethodService: paymentMethodServiceGatewayMock,
+        paymentStatusServiceGateway: paymentStatusServiceGatewayMock,
       });
 
     editReceivableUseCase = EditReceivableUseCase.create({
