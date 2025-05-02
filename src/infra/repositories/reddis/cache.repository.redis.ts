@@ -1,3 +1,4 @@
+import { Scan } from '@/domain/Cache/dtos/cache.dto';
 import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
 import { LoggerGateway } from '@/domain/Helpers/gateway/logger.gateway';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
@@ -5,7 +6,7 @@ import { ApiError } from '@/helpers/errors';
 import { TypeOfClientRedis } from '@/infra/database/redis/redis.database.cache';
 
 export class RedisCacheRepository implements CacheGateway {
-  private static instante: RedisCacheRepository;
+  private static instance: RedisCacheRepository;
 
   private constructor(
     private readonly clientRedis: TypeOfClientRedis,
@@ -13,14 +14,14 @@ export class RedisCacheRepository implements CacheGateway {
   ) {}
 
   public static create(clientRedis: TypeOfClientRedis, logger: LoggerGateway) {
-    if (!RedisCacheRepository.instante) {
-      RedisCacheRepository.instante = new RedisCacheRepository(
+    if (!RedisCacheRepository.instance) {
+      RedisCacheRepository.instance = new RedisCacheRepository(
         clientRedis,
         logger,
       );
     }
 
-    return RedisCacheRepository.instante;
+    return RedisCacheRepository.instance;
   }
 
   private async handleErrorConnection(error?: Error) {
@@ -34,9 +35,15 @@ export class RedisCacheRepository implements CacheGateway {
         err.statusCode
       }}: ${`[DETAILS]: ${err?.details} - ${err.stack}`}`,
     );
+
     if (error && (error as any)?.code === 'ECONNREFUSED') {
       await this.quit();
     }
+  }
+
+  public async scan(cursor: number, pattern: string): Promise<Scan> {
+    const result = await this.clientRedis.scan(cursor, { MATCH: pattern });
+    return result;
   }
 
   public async connect(): Promise<void> {
@@ -56,7 +63,7 @@ export class RedisCacheRepository implements CacheGateway {
   }
 
   public providerIsAlreadyConected() {
-    return !!RedisCacheRepository.instante;
+    return !!RedisCacheRepository.instance;
   }
 
   public async recover<T>(key: string): Promise<T | null> {
@@ -69,10 +76,25 @@ export class RedisCacheRepository implements CacheGateway {
 
   public async save<T>(key: string, data: T, ttl: number): Promise<void> {
     await this.clientRedis.set(key, JSON.stringify(data), { EX: ttl });
-    //mapear as chaves relacionadas ao save para deleta-las.
   }
 
-  public async delete(key: string): Promise<void> {
+  public async delete(key: string | Array<string>): Promise<void> {
     await this.clientRedis.del(key);
+  }
+
+  public async deleteWithPattern(pattern: string) {
+    let cursor = 0;
+    const keysToDelete: Array<string> = [];
+
+    do {
+      const { cursor: nextCursor, keys } = await this.scan(+cursor, pattern);
+
+      cursor = Number(nextCursor);
+      keysToDelete.push(...keys);
+    } while (cursor !== 0);
+
+    if (keysToDelete.length > 0) {
+      await this.delete(keysToDelete);
+    }
   }
 }
