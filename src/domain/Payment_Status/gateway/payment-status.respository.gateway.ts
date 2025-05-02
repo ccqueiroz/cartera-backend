@@ -1,6 +1,6 @@
 import { PaymentStatusDTO } from '../dtos/payment-status.dto';
 
-export interface PaymentStatusGateway {
+export interface PaymentStatusRepositoryGateway {
   getPaymentStatus(): Promise<Array<PaymentStatusDTO>>;
   getPaymentStatusById({
     id,
