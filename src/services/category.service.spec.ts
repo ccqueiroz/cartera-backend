@@ -1,10 +1,10 @@
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryRepositoryGateway } from '@/domain/Category/gateway/category.repository.gateway';
 import { CategoryService } from './category.service';
 import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
 
-let dbMock: jest.Mocked<CategoryGateway>;
+let dbMock: jest.Mocked<CategoryRepositoryGateway>;
 let cacheMock: jest.Mocked<CacheGateway>;
 
 describe('Category Service', () => {
