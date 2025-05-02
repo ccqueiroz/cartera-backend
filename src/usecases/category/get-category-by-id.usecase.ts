@@ -4,23 +4,25 @@ import {
   CategoryDTO,
   GetCategoryByIdInputDTO,
 } from '@/domain/Category/dtos/category.dto';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 
 export type GetCategoryByIdOutputDTO = OutputDTO<CategoryDTO | null>;
 
 export class GetCategoryByIdUseCase
   implements Usecase<GetCategoryByIdInputDTO, GetCategoryByIdOutputDTO>
 {
-  private constructor(private readonly categoryGateway: CategoryGateway) {}
+  private constructor(
+    private readonly categoryService: CategoryServiceGateway,
+  ) {}
 
   public static create({
-    categoryGateway,
+    categoryService,
   }: {
-    categoryGateway: CategoryGateway;
+    categoryService: CategoryServiceGateway;
   }) {
-    return new GetCategoryByIdUseCase(categoryGateway);
+    return new GetCategoryByIdUseCase(categoryService);
   }
 
   public async execute({
@@ -30,7 +32,7 @@ export class GetCategoryByIdUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const category = await this.categoryGateway.getCategoryById({
+    const category = await this.categoryService.getCategoryById({
       id,
     });
 

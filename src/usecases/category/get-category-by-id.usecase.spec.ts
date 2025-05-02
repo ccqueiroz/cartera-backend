@@ -1,22 +1,22 @@
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
 import { GetCategoryByIdUseCase } from './get-category-by-id.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 
-let categoryUserGatewayMock: jest.Mocked<CategoryGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
 
 describe('Get Category By Id', () => {
   let getCategoryByIdUseCase: GetCategoryByIdUseCase;
 
   beforeEach(() => {
-    categoryUserGatewayMock = {
+    categoryServiceGatewayMock = {
       getCategoryById: jest.fn(),
     } as any;
 
     getCategoryByIdUseCase = GetCategoryByIdUseCase.create({
-      categoryGateway: categoryUserGatewayMock,
+      categoryService: categoryServiceGatewayMock,
     });
   });
 
@@ -25,7 +25,7 @@ describe('Get Category By Id', () => {
   });
 
   it('should be call execute method and return the category when this id are provided', async () => {
-    categoryUserGatewayMock.getCategoryById.mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Aluguel e Financiamento Residencial',
       type: CategoryType.BILLS,
@@ -41,7 +41,7 @@ describe('Get Category By Id', () => {
   });
 
   it('should be call execute method and return null when this id are provided but this payment method is not exist.', async () => {
-    categoryUserGatewayMock.getCategoryById.mockResolvedValue(null);
+    categoryServiceGatewayMock.getCategoryById.mockResolvedValue(null);
 
     const result = await getCategoryByIdUseCase.execute({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
@@ -64,6 +64,6 @@ describe('Get Category By Id', () => {
       statusCode: 400,
     });
 
-    expect(categoryUserGatewayMock.getCategoryById).not.toHaveBeenCalled();
+    expect(categoryServiceGatewayMock.getCategoryById).not.toHaveBeenCalled();
   });
 });
