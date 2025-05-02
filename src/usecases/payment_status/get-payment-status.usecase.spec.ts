@@ -1,18 +1,18 @@
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
 import { GetPaymentStatusUseCase } from './get-payment-status.usecase';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
-let paymentStatusUserGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 describe('Get Payment Status', () => {
   let getPaymentStatusUseCase: GetPaymentStatusUseCase;
 
   beforeEach(() => {
-    paymentStatusUserGatewayMock = {
+    paymentStatusServiceGatewayMock = {
       getPaymentStatus: jest.fn(),
     } as any;
 
     getPaymentStatusUseCase = GetPaymentStatusUseCase.create({
-      paymentStatusGateway: paymentStatusUserGatewayMock,
+      paymentStatusService: paymentStatusServiceGatewayMock,
     });
   });
 
@@ -21,7 +21,7 @@ describe('Get Payment Status', () => {
   });
 
   it('should be call execute method and return the payment status filled list with PaymentStatusDTO objects types', async () => {
-    paymentStatusUserGatewayMock.getPaymentStatus.mockResolvedValue([
+    paymentStatusServiceGatewayMock.getPaymentStatus.mockResolvedValue([
       {
         id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
         description: 'Pago',
@@ -54,7 +54,7 @@ describe('Get Payment Status', () => {
   });
 
   it('should be call execute method and return the payment status empty list', async () => {
-    paymentStatusUserGatewayMock.getPaymentStatus.mockResolvedValue([]);
+    paymentStatusServiceGatewayMock.getPaymentStatus.mockResolvedValue([]);
 
     const result = await getPaymentStatusUseCase.execute();
 

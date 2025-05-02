@@ -1,21 +1,21 @@
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
 import { GetPaymentStatusByIdUseCase } from './get-payment-status-by-id.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
-let paymentStatusUserGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 describe('Get Payment Status By Id', () => {
   let getPaymentStatusByIdUseCase: GetPaymentStatusByIdUseCase;
 
   beforeEach(() => {
-    paymentStatusUserGatewayMock = {
+    paymentStatusServiceGatewayMock = {
       getPaymentStatusById: jest.fn(),
     } as any;
 
     getPaymentStatusByIdUseCase = GetPaymentStatusByIdUseCase.create({
-      paymentStatusGateway: paymentStatusUserGatewayMock,
+      paymentStatusService: paymentStatusServiceGatewayMock,
     });
   });
 
@@ -26,7 +26,7 @@ describe('Get Payment Status By Id', () => {
   });
 
   it('should be call execute method and return the payment status when this id are provided', async () => {
-    paymentStatusUserGatewayMock.getPaymentStatusById.mockResolvedValue({
+    paymentStatusServiceGatewayMock.getPaymentStatusById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'A receber',
       createdAt: new Date().getTime(),
@@ -41,7 +41,9 @@ describe('Get Payment Status By Id', () => {
   });
 
   it('should be call execute method and return null when this id are provided but this payment status is not exist.', async () => {
-    paymentStatusUserGatewayMock.getPaymentStatusById.mockResolvedValue(null);
+    paymentStatusServiceGatewayMock.getPaymentStatusById.mockResolvedValue(
+      null,
+    );
 
     const result = await getPaymentStatusByIdUseCase.execute({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
@@ -65,7 +67,7 @@ describe('Get Payment Status By Id', () => {
     });
 
     expect(
-      paymentStatusUserGatewayMock.getPaymentStatusById,
+      paymentStatusServiceGatewayMock.getPaymentStatusById,
     ).not.toHaveBeenCalled();
   });
 });
