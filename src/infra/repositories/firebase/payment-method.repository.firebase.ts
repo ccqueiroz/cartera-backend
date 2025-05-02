@@ -1,10 +1,12 @@
 import * as admin from 'firebase-admin';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodRepositoryGateway } from '@/domain/Payment_Method/gateway/payment-method.repository.gateway';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentMethodEntitie } from '@/domain/Payment_Method/entitie/payment-method.entitie';
 
-export class PaymentMethodRepositoryFirebase implements PaymentMethodGateway {
+export class PaymentMethodRepositoryFirebase
+  implements PaymentMethodRepositoryGateway
+{
   private static instance: PaymentMethodRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Payment_Method';
