@@ -1,19 +1,19 @@
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 import { GetCategoriesUseCase } from './get-categories.usecase';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 
-let categoryUserGatewayMock: jest.Mocked<CategoryGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
 
 describe('Get Categories', () => {
   let getCategoriesUseCase: GetCategoriesUseCase;
 
   beforeEach(() => {
-    categoryUserGatewayMock = {
+    categoryServiceGatewayMock = {
       getCategories: jest.fn(),
     } as any;
 
     getCategoriesUseCase = GetCategoriesUseCase.create({
-      categoryGateway: categoryUserGatewayMock,
+      categoryService: categoryServiceGatewayMock,
     });
   });
 
@@ -22,7 +22,7 @@ describe('Get Categories', () => {
   });
 
   it('should be call execute method and return the categories filled list with CategoryDTO objects types', async () => {
-    categoryUserGatewayMock.getCategories.mockResolvedValue([
+    categoryServiceGatewayMock.getCategories.mockResolvedValue([
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
         description: 'Restaurante',
@@ -44,42 +44,35 @@ describe('Get Categories', () => {
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
-      {
-        id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
-        description: 'Recebimento por Serviço Prestado',
-        type: CategoryType.RECEIVABLE,
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-      },
     ]);
 
-    const result = await getCategoriesUseCase.execute();
+    const result = await getCategoriesUseCase.execute({});
 
-    expect(result.data.length).toEqual(4);
-    expect(categoryUserGatewayMock.getCategories).toHaveBeenCalledWith({
+    expect(result.data.length).toEqual(3);
+    expect(categoryServiceGatewayMock.getCategories).toHaveBeenCalledWith({
       type: undefined,
     });
   });
 
   it('should be call execute method and return the categories empty list', async () => {
-    categoryUserGatewayMock.getCategories.mockResolvedValue([]);
+    categoryServiceGatewayMock.getCategories.mockResolvedValue([]);
 
-    const result = await getCategoriesUseCase.execute();
+    const result = await getCategoriesUseCase.execute({});
 
     expect(result.data.length).toEqual(0);
-    expect(categoryUserGatewayMock.getCategories).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategories).toHaveBeenCalledWith({
       type: undefined,
     });
   });
 
   it('should be call execute method with types params and check whether the getCategories method of the categoryGateway is receiving this type param.', async () => {
-    categoryUserGatewayMock.getCategories.mockResolvedValue([]);
+    categoryServiceGatewayMock.getCategories.mockResolvedValue([]);
 
     const type = CategoryType.RECEIVABLE;
 
     await getCategoriesUseCase.execute({ type });
 
-    expect(categoryUserGatewayMock.getCategories).toHaveBeenCalledWith({
+    expect(categoryServiceGatewayMock.getCategories).toHaveBeenCalledWith({
       type: CategoryType.RECEIVABLE,
     });
   });
