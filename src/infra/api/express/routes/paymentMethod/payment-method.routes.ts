@@ -1,4 +1,4 @@
-import { PaymentMethodGateway } from './../../../../../domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodServiceGateway } from '../../../../../domain/Payment_Method/gateway/payment-method.service.gateway';
 import { MapRoutes, Route } from '../route';
 import { Middleware } from '../../middlewares/middleware';
 import { GetPaymentMethodsUseCase } from '@/usecases/payment_method/get-payment-methods.usecase';
@@ -8,7 +8,7 @@ import { GetPaymentMethodByIdRoute } from './get-payment-method-by-id.route';
 
 export class PaymentMethodRoute implements MapRoutes {
   private constructor(
-    private readonly paymentMethodGateway: PaymentMethodGateway,
+    private readonly paymentMethodGateway: PaymentMethodServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
     private readonly routes: Array<Route> = [],
   ) {
@@ -16,7 +16,7 @@ export class PaymentMethodRoute implements MapRoutes {
   }
 
   public static create(
-    paymentMethodGateway: PaymentMethodGateway,
+    paymentMethodGateway: PaymentMethodServiceGateway,
     authVerifyMiddleware: Middleware,
   ) {
     return new PaymentMethodRoute(paymentMethodGateway, authVerifyMiddleware);
@@ -24,7 +24,7 @@ export class PaymentMethodRoute implements MapRoutes {
 
   private factoryGetPaymentMethods() {
     const getPaymentMethodsService = GetPaymentMethodsUseCase.create({
-      paymentMethodGateway: this.paymentMethodGateway,
+      paymentMethodService: this.paymentMethodGateway,
     });
     const getPaymentMethodsRoute = GetPaymentMethodsRoute.create(
       getPaymentMethodsService,
@@ -35,7 +35,7 @@ export class PaymentMethodRoute implements MapRoutes {
 
   private factoryGetPaymentMethodById() {
     const getPaymentMethodByIdService = GetPaymentMethodByIdUseCase.create({
-      paymentMethodGateway: this.paymentMethodGateway,
+      paymentMethodService: this.paymentMethodGateway,
     });
     const getPaymentMethodByIdRoute = GetPaymentMethodByIdRoute.create(
       getPaymentMethodByIdService,
