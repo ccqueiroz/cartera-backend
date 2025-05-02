@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { CategoryService } from './src/services/category.service';
 import { RedisCacheRepository } from './src/infra/repositories/reddis/cache.repository.redis';
 import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
@@ -66,10 +67,16 @@ function main() {
   );
   //
 
+  // ----- SERVICES -----
+  const categoryService = CategoryService.create(
+    categoryRepository,
+    redisCacheRepository,
+  );
+
   // ------- VALIDATION - CASES -----------
   const validateCategoryPaymentMethodStatusUseCase =
     ValidateCategoryPaymentMethodStatusUseCase.create({
-      categoryGateway: categoryRepository,
+      categoryService: categoryService,
       paymentMethodGateway: paymentMethodRepository,
       paymentStatusGateway: paymentStatusRepository,
     });
@@ -99,7 +106,7 @@ function main() {
   ).execute();
 
   const categoryRoutes = CategoryRoute.create(
-    categoryRepository,
+    categoryService,
     authVerifyTokenMiddleware,
   ).execute();
 
