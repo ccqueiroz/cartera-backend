@@ -4,7 +4,7 @@ import { GetCategoriesUseCase } from '@/usecases/category/get-categories.usecase
 import { GetCategoriesRoute } from './get-categories.route';
 import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.usecase';
 import { GetCategoryByIdRoute } from './get-category-by-id.route';
-import { CategoryService } from '@/services/category.service';
+import { CategoryService } from '@/services/category/category.service';
 
 export class CategoryRoute implements MapRoutes {
   private constructor(

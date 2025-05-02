@@ -99,7 +99,7 @@ export class GetCategoriesRoute implements Route {
           type && typeof type === 'string' ? (type as CategoryType) : undefined;
 
         const categories = await this.getCategoriesService.execute(
-          categoryType ? { type: categoryType } : undefined,
+          categoryType ? { type: categoryType } : {},
         );
 
         response.status(200).json({ ...categories });
