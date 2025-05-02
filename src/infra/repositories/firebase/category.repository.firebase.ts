@@ -3,11 +3,11 @@ import {
   CategoryDTO,
   GetCategoriesInputDTO,
 } from '@/domain/Category/dtos/category.dto';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryRepositoryGateway } from '@/domain/Category/gateway/category.repository.gateway';
 import firebase from 'firebase';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
-export class CategoryRepositoryFirebase implements CategoryGateway {
+export class CategoryRepositoryFirebase implements CategoryRepositoryGateway {
   private static instance: CategoryRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Category';
