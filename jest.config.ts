@@ -34,6 +34,7 @@ const config: Config = {
     '!**/src/packages/clients/**/*.ts',
     '!**/*.gateway.ts',
     '!**/src/infra/database/firebase/firebase.database.ts',
+    '!**/src/infra/database/redis/redis.database.cache.ts',
     '!**/src/helpers/httpCodes.ts',
     '!./migrations-firebase/*ts',
     '!./scripts/*ts',
