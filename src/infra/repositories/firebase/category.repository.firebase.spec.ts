@@ -61,7 +61,9 @@ describe('Category Repository Firebase', () => {
       ],
     });
 
-    const result = await categoryRepo.getCategories();
+    const result = await categoryRepo.getCategories({
+      type: CategoryType.BILLS,
+    });
 
     result.forEach((i) =>
       expect(i).toEqual(
@@ -91,7 +93,9 @@ describe('Category Repository Firebase', () => {
       docs: [],
     });
 
-    const result = await categoryRepo.getCategories();
+    const result = await categoryRepo.getCategories({
+      type: CategoryType.BILLS,
+    });
 
     expect(result.length).toEqual(0);
     expect(firestore.get).toHaveBeenCalledTimes(1);
@@ -149,6 +153,58 @@ describe('Category Repository Firebase', () => {
     expect(categoryRepo.getCategories).toHaveBeenCalledWith({ type });
   });
 
+  it('should be return Categories list with type RECEIVABLES when the type param to be receive', async () => {
+    firestore.get.mockResolvedValueOnce({
+      docs: [
+        {
+          id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+          data: () => ({
+            description: 'Receitas Diversas',
+            type: CategoryType.RECEIVABLE,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+        {
+          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+          data: () => ({
+            description: 'Aportes e Financiamentos',
+            type: CategoryType.RECEIVABLE,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+        {
+          id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+          data: () => ({
+            description: 'Aposentadorias e Pensões',
+            type: CategoryType.RECEIVABLE,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+        {
+          id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
+          data: () => ({
+            description: 'Comissões e Bonificações',
+            type: CategoryType.RECEIVABLE,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+      ],
+    });
+
+    const categoryRepo = {
+      getCategories: firestore.get,
+    };
+
+    const type = CategoryType.BILLS;
+    await categoryRepo.getCategories({ type });
+
+    expect(categoryRepo.getCategories).toHaveBeenCalledWith({ type });
+  });
+
   it('should be return throw Error if there is a problem with the getCategories request', async () => {
     const error = new Error('Unexpected error');
 
@@ -158,7 +214,9 @@ describe('Category Repository Firebase', () => {
 
     firestore.get.mockRejectedValueOnce(error);
 
-    await expect(categoryRepo.getCategories()).rejects.toThrow(error);
+    await expect(
+      categoryRepo.getCategories({ type: undefined as any }),
+    ).rejects.toThrow(error);
   });
 
   it('should be return Category by id when exist this item in database.', async () => {
