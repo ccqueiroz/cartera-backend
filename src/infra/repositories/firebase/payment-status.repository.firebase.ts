@@ -1,10 +1,12 @@
 import * as admin from 'firebase-admin';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
+import { PaymentStatusRepositoryGateway } from '@/domain/Payment_Status/gateway/payment-status.respository.gateway';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 
-export class PaymentStatusRepositoryFirebase implements PaymentStatusGateway {
+export class PaymentStatusRepositoryFirebase
+  implements PaymentStatusRepositoryGateway
+{
   private static instance: PaymentStatusRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Payment_Status';
