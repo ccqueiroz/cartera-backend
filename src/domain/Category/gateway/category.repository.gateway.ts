@@ -4,7 +4,7 @@ import {
   GetCategoryByIdInputDTO,
 } from '../dtos/category.dto';
 
-export interface CategoryGateway {
+export interface CategoryRepositoryGateway {
   getCategories(type: GetCategoriesInputDTO): Promise<Array<CategoryDTO>>;
   getCategoryById({ id }: GetCategoryByIdInputDTO): Promise<CategoryDTO | null>;
 }
