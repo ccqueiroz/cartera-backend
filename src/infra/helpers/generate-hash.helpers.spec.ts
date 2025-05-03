@@ -1,6 +1,6 @@
 import { DeterministicSerializationObjectGateway } from '@/domain/Helpers/gateway/deterministic-serialization-object.gateway';
 import { GenerateHashHelper } from './generate-hash.helpers';
-import { crypto } from '@/packages/clients/cripto';
+import { crypto } from '@/packages/clients/crypto';
 
 let deterministcSerializationMock: jest.Mocked<DeterministicSerializationObjectGateway>;
 

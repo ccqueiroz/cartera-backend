@@ -1,6 +1,6 @@
 import { DeterministicSerializationObjectGateway } from '@/domain/Helpers/gateway/deterministic-serialization-object.gateway';
 import { GenerateHashGateway } from '@/domain/Helpers/gateway/generate-hash.gateway';
-import { crypto } from '@/packages/clients/cripto';
+import { crypto } from '@/packages/clients/crypto';
 
 export class GenerateHashHelper implements GenerateHashGateway {
   private static instance: GenerateHashHelper;
