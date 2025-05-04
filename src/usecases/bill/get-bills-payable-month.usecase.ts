@@ -2,12 +2,12 @@ import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import {
   BillsPayableMonthInputDTO,
   BillsPayableMonthOutPutDTO,
   StatusBill,
 } from '@/domain/Bill/dtos/bill.dto';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export type GetBillsPayableMonthOutputDTO = OutputDTO<
   Array<BillsPayableMonthOutPutDTO>
@@ -16,10 +16,10 @@ export type GetBillsPayableMonthOutputDTO = OutputDTO<
 export class GetBillsPayableMonthUseCase
   implements Usecase<BillsPayableMonthInputDTO, GetBillsPayableMonthOutputDTO>
 {
-  private constructor(private readonly billGateway: BillGateway) {}
+  private constructor(private readonly billService: BillServiceGateway) {}
 
-  public static create({ billGateway }: { billGateway: BillGateway }) {
-    return new GetBillsPayableMonthUseCase(billGateway);
+  public static create({ billService }: { billService: BillServiceGateway }) {
+    return new GetBillsPayableMonthUseCase(billService);
   }
 
   private handleSetInvoiceStatus(billDate: number, referenceDate: number) {
@@ -54,7 +54,17 @@ export class GetBillsPayableMonthUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
 
-    const bills = await this.billGateway.billsPayableMonth({
+    if (
+      !inputGetBills?.period ||
+      !inputGetBills?.period?.initialDate ||
+      !inputGetBills?.period?.finalDate ||
+      isNaN(inputGetBills?.period.initialDate) ||
+      isNaN(inputGetBills?.period.finalDate)
+    ) {
+      throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
+    }
+
+    const bills = await this.billService.billsPayableMonth({
       ...inputGetBills,
     });
 

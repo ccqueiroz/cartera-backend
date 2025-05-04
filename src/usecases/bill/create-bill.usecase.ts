@@ -7,7 +7,7 @@ import { OutputDTO } from '@/domain/dtos/output.dto';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export type CreateBillOutputDTO = OutputDTO<TypeCreateBillOutputDTO | null>;
 
@@ -15,19 +15,19 @@ export class CreateBillUseCase
   implements Usecase<CreateBillInputDTO, CreateBillOutputDTO>
 {
   private constructor(
-    private readonly billGateway: BillGateway,
+    private readonly billService: BillServiceGateway,
     private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
   ) {}
 
   public static create({
-    billGateway,
+    billService,
     validateCategoryPaymentMethodStatusService,
   }: {
-    billGateway: BillGateway;
+    billService: BillServiceGateway;
     validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
   }) {
     return new CreateBillUseCase(
-      billGateway,
+      billService,
       validateCategoryPaymentMethodStatusService,
     );
   }
@@ -54,7 +54,7 @@ export class CreateBillUseCase
       );
     }
 
-    const bill = await this.billGateway.createBill({
+    const bill = await this.billService.createBill({
       billData,
       userId,
     });

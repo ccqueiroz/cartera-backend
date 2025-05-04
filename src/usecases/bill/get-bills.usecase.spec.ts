@@ -1,11 +1,11 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { GetBillsUseCase } from './get-bills.usecase';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 let getBillsUseCase: GetBillsUseCase;
 const userIdMock = '1234567d';
 
@@ -80,12 +80,12 @@ const billsItemsMock = [
 
 describe('Get Bills UseCase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       getBills: jest.fn(),
     } as any;
 
     getBillsUseCase = GetBillsUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
     });
   });
 
@@ -94,7 +94,7 @@ describe('Get Bills UseCase', () => {
   });
 
   it('should be call execute method and return the bills filled list with BillDTO objects type', async () => {
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -110,7 +110,7 @@ describe('Get Bills UseCase', () => {
     });
 
     expect(result.data.content.length).toBe(3);
-    expect(billGatewayMock.getBills).toHaveBeenCalledWith({
+    expect(billServiceMock.getBills).toHaveBeenCalledWith({
       page: 0,
       size: 10,
       userId: userIdMock,
@@ -118,7 +118,7 @@ describe('Get Bills UseCase', () => {
   });
 
   it('should be call execute method with all PaginationParams attributes valid', async () => {
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -144,7 +144,7 @@ describe('Get Bills UseCase', () => {
       userId: userIdMock,
     });
 
-    expect(billGatewayMock.getBills).toHaveBeenCalledWith({
+    expect(billServiceMock.getBills).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       ordering: { amount: SortOrder.ASC },
@@ -169,7 +169,7 @@ describe('Get Bills UseCase', () => {
       userId: userIdMock,
     });
 
-    expect(billGatewayMock.getBills).toHaveBeenCalledWith({
+    expect(billServiceMock.getBills).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       ordering: { amount: SortOrder.ASC },
@@ -183,7 +183,7 @@ describe('Get Bills UseCase', () => {
   });
 
   it('should be call execute method with all GetBillsInputDTO attributes valid', async () => {
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -218,7 +218,7 @@ describe('Get Bills UseCase', () => {
       userId: userIdMock,
     });
 
-    expect(billGatewayMock.getBills).toHaveBeenCalledWith({
+    expect(billServiceMock.getBills).toHaveBeenCalledWith({
       ...params,
       userId: userIdMock,
     });
@@ -226,7 +226,7 @@ describe('Get Bills UseCase', () => {
   });
 
   it('should be call execute method and return the bills empty list', async () => {
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: [],
       totalElements: 0,
       totalPages: 1,
@@ -244,7 +244,7 @@ describe('Get Bills UseCase', () => {
 
     expect(result.data.content.length).toBe(0);
     expect(result.data.totalElements).toEqual(0);
-    expect(billGatewayMock.getBills).toHaveBeenCalledWith({
+    expect(billServiceMock.getBills).toHaveBeenCalledWith({
       page: 0,
       size: 10,
       ordering: { amount: SortOrder.DESC },
@@ -267,6 +267,6 @@ describe('Get Bills UseCase', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.getBills).not.toHaveBeenCalled();
+    expect(billServiceMock.getBills).not.toHaveBeenCalled();
   });
 });

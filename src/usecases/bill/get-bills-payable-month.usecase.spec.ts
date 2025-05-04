@@ -1,10 +1,10 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ApiError } from '@/helpers/errors';
 import { StatusBill } from '@/domain/Bill/dtos/bill.dto';
-import { GetBillsPayableMonthUseCase } from './get-bills-payable-month';
+import { GetBillsPayableMonthUseCase } from './get-bills-payable-month.usecase';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 let getBillsPayableMonthUseCase: GetBillsPayableMonthUseCase;
 const userIdMock = '1234567d';
 
@@ -133,13 +133,13 @@ const billsMock = [
 
 describe('Get Bills Payable Month Usecase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       getBills: jest.fn(),
       billsPayableMonth: jest.fn(),
     } as any;
 
     getBillsPayableMonthUseCase = GetBillsPayableMonthUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
     });
   });
 
@@ -150,7 +150,7 @@ describe('Get Bills Payable Month Usecase', () => {
   });
 
   it('should return the bills with correct status', async () => {
-    billGatewayMock.billsPayableMonth.mockResolvedValueOnce(billsMock);
+    billServiceMock.billsPayableMonth.mockResolvedValueOnce(billsMock);
 
     const result = await getBillsPayableMonthUseCase.execute(input);
 
@@ -161,7 +161,7 @@ describe('Get Bills Payable Month Usecase', () => {
     expect(result.data[3].status).toBe(StatusBill.PENDING);
     expect(result.data[4].status).toBe(StatusBill.PENDING);
 
-    expect(billGatewayMock.billsPayableMonth).toHaveBeenCalledWith(input);
+    expect(billServiceMock.billsPayableMonth).toHaveBeenCalledWith(input);
   });
 
   it('should throw ApiError if userId is not provided', async () => {
@@ -178,7 +178,7 @@ describe('Get Bills Payable Month Usecase', () => {
   });
 
   it('should return empty list if no bills returned from gateway', async () => {
-    billGatewayMock.billsPayableMonth.mockResolvedValueOnce([]);
+    billServiceMock.billsPayableMonth.mockResolvedValueOnce([]);
 
     const result = await getBillsPayableMonthUseCase.execute(input);
 
