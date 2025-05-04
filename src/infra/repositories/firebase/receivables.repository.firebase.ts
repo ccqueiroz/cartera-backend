@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
+import { ReceivableRepositoryGateway } from '@/domain/Receivable/gateway/receivable.repository.gateway';
 import {
   CreateReceivableInputDTO,
   CreateReceivableOutputDTO,
@@ -23,7 +23,9 @@ import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
 import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 
-export class ReceivablesRepositoryFirebase implements ReceivableGateway {
+export class ReceivablesRepositoryFirebase
+  implements ReceivableRepositoryGateway
+{
   private static instance: ReceivablesRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Receivable';

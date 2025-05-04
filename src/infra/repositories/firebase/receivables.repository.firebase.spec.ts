@@ -104,6 +104,7 @@ describe('Receivable Repository Firebase', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NODE_ENV = 'development';
+    ReceivablesRepositoryFirebase['instance'] = null as any;
   });
 
   it('should be return Receivables list when exist items in database', async () => {
