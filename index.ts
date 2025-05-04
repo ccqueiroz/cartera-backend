@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { BillService } from './src/services/bill/bill.service';
 import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
 import { PaymentMethodService } from './src/services/payment_method/payment-method.service';
 import { CategoryService } from './src/services/category/category.service';
@@ -22,6 +23,7 @@ import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/pers
 import {
   applayPaginationHelpers,
   checkIfIsNecessaryCreateNewTokenHelpers,
+  generateHashHelper,
   handleCanProgressToWritteOperation,
   mergeSortHelpers,
   normalizeIp,
@@ -85,6 +87,12 @@ function main() {
     redisCacheRepository,
   );
 
+  const billService = BillService.create(
+    billRepository,
+    redisCacheRepository,
+    generateHashHelper,
+  );
+
   // ------- VALIDATION - CASES -----------
   const validateCategoryPaymentMethodStatusUseCase =
     ValidateCategoryPaymentMethodStatusUseCase.create({
@@ -134,7 +142,7 @@ function main() {
   ).execute();
 
   const billRoutes = BillRoute.create(
-    billRepository,
+    billService,
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
