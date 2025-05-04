@@ -1,3 +1,4 @@
+import { ReceivableService } from './src/services/receivable/receivables.service';
 import 'dotenv/config';
 import { BillService } from './src/services/bill/bill.service';
 import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
@@ -93,6 +94,12 @@ function main() {
     generateHashHelper,
   );
 
+  const receivableService = ReceivableService.create(
+    receivableRepository,
+    redisCacheRepository,
+    generateHashHelper,
+  );
+
   // ------- VALIDATION - CASES -----------
   const validateCategoryPaymentMethodStatusUseCase =
     ValidateCategoryPaymentMethodStatusUseCase.create({
@@ -136,7 +143,7 @@ function main() {
   ).execute();
 
   const receivableRoutes = ReceivableRoute.create(
-    receivableRepository,
+    receivableService,
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
