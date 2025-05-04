@@ -10,7 +10,7 @@ import {
   GetBillsInputDTO,
 } from '../dtos/bill.dto';
 
-export interface BillGateway {
+export interface BillServiceGateway {
   getBills(input: GetBillsInputDTO): Promise<ResponseListDTO<BillDTO>>;
 
   getBillById({ id, userId }: GetBillByIdInputDTO): Promise<BillDTO | null>;
