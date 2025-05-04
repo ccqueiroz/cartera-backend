@@ -5,7 +5,7 @@ import {
   PersonUserEntitieDTO,
 } from '../dtos/person-user.dto';
 
-export interface PersonUserGateway {
+export interface PersonUserServiceGateway {
   getPersonUserByEmail({
     email,
   }: Pick<PersonUserEntitieDTO, 'email'>): Promise<PersonUserEntitieDTO | null>;
