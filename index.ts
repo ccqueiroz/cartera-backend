@@ -155,8 +155,8 @@ function main() {
   ).execute();
 
   const cashFlowRoutes = CashFlowRoute.create(
-    billRepository,
-    receivableRepository,
+    billService,
+    receivableService,
     authVerifyTokenMiddleware,
   ).execute();
   //
