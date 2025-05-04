@@ -4,10 +4,10 @@ import {
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export type CreateReceivableOutputDTO =
   OutputDTO<TypeCreateReceivableOutputDTO | null>;
@@ -16,19 +16,19 @@ export class CreateReceivableUseCase
   implements Usecase<CreateReceivableInputDTO, CreateReceivableOutputDTO>
 {
   private constructor(
-    private readonly receivableGateway: ReceivableGateway,
+    private readonly receivableService: ReceivableServiceGateway,
     private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
   ) {}
 
   public static create({
-    receivableGateway,
+    receivableService,
     validateCategoryPaymentMethodStatusService,
   }: {
-    receivableGateway: ReceivableGateway;
+    receivableService: ReceivableServiceGateway;
     validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
   }) {
     return new CreateReceivableUseCase(
-      receivableGateway,
+      receivableService,
       validateCategoryPaymentMethodStatusService,
     );
   }
@@ -55,7 +55,7 @@ export class CreateReceivableUseCase
       );
     }
 
-    const receivable = await this.receivableGateway.createReceivable({
+    const receivable = await this.receivableService.createReceivable({
       receivableData,
       userId,
     });

@@ -1,4 +1,3 @@
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
@@ -7,8 +6,9 @@ import { EditReceivableUseCase } from './edit-receivable.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
-let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 
 let editReceivableUseCase: EditReceivableUseCase;
 
@@ -22,7 +22,7 @@ const userIdMock = '1234567d';
 
 describe('EditReceivableUseCase', () => {
   beforeEach(() => {
-    receivableGatewayMock = {
+    receivableServiceMock = {
       getReceivableById: jest.fn(),
       updateReceivable: jest.fn(),
     } as any;
@@ -47,7 +47,7 @@ describe('EditReceivableUseCase', () => {
       });
 
     editReceivableUseCase = EditReceivableUseCase.create({
-      receivableGateway: receivableGatewayMock,
+      receivableService: receivableServiceMock,
       validateCategoryPaymentMethodStatusService:
         validateCategoryPaymentMethodStatusUseCase,
     });
@@ -79,7 +79,7 @@ describe('EditReceivableUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValue({
+    receivableServiceMock.getReceivableById.mockResolvedValue({
       ...receivableData,
       updatedAt: null,
     });
@@ -88,7 +88,7 @@ describe('EditReceivableUseCase', () => {
       .fn()
       .mockResolvedValue(true);
 
-    receivableGatewayMock.updateReceivable.mockResolvedValue({
+    receivableServiceMock.updateReceivable.mockResolvedValue({
       ...receivableData,
       descriptionReceivable: 'Test Receivable updated',
       updatedAt: new Date().getTime(),
@@ -101,7 +101,7 @@ describe('EditReceivableUseCase', () => {
     });
 
     expect(result.data?.id).toBe(receivableData.id);
-    expect(receivableGatewayMock.updateReceivable).toHaveBeenCalledWith({
+    expect(receivableServiceMock.updateReceivable).toHaveBeenCalledWith({
       receivableId: receivableData.id,
       receivableData,
       userId: userIdMock,
@@ -131,7 +131,7 @@ describe('EditReceivableUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValue({
+    receivableServiceMock.getReceivableById.mockResolvedValue({
       ...receivableData,
       updatedAt: null,
     });
@@ -153,7 +153,7 @@ describe('EditReceivableUseCase', () => {
       message: ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 
   it('should throw an error if receivableId is not exist in data base.', async () => {
@@ -178,7 +178,7 @@ describe('EditReceivableUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValue(null);
+    receivableServiceMock.getReceivableById.mockResolvedValue(null);
 
     const error = await editReceivableUseCase
       .execute({
@@ -193,7 +193,7 @@ describe('EditReceivableUseCase', () => {
       message: ERROR_MESSAGES.RECEIVABLE_NOT_FOUND,
       statusCode: 404,
     });
-    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 
   it('should throw an error if receivableId is invalid', async () => {
@@ -231,7 +231,7 @@ describe('EditReceivableUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 
   it('should be throw an error if the userId does not passed', async () => {
@@ -266,6 +266,6 @@ describe('EditReceivableUseCase', () => {
       statusCode: 401,
     });
 
-    expect(receivableGatewayMock.updateReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 });

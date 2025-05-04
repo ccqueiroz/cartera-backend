@@ -1,5 +1,4 @@
 import { CreateReceivableUseCase } from './create-receivable.usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
@@ -7,8 +6,9 @@ import { CategoryServiceGateway } from '@/domain/Category/gateway/category.servi
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
-let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 
 let createReceivableUseCase: CreateReceivableUseCase;
 
@@ -22,7 +22,7 @@ const userIdMock = '1234567d';
 
 describe('CreateReceivableUseCase', () => {
   beforeEach(() => {
-    receivableGatewayMock = {
+    receivableServiceMock = {
       createReceivable: jest.fn(),
     } as any;
 
@@ -46,7 +46,7 @@ describe('CreateReceivableUseCase', () => {
       });
 
     createReceivableUseCase = CreateReceivableUseCase.create({
-      receivableGateway: receivableGatewayMock,
+      receivableService: receivableServiceMock,
       validateCategoryPaymentMethodStatusService:
         validateCategoryPaymentMethodStatusUseCase,
     });
@@ -80,7 +80,7 @@ describe('CreateReceivableUseCase', () => {
       id: 'd41d8cd98f00b204e9800998ecf8427e',
     };
 
-    receivableGatewayMock.createReceivable.mockResolvedValue({
+    receivableServiceMock.createReceivable.mockResolvedValue({
       id: 'd41d8cd98f00b204e9800998ecf8427e',
     });
 
@@ -96,7 +96,7 @@ describe('CreateReceivableUseCase', () => {
     expect(result.data).not.toBeNull();
 
     expect(result.data?.id).toBe(receivable.id);
-    expect(receivableGatewayMock.createReceivable).toHaveBeenCalledWith({
+    expect(receivableServiceMock.createReceivable).toHaveBeenCalledWith({
       receivableData,
       userId: userIdMock,
     });
@@ -135,7 +135,7 @@ describe('CreateReceivableUseCase', () => {
       message: ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.createReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.createReceivable).not.toHaveBeenCalled();
   });
 
   it('should return null if the receivable creation fails', async () => {
@@ -158,7 +158,7 @@ describe('CreateReceivableUseCase', () => {
       createdAt: new Date().getTime(),
     };
 
-    receivableGatewayMock.createReceivable.mockResolvedValue(null);
+    receivableServiceMock.createReceivable.mockResolvedValue(null);
 
     validateCategoryPaymentMethodStatusUseCase.execute = jest
       .fn()
@@ -171,7 +171,7 @@ describe('CreateReceivableUseCase', () => {
 
     expect(result.data).toBeNull();
 
-    expect(receivableGatewayMock.createReceivable).toHaveBeenCalledWith({
+    expect(receivableServiceMock.createReceivable).toHaveBeenCalledWith({
       receivableData,
       userId: userIdMock,
     });
@@ -208,7 +208,7 @@ describe('CreateReceivableUseCase', () => {
       statusCode: 401,
     });
 
-    expect(receivableGatewayMock.createReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.createReceivable).not.toHaveBeenCalled();
   });
 
   it('should be return data null when the response of the createReceivable repository dont contain id', async () => {
@@ -235,7 +235,7 @@ describe('CreateReceivableUseCase', () => {
       .fn()
       .mockResolvedValue(true);
 
-    receivableGatewayMock.createReceivable.mockResolvedValue({
+    receivableServiceMock.createReceivable.mockResolvedValue({
       id: '',
     });
 
@@ -248,7 +248,7 @@ describe('CreateReceivableUseCase', () => {
       data: null,
     });
 
-    expect(receivableGatewayMock.createReceivable).toHaveBeenCalledWith({
+    expect(receivableServiceMock.createReceivable).toHaveBeenCalledWith({
       receivableData,
       userId: userIdMock,
     });

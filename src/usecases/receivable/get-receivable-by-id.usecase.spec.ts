@@ -1,22 +1,22 @@
 import { GetReceivableByIdUseCase } from '@/usecases/receivable/get-receivable-by-id.usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 describe('GetReceivableByIdUseCase', () => {
-  let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+  let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
   let getReceivableByIdUseCase: GetReceivableByIdUseCase;
 
   const userIdMock = '1234567d';
 
   beforeEach(() => {
-    receivableGatewayMock = {
+    receivableServiceMock = {
       getReceivableById: jest.fn(),
     } as any;
 
     getReceivableByIdUseCase = GetReceivableByIdUseCase.create({
-      receivableGateway: receivableGatewayMock,
+      receivableService: receivableServiceMock,
     });
   });
 
@@ -33,11 +33,11 @@ describe('GetReceivableByIdUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.getReceivableById).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivableById).not.toHaveBeenCalled();
   });
 
   it('should return null if receivable is not found', async () => {
-    receivableGatewayMock.getReceivableById.mockResolvedValueOnce(null);
+    receivableServiceMock.getReceivableById.mockResolvedValueOnce(null);
 
     const result = await getReceivableByIdUseCase.execute({
       id: 'non-existent-id',
@@ -45,7 +45,7 @@ describe('GetReceivableByIdUseCase', () => {
     });
 
     expect(result).toEqual({ data: null });
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: 'non-existent-id',
       userId: userIdMock,
     });
@@ -73,7 +73,7 @@ describe('GetReceivableByIdUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValueOnce(
+    receivableServiceMock.getReceivableById.mockResolvedValueOnce(
       receivableData,
     );
 
@@ -84,7 +84,7 @@ describe('GetReceivableByIdUseCase', () => {
 
     expect(result.data?.id).toBe(receivableData.id);
 
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: receivableData.id,
       userId: userIdMock,
     });
@@ -112,7 +112,7 @@ describe('GetReceivableByIdUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValueOnce(
+    receivableServiceMock.getReceivableById.mockResolvedValueOnce(
       receivableData,
     );
 
@@ -128,7 +128,7 @@ describe('GetReceivableByIdUseCase', () => {
       },
     });
 
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: receivableData.id,
       userId: userIdMock,
     });
@@ -147,7 +147,7 @@ describe('GetReceivableByIdUseCase', () => {
       statusCode: 401,
     });
 
-    expect(receivableGatewayMock.getReceivableById).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivableById).not.toHaveBeenCalled();
   });
 
   it('should be return data null when the response of the getReceivableById repository dont contain id', async () => {
@@ -173,7 +173,7 @@ describe('GetReceivableByIdUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValueOnce(
+    receivableServiceMock.getReceivableById.mockResolvedValueOnce(
       receivableData,
     );
 
@@ -186,7 +186,7 @@ describe('GetReceivableByIdUseCase', () => {
       data: null,
     });
 
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: receivableId,
       userId: userIdMock,
     });

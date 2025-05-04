@@ -4,10 +4,10 @@ import {
   ReceivableDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export type EditReceivableOutputDTO = OutputDTO<ReceivableDTO | null>;
 
@@ -15,19 +15,19 @@ export class EditReceivableUseCase
   implements Usecase<EditReceivableInputDTO, EditReceivableOutputDTO>
 {
   private constructor(
-    private readonly receivableGateway: ReceivableGateway,
+    private readonly receivableService: ReceivableServiceGateway,
     private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
   ) {}
 
   public static create({
-    receivableGateway,
+    receivableService,
     validateCategoryPaymentMethodStatusService,
   }: {
-    receivableGateway: ReceivableGateway;
+    receivableService: ReceivableServiceGateway;
     validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
   }) {
     return new EditReceivableUseCase(
-      receivableGateway,
+      receivableService,
       validateCategoryPaymentMethodStatusService,
     );
   }
@@ -45,7 +45,7 @@ export class EditReceivableUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const hasReceivable = await this.receivableGateway.getReceivableById({
+    const hasReceivable = await this.receivableService.getReceivableById({
       id: receivableId,
       userId,
     });
@@ -68,7 +68,7 @@ export class EditReceivableUseCase
       );
     }
 
-    const receivable = await this.receivableGateway.updateReceivable({
+    const receivable = await this.receivableService.updateReceivable({
       receivableId,
       receivableData,
       userId,
