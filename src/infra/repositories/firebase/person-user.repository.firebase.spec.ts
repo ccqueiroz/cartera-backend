@@ -17,6 +17,7 @@ describe('Person User Repository Firebase', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NODE_ENV = 'development';
+    PersonUserRepositoryFirebase['instance'] = null as any;
   });
 
   it('should be return user data if email found when this search to be by email', async () => {

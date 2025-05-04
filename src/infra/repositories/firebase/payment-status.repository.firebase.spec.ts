@@ -17,6 +17,7 @@ describe('Payment Status Repository Firebase', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NODE_ENV = 'development';
+    PaymentStatusRepositoryFirebase['instance'] = null as any;
   });
 
   it('should be return Payment Status list when exist items in database.', async () => {

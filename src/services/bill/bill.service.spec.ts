@@ -432,7 +432,7 @@ describe('Bill Service', () => {
     expect(result).toBeNull();
   });
 
-  it('should be call getFileById and must be call the db repository when data response of the cache repository return null', async () => {
+  it('should be call getBillById and must be call the db repository when data response of the cache repository return null', async () => {
     const data = null;
 
     const input = {

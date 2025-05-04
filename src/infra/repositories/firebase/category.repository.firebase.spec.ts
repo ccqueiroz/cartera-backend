@@ -17,6 +17,7 @@ describe('Category Repository Firebase', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NODE_ENV = 'development';
+    CategoryRepositoryFirebase['instance'] = null as any;
   });
 
   it('should be return Categories list when exist items in database.', async () => {

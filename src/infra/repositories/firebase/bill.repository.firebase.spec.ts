@@ -233,6 +233,7 @@ describe('Bill Repository Firebase', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     process.env.NODE_ENV = 'development';
+    BillsRepositoryFirebase['instance'] = null as any;
   });
 
   it('should be return Bills list when exist items in database', async () => {
