@@ -1,13 +1,13 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { GetConsolidatedCashFlowByYearUseCase } from './get-consolidated-cash-flow-by-year.usecase';
 import { Months } from '@/domain/dtos/months.dto';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
-let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
+let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 let getConsolidatedCashFlow: GetConsolidatedCashFlowByYearUseCase;
 
 const billsItemsMock = [
@@ -148,17 +148,17 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    billGatewayMock = {
+    billServiceMock = {
       getBills: jest.fn(),
     } as any;
 
-    receivableGatewayMock = {
+    receivableServiceMock = {
       getReceivables: jest.fn(),
     } as any;
 
     getConsolidatedCashFlow = GetConsolidatedCashFlowByYearUseCase.create({
-      billGateway: billGatewayMock,
-      receivableGateway: receivableGatewayMock,
+      billService: billServiceMock,
+      receivableService: receivableServiceMock,
     });
   });
 
@@ -169,7 +169,7 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
   });
 
   it('should receive a year and must should receive a year and must return a cash flow list with all months containing the informations about its respective months cash flow return a cash flow list with all months and this cash flow informations of months', async () => {
-    receivableGatewayMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.getReceivables.mockResolvedValue({
       content: receivablesItemsMocks,
       totalElements: 3,
       totalPages: 1,
@@ -178,7 +178,7 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       ordering: null,
     });
 
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -243,8 +243,8 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.getBills).not.toHaveBeenCalled();
-    expect(receivableGatewayMock.getReceivables).not.toHaveBeenCalled();
+    expect(billServiceMock.getBills).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivables).not.toHaveBeenCalled();
   });
 
   it('should throw an error if the year is invalid (NaN)', async () => {
@@ -261,16 +261,16 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 400,
     });
 
-    expect(billGatewayMock.getBills).not.toHaveBeenCalled();
-    expect(receivableGatewayMock.getReceivables).not.toHaveBeenCalled();
+    expect(billServiceMock.getBills).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivables).not.toHaveBeenCalled();
   });
 
   it('should throw an internal error if any gateway call fails', async () => {
-    receivableGatewayMock.getReceivables.mockRejectedValueOnce(
+    receivableServiceMock.getReceivables.mockRejectedValueOnce(
       new Error('Unexpected error'),
     );
 
-    billGatewayMock.getBills.mockResolvedValue({
+    billServiceMock.getBills.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -292,7 +292,7 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 500,
     });
 
-    expect(billGatewayMock.getBills).toHaveBeenCalledTimes(1);
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledTimes(1);
+    expect(billServiceMock.getBills).toHaveBeenCalledTimes(1);
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledTimes(1);
   });
 });

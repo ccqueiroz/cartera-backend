@@ -4,14 +4,14 @@ import {
 } from '@/domain/Cash_Flow/dtos/cash-flow.dto';
 import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
 import { ReceivableDTO } from '@/domain/Receivable/dtos/receivable.dto';
 import { Months } from '@/domain/dtos/months.dto';
 import { CashFlowEntitie } from '@/domain/Cash_Flow/entitie/cash-flow.entitie';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export type GetConsolidatedCashFlowByYearOutputDTO = OutputDTO<
   Array<CashFlowDTO>
@@ -35,20 +35,20 @@ export class GetConsolidatedCashFlowByYearUseCase
   ) as Array<keyof typeof Months>;
 
   private constructor(
-    private readonly receivableGateway: ReceivableGateway,
-    private readonly billGateway: BillGateway,
+    private readonly receivableService: ReceivableServiceGateway,
+    private readonly billService: BillServiceGateway,
   ) {}
 
   public static create({
-    receivableGateway,
-    billGateway,
+    receivableService,
+    billService,
   }: {
-    receivableGateway: ReceivableGateway;
-    billGateway: BillGateway;
+    receivableService: ReceivableServiceGateway;
+    billService: BillServiceGateway;
   }) {
     return new GetConsolidatedCashFlowByYearUseCase(
-      receivableGateway,
-      billGateway,
+      receivableService,
+      billService,
     );
   }
 
@@ -122,7 +122,7 @@ export class GetConsolidatedCashFlowByYearUseCase
 
     const [listBillsByGateway, listReceivablesByGateway] =
       await Promise.allSettled([
-        this.billGateway.getBills({
+        this.billService.getBills({
           userId,
           page: 0,
           size: 99999,
@@ -133,7 +133,7 @@ export class GetConsolidatedCashFlowByYearUseCase
             },
           },
         }),
-        this.receivableGateway.getReceivables({
+        this.receivableService.getReceivables({
           userId,
           page: 0,
           size: 99999,
