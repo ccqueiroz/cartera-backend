@@ -1,4 +1,3 @@
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { MapRoutes, Route } from './../route';
 import { Middleware } from '../../middlewares/middleware';
 import { GetReceivablesRoute } from './get-receivables.route';
@@ -12,10 +11,11 @@ import { EditReceivableUseCase } from '@/usecases/receivable/edit-receivable.use
 import { EditReceivableRoute } from './edit-receivable.route';
 import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable.usecase';
 import { DeleteReceivableRoute } from './delete-receivable.route';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export class ReceivableRoute implements MapRoutes {
   private constructor(
-    private readonly receivableGateway: ReceivableGateway,
+    private readonly receivableServiceGateway: ReceivableServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
     private readonly validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
     private readonly routes: Array<Route> = [],
@@ -24,12 +24,12 @@ export class ReceivableRoute implements MapRoutes {
   }
 
   public static create(
-    receivableGateway: ReceivableGateway,
+    receivableServiceGateway: ReceivableServiceGateway,
     authVerifyMiddleware: Middleware,
     validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
   ) {
     return new ReceivableRoute(
-      receivableGateway,
+      receivableServiceGateway,
       authVerifyMiddleware,
       validateCategoryPaymentMethodStatusUseCase,
     );
@@ -37,7 +37,7 @@ export class ReceivableRoute implements MapRoutes {
 
   private factoryGetReceivables() {
     const getReceivablesService = GetReceivablesUseCase.create({
-      receivableGateway: this.receivableGateway,
+      receivableService: this.receivableServiceGateway,
     });
     const getReceivablesRoute = GetReceivablesRoute.create(
       getReceivablesService,
@@ -48,7 +48,7 @@ export class ReceivableRoute implements MapRoutes {
 
   private factoryGetReceivableById() {
     const getReceivableByIdService = GetReceivableByIdUseCase.create({
-      receivableGateway: this.receivableGateway,
+      receivableService: this.receivableServiceGateway,
     });
     const getReceivableByIdRoute = GetReceivableByIdRoute.create(
       getReceivableByIdService,
@@ -59,7 +59,7 @@ export class ReceivableRoute implements MapRoutes {
 
   private factoryCreateReceivable() {
     const createReceivableService = CreateReceivableUseCase.create({
-      receivableGateway: this.receivableGateway,
+      receivableService: this.receivableServiceGateway,
       validateCategoryPaymentMethodStatusService:
         this.validateCategoryPaymentMethodStatusUseCase,
     });
@@ -72,7 +72,7 @@ export class ReceivableRoute implements MapRoutes {
 
   private factoryUpdateReceivable() {
     const updateReceivableService = EditReceivableUseCase.create({
-      receivableGateway: this.receivableGateway,
+      receivableService: this.receivableServiceGateway,
       validateCategoryPaymentMethodStatusService:
         this.validateCategoryPaymentMethodStatusUseCase,
     });
@@ -85,7 +85,7 @@ export class ReceivableRoute implements MapRoutes {
 
   private factoryDeleteReceivable() {
     const deleteReceivableService = DeleteReceivableUseCase.create({
-      receivableGateway: this.receivableGateway,
+      receivableService: this.receivableServiceGateway,
     });
     const deleteReceivableRoute = DeleteReceivableRoute.create(
       deleteReceivableService,
