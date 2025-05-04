@@ -1,14 +1,14 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { MapRoutes, Route } from '../route';
 import { Middleware } from '../../middlewares/middleware';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { GetConsolidatedCashFlowByYearUseCase } from '@/usecases/cash_flow/get-consolidated-cash-flow-by-year.usecase';
 import { GetConsolidatedCashFlowByYearRoute } from './get-consolidated-cash-flow-by-year.route';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export class CashFlowRoute implements MapRoutes {
   private constructor(
-    private readonly billGateway: BillGateway,
-    private readonly receivableGateway: ReceivableGateway,
+    private readonly billServiceGateway: BillServiceGateway,
+    private readonly receivableServiceGateway: ReceivableServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
     private readonly routes: Array<Route> = [],
   ) {
@@ -16,13 +16,13 @@ export class CashFlowRoute implements MapRoutes {
   }
 
   public static create(
-    billGateway: BillGateway,
-    receivableGateway: ReceivableGateway,
+    billServiceGateway: BillServiceGateway,
+    receivableServiceGateway: ReceivableServiceGateway,
     authVerifyMiddleware: Middleware,
   ) {
     return new CashFlowRoute(
-      billGateway,
-      receivableGateway,
+      billServiceGateway,
+      receivableServiceGateway,
       authVerifyMiddleware,
     );
   }
@@ -30,8 +30,8 @@ export class CashFlowRoute implements MapRoutes {
   private factoryGetConsolidatedCashFlowByYear() {
     const getetConsolidatedCashFlowByYearService =
       GetConsolidatedCashFlowByYearUseCase.create({
-        billGateway: this.billGateway,
-        receivableGateway: this.receivableGateway,
+        billService: this.billServiceGateway,
+        receivableService: this.receivableServiceGateway,
       });
     const getConsolidatedCashFlowByYearServiceRoute =
       GetConsolidatedCashFlowByYearRoute.create(
