@@ -9,7 +9,7 @@ import {
   ReceivableDTO,
 } from '../dtos/receivable.dto';
 
-export interface ReceivableGateway {
+export interface ReceivableRepositoryGateway {
   getReceivables(
     input: GetReceivablesInputDTO,
   ): Promise<ResponseListDTO<ReceivableDTO>>;
