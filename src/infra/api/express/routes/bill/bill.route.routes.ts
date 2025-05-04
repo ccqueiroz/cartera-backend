@@ -1,4 +1,3 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { MapRoutes, Route } from '../route';
 import { Middleware } from '../../middlewares/middleware';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '@/usecases/validate_entities/validate-category-payment-method-status.usecase';
@@ -12,12 +11,13 @@ import { EditBillUseCase } from '@/usecases/bill/edit-bill.usecase';
 import { EditBillRoute } from './edit-bill.route';
 import { DeleteBillUseCase } from '@/usecases/bill/delete-bill.usecase';
 import { DeleteBillRoute } from './delete-bill.route';
-import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month';
+import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month.usecase';
 import { GetBillsPayableMonthRoute } from './get-bills-payable-month.route';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export class BillRoute implements MapRoutes {
   private constructor(
-    private readonly billGateway: BillGateway,
+    private readonly billServiceGateway: BillServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
     private readonly validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
     private readonly routes: Array<Route> = [],
@@ -26,12 +26,12 @@ export class BillRoute implements MapRoutes {
   }
 
   public static create(
-    billGateway: BillGateway,
+    billServiceGateway: BillServiceGateway,
     authVerifyMiddleware: Middleware,
     validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
   ) {
     return new BillRoute(
-      billGateway,
+      billServiceGateway,
       authVerifyMiddleware,
       validateCategoryPaymentMethodStatusUseCase,
     );
@@ -39,7 +39,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryGetBills() {
     const getBillsService = GetBillsUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
     });
     const getBillsRoute = GetBillsRoute.create(getBillsService, [
       this.authVerifyMiddleware.getHandler(),
@@ -49,7 +49,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryGetBillById() {
     const getBillByIdService = GetBillByIdUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
     });
     const getBillByIdRoute = GetBillByIdRoute.create(getBillByIdService, [
       this.authVerifyMiddleware.getHandler(),
@@ -59,7 +59,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryCreateBill() {
     const createBillService = CreateBillUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
       validateCategoryPaymentMethodStatusService:
         this.validateCategoryPaymentMethodStatusUseCase,
     });
@@ -71,7 +71,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryUpdateBill() {
     const updateBillService = EditBillUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
       validateCategoryPaymentMethodStatusService:
         this.validateCategoryPaymentMethodStatusUseCase,
     });
@@ -83,7 +83,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryDeleteBill() {
     const deleteBillService = DeleteBillUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
     });
     const deleteBillRoute = DeleteBillRoute.create(deleteBillService, [
       this.authVerifyMiddleware.getHandler(),
@@ -93,7 +93,7 @@ export class BillRoute implements MapRoutes {
 
   private factoryGetBillsPayableMonth() {
     const getBillsPayableMonthService = GetBillsPayableMonthUseCase.create({
-      billGateway: this.billGateway,
+      billService: this.billServiceGateway,
     });
     const getBillsPayableMonthServiceRoute = GetBillsPayableMonthRoute.create(
       getBillsPayableMonthService,
