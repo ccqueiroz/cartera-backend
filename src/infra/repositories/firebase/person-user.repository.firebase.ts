@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
+import { PersonUserRepositoryGateway } from '@/domain/Person_User/gateway/person-user.repository.gateway';
 import {
   CreatePersonUserOutputDTO,
   EditPersonUserDTO,
@@ -9,7 +9,9 @@ import {
 import { PersonUserEntitie } from '@/domain/Person_User/entitie/person_user.entitie';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 
-export class PersonUserRepositoryFirebase implements PersonUserGateway {
+export class PersonUserRepositoryFirebase
+  implements PersonUserRepositoryGateway
+{
   private static instance: PersonUserRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Person_User';
