@@ -1,5 +1,6 @@
-import { ReceivableService } from './src/services/receivable/receivables.service';
+import { PersonUserService } from './src/services/person_user/person-user.service';
 import 'dotenv/config';
+import { ReceivableService } from './src/services/receivable/receivables.service';
 import { BillService } from './src/services/bill/bill.service';
 import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
 import { PaymentMethodService } from './src/services/payment_method/payment-method.service';
@@ -73,6 +74,11 @@ function main() {
   //
 
   // ----- SERVICES -----
+  const personUserService = PersonUserService.create(
+    personUserRepository,
+    redisCacheRepository,
+  );
+
   const categoryService = CategoryService.create(
     categoryRepository,
     redisCacheRepository,
@@ -118,12 +124,12 @@ function main() {
   // ----- ROUTES -----
   const authRoutes = AuthRoutes.create(
     authRepository,
-    personUserRepository,
+    personUserService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const personUserRoutes = PersonUserRoutes.create(
-    personUserRepository,
+    personUserService,
     authVerifyTokenMiddleware,
   ).execute();
 
