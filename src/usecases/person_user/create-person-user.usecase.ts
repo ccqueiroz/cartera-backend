@@ -3,11 +3,11 @@ import {
   CreatePersonUserOutputDTO as TypeCreatePersonUserOutputDTO,
 } from '@/domain/Person_User/dtos/person-user.dto';
 import { Usecase } from '../usecase';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { EmailValidatorGateway } from '@/domain/Validators/EmailValidator/gateway/email-validator.gateway';
 import { OutputDTO } from '@/domain/dtos/output.dto';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 
 export type CreatePersonUserInputDTO = CreatePersonUserDTO;
 
@@ -18,19 +18,19 @@ export class CreatePersonUserUseCase
   implements Usecase<CreatePersonUserInputDTO, CreatePersonUserOutputDTO>
 {
   private constructor(
-    private readonly personUserGateway: PersonUserGateway,
+    private readonly personUserService: PersonUserServiceGateway,
     private readonly emailValidatorGateway: EmailValidatorGateway,
   ) {}
 
   public static create({
-    personUserGateway,
+    personUserService,
     emailValidatorGateway,
   }: {
-    personUserGateway: PersonUserGateway;
+    personUserService: PersonUserServiceGateway;
     emailValidatorGateway: EmailValidatorGateway;
   }) {
     return new CreatePersonUserUseCase(
-      personUserGateway,
+      personUserService,
       emailValidatorGateway,
     );
   }
@@ -46,7 +46,7 @@ export class CreatePersonUserUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
-    const hasPersonUser = await this.personUserGateway.getPersonUserByEmail({
+    const hasPersonUser = await this.personUserService.getPersonUserByEmail({
       email,
     });
 
@@ -54,7 +54,7 @@ export class CreatePersonUserUseCase
       throw new ApiError(ERROR_MESSAGES.EMAIL_ALREADY_IN_USE, 400);
     }
 
-    const personUser = await this.personUserGateway.createPersonUser({
+    const personUser = await this.personUserService.createPersonUser({
       email,
       userId,
       firstName,

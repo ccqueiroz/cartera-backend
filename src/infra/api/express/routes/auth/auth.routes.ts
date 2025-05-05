@@ -1,6 +1,5 @@
 import { AuthGateway } from '@/domain/Auth/gateway/auth.gateway';
 import { MapRoutes, Route } from '../route';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { SignoutRoute } from './signout.route';
 import { SignoutUseCase } from '@/usecases/auth/signout.usecase';
 import { LoginRoute } from './login.route';
@@ -13,6 +12,7 @@ import { emailValidator } from '@/infra/validators';
 import { GetPersonUserByEmailUseCase } from '@/usecases/person_user/get-person-user-by-email.usecase';
 import { CreatePersonUserUseCase } from '@/usecases/person_user/create-person-user.usecase';
 import { Middleware } from '../../middlewares/middleware';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 
 export class AuthRoutes implements MapRoutes {
   private getPersonUserByEmail: GetPersonUserByEmailUseCase;
@@ -20,17 +20,17 @@ export class AuthRoutes implements MapRoutes {
 
   private constructor(
     private readonly authGateway: AuthGateway,
-    private readonly personUserGateway: PersonUserGateway,
+    private readonly personUserServiceGateway: PersonUserServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
     private readonly routes: Array<Route> = [],
   ) {
     this.getPersonUserByEmail = GetPersonUserByEmailUseCase.create({
       emailValidatorGateway: emailValidator,
-      personUserGateway: this.personUserGateway,
+      personUserService: this.personUserServiceGateway,
     });
     this.createPersonUser = CreatePersonUserUseCase.create({
       emailValidatorGateway: emailValidator,
-      personUserGateway: this.personUserGateway,
+      personUserService: this.personUserServiceGateway,
     });
 
     this.joinRoutes();
@@ -38,10 +38,14 @@ export class AuthRoutes implements MapRoutes {
 
   public static create(
     authGateway: AuthGateway,
-    personUserGateway: PersonUserGateway,
+    personUserServiceGateway: PersonUserServiceGateway,
     authVerifyMiddleware: Middleware,
   ) {
-    return new AuthRoutes(authGateway, personUserGateway, authVerifyMiddleware);
+    return new AuthRoutes(
+      authGateway,
+      personUserServiceGateway,
+      authVerifyMiddleware,
+    );
   }
 
   private factorySignout() {

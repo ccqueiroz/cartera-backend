@@ -1,21 +1,21 @@
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { EditPersonUserUseCase } from './edit-person-user.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 
-let personUserGatewayMock: jest.Mocked<PersonUserGateway>;
+let personUserServiceMock: jest.Mocked<PersonUserServiceGateway>;
 describe('Edit Person User Usecase', () => {
   let editPersonUserUseCase: EditPersonUserUseCase;
 
   beforeEach(() => {
-    personUserGatewayMock = {
+    personUserServiceMock = {
       getPersonUserById: jest.fn(),
       editPersonUser: jest.fn(),
     } as any;
 
     editPersonUserUseCase = EditPersonUserUseCase.create({
-      personUserGateway: personUserGatewayMock,
+      personUserService: personUserServiceMock,
     });
   });
 
@@ -28,7 +28,7 @@ describe('Edit Person User Usecase', () => {
   });
 
   it('should be call execute method when valid personId and personData are provided.', async () => {
-    personUserGatewayMock.editPersonUser.mockResolvedValue({
+    personUserServiceMock.editPersonUser.mockResolvedValue({
       userId: 'PnAvaiVeApVMDZz21lKG94gU1fJ3',
       firstName: 'John',
       lastName: 'Doe',
@@ -40,7 +40,7 @@ describe('Edit Person User Usecase', () => {
       updatedAt: 122222222222223,
     });
 
-    personUserGatewayMock.getPersonUserById.mockResolvedValue({
+    personUserServiceMock.getPersonUserById.mockResolvedValue({
       userId: 'PnAvaiVeApVMDZz21lKG94gU1fJ3',
       firstName: 'John',
       lastName: 'Doe',
@@ -67,7 +67,7 @@ describe('Edit Person User Usecase', () => {
       },
     });
 
-    expect(personUserGatewayMock.editPersonUser).toHaveBeenLastCalledWith({
+    expect(personUserServiceMock.editPersonUser).toHaveBeenLastCalledWith({
       personId: '1666',
       personData: {
         userId: 'PnAvaiVeApVMDZz21lKG94gU1fJ3',
@@ -116,11 +116,11 @@ describe('Edit Person User Usecase', () => {
       statusCode: 400,
     });
 
-    expect(personUserGatewayMock.editPersonUser).not.toHaveBeenCalled();
+    expect(personUserServiceMock.editPersonUser).not.toHaveBeenCalled();
   });
 
   it('should call execute method when the user not exist.', async () => {
-    personUserGatewayMock.getPersonUserById.mockResolvedValue(null);
+    personUserServiceMock.getPersonUserById.mockResolvedValue(null);
 
     const error = await editPersonUserUseCase
       .execute({
@@ -146,6 +146,6 @@ describe('Edit Person User Usecase', () => {
       statusCode: 404,
     });
 
-    expect(personUserGatewayMock.editPersonUser).not.toHaveBeenCalled();
+    expect(personUserServiceMock.editPersonUser).not.toHaveBeenCalled();
   });
 });
