@@ -20,7 +20,8 @@
     "test:coverage:unit": "dotenv -e .env.test jest --config=jest-unit-config.ts --coverage",
     "test:unit": "npx jest --watch -c jest-unit-config.ts",
     "test:ci:unit": "npx jest -c jest-unit-config.ts --coverage",
-    "migrate": "ts-node scripts/run-migrations-firebase.ts"
+    "migrate": "ts-node scripts/run-migrations-firebase.ts",
+    "start:docker": "docker compose --env-file ./.env up --build -d"
   },
   "engines": {
     "node": "18"
