@@ -1,21 +1,21 @@
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { GetPaymentMethodByIdUseCase } from './get-payment-method-by-id.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 
-let paymentMethodUserGatewayMock: jest.Mocked<PaymentMethodGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
 
 describe('Get Payment Method By Id', () => {
   let getPaymentMethodByIdUseCase: GetPaymentMethodByIdUseCase;
 
   beforeEach(() => {
-    paymentMethodUserGatewayMock = {
+    paymentMethodServiceGatewayMock = {
       getPaymentMethodById: jest.fn(),
     } as any;
 
     getPaymentMethodByIdUseCase = GetPaymentMethodByIdUseCase.create({
-      paymentMethodGateway: paymentMethodUserGatewayMock,
+      paymentMethodService: paymentMethodServiceGatewayMock,
     });
   });
 
@@ -26,7 +26,7 @@ describe('Get Payment Method By Id', () => {
   });
 
   it('should be call execute method and return the payment method when this id are provided', async () => {
-    paymentMethodUserGatewayMock.getPaymentMethodById.mockResolvedValue({
+    paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Cartão de crédito',
       createdAt: new Date().getTime(),
@@ -41,7 +41,9 @@ describe('Get Payment Method By Id', () => {
   });
 
   it('should be call execute method and return null when this id are provided but this payment method is not exist.', async () => {
-    paymentMethodUserGatewayMock.getPaymentMethodById.mockResolvedValue(null);
+    paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue(
+      null,
+    );
 
     const result = await getPaymentMethodByIdUseCase.execute({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
@@ -65,7 +67,7 @@ describe('Get Payment Method By Id', () => {
     });
 
     expect(
-      paymentMethodUserGatewayMock.getPaymentMethodById,
+      paymentMethodServiceGatewayMock.getPaymentMethodById,
     ).not.toHaveBeenCalled();
   });
 });

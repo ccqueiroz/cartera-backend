@@ -1,18 +1,18 @@
 import { EmailValidatorGateway } from '@/domain/Validators/EmailValidator/gateway/email-validator.gateway';
 import { GetPersonUserByEmailUseCase } from './get-person-user-by-email.usecase';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 
-let personUserGatewayMock: jest.Mocked<PersonUserGateway>;
+let personUserServiceMock: jest.Mocked<PersonUserServiceGateway>;
 let emailValidatorGatewayMock: jest.Mocked<EmailValidatorGateway>;
 describe('Get Person User By Email', () => {
   let getPersonUserByEmailUseCase: GetPersonUserByEmailUseCase;
 
   beforeEach(() => {
-    personUserGatewayMock = {
+    personUserServiceMock = {
       getPersonUserByEmail: jest.fn(),
     } as any;
 
@@ -21,7 +21,7 @@ describe('Get Person User By Email', () => {
     } as any;
 
     getPersonUserByEmailUseCase = GetPersonUserByEmailUseCase.create({
-      personUserGateway: personUserGatewayMock,
+      personUserService: personUserServiceMock,
       emailValidatorGateway: emailValidatorGatewayMock,
     });
   });
@@ -33,7 +33,7 @@ describe('Get Person User By Email', () => {
   });
 
   it('should call execute method when valid email and password are provided', async () => {
-    personUserGatewayMock.getPersonUserByEmail.mockResolvedValue({
+    personUserServiceMock.getPersonUserByEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       firstName: 'john',
       lastName: 'doe',
@@ -50,7 +50,7 @@ describe('Get Person User By Email', () => {
       email: 'jonh.doe@example.com',
     });
 
-    expect(personUserGatewayMock.getPersonUserByEmail).toHaveBeenCalledWith({
+    expect(personUserServiceMock.getPersonUserByEmail).toHaveBeenCalledWith({
       email: 'jonh.doe@example.com',
     });
 
@@ -76,6 +76,6 @@ describe('Get Person User By Email', () => {
       statusCode: 400,
     });
 
-    expect(personUserGatewayMock.getPersonUserByEmail).not.toHaveBeenCalled();
+    expect(personUserServiceMock.getPersonUserByEmail).not.toHaveBeenCalled();
   });
 });

@@ -1,9 +1,9 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { Usecase } from '../usecase';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
 export type GetPaymentStatusByIdInputDTO = Pick<PaymentStatusDTO, 'id'>;
 
@@ -14,15 +14,15 @@ export class GetPaymentStatusByIdUseCase
     Usecase<GetPaymentStatusByIdInputDTO, GetPaymentStatusByIdOutputDTO>
 {
   private constructor(
-    private readonly paymentStatusGateway: PaymentStatusGateway,
+    private readonly paymentStatusService: PaymentStatusServiceGateway,
   ) {}
 
   public static create({
-    paymentStatusGateway,
+    paymentStatusService,
   }: {
-    paymentStatusGateway: PaymentStatusGateway;
+    paymentStatusService: PaymentStatusServiceGateway;
   }) {
-    return new GetPaymentStatusByIdUseCase(paymentStatusGateway);
+    return new GetPaymentStatusByIdUseCase(paymentStatusService);
   }
 
   public async execute({
@@ -32,7 +32,7 @@ export class GetPaymentStatusByIdUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const paymentStatus = await this.paymentStatusGateway.getPaymentStatusById({
+    const paymentStatus = await this.paymentStatusService.getPaymentStatusById({
       id,
     });
 

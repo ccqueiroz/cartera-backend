@@ -1,22 +1,24 @@
 import { DeleteReceivableInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export type DeleteReceivableOutputDTO = void;
 
 export class DeleteReceivableUseCase
   implements Usecase<DeleteReceivableInputDTO, DeleteReceivableOutputDTO>
 {
-  private constructor(private readonly receivableGateway: ReceivableGateway) {}
+  private constructor(
+    private readonly receivableService: ReceivableServiceGateway,
+  ) {}
 
   public static create({
-    receivableGateway,
+    receivableService,
   }: {
-    receivableGateway: ReceivableGateway;
+    receivableService: ReceivableServiceGateway;
   }) {
-    return new DeleteReceivableUseCase(receivableGateway);
+    return new DeleteReceivableUseCase(receivableService);
   }
 
   public async execute({
@@ -31,7 +33,7 @@ export class DeleteReceivableUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const hasReceivable = await this.receivableGateway.getReceivableById({
+    const hasReceivable = await this.receivableService.getReceivableById({
       id: receivableId,
       userId,
     });
@@ -40,7 +42,7 @@ export class DeleteReceivableUseCase
       throw new ApiError(ERROR_MESSAGES.RECEIVABLE_NOT_FOUND, 404);
     }
 
-    await this.receivableGateway.deleteReceivable({
+    await this.receivableService.deleteReceivable({
       id: receivableId,
       userId,
     });

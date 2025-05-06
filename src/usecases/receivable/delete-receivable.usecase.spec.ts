@@ -1,23 +1,23 @@
 import { DeleteReceivableUseCase } from './delete-receivable.usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
-let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 let deleteReceivableUseCase: DeleteReceivableUseCase;
 
 const userIdMock = '1234567d';
 
 describe('DeleteReceivableUseCase', () => {
   beforeEach(() => {
-    receivableGatewayMock = {
+    receivableServiceMock = {
       deleteReceivable: jest.fn(),
       getReceivableById: jest.fn(),
     } as any;
 
     deleteReceivableUseCase = DeleteReceivableUseCase.create({
-      receivableGateway: receivableGatewayMock,
+      receivableService: receivableServiceMock,
     });
   });
 
@@ -47,23 +47,23 @@ describe('DeleteReceivableUseCase', () => {
       updatedAt: null,
     };
 
-    receivableGatewayMock.getReceivableById.mockResolvedValue({
+    receivableServiceMock.getReceivableById.mockResolvedValue({
       ...receivableData,
     });
 
-    receivableGatewayMock.deleteReceivable.mockResolvedValue();
+    receivableServiceMock.deleteReceivable.mockResolvedValue();
 
     await deleteReceivableUseCase.execute({
       id: receivableData.id,
       userId: userIdMock,
     });
 
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: receivableData.id,
       userId: userIdMock,
     });
 
-    expect(receivableGatewayMock.deleteReceivable).toHaveBeenCalledWith({
+    expect(receivableServiceMock.deleteReceivable).toHaveBeenCalledWith({
       id: receivableData.id,
       userId: userIdMock,
     });
@@ -79,14 +79,14 @@ describe('DeleteReceivableUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(receivableGatewayMock.getReceivableById).not.toHaveBeenCalled();
-    expect(receivableGatewayMock.deleteReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivableById).not.toHaveBeenCalled();
+    expect(receivableServiceMock.deleteReceivable).not.toHaveBeenCalled();
   });
 
   it('should throw an error if the receivable does not exist', async () => {
     const receivableId = 'non-existent-id';
 
-    receivableGatewayMock.getReceivableById.mockResolvedValue(null);
+    receivableServiceMock.getReceivableById.mockResolvedValue(null);
 
     const error = await deleteReceivableUseCase
       .execute({ id: receivableId, userId: userIdMock })
@@ -97,11 +97,11 @@ describe('DeleteReceivableUseCase', () => {
       message: ERROR_MESSAGES.RECEIVABLE_NOT_FOUND,
       statusCode: 404,
     });
-    expect(receivableGatewayMock.getReceivableById).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivableById).toHaveBeenCalledWith({
       id: receivableId,
       userId: userIdMock,
     });
-    expect(receivableGatewayMock.deleteReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.deleteReceivable).not.toHaveBeenCalled();
   });
 
   it('should be throw an error if the userId does not passed', async () => {
@@ -117,6 +117,6 @@ describe('DeleteReceivableUseCase', () => {
       statusCode: 401,
     });
 
-    expect(receivableGatewayMock.deleteReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.deleteReceivable).not.toHaveBeenCalled();
   });
 });

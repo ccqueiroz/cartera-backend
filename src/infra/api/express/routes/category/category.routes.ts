@@ -4,11 +4,11 @@ import { GetCategoriesUseCase } from '@/usecases/category/get-categories.usecase
 import { GetCategoriesRoute } from './get-categories.route';
 import { GetCategoryByIdUseCase } from '@/usecases/category/get-category-by-id.usecase';
 import { GetCategoryByIdRoute } from './get-category-by-id.route';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryService } from '@/services/category/category.service';
 
 export class CategoryRoute implements MapRoutes {
   private constructor(
-    private readonly categoryGateway: CategoryGateway,
+    private readonly categoryService: CategoryService,
     private readonly authVerifyMiddleware: Middleware,
     private readonly routes: Array<Route> = [],
   ) {
@@ -16,15 +16,15 @@ export class CategoryRoute implements MapRoutes {
   }
 
   public static create(
-    categoryGateway: CategoryGateway,
+    categoryService: CategoryService,
     authVerifyMiddleware: Middleware,
   ) {
-    return new CategoryRoute(categoryGateway, authVerifyMiddleware);
+    return new CategoryRoute(categoryService, authVerifyMiddleware);
   }
 
   private factoryGetCategories() {
     const getCategoriesService = GetCategoriesUseCase.create({
-      categoryGateway: this.categoryGateway,
+      categoryService: this.categoryService,
     });
     const getCategoriesRoute = GetCategoriesRoute.create(getCategoriesService, [
       this.authVerifyMiddleware.getHandler(),
@@ -34,7 +34,7 @@ export class CategoryRoute implements MapRoutes {
 
   private factoryGetCategoryById() {
     const getCategoryByIdService = GetCategoryByIdUseCase.create({
-      categoryGateway: this.categoryGateway,
+      categoryService: this.categoryService,
     });
     const getCategoryByIdRoute = GetCategoryByIdRoute.create(
       getCategoryByIdService,

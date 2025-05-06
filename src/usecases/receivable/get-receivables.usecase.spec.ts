@@ -1,11 +1,11 @@
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { GetReceivablesUseCase } from './get-receivables.usecase';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ApiError } from '@/helpers/errors';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
-let receivableGatewayMock: jest.Mocked<ReceivableGateway>;
+let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 
 const userIdMock = '1234567d';
 
@@ -76,12 +76,12 @@ describe('GetReceivablesUseCase', () => {
   let getReceivablesUseCase: GetReceivablesUseCase;
 
   beforeEach(() => {
-    receivableGatewayMock = {
+    receivableServiceMock = {
       getReceivables: jest.fn(),
     } as any;
 
     getReceivablesUseCase = GetReceivablesUseCase.create({
-      receivableGateway: receivableGatewayMock,
+      receivableService: receivableServiceMock,
     });
   });
 
@@ -90,7 +90,7 @@ describe('GetReceivablesUseCase', () => {
   });
 
   it('should be call execute method and return the receivables filled list with ReceivableDTO objects type', async () => {
-    receivableGatewayMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.getReceivables.mockResolvedValue({
       content: receivablesItemsMocks,
       totalElements: 3,
       totalPages: 1,
@@ -106,7 +106,7 @@ describe('GetReceivablesUseCase', () => {
     });
 
     expect(result.data.content.length).toEqual(3);
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       userId: userIdMock,
@@ -114,7 +114,7 @@ describe('GetReceivablesUseCase', () => {
   });
 
   it('should be call execute method with all PaginationParams attributes valid', async () => {
-    receivableGatewayMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.getReceivables.mockResolvedValue({
       content: receivablesItemsMocks,
       totalElements: 3,
       totalPages: 1,
@@ -140,7 +140,7 @@ describe('GetReceivablesUseCase', () => {
       userId: userIdMock,
     });
 
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       ordering: { amount: SortOrder.ASC },
@@ -164,7 +164,7 @@ describe('GetReceivablesUseCase', () => {
       userId: userIdMock,
     });
 
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       searchByDate: {
@@ -177,7 +177,7 @@ describe('GetReceivablesUseCase', () => {
   });
 
   it('should be call execute method with all GetReceivablesInputDTO attributes valid', async () => {
-    receivableGatewayMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.getReceivables.mockResolvedValue({
       content: receivablesItemsMocks,
       totalElements: 3,
       totalPages: 1,
@@ -207,14 +207,14 @@ describe('GetReceivablesUseCase', () => {
 
     await getReceivablesUseCase.execute({ ...params, userId: userIdMock });
 
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       ...params,
       userId: userIdMock,
     });
   });
 
   it('should be call execute method and return the receivables empty list', async () => {
-    receivableGatewayMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.getReceivables.mockResolvedValue({
       content: [],
       totalElements: 0,
       totalPages: 1,
@@ -231,7 +231,7 @@ describe('GetReceivablesUseCase', () => {
 
     expect(result.data.content.length).toEqual(0);
     expect(result.data.totalElements).toEqual(0);
-    expect(receivableGatewayMock.getReceivables).toHaveBeenCalledWith({
+    expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       size: 10,
       page: 0,
       userId: userIdMock,
@@ -253,6 +253,6 @@ describe('GetReceivablesUseCase', () => {
       statusCode: 401,
     });
 
-    expect(receivableGatewayMock.getReceivables).not.toHaveBeenCalled();
+    expect(receivableServiceMock.getReceivables).not.toHaveBeenCalled();
   });
 });

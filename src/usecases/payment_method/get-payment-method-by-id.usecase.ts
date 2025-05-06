@@ -1,7 +1,7 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { Usecase } from '../usecase';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 
@@ -14,15 +14,15 @@ export class GetPaymentMethodByIdUseCase
     Usecase<GetPaymentMethodByIdInputDTO, GetPaymentMethodByIdOutputDTO>
 {
   private constructor(
-    private readonly paymentMethodGateway: PaymentMethodGateway,
+    private readonly paymentMethodService: PaymentMethodServiceGateway,
   ) {}
 
   public static create({
-    paymentMethodGateway,
+    paymentMethodService,
   }: {
-    paymentMethodGateway: PaymentMethodGateway;
+    paymentMethodService: PaymentMethodServiceGateway;
   }) {
-    return new GetPaymentMethodByIdUseCase(paymentMethodGateway);
+    return new GetPaymentMethodByIdUseCase(paymentMethodService);
   }
 
   public async execute({
@@ -32,7 +32,7 @@ export class GetPaymentMethodByIdUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const paymentMethod = await this.paymentMethodGateway.getPaymentMethodById({
+    const paymentMethod = await this.paymentMethodService.getPaymentMethodById({
       id,
     });
 

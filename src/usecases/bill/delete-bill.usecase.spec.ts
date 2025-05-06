@@ -1,23 +1,23 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { DeleteBillUseCase } from './delete-bill.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 let deletebillUseCase: DeleteBillUseCase;
 
 const userIdMock = '1234567d';
 
 describe('DeleteBillUseCase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       getBillById: jest.fn(),
       deleteBill: jest.fn(),
     } as any;
 
     deletebillUseCase = DeleteBillUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
     });
   });
 
@@ -49,20 +49,20 @@ describe('DeleteBillUseCase', () => {
       updatedAt: new Date().getTime(),
     };
 
-    billGatewayMock.getBillById.mockResolvedValue({ ...billObject });
+    billServiceMock.getBillById.mockResolvedValue({ ...billObject });
 
-    billGatewayMock.deleteBill.mockResolvedValue();
+    billServiceMock.deleteBill.mockResolvedValue();
 
     await deletebillUseCase.execute({
       id: billObject.id,
       userId: userIdMock,
     });
 
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: billObject.id,
       userId: userIdMock,
     });
-    expect(billGatewayMock.deleteBill).toHaveBeenCalledWith({
+    expect(billServiceMock.deleteBill).toHaveBeenCalledWith({
       id: billObject.id,
       userId: userIdMock,
     });
@@ -78,14 +78,14 @@ describe('DeleteBillUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(billGatewayMock.getBillById).not.toHaveBeenCalled();
-    expect(billGatewayMock.deleteBill).not.toHaveBeenCalled();
+    expect(billServiceMock.getBillById).not.toHaveBeenCalled();
+    expect(billServiceMock.deleteBill).not.toHaveBeenCalled();
   });
 
   it('should throw an error if the bill does not exist', async () => {
     const billId = 'non-existent-id';
 
-    billGatewayMock.getBillById.mockResolvedValue(null);
+    billServiceMock.getBillById.mockResolvedValue(null);
 
     const error = await deletebillUseCase
       .execute({ id: billId, userId: userIdMock })
@@ -96,11 +96,11 @@ describe('DeleteBillUseCase', () => {
       message: ERROR_MESSAGES.BILL_NOT_FOUND,
       statusCode: 404,
     });
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: billId,
       userId: userIdMock,
     });
-    expect(billGatewayMock.deleteBill).not.toHaveBeenCalled();
+    expect(billServiceMock.deleteBill).not.toHaveBeenCalled();
   });
 
   it('should be throw an error if the userId does not passed', async () => {
@@ -116,6 +116,6 @@ describe('DeleteBillUseCase', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.deleteBill).not.toHaveBeenCalled();
+    expect(billServiceMock.deleteBill).not.toHaveBeenCalled();
   });
 });

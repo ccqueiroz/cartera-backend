@@ -1,21 +1,21 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { GetBillByIdUseCase } from './get-bill-by-id.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 let getBillByIdUseCase: GetBillByIdUseCase;
 const userIdMock = '1234567d';
 
 describe('GetBillByIdUseCase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       getBillById: jest.fn(),
     } as any;
 
     getBillByIdUseCase = GetBillByIdUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
     });
   });
 
@@ -36,11 +36,11 @@ describe('GetBillByIdUseCase', () => {
       message: ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS,
       statusCode: 400,
     });
-    expect(billGatewayMock.getBillById).not.toHaveBeenCalled();
+    expect(billServiceMock.getBillById).not.toHaveBeenCalled();
   });
 
   it('should return null if bill is not found', async () => {
-    billGatewayMock.getBillById.mockResolvedValueOnce(null);
+    billServiceMock.getBillById.mockResolvedValueOnce(null);
 
     const result = await getBillByIdUseCase.execute({
       id: 'non-existent-id',
@@ -48,7 +48,7 @@ describe('GetBillByIdUseCase', () => {
     });
 
     expect(result).toEqual({ data: null });
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: 'non-existent-id',
       userId: userIdMock,
     });
@@ -78,7 +78,7 @@ describe('GetBillByIdUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValueOnce(billObject);
+    billServiceMock.getBillById.mockResolvedValueOnce(billObject);
 
     const result = await getBillByIdUseCase.execute({
       id: billObject.id,
@@ -87,7 +87,7 @@ describe('GetBillByIdUseCase', () => {
 
     expect(result.data?.id).toBe(billObject.id);
 
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: billObject.id,
       userId: userIdMock,
     });
@@ -117,7 +117,7 @@ describe('GetBillByIdUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValueOnce(billObject);
+    billServiceMock.getBillById.mockResolvedValueOnce(billObject);
 
     const result = await getBillByIdUseCase.execute({
       id: billObject.id,
@@ -131,7 +131,7 @@ describe('GetBillByIdUseCase', () => {
       },
     });
 
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: billObject.id,
       userId: userIdMock,
     });
@@ -150,7 +150,7 @@ describe('GetBillByIdUseCase', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.getBillById).not.toHaveBeenCalled();
+    expect(billServiceMock.getBillById).not.toHaveBeenCalled();
   });
 
   it('should be return data null when the response of the getBillById repository dont contain id', async () => {
@@ -178,7 +178,7 @@ describe('GetBillByIdUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValueOnce(billObject);
+    billServiceMock.getBillById.mockResolvedValueOnce(billObject);
 
     const result = await getBillByIdUseCase.execute({
       id: billId,
@@ -189,7 +189,7 @@ describe('GetBillByIdUseCase', () => {
       data: null,
     });
 
-    expect(billGatewayMock.getBillById).toHaveBeenCalledWith({
+    expect(billServiceMock.getBillById).toHaveBeenCalledWith({
       id: billId,
       userId: userIdMock,
     });

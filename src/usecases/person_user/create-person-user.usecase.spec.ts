@@ -1,18 +1,18 @@
 import { EmailValidatorGateway } from '@/domain/Validators/EmailValidator/gateway/email-validator.gateway';
 import { CreatePersonUserUseCase } from './create-person-user.usecase';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 
-let personUserGatewayMock: jest.Mocked<PersonUserGateway>;
+let personUserServiceMock: jest.Mocked<PersonUserServiceGateway>;
 let emailValidatorGatewayMock: jest.Mocked<EmailValidatorGateway>;
 
 describe('Create Person User Usecase', () => {
   let createPersonUserUseCase: CreatePersonUserUseCase;
 
   beforeEach(() => {
-    personUserGatewayMock = {
+    personUserServiceMock = {
       getPersonUserByEmail: jest.fn(),
       createPersonUser: jest.fn(),
     } as any;
@@ -22,7 +22,7 @@ describe('Create Person User Usecase', () => {
     } as any;
 
     createPersonUserUseCase = CreatePersonUserUseCase.create({
-      personUserGateway: personUserGatewayMock,
+      personUserService: personUserServiceMock,
       emailValidatorGateway: emailValidatorGatewayMock,
     });
   });
@@ -32,7 +32,7 @@ describe('Create Person User Usecase', () => {
   });
 
   it('should call execute method when valid email and password are provided', async () => {
-    personUserGatewayMock.createPersonUser.mockResolvedValue({
+    personUserServiceMock.createPersonUser.mockResolvedValue({
       id: 'P1fJ3',
       fullName: 'john doe',
     });
@@ -47,7 +47,7 @@ describe('Create Person User Usecase', () => {
       createdAt: 12121212121212,
     });
 
-    expect(personUserGatewayMock.createPersonUser).toHaveBeenCalledWith({
+    expect(personUserServiceMock.createPersonUser).toHaveBeenCalledWith({
       email: 'jonh.doe@example.com',
       firstName: 'john',
       lastName: 'doe',
@@ -81,18 +81,18 @@ describe('Create Person User Usecase', () => {
       statusCode: 400,
     });
 
-    expect(personUserGatewayMock.createPersonUser).not.toHaveBeenCalled();
+    expect(personUserServiceMock.createPersonUser).not.toHaveBeenCalled();
   });
 
   it('should call execute method when the user already exist.', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
-    personUserGatewayMock.createPersonUser.mockResolvedValue({
+    personUserServiceMock.createPersonUser.mockResolvedValue({
       id: 'P1fJ3',
       fullName: 'john doe',
     });
 
-    personUserGatewayMock.getPersonUserByEmail.mockResolvedValue({
+    personUserServiceMock.getPersonUserByEmail.mockResolvedValue({
       email: 'jonh.doe@example.com',
       userId: 'P1fJ3',
       id: 'P1fJ3',
@@ -121,17 +121,17 @@ describe('Create Person User Usecase', () => {
       statusCode: 400,
     });
 
-    expect(personUserGatewayMock.createPersonUser).not.toHaveBeenCalled();
+    expect(personUserServiceMock.createPersonUser).not.toHaveBeenCalled();
   });
 
   it('should be return null when the createPersonUser repository to send the response without "id"', async () => {
     emailValidatorGatewayMock.validate.mockReturnValue(true);
 
-    personUserGatewayMock.createPersonUser.mockResolvedValue({
+    personUserServiceMock.createPersonUser.mockResolvedValue({
       fullName: 'john doe',
     });
 
-    personUserGatewayMock.getPersonUserByEmail.mockResolvedValue(null);
+    personUserServiceMock.getPersonUserByEmail.mockResolvedValue(null);
 
     const result = await createPersonUserUseCase.execute({
       email: 'jonh.doe@example.com',

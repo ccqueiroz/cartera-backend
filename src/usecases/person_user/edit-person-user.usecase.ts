@@ -4,7 +4,7 @@ import {
   EditPersonUserOutputDTO as TypeEditPersonUserOutputDTO,
 } from '@/domain/Person_User/dtos/person-user.dto';
 import { Usecase } from '../usecase';
-import { PersonUserGateway } from '@/domain/Person_User/gateway/person_user.gateway';
+import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 
@@ -16,14 +16,16 @@ export type EditPersonUserOutputDTO =
 export class EditPersonUserUseCase
   implements Usecase<EditPersonUserInputDTO, EditPersonUserOutputDTO>
 {
-  private constructor(private readonly personUserGateway: PersonUserGateway) {}
+  private constructor(
+    private readonly personUserService: PersonUserServiceGateway,
+  ) {}
 
   public static create({
-    personUserGateway,
+    personUserService,
   }: {
-    personUserGateway: PersonUserGateway;
+    personUserService: PersonUserServiceGateway;
   }) {
-    return new EditPersonUserUseCase(personUserGateway);
+    return new EditPersonUserUseCase(personUserService);
   }
 
   public async execute({
@@ -34,7 +36,7 @@ export class EditPersonUserUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const hasPersonUser = await this.personUserGateway.getPersonUserById({
+    const hasPersonUser = await this.personUserService.getPersonUserById({
       id: personId,
     });
 
@@ -42,7 +44,7 @@ export class EditPersonUserUseCase
       throw new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404);
     }
 
-    const personUser = await this.personUserGateway.editPersonUser({
+    const personUser = await this.personUserService.editPersonUser({
       personId,
       personData,
     });

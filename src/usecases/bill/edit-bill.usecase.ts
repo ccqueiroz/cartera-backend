@@ -4,7 +4,7 @@ import { Usecase } from '../usecase';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export type EditBillOutputDTO = OutputDTO<BillDTO | null>;
 
@@ -12,19 +12,19 @@ export class EditBillUseCase
   implements Usecase<EditBillInputDTO, EditBillOutputDTO>
 {
   private constructor(
-    private readonly billGateway: BillGateway,
+    private readonly billService: BillServiceGateway,
     private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
   ) {}
 
   public static create({
-    billGateway,
+    billService,
     validateCategoryPaymentMethodStatusService,
   }: {
-    billGateway: BillGateway;
+    billService: BillServiceGateway;
     validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
   }) {
     return new EditBillUseCase(
-      billGateway,
+      billService,
       validateCategoryPaymentMethodStatusService,
     );
   }
@@ -42,7 +42,7 @@ export class EditBillUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const hasReceivable = await this.billGateway.getBillById({
+    const hasReceivable = await this.billService.getBillById({
       id: billId,
       userId,
     });
@@ -65,7 +65,7 @@ export class EditBillUseCase
       );
     }
 
-    const bill = await this.billGateway.updateBill({
+    const bill = await this.billService.updateBill({
       billId,
       billData,
       userId,

@@ -1,22 +1,31 @@
+import { PersonUserService } from './src/services/person_user/person-user.service';
 import 'dotenv/config';
+import { ReceivableService } from './src/services/receivable/receivables.service';
+import { BillService } from './src/services/bill/bill.service';
+import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
+import { PaymentMethodService } from './src/services/payment_method/payment-method.service';
+import { CategoryService } from './src/services/category/category.service';
+import { RedisCacheRepository } from './src/infra/repositories/reddis/cache.repository.redis';
+import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
-import { BillsRepositoryFirebase } from './src/infra/repositories/bill.repository.firebase';
+import { BillsRepositoryFirebase } from './src/infra/repositories/firebase/bill.repository.firebase';
 import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
-import { ReceivablesRepositoryFirebase } from './src/infra/repositories/receivables.repository.firebase';
+import { ReceivablesRepositoryFirebase } from './src/infra/repositories/firebase/receivables.repository.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
-import { PaymentStatusRepositoryFirebase } from './src/infra/repositories/payment-status.repository.firebase';
+import { PaymentStatusRepositoryFirebase } from './src/infra/repositories/firebase/payment-status.repository.firebase';
 import { CategoryRoute } from './src/infra/api/express/routes/category/category.routes';
-import { CategoryRepositoryFirebase } from './src/infra/repositories/category.repository.firebase';
-import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/payment-method.repository.firebase';
+import { CategoryRepositoryFirebase } from './src/infra/repositories/firebase/category.repository.firebase';
+import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/firebase/payment-method.repository.firebase';
 import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
 import {
   applayPaginationHelpers,
   checkIfIsNecessaryCreateNewTokenHelpers,
+  generateHashHelper,
   handleCanProgressToWritteOperation,
   mergeSortHelpers,
   normalizeIp,
@@ -24,9 +33,9 @@ import {
 import { VerifyTokenMiddleware } from './src/infra/api/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from './src/infra/api/express/middlewares/error.middleware';
 import { ApiExpress } from './src/infra/api/express/api.express';
-import { PersonUserRepositoryFirebase } from './src/infra/repositories/person-user.repository.firebase';
+import { PersonUserRepositoryFirebase } from './src/infra/repositories/firebase/person-user.repository.firebase';
 import { AuthRoutes } from './src/infra/api/express/routes/auth/auth.routes';
-import { AuthRepositoryFirebase } from './src/infra/repositories/auth.repository.firebase';
+import { AuthRepositoryFirebase } from './src/infra/repositories/firebase/auth.repository.firebase';
 import {
   authFirebase,
   dbFirestore,
@@ -35,6 +44,8 @@ import { logger } from './src/infra/logger';
 
 function main() {
   // ----- REPOSITORIES -----
+  const redisCacheRepository = RedisCacheRepository.create(clientRedis, logger);
+
   const authRepository = AuthRepositoryFirebase.create(authFirebase);
 
   const personUserRepository = PersonUserRepositoryFirebase.create(dbFirestore);
@@ -62,12 +73,45 @@ function main() {
   );
   //
 
+  // ----- SERVICES -----
+  const personUserService = PersonUserService.create(
+    personUserRepository,
+    redisCacheRepository,
+  );
+
+  const categoryService = CategoryService.create(
+    categoryRepository,
+    redisCacheRepository,
+  );
+
+  const paymentMethodService = PaymentMethodService.create(
+    paymentMethodRepository,
+    redisCacheRepository,
+  );
+
+  const paymentStatusService = PaymentStatusService.create(
+    paymentStatusRepository,
+    redisCacheRepository,
+  );
+
+  const billService = BillService.create(
+    billRepository,
+    redisCacheRepository,
+    generateHashHelper,
+  );
+
+  const receivableService = ReceivableService.create(
+    receivableRepository,
+    redisCacheRepository,
+    generateHashHelper,
+  );
+
   // ------- VALIDATION - CASES -----------
   const validateCategoryPaymentMethodStatusUseCase =
     ValidateCategoryPaymentMethodStatusUseCase.create({
-      categoryGateway: categoryRepository,
-      paymentMethodGateway: paymentMethodRepository,
-      paymentStatusGateway: paymentStatusRepository,
+      categoryService: categoryService,
+      paymentMethodService: paymentMethodService,
+      paymentStatusServiceGateway: paymentStatusService,
     });
 
   //MIDDLEWARES
@@ -80,45 +124,45 @@ function main() {
   // ----- ROUTES -----
   const authRoutes = AuthRoutes.create(
     authRepository,
-    personUserRepository,
+    personUserService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const personUserRoutes = PersonUserRoutes.create(
-    personUserRepository,
+    personUserService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const paymentMethodRoutes = PaymentMethodRoute.create(
-    paymentMethodRepository,
+    paymentMethodService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const categoryRoutes = CategoryRoute.create(
-    categoryRepository,
+    categoryService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const paymentStatusRoutes = PaymentStatusRoute.create(
-    paymentStatusRepository,
+    paymentStatusService,
     authVerifyTokenMiddleware,
   ).execute();
 
   const receivableRoutes = ReceivableRoute.create(
-    receivableRepository,
+    receivableService,
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
 
   const billRoutes = BillRoute.create(
-    billRepository,
+    billService,
     authVerifyTokenMiddleware,
     validateCategoryPaymentMethodStatusUseCase,
   ).execute();
 
   const cashFlowRoutes = CashFlowRoute.create(
-    billRepository,
-    receivableRepository,
+    billService,
+    receivableService,
     authVerifyTokenMiddleware,
   ).execute();
   //
@@ -144,6 +188,7 @@ function main() {
     [cors, ipControll],
     errorMiddleware,
     logger,
+    redisCacheRepository,
   );
   const port = Number(process.env.PORT) || 8000;
   api.start(port);

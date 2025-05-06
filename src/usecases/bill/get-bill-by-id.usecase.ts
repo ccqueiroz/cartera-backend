@@ -1,19 +1,19 @@
-import { BillGateway } from './../../domain/Bill/gateway/bill.gateway';
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { Usecase } from '../usecase';
 import { BillDTO, GetBillByIdInputDTO } from '@/domain/Bill/dtos/bill.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 export type GetBillByIdOutputDTO = OutputDTO<BillDTO | null>;
 
 export class GetBillByIdUseCase
   implements Usecase<GetBillByIdInputDTO, GetBillByIdOutputDTO>
 {
-  private constructor(private readonly billGateway: BillGateway) {}
+  private constructor(private readonly billService: BillServiceGateway) {}
 
-  public static create({ billGateway }: { billGateway: BillGateway }) {
-    return new GetBillByIdUseCase(billGateway);
+  public static create({ billService }: { billService: BillServiceGateway }) {
+    return new GetBillByIdUseCase(billService);
   }
 
   public async execute({
@@ -28,7 +28,7 @@ export class GetBillByIdUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const bill = await this.billGateway.getBillById({
+    const bill = await this.billService.getBillById({
       id: billId,
       userId,
     });

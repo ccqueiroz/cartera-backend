@@ -30,4 +30,5 @@ export const ERROR_MESSAGES = {
   INVALID_PERIOD:
     'Período de pesquisa inválido. Por favor, informe o período de análise.',
   INVALID_PARAMETERS: 'Parâmetros de entrada inválidos',
+  CACHE_CLIENT_ERROR: 'Erro no client de Cache.',
 } as const;

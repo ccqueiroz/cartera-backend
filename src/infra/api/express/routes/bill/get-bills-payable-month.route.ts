@@ -3,7 +3,7 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month';
+import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month.usecase';
 import { BillsPayableMonthInputDTO } from '@/domain/Bill/dtos/bill.dto';
 import { GetBillsPayableMonthDTO } from '../../schema_validations/Bill/bill.schema';
 import { runValidate } from '@/packages/clients/class-validator';

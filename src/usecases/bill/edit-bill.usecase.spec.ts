@@ -1,52 +1,52 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 import { EditBillUseCase } from './edit-bill.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 const userIdMock = '1234567d';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 
 let editBillUseCase: EditBillUseCase;
 
-let categoryGatewayMock: jest.Mocked<CategoryGateway>;
-let paymentMethodGatewayMock: jest.Mocked<PaymentMethodGateway>;
-let paymentStatusGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase;
 describe('EditBillUseCase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       getBillById: jest.fn(),
       updateBill: jest.fn(),
     } as any;
 
-    categoryGatewayMock = {
+    categoryServiceGatewayMock = {
       getCategories: jest.fn(),
     } as any;
 
-    paymentMethodGatewayMock = {
+    paymentMethodServiceGatewayMock = {
       getPaymentMethods: jest.fn(),
     } as any;
 
-    paymentStatusGatewayMock = {
+    paymentStatusServiceGatewayMock = {
       getPaymentStatus: jest.fn(),
     } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({
-        categoryGateway: categoryGatewayMock,
-        paymentMethodGateway: paymentMethodGatewayMock,
-        paymentStatusGateway: paymentStatusGatewayMock,
+        categoryService: categoryServiceGatewayMock,
+        paymentMethodService: paymentMethodServiceGatewayMock,
+        paymentStatusServiceGateway: paymentStatusServiceGatewayMock,
       });
 
     editBillUseCase = EditBillUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
       validateCategoryPaymentMethodStatusService:
         validateCategoryPaymentMethodStatusUseCase,
     });
@@ -80,7 +80,7 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValue({
+    billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
       updatedAt: null,
     });
@@ -89,7 +89,7 @@ describe('EditBillUseCase', () => {
       .fn()
       .mockResolvedValue(true);
 
-    billGatewayMock.updateBill.mockResolvedValue({
+    billServiceMock.updateBill.mockResolvedValue({
       ...billObject,
       descriptionBill: 'Test Bill updated',
       updatedAt: new Date().getTime(),
@@ -102,7 +102,7 @@ describe('EditBillUseCase', () => {
     });
 
     expect(result.data?.id).toBe(billObject.id);
-    expect(billGatewayMock.updateBill).toHaveBeenCalledWith({
+    expect(billServiceMock.updateBill).toHaveBeenCalledWith({
       billId: billObject.id,
       billData: billObject,
       userId: userIdMock,
@@ -134,7 +134,7 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValue({
+    billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
       updatedAt: null,
     });
@@ -156,7 +156,7 @@ describe('EditBillUseCase', () => {
       message: ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
       statusCode: 400,
     });
-    expect(billGatewayMock.updateBill).not.toHaveBeenCalled();
+    expect(billServiceMock.updateBill).not.toHaveBeenCalled();
   });
 
   it('should throw an error if billId is not exist in data base.', async () => {
@@ -183,7 +183,7 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
-    billGatewayMock.getBillById.mockResolvedValue(null);
+    billServiceMock.getBillById.mockResolvedValue(null);
 
     const error = await editBillUseCase
       .execute({
@@ -198,7 +198,7 @@ describe('EditBillUseCase', () => {
       message: ERROR_MESSAGES.BILL_NOT_FOUND,
       statusCode: 404,
     });
-    expect(billGatewayMock.updateBill).not.toHaveBeenCalled();
+    expect(billServiceMock.updateBill).not.toHaveBeenCalled();
   });
 
   it('should throw an error if billId is invalid', async () => {
@@ -239,7 +239,7 @@ describe('EditBillUseCase', () => {
       statusCode: 400,
     });
 
-    expect(billGatewayMock.updateBill).not.toHaveBeenCalled();
+    expect(billServiceMock.updateBill).not.toHaveBeenCalled();
   });
 
   it('should be throw an error if the userId does not passed', async () => {
@@ -276,6 +276,6 @@ describe('EditBillUseCase', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.updateBill).not.toHaveBeenCalled();
+    expect(billServiceMock.updateBill).not.toHaveBeenCalled();
   });
 });

@@ -1,51 +1,51 @@
-import { BillGateway } from '@/domain/Bill/gateway/bill.gateway';
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
 import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
 import { CreateBillUseCase } from './create-bill.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
+import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
 const userIdMock = '1234567d';
 
-let billGatewayMock: jest.Mocked<BillGateway>;
+let billServiceMock: jest.Mocked<BillServiceGateway>;
 
 let createBillUseCase: CreateBillUseCase;
 
-let categoryGatewayMock: jest.Mocked<CategoryGateway>;
-let paymentMethodGatewayMock: jest.Mocked<PaymentMethodGateway>;
-let paymentStatusGatewayMock: jest.Mocked<PaymentStatusGateway>;
+let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
+let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
+let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
 let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase;
 describe('CreateBillUseCase', () => {
   beforeEach(() => {
-    billGatewayMock = {
+    billServiceMock = {
       createBill: jest.fn(),
     } as any;
 
-    categoryGatewayMock = {
+    categoryServiceGatewayMock = {
       getCategories: jest.fn(),
     } as any;
 
-    paymentMethodGatewayMock = {
+    paymentMethodServiceGatewayMock = {
       getPaymentMethods: jest.fn(),
     } as any;
 
-    paymentStatusGatewayMock = {
+    paymentStatusServiceGatewayMock = {
       getPaymentStatus: jest.fn(),
     } as any;
 
     validateCategoryPaymentMethodStatusUseCase =
       ValidateCategoryPaymentMethodStatusUseCase.create({
-        categoryGateway: categoryGatewayMock,
-        paymentMethodGateway: paymentMethodGatewayMock,
-        paymentStatusGateway: paymentStatusGatewayMock,
+        categoryService: categoryServiceGatewayMock,
+        paymentMethodService: paymentMethodServiceGatewayMock,
+        paymentStatusServiceGateway: paymentStatusServiceGatewayMock,
       });
 
     createBillUseCase = CreateBillUseCase.create({
-      billGateway: billGatewayMock,
+      billService: billServiceMock,
       validateCategoryPaymentMethodStatusService:
         validateCategoryPaymentMethodStatusUseCase,
     });
@@ -82,7 +82,7 @@ describe('CreateBillUseCase', () => {
       id: 'd41d8cd98f00b204e9800998ecf8427e',
     };
 
-    billGatewayMock.createBill.mockResolvedValue({
+    billServiceMock.createBill.mockResolvedValue({
       id: 'd41d8cd98f00b204e9800998ecf8427e',
     });
 
@@ -98,7 +98,7 @@ describe('CreateBillUseCase', () => {
     expect(result.data).not.toBeNull();
 
     expect(result.data?.id).toBe(bill.id);
-    expect(billGatewayMock.createBill).toHaveBeenCalledWith({
+    expect(billServiceMock.createBill).toHaveBeenCalledWith({
       billData: billObject,
       userId: userIdMock,
     });
@@ -127,7 +127,7 @@ describe('CreateBillUseCase', () => {
       createdAt: new Date().getTime(),
     };
 
-    billGatewayMock.createBill.mockResolvedValue(null);
+    billServiceMock.createBill.mockResolvedValue(null);
 
     validateCategoryPaymentMethodStatusUseCase.execute = jest
       .fn()
@@ -140,7 +140,7 @@ describe('CreateBillUseCase', () => {
 
     expect(result.data).toBeNull();
 
-    expect(billGatewayMock.createBill).toHaveBeenCalledWith({
+    expect(billServiceMock.createBill).toHaveBeenCalledWith({
       billData: billObject,
       userId: userIdMock,
     });
@@ -179,7 +179,7 @@ describe('CreateBillUseCase', () => {
       statusCode: 401,
     });
 
-    expect(billGatewayMock.createBill).not.toHaveBeenCalled();
+    expect(billServiceMock.createBill).not.toHaveBeenCalled();
   });
 
   it('should be return data null when the response of the createReceivable repository dont contain id', async () => {
@@ -209,7 +209,7 @@ describe('CreateBillUseCase', () => {
       .fn()
       .mockResolvedValue(true);
 
-    billGatewayMock.createBill.mockResolvedValue({
+    billServiceMock.createBill.mockResolvedValue({
       id: '',
     });
 
@@ -222,7 +222,7 @@ describe('CreateBillUseCase', () => {
       data: null,
     });
 
-    expect(billGatewayMock.createBill).toHaveBeenCalledWith({
+    expect(billServiceMock.createBill).toHaveBeenCalledWith({
       billData: billObject,
       userId: userIdMock,
     });

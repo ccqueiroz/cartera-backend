@@ -3,24 +3,26 @@ import {
   ReceivableDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { OutputDTO } from '@/domain/dtos/output.dto';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export type GetReceivableByIdOutputDTO = OutputDTO<ReceivableDTO | null>;
 
 export class GetReceivableByIdUseCase
   implements Usecase<GetReceivableByIdInputDTO, GetReceivableByIdOutputDTO>
 {
-  private constructor(private readonly receivableGateway: ReceivableGateway) {}
+  private constructor(
+    private readonly receivableService: ReceivableServiceGateway,
+  ) {}
 
   public static create({
-    receivableGateway,
+    receivableService,
   }: {
-    receivableGateway: ReceivableGateway;
+    receivableService: ReceivableServiceGateway;
   }) {
-    return new GetReceivableByIdUseCase(receivableGateway);
+    return new GetReceivableByIdUseCase(receivableService);
   }
 
   public async execute({
@@ -35,7 +37,7 @@ export class GetReceivableByIdUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const receivable = await this.receivableGateway.getReceivableById({
+    const receivable = await this.receivableService.getReceivableById({
       id: receivableId,
       userId,
     });

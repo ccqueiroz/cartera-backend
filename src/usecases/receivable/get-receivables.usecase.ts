@@ -1,4 +1,3 @@
-import { ReceivableGateway } from '@/domain/Receivable/gateway/receivable.gateway';
 import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import {
@@ -8,20 +7,23 @@ import {
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
 export type GetReceivablesOutputDTO = OutputDTO<ResponseListDTO<ReceivableDTO>>;
 
 export class GetReceivablesUseCase
   implements Usecase<GetReceivablesInputDTO, GetReceivablesOutputDTO>
 {
-  private constructor(private readonly receivableGateway: ReceivableGateway) {}
+  private constructor(
+    private readonly receivableService: ReceivableServiceGateway,
+  ) {}
 
   public static create({
-    receivableGateway,
+    receivableService,
   }: {
-    receivableGateway: ReceivableGateway;
+    receivableService: ReceivableServiceGateway;
   }) {
-    return new GetReceivablesUseCase(receivableGateway);
+    return new GetReceivablesUseCase(receivableService);
   }
 
   public async execute(
@@ -31,7 +33,7 @@ export class GetReceivablesUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
 
-    const receivables = await this.receivableGateway.getReceivables({
+    const receivables = await this.receivableService.getReceivables({
       ...inputGetReceivables,
     });
 

@@ -1,10 +1,10 @@
-import { CategoryGateway } from '@/domain/Category/gateway/category.gateway';
+import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { GetCategoryByIdUseCase } from '../category/get-category-by-id.usecase';
 import { GetPaymentMethodByIdUseCase } from '../payment_method/get-payment-method-by-id.usecase';
 import { GetPaymentStatusByIdUseCase } from '../payment_status/get-payment-status-by-id.usecase';
 import { Usecase } from '../usecase';
-import { PaymentMethodGateway } from '@/domain/Payment_Method/gateway/payment-method.gateway';
-import { PaymentStatusGateway } from '@/domain/Payment_Status/gateway/payment-status.gateway';
+import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
 export type ValidateEntitiesCategoryPaymentMethodStatusInputDTO = {
   paymentMethodId: string;
@@ -31,34 +31,34 @@ export class ValidateCategoryPaymentMethodStatusUseCase
   private getPaymentStatusByIdService: GetPaymentStatusByIdUseCase;
 
   private constructor(
-    private categoryGateway: CategoryGateway,
-    private paymentMethodGateway: PaymentMethodGateway,
-    private paymentStatusGateway: PaymentStatusGateway,
+    private categoryService: CategoryServiceGateway,
+    private paymentMethodService: PaymentMethodServiceGateway,
+    private paymentStatusServiceGateway: PaymentStatusServiceGateway,
   ) {
     this.getCategoryByIdService = GetCategoryByIdUseCase.create({
-      categoryGateway: this.categoryGateway,
+      categoryService: this.categoryService,
     });
     this.getPaymentMethodByIdService = GetPaymentMethodByIdUseCase.create({
-      paymentMethodGateway: this.paymentMethodGateway,
+      paymentMethodService: this.paymentMethodService,
     });
     this.getPaymentStatusByIdService = GetPaymentStatusByIdUseCase.create({
-      paymentStatusGateway: this.paymentStatusGateway,
+      paymentStatusService: this.paymentStatusServiceGateway,
     });
   }
 
   public static create({
-    categoryGateway,
-    paymentMethodGateway,
-    paymentStatusGateway,
+    categoryService,
+    paymentMethodService,
+    paymentStatusServiceGateway,
   }: {
-    categoryGateway: CategoryGateway;
-    paymentMethodGateway: PaymentMethodGateway;
-    paymentStatusGateway: PaymentStatusGateway;
+    categoryService: CategoryServiceGateway;
+    paymentMethodService: PaymentMethodServiceGateway;
+    paymentStatusServiceGateway: PaymentStatusServiceGateway;
   }) {
     return new ValidateCategoryPaymentMethodStatusUseCase(
-      categoryGateway,
-      paymentMethodGateway,
-      paymentStatusGateway,
+      categoryService,
+      paymentMethodService,
+      paymentStatusServiceGateway,
     );
   }
 
