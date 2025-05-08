@@ -2,7 +2,7 @@ name: Cartera-Backend CI-CD
 
 on:
   pull_request:
-    branches: ['main']
+    branches: ['main', 'test', 'dev']
 
 jobs:
   build:
