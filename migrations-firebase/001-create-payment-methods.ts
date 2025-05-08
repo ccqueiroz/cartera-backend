@@ -1,4 +1,4 @@
-import { Firestore } from 'firebase-admin/firestore';
+import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
 
 const paymentMethods = [
@@ -44,7 +44,7 @@ const paymentMethods = [
   },
 ];
 
-export default async function (db: Firestore) {
+export default async function (db: admin.firestore.Firestore) {
   const paymentMethodsRef = db.collection('Payment_Method');
 
   for (const method of paymentMethods) {

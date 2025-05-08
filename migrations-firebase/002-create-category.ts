@@ -1,5 +1,5 @@
 import { CategoryType } from './../src/domain/Category/enums/category-type.enum';
-import { Firestore } from 'firebase-admin/firestore';
+import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
 
 const categories = [
@@ -182,7 +182,7 @@ const categories = [
   },
 ];
 
-export default async function (db: Firestore) {
+export default async function (db: admin.firestore.Firestore) {
   const categoriesRef = db.collection('Category');
 
   for (const method of categories) {
