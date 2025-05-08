@@ -3,7 +3,7 @@
     "module": "commonjs",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "lib",
+    "outDir": "dist",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
@@ -25,7 +25,8 @@
   "include": [
     "src/**/*",
     "**/*.spec.ts",
-    "src/infra/api/express/@types/**/*.d.ts"
+    "src/infra/api/express/@types/**/*.d.ts",
+    "index.ts"
   ],
   "compileOnSave": true
 }
