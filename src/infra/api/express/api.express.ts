@@ -93,9 +93,9 @@ export class ApiExpress implements Api {
   public async start(port: number) {
     await this.cache.connect();
 
-    this.serverListner = this.app.listen(port, () => {
+    this.serverListner = this.app.listen(port, '0.0.0.0', () => {
       this.logger.info(`Server running on port ${port}`);
-      this.listRoutes(port);
+      this.listRoutes();
     });
 
     this.serverListner.on('error', async () => {
@@ -106,7 +106,7 @@ export class ApiExpress implements Api {
     process.on('SIGTERM', this.shutdown.bind(this));
   }
 
-  private listRoutes(port: number) {
+  private listRoutes() {
     const routes = this.app._router.stack
       .filter((route: any) => route.route)
       .map((route: any) => {
@@ -115,7 +115,7 @@ export class ApiExpress implements Api {
           method: route.route.stack[0].method,
         };
       });
-    this.logger.info(`Swagger UI ->  http://localhost:${port}${API_DOC}/#/`);
+    this.logger.info(`Swagger UI ->  ${process.env.SWAGGER_HOST}${API_DOC}/#/`);
     console.log(routes);
   }
 }
