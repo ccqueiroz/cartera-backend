@@ -11,7 +11,7 @@ const swaggerDefinition: OAS3Options = {
     },
     servers: [
       {
-        url: 'http://localhost:8889',
+        url: process.env.SWAGGER_HOST ?? '',
         description: 'Servidor de Desenvolvimento',
       },
     ],

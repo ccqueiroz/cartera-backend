@@ -1,5 +1,6 @@
-import { PersonUserService } from './src/services/person_user/person-user.service';
 import 'dotenv/config';
+import { PingRoutes } from './src/infra/api/express/routes/ping/ping.routes';
+import { PersonUserService } from './src/services/person_user/person-user.service';
 import { ReceivableService } from './src/services/receivable/receivables.service';
 import { BillService } from './src/services/bill/bill.service';
 import { PaymentStatusService } from './src/services/payment_status/payment-status.service';
@@ -122,6 +123,8 @@ function main() {
   //
 
   // ----- ROUTES -----
+  const pingRoutes = PingRoutes.create().execute();
+
   const authRoutes = AuthRoutes.create(
     authRepository,
     personUserService,
@@ -176,6 +179,7 @@ function main() {
 
   const api = ApiExpress.create(
     [
+      ...pingRoutes,
       ...authRoutes,
       ...personUserRoutes,
       ...paymentMethodRoutes,
