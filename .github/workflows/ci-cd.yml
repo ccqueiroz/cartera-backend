@@ -2,7 +2,10 @@ name: Cartera-Backend CI-CD
 
 on:
   pull_request:
-    branches: ['main']
+    branches:
+      - main
+      - test
+      - dev
 
 jobs:
   build:
@@ -20,6 +23,23 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+
+      - name: Check origem do PR
+        run: |
+          echo "${{ github.base_ref }}"
+          echo "${{ github.head_ref }}"
+
+          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "test" ]]; then
+            echo "Erro: Apenas podem ser abertos PRs para branch MAIN a partir da branch TEST."
+            exit 1
+          fi
+
+          if [[ "${{ github.base_ref }}" == "test" && "${{ github.head_ref }}" != "dev" ]]; then
+            echo "Erro: Apenas podem ser abertos PRs para branch TEST a partir da branch DEV."
+            exit 1
+          fi
+        shell: bash
+        continue-on-error: false
 
       - name: Configuração do Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
