@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: "🚀 Build & Test"
+    name: '🚀 Build & Test'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -30,6 +30,7 @@ jobs:
       - name: Criando .env
         run: |
           echo "PORT=${{ env.PORT }}" >> .env
+          echo "SWAGGER_HOST=${{ env.SWAGGER_HOST }}" >> .env
           echo "FIREBASE_CONFIG_API_KEY=${{ secrets.FIREBASE_CONFIG_API_KEY }}" >> .env
           echo "FIREBASE_CONFIG_AUTH_DOMAIN=${{ secrets.FIREBASE_CONFIG_AUTH_DOMAIN }}" >> .env
           echo "FIREBASE_CONFIG_PROJECT_ID=${{ secrets.FIREBASE_CONFIG_PROJECT_ID }}" >> .env
@@ -47,6 +48,10 @@ jobs:
           echo "FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL=${{ secrets.FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL }}" >> .env
           echo "FIREBASE_SERVICE_ACCOUNT_CLIENT_URL=${{ secrets.FIREBASE_SERVICE_ACCOUNT_CLIENT_URL }}" >> .env
           echo "FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN }}" >> .env
+          echo "REDIS_HOST_NAME=${{ secrets.REDIS_HOST_NAME }}" >> .env
+          echo "REDIS_HOST_PORT=${{ secrets.REDIS_HOST_PORT }}" >> .env
+          echo "REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}" >> .env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
         shell: bash
 
       - name: Instalando as dependências
