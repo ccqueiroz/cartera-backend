@@ -1,5 +1,8 @@
 ![CI](https://github.com/ccqueiroz/cartera-backend/actions/workflows/ci-cd.yml/badge.svg?branch=dev)
 
+## Versões README
+[Portuguese 🇧🇷](https://github.com/ccqueiroz/cartera-backend/blob/main/README.md)  |  [English 🇺🇸](https://github.com/ccqueiroz/cartera-backend/blob/main/README-en.md)
+
 # 💼 Cartera - Backend
 
 O **Cartera** é um sistema de gerenciamento financeiro pessoal projetado para ajudar pessoas a organizarem suas finanças, controlar gastos, planejar metas e tomar decisões financeiras mais inteligentes.
