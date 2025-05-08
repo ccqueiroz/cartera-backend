@@ -1,0 +1,28 @@
+FROM node:18
+
+LABEL mainteiner 'Caio Queiroz - App Cartera'
+
+RUN echo 'Criando diretório app no container'
+
+WORKDIR /usr/src/app
+
+RUN echo 'Instalando Dockerize - APP'
+
+ENV DOCKERIZE_VERSION v0.7.0
+
+RUN apt-get update \
+    && apt-get install -y wget \
+    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz | tar xzf - -C /usr/local/bin \
+    && apt-get autoremove -yqq --purge wget && rm -rf /var/lib/apt/lists/*
+
+RUN echo 'Copiando os arquivos para o container'
+
+COPY ./package.json ./yarn.lock ./tsconfig.json ./firebase.json .
+
+RUN echo 'Instalando as dependências'
+
+RUN yarn install
+
+COPY . .
+
+CMD ["yarn", "start:dev"]
