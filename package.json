@@ -21,7 +21,8 @@
     "test:unit": "npx jest --watch -c jest-unit-config.ts",
     "test:ci:unit": "npx jest -c jest-unit-config.ts --coverage",
     "migrate": "ts-node scripts/run-migrations-firebase.ts",
-    "start:docker": "docker compose --env-file ./.env up --build -d"
+    "start:docker:dev": "docker compose -f docker-compose.dev.yml --env-file .env.docker.env up --build -d",
+    "stop:docker:dev": "docker compose -f docker-compose.dev.yml down"
   },
   "engines": {
     "node": "18"
