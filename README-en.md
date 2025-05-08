@@ -63,7 +63,7 @@ This project adopts **Clean Architecture**, separating the system into independe
 
 <br/>
 
-![Architecture](assets/images/fluxo-arquitetura-cartera.png 'Architecture')
+![Architecture](https://github.com/ccqueiroz/cartera-backend/blob/dev/assets/images/fluxo-arquitetura-cartera.png 'Architecture')
 
 ---
 
