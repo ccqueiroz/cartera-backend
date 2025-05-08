@@ -81,6 +81,9 @@ jobs:
         run: yarn lint
         continue-on-error: false
 
+      - name: Limpeza do cache do Jest
+        run: npx jest --clearCache
+
       - name: Analisando Testes Unitários
         id: unit-tests
         run: yarn test:ci:unit
