@@ -33,6 +33,7 @@ jobs:
             exit 1
           fi
         shell: bash
+        continue-on-error: false
 
       - name: Configuração do Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
