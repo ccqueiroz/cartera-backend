@@ -1,7 +1,8 @@
 ![CI](https://github.com/ccqueiroz/cartera-backend/actions/workflows/ci-cd.yml/badge.svg?branch=dev)
 
 ## Versões README
-[Portuguese 🇧🇷](https://github.com/ccqueiroz/cartera-backend/blob/main/README.md)  |  [English 🇺🇸](https://github.com/ccqueiroz/cartera-backend/blob/main/README-en.md)
+
+[Português 🇧🇷](https://github.com/ccqueiroz/cartera-backend/blob/main/README.md) | [English 🇺🇸](https://github.com/ccqueiroz/cartera-backend/blob/main/README-en.md)
 
 # 💼 Cartera - Backend
 
@@ -60,7 +61,7 @@ Este projeto adota a **Clean Architecture**, separando o sistema em camadas inde
 
 <br/>
 
-![Arquitetura](assets/images/fluxo-arquitetura-cartera.png 'Arquitetura')
+![Arquitetura](https://github.com/ccqueiroz/cartera-backend/blob/dev/assets/images/fluxo-arquitetura-cartera.png 'Arquitetura')
 
 ---
 
