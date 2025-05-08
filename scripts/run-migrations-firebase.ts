@@ -1,27 +1,47 @@
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import 'dotenv/config';
+
+import { clientWinston } from './../src/packages/clients/winston';
+import { serviceAccountKey } from './../src/packages/clients/firebase/serviceAccountKey';
+import * as admin from 'firebase-admin';
 import { readdir } from 'fs/promises';
 import { join } from 'path';
 
-initializeApp({
-  credential: cert(
-    join(__dirname, '../src/packages/clients/firebase/serviceAccountKey.json'),
-  ),
-});
-
-const db = getFirestore();
 const migrationsPath = join(__dirname, '../migrations-firebase');
-
 const collection = 'Migrations';
 
-async function getExecutedMigrations() {
+const getDb = () => {
+  try {
+    return admin
+      .initializeApp({
+        credential: admin.credential.cert({
+          projectId: serviceAccountKey.projectId,
+          clientEmail: serviceAccountKey.clientEmail,
+          privateKey: serviceAccountKey.privateKey,
+        } as admin.ServiceAccount),
+        databaseURL: `https://${serviceAccountKey.projectId}.firebaseio.com`,
+        storageBucket: `${serviceAccountKey.projectId}.appspot.com`,
+        serviceAccountId: serviceAccountKey.clientEmail,
+      })
+      .firestore();
+  } catch (error) {
+    return error as Error;
+  }
+};
+
+const db = getDb();
+
+async function getExecutedMigrations(db: admin.firestore.Firestore) {
   const migrationsRef = db.collection(collection);
   const snapshot = await migrationsRef.get();
   const executedMigrations = snapshot.docs.map((doc) => doc.id);
   return new Set(executedMigrations);
 }
 
-async function runMigration(filePath: string, migrationId: string) {
+async function runMigration(
+  db: admin.firestore.Firestore,
+  filePath: string,
+  migrationId: string,
+) {
   console.log(`Executando migração: ${migrationId}...`);
   const { default: migration } = await import(filePath);
 
@@ -34,15 +54,26 @@ async function runMigration(filePath: string, migrationId: string) {
     });
     console.log(`Migração "${migrationId}" concluída com sucesso.`);
   } catch (error) {
-    console.error(`Erro ao executar migração "${migrationId}":`, error);
-    process.exit(1);
+    clientWinston.error(
+      `Erro ao executar migração "${migrationId}": ${
+        (error as Error)?.message
+      }`,
+    );
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(null);
+        process.exit(1);
+      }, 10),
+    );
   }
 }
 
-async function runMigrations() {
+async function runMigrations(db: admin.firestore.Firestore | Error) {
+  if (db instanceof Error) throw new Error(db.message);
+
   console.log('Iniciando execução de migrações...');
 
-  const executedMigrations = await getExecutedMigrations();
+  const executedMigrations = await getExecutedMigrations(db);
   const migrationFiles = await readdir(migrationsPath);
 
   const sortedMigrations = migrationFiles
@@ -58,15 +89,21 @@ async function runMigrations() {
     }
 
     const filePath = join(migrationsPath, file);
-    await runMigration(filePath, migrationId);
+    await runMigration(db, filePath, migrationId);
   }
 
   console.log('Todas as migrações foram processadas.');
 }
 
-runMigrations()
+runMigrations(db)
   .then(() => process.exit(0))
-  .catch((err) => {
-    console.error('Erro geral ao executar migrações:', err);
-    process.exit(1);
+  .catch((err: Error) => {
+    clientWinston.error(`Erro geral ao executar migrações: ${err.message}.`);
+
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve(null);
+        process.exit(1);
+      }, 10),
+    );
   });
