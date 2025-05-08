@@ -26,8 +26,8 @@ jobs:
 
       - name: Check origem do PR
         run: |
-          echo "${{ github.base_ref }}"
-          echo "${{ github.head_ref }}"
+          echo BASE_BRANCH: "${{ github.base_ref }}"
+          echo HEAD_BRANCH: "${{ github.head_ref }}"
 
           if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "test" ]]; then
             echo "Erro: Apenas podem ser abertos PRs para branch MAIN a partir da branch TEST."
