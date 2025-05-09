@@ -22,8 +22,10 @@
     "test:unit": "npx jest --watch -c jest-unit-config.ts",
     "test:ci:unit": "npx jest -c jest-unit-config.ts --coverage",
     "migrate": "ts-node scripts/run-migrations-firebase.ts",
-    "start:docker:dev": "docker compose -f docker-compose.dev.yml --env-file .env.docker.env up --build -d",
-    "stop:docker:dev": "docker compose -f docker-compose.dev.yml down"
+    "start:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml --env-file .env.docker.env up --build -d",
+    "stop:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml down",
+    "start:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml --env-file .env.docker.prod.env up --build -d",
+    "stop:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml down"
   },
   "engines": {
     "node": "18"
