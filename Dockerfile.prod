@@ -1,0 +1,43 @@
+FROM node:18-alpine as builder
+
+LABEL mainteiner 'Caio Queiroz - App Cartera'
+
+WORKDIR /usr/src/app
+
+ENV DOCKERIZE_VERSION v0.7.0
+
+RUN apk add --no-cache wget curl bash tar \
+    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    | tar xzf - -C /usr/local/bin \
+    && rm -rf /var/cache/apk/*
+
+COPY ./package.json ./yarn.lock .
+
+RUN yarn install --production --frozen-lockfile
+
+RUN yarn add ts-node ts-node-dev tsconfig-paths -D
+
+COPY . .
+
+RUN npm install -g firebase-tools
+
+RUN chmod +x entrypoint.sh
+
+RUN yarn migrate
+
+RUN ./entrypoint.sh
+
+RUN yarn build
+
+# ====================================================================================================================== #
+FROM node:18-alpine as main
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app/dist ./dist
+
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+COPY --from=builder /usr/src/app/package.json ./package.json
+
+CMD ["yarn", "start:prod"]
