@@ -51,6 +51,7 @@ jobs:
         run: |
           echo "PORT=${{ env.PORT }}" >> .env
           echo "SWAGGER_HOST=${{ env.SWAGGER_HOST }}" >> .env
+          echo "FIREBASE_TOKEN=${{ env.FIREBASE_TOKEN }}" >> .env
           echo "FIREBASE_CONFIG_API_KEY=${{ secrets.FIREBASE_CONFIG_API_KEY }}" >> .env
           echo "FIREBASE_CONFIG_AUTH_DOMAIN=${{ secrets.FIREBASE_CONFIG_AUTH_DOMAIN }}" >> .env
           echo "FIREBASE_CONFIG_PROJECT_ID=${{ secrets.FIREBASE_CONFIG_PROJECT_ID }}" >> .env
