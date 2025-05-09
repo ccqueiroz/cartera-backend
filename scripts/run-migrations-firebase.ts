@@ -98,7 +98,11 @@ async function runMigrations(db: admin.firestore.Firestore | Error) {
 runMigrations(db)
   .then(() => process.exit(0))
   .catch((err: Error) => {
-    clientWinston.error(`Erro geral ao executar migrações: ${err.message}.`);
+    clientWinston.error(
+      `Erro geral ao executar migrações: ${err.message} - ${JSON.stringify(
+        err.stack,
+      )}.`,
+    );
 
     new Promise((resolve) =>
       setTimeout(() => {
