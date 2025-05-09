@@ -41,7 +41,7 @@ services:
           'CMD-SHELL',
           'curl',
           '-f',
-          'curl -f http://localhost:${PORT}/api/ping || exit 1',
+          'http://localhost:${PORT}/api/ping || exit 1',
         ]
       interval: 10s
       retries: 5
