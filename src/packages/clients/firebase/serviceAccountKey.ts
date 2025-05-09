@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export const serviceAccountKey = {
   type: process.env.FIREBASE_SERVICE_ACCOUNT_TYPE ?? undefined,
   projectId: process.env.FIREBASE_SERVICE_ACCOUNT_PROJECT_ID ?? undefined,
