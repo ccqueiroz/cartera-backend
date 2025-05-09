@@ -15,8 +15,6 @@ COPY ./package.json ./yarn.lock .
 
 RUN yarn install --production --frozen-lockfile
 
-RUN yarn add ts-node ts-node-dev tsconfig-paths -D
-
 COPY . .
 
 RUN npm install -g firebase-tools
