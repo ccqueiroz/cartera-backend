@@ -9,23 +9,36 @@ services:
     restart: unless-stopped
     command: ['redis-server', '--requirepass', '${REDIS_PASSWORD}']
     networks:
-      - cartera-network-dev
+      - cartera-network-prod
 
   app:
     build:
       context: .
       dockerfile: Dockerfile.prod
+      args:
+        FIREBASE_TOKEN: ${FIREBASE_TOKEN}
+        FIREBASE_SERVICE_ACCOUNT_TYPE: ${FIREBASE_SERVICE_ACCOUNT_TYPE}
+        FIREBASE_SERVICE_ACCOUNT_PROJECT_ID: ${FIREBASE_SERVICE_ACCOUNT_PROJECT_ID}
+        FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY_ID: ${FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY_ID}
+        FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY: ${FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY}
+        FIREBASE_SERVICE_ACCOUNT_CLIENT_EMAIL: ${FIREBASE_SERVICE_ACCOUNT_CLIENT_EMAIL}
+        FIREBASE_SERVICE_ACCOUNT_CLIENT_ID: ${FIREBASE_SERVICE_ACCOUNT_CLIENT_ID}
+        FIREBASE_SERVICE_ACCOUNT_AUTH_URI: ${FIREBASE_SERVICE_ACCOUNT_AUTH_URI}
+        FIREBASE_SERVICE_ACCOUNT_TOKEN_URI: ${FIREBASE_SERVICE_ACCOUNT_TOKEN_URI}
+        FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL: ${FIREBASE_SERVICE_ACCOUNT_AUTH_PROVIDER_URL}
+        FIREBASE_SERVICE_ACCOUNT_CLIENT_URL: ${FIREBASE_SERVICE_ACCOUNT_CLIENT_URL}
+        FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN: ${FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN}
     container_name: app
     entrypoint: >
-      sh -c "dockerize -wait tcp://redis:6379 -timeout 30s && exec yarn start:prod"
+      sh -c "dockerize -wait tcp://redis:6379 -timeout 60s && exec yarn start:prod"
     networks:
-      - cartera-network-dev
+      - cartera-network-prod
     restart: unless-stopped
     tty: true
     ports:
       - '${PORT}:${PORT}'
     env_file:
-      - .env.docker.prod
+      - .env.docker.prod.env
     expose:
       - '${PORT}'
     depends_on:
@@ -39,10 +52,11 @@ services:
           'CMD-SHELL',
           'curl',
           '-f',
-          'curl -f http://localhost:${PORT}/api/ping || exit 1',
+          'http://localhost:${PORT}/api/ping || exit 1',
         ]
-      interval: 10s
-      retries: 5
+      interval: 30s
+      retries: 10
+      timeout: 20s
 
   nginx:
     build:
@@ -50,16 +64,16 @@ services:
       dockerfile: nginx/Dockerfile
     container_name: nginx
     entrypoint: >
-      sh -c "dockerize -wait tcp://app:8889 -timeout 30s && nginx -g 'daemon off;'"
+      sh -c "dockerize -wait tcp://app:8889 -timeout 120s && nginx -g 'daemon off;'"
     ports:
       - '80:80'
     restart: always
     networks:
-      - cartera-network-dev
+      - cartera-network-prod
     depends_on:
       app:
         condition: service_healthy
 
 networks:
-  cartera-network-dev:
+  cartera-network-prod:
     driver: bridge
