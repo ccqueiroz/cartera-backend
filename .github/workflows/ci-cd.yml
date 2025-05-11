@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - test
       - dev
 
 jobs:
@@ -29,15 +28,11 @@ jobs:
           echo BASE_BRANCH: "${{ github.base_ref }}"
           echo HEAD_BRANCH: "${{ github.head_ref }}"
 
-          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "test" ]]; then
+          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "dev" ]]; then
             echo "Erro: Apenas podem ser abertos PRs para branch MAIN a partir da branch TEST."
             exit 1
           fi
 
-          if [[ "${{ github.base_ref }}" == "test" && "${{ github.head_ref }}" != "dev" ]]; then
-            echo "Erro: Apenas podem ser abertos PRs para branch TEST a partir da branch DEV."
-            exit 1
-          fi
         shell: bash
         continue-on-error: false
 
