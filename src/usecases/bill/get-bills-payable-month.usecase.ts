@@ -73,6 +73,7 @@ export class GetBillsPayableMonthUseCase
         id: item.id,
         amount: item.amount,
         billDate: item.billDate,
+        descriptionBill: item.descriptionBill,
         categoryId: item.categoryId,
         categoryDescription: item.categoryDescription,
         status: this.handleSetInvoiceStatus(
