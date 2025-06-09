@@ -135,6 +135,7 @@ export const StatusBill = {
 export type BillsPayableMonthOutPutDTO = {
   id: string;
   amount: number;
+  descriptionBill: string;
   billDate: number;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
