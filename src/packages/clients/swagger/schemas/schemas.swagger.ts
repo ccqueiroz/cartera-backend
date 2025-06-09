@@ -247,6 +247,9 @@
  *         id:
  *           type: string
  *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         descriptionBill:
+ *           type: string
+ *           example: Compras do Supermercado
  *         amount:
  *           type: number
  *           example: 1200.00
