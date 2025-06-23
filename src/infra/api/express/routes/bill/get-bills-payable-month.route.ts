@@ -34,6 +34,20 @@ import { runValidate } from '@/packages/clients/class-validator';
  *           type: number
  *           example: 1743390000000
  *         description: Final do período para análise.
+ *       - in: query
+ *         name: page
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 0
+ *         description: Número da página (começando em 0).
+ *       - in: query
+ *         name: size
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 10
+ *         description: Quantidade de itens por página.
  *     responses:
  *       200:
  *         description: Lista de contas/despesas retornada com sucesso.
@@ -43,9 +57,24 @@ import { runValidate } from '@/packages/clients/class-validator';
  *               type: object
  *               properties:
  *                 data:
- *                   type: array
- *                   items:
- *                    $ref: '#/components/schemas/BillsPayableMonthOutPutDTO'
+ *                   type: object
+ *                   properties:
+ *                    content:
+ *                      type: array
+ *                      items:
+ *                        $ref: '#/components/schemas/BillsPayableMonthOutPutDTO'
+ *                    page:
+ *                      type: number
+ *                      example: 0
+ *                    size:
+ *                      type: number
+ *                      example: 10
+ *                    totalElements:
+ *                      type: number
+ *                      example: 50
+ *                    totalPages:
+ *                      type: number
+ *                      example: 5
  *
  *       400:
  *         description: Período de pesquisa inválido. Por favor, informe o período de análise. | Parâmetros de entrada inválidos.
@@ -79,14 +108,22 @@ export class GetBillsPayableMonthRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
-        const { initialDate, finalDate } = request.query;
-
+        const { initialDate, finalDate, page, size } = request.query;
+        console.log(
+          'initialDate, finalDate, page, size ',
+          initialDate,
+          finalDate,
+          page,
+          size,
+        );
         const errors = await runValidate<GetBillsPayableMonthDTO>(
           GetBillsPayableMonthDTO,
           {
             initialDate: initialDate as unknown as number,
             finalDate: finalDate as unknown as number,
             authUserId: user_auth?.userId as string,
+            page: page as unknown as number,
+            size: size as unknown as number,
           },
         );
 
@@ -100,6 +137,8 @@ export class GetBillsPayableMonthRoute implements Route {
             initialDate: Number(initialDate),
             finalDate: Number(finalDate),
           },
+          page: Number(page),
+          size: Number(size),
         } as BillsPayableMonthInputDTO);
 
         response.status(200).json({ ...bills });
