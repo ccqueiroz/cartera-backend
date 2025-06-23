@@ -55,7 +55,7 @@ describe('Person User Service', () => {
 
     const input = { id: data.id };
 
-    const key = `${keyController}/*/${data.id}`;
+    const key = `${keyController}/*/${data.id}/*`;
 
     cacheMock.recover.mockResolvedValue(null);
     cacheMock.scan.mockResolvedValueOnce({
@@ -89,8 +89,8 @@ describe('Person User Service', () => {
 
     const input = { id: data.id };
 
-    const key = `${keyController}/*/${data.id}`;
-    const keyFromScan = `${keyController}/${data.email}/${data.id}`;
+    const key = `${keyController}/*/${data.id}/*`;
+    const keyFromScan = `${keyController}/${data.email}/${data.id}/${data.userId}`;
 
     cacheMock.recover.mockResolvedValue(data);
     cacheMock.scan.mockResolvedValueOnce({
@@ -123,8 +123,8 @@ describe('Person User Service', () => {
 
     const input = { id: data.id };
 
-    const key = `${keyController}/*/${data.id}`;
-    const keyFromScan = `${keyController}/${data.email}/${data.id}`;
+    const key = `${keyController}/*/${data.id}/*`;
+    const keyFromScan = `${keyController}/${data.email}/${data.id}${data.userId}`;
 
     cacheMock.recover.mockResolvedValue(data);
     cacheMock.scan.mockResolvedValueOnce({
@@ -158,7 +158,7 @@ describe('Person User Service', () => {
 
     const input = { id: data.id };
 
-    const key = `${keyController}/*/${data.id}`;
+    const key = `${keyController}/*/${data.id}/*`;
 
     cacheMock.recover.mockResolvedValue(null);
     cacheMock.scan.mockResolvedValueOnce({
@@ -191,8 +191,8 @@ describe('Person User Service', () => {
 
     const input = { id: data.id };
 
-    const key = `${keyController}/*/${data.id}`;
-    const keyFromScan = `${keyController}/${data.email}/${data.id}`;
+    const key = `${keyController}/*/${data.id}/*`;
+    const keyFromScan = `${keyController}/${data.email}/${data.id}/${data.userId}`;
 
     cacheMock.recover.mockResolvedValue(null);
     cacheMock.scan.mockResolvedValueOnce({
@@ -226,7 +226,7 @@ describe('Person User Service', () => {
 
     const input = { email: data.email };
 
-    const key = `${keyController}/${data.email}/*`;
+    const key = `${keyController}/${data.email}/*/*`;
 
     cacheMock.recover.mockResolvedValue(null);
     cacheMock.scan.mockResolvedValueOnce({
@@ -260,8 +260,8 @@ describe('Person User Service', () => {
 
     const input = { email: data.email };
 
-    const key = `${keyController}/${data.email}/*`;
-    const keyFromScan = `${keyController}/${data.email}/${data.id}`;
+    const key = `${keyController}/${data.email}/*/*`;
+    const keyFromScan = `${keyController}/${data.email}/${data.id}/${data.userId}`;
 
     cacheMock.recover.mockResolvedValue(data);
     cacheMock.scan.mockResolvedValueOnce({
@@ -307,7 +307,7 @@ describe('Person User Service', () => {
       fullName: 'Jonh Doe',
     };
 
-    const key = `${keyController}/${dataToSave.email}/${dataToSave.id}`;
+    const key = `${keyController}/${dataToSave.email}/${dataToSave.id}/${dataToSave.userId}`;
 
     dbMock.createPersonUser.mockResolvedValue(dataResponse);
 
@@ -374,7 +374,7 @@ describe('Person User Service', () => {
       updatedAt,
     };
 
-    const key = `${keyController}/${dataResponse.email}/${dataResponse.id}`;
+    const key = `${keyController}/${dataResponse.email}/${dataResponse.id}/${dataResponse.userId}`;
 
     dbMock.editPersonUser.mockResolvedValue(dataResponse);
 
@@ -418,5 +418,73 @@ describe('Person User Service', () => {
     expect(cacheMock.scan).toHaveBeenCalledWith(0, key);
     expect(cacheMock.delete).toHaveBeenCalled();
     expect(cacheMock.delete).toHaveBeenCalledWith([keyFromScan]);
+  });
+
+  it('should be call getPersonUserByUserId and verify if exist registered keys in cache provider and in case exist registereds keys, must be return data from cache.', async () => {
+    const data = {
+      id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+      email: 'jonh.doe@example.com',
+      firstName: 'Jonh',
+      lastName: 'Doe',
+      userId: 'abc098',
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      fullName: 'Jonh Doe',
+    };
+
+    const input = { userId: data.userId };
+
+    const key = `${keyController}/*/*/${data.userId}`;
+    const keyFromScan = `${keyController}/${data.email}/${data.id}/${data.userId}`;
+
+    cacheMock.recover.mockResolvedValue(data);
+    cacheMock.scan.mockResolvedValueOnce({
+      cursor: 0,
+      keys: [keyFromScan],
+    });
+
+    const result = await personUSerService.getPersonUserByUserId(input);
+
+    expect(cacheMock.scan).toHaveBeenCalled();
+    expect(cacheMock.scan).toHaveBeenCalledWith(0, key);
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(keyFromScan);
+    expect(dbMock.getPersonUserByEmail).not.toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result).not.toBeNull();
+  });
+
+  it('should be call getPersonUserByUserId and return data from db', async () => {
+    const data = {
+      id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+      email: 'jonh.doe@example.com',
+      firstName: 'Jonh',
+      lastName: 'Doe',
+      userId: 'abc098',
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      fullName: 'Jonh Doe',
+    };
+
+    const input = { userId: data.userId };
+
+    const key = `${keyController}/*/*/${data.userId}`;
+
+    cacheMock.recover.mockResolvedValue(null);
+    cacheMock.scan.mockResolvedValueOnce({
+      cursor: 0,
+      keys: [],
+    });
+
+    dbMock.getPersonUserByUserId.mockResolvedValue(data);
+
+    const result = await personUSerService.getPersonUserByUserId(input);
+
+    expect(cacheMock.scan).toHaveBeenCalled();
+    expect(cacheMock.scan).toHaveBeenCalledWith(0, key);
+    expect(cacheMock.recover).not.toHaveBeenCalled();
+    expect(dbMock.getPersonUserByUserId).toHaveBeenCalled();
+    expect(cacheMock.save).toHaveBeenCalled();
+    expect(result).not.toBeNull();
   });
 });
