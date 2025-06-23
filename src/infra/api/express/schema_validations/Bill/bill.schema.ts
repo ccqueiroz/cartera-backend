@@ -271,4 +271,10 @@ export class GetBillsPayableMonthDTO extends UserIdAuthValidation {
   @IsDefined()
   @IsNumber()
   finalDate!: number;
+
+  @IsNumber()
+  page!: number;
+
+  @IsNumber()
+  size!: number;
 }
