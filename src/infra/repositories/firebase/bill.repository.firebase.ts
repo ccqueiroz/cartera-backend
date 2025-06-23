@@ -358,7 +358,9 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
   public async billsPayableMonth({
     period,
     userId,
-  }: BillsPayableMonthInputDTO): Promise<Array<BillDTO>> {
+    page,
+    size,
+  }: BillsPayableMonthInputDTO): Promise<ResponseListDTO<BillDTO>> {
     if (!userId) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
 
     if (
@@ -398,6 +400,10 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       data as Array<BillDTO>,
     );
 
-    return data;
+    return this.applayPaginationHelpers.execute<
+      GetBillsInputDTO,
+      OrderByGetBillsInputDTO,
+      BillDTO
+    >({ page, size }, data as Array<BillDTO>);
   }
 }

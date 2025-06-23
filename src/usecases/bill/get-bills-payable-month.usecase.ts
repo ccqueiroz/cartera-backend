@@ -8,9 +8,10 @@ import {
   StatusBill,
 } from '@/domain/Bill/dtos/bill.dto';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 
 export type GetBillsPayableMonthOutputDTO = OutputDTO<
-  Array<BillsPayableMonthOutPutDTO>
+  ResponseListDTO<BillsPayableMonthOutPutDTO>
 >;
 
 export class GetBillsPayableMonthUseCase
@@ -68,7 +69,7 @@ export class GetBillsPayableMonthUseCase
       ...inputGetBills,
     });
 
-    const data = bills.map((item) => {
+    const data = bills.content.map((item) => {
       return {
         id: item.id,
         amount: item.amount,
@@ -83,8 +84,13 @@ export class GetBillsPayableMonthUseCase
       };
     }) as Array<BillsPayableMonthOutPutDTO>;
 
+    const billsPayables: ResponseListDTO<BillsPayableMonthOutPutDTO> = {
+      ...bills,
+      content: data,
+    };
+
     return {
-      data,
+      data: billsPayables,
     };
   }
 }

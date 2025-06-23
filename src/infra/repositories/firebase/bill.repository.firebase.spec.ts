@@ -623,15 +623,23 @@ describe('Bill Repository Firebase', () => {
         initialDate: new Date('03-01-2025').getTime(),
         finalDate: new Date('03-31-2025').getTime(),
       },
+      page: 0,
+      size: 10,
     });
 
-    expect(result.length).toEqual(3);
-    expect(result[0].billDate).toEqual(new Date('03-01-2025').getTime());
-    expect(result[0].payOut).toBeFalsy();
-    expect(result[1].billDate).toEqual(new Date('03-12-2025').getTime());
-    expect(result[1].payOut).toBeFalsy();
-    expect(result[2].billDate).toEqual(new Date('03-26-2025').getTime());
-    expect(result[2].payOut).toBeFalsy();
+    expect(result.content.length).toEqual(3);
+    expect(result.content[0].billDate).toEqual(
+      new Date('03-01-2025').getTime(),
+    );
+    expect(result.content[0].payOut).toBeFalsy();
+    expect(result.content[1].billDate).toEqual(
+      new Date('03-12-2025').getTime(),
+    );
+    expect(result.content[1].payOut).toBeFalsy();
+    expect(result.content[2].billDate).toEqual(
+      new Date('03-26-2025').getTime(),
+    );
+    expect(result.content[2].payOut).toBeFalsy();
   });
 
   it('should be throw an error when call billsPayableMonth if the userId do not exist in param', async () => {
@@ -642,6 +650,8 @@ describe('Bill Repository Firebase', () => {
           initialDate: new Date('03-01-2025').getTime(),
           finalDate: new Date('03-31-2025').getTime(),
         },
+        page: 0,
+        size: 10,
       })
       .catch((err) => err);
 
@@ -657,6 +667,8 @@ describe('Bill Repository Firebase', () => {
       .billsPayableMonth({
         userId: userIdMock,
         period: undefined as any,
+        page: 0,
+        size: 10,
       })
       .catch((err) => err);
 
@@ -673,6 +685,8 @@ describe('Bill Repository Firebase', () => {
           initialDate: new Date().getTime(),
           finalDate: 'abs121212' as any,
         },
+        page: 0,
+        size: 10,
       })
       .catch((err) => err);
 
@@ -689,6 +703,8 @@ describe('Bill Repository Firebase', () => {
           initialDate: undefined as any,
           finalDate: new Date().getTime(),
         },
+        page: 0,
+        size: 10,
       })
       .catch((err) => err);
 
