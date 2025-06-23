@@ -394,6 +394,8 @@ describe('Bill Schema', () => {
       initialDate: 1212121212121212,
       finalDate: 1212121212121212,
       authUserId: '20000',
+      page: 0,
+      size: 10,
     }).then((errors) => {
       expect(errors.length).toEqual(0);
     });
