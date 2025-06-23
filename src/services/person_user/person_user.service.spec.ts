@@ -19,6 +19,7 @@ describe('Person User Service', () => {
       createPersonUser: jest.fn(),
       editPersonUser: jest.fn(),
       deletePersonUser: jest.fn(),
+      getPersonUserByUserId: jest.fn(),
     };
 
     cacheMock = {
