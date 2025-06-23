@@ -67,7 +67,7 @@ export class PersonUserService implements PersonUserServiceGateway {
     data: PersonUserEntitieDTO | null,
   ): Promise<void> {
     if (data) {
-      const keyToSave = `${this.keyController}/${data.email}/${data.id}`;
+      const keyToSave = `${this.keyController}/${data.email}/${data.id}/${data.userId}`;
 
       await this.cache.save<PersonUserEntitieDTO>(
         keyToSave,
@@ -83,7 +83,7 @@ export class PersonUserService implements PersonUserServiceGateway {
     PersonUserEntitieDTO,
     'email'
   >): Promise<PersonUserEntitieDTO | null> {
-    const key = `${this.keyController}/${email ?? ''}/*`;
+    const key = `${this.keyController}/${email ?? ''}/*/*`;
 
     const findKeys = await this.findKeysPersonUser(key);
 
@@ -103,7 +103,7 @@ export class PersonUserService implements PersonUserServiceGateway {
   public async getPersonUserById({
     id,
   }: Pick<PersonUserEntitieDTO, 'id'>): Promise<PersonUserEntitieDTO | null> {
-    const key = `${this.keyController}/*/${id ?? ''}`;
+    const key = `${this.keyController}/*/${id ?? ''}/*`;
 
     const findKeys = await this.findKeysPersonUser(key);
 
@@ -114,6 +114,29 @@ export class PersonUserService implements PersonUserServiceGateway {
     }
 
     const personUserDb = await this.db.getPersonUserById({ id });
+
+    await this.savePersonUserData(personUserDb);
+
+    return personUserDb;
+  }
+
+  async getPersonUserByUserId({
+    userId,
+  }: Pick<
+    PersonUserEntitieDTO,
+    'userId'
+  >): Promise<PersonUserEntitieDTO | null> {
+    const key = `${this.keyController}/*/*/${userId ?? ''}`;
+
+    const findKeys = await this.findKeysPersonUser(key);
+
+    const personUserCache = await this.recoverPersonUserData(findKeys);
+
+    if (personUserCache) {
+      return personUserCache;
+    }
+
+    const personUserDb = await this.db.getPersonUserByUserId({ userId });
 
     await this.savePersonUserData(personUserDb);
 
