@@ -16,6 +16,8 @@ const input = {
     initialDate: new Date('2025-03-01').getTime(),
     finalDate: new Date('2025-03-31').getTime(),
   },
+  page: 0,
+  size: 10,
 };
 
 const billsMock = [
@@ -150,16 +152,23 @@ describe('Get Bills Payable Month Usecase', () => {
   });
 
   it('should return the bills with correct status', async () => {
-    billServiceMock.billsPayableMonth.mockResolvedValueOnce(billsMock);
+    billServiceMock.billsPayableMonth.mockResolvedValueOnce({
+      content: billsMock,
+      page: 1,
+      size: 10,
+      totalElements: 5,
+      totalPages: 1,
+      ordering: null,
+    });
 
     const result = await getBillsPayableMonthUseCase.execute(input);
 
-    expect(result.data.length).toBe(5);
-    expect(result.data[0].status).toBe(StatusBill.OVERDUE);
-    expect(result.data[1].status).toBe(StatusBill.DUE_SOON);
-    expect(result.data[2].status).toBe(StatusBill.DUE_DAY);
-    expect(result.data[3].status).toBe(StatusBill.PENDING);
-    expect(result.data[4].status).toBe(StatusBill.PENDING);
+    expect(result.data.content.length).toBe(5);
+    expect(result.data.content[0].status).toBe(StatusBill.OVERDUE);
+    expect(result.data.content[1].status).toBe(StatusBill.DUE_SOON);
+    expect(result.data.content[2].status).toBe(StatusBill.DUE_DAY);
+    expect(result.data.content[3].status).toBe(StatusBill.PENDING);
+    expect(result.data.content[4].status).toBe(StatusBill.PENDING);
 
     expect(billServiceMock.billsPayableMonth).toHaveBeenCalledWith(input);
   });
@@ -169,6 +178,8 @@ describe('Get Bills Payable Month Usecase', () => {
       .execute({
         userId: '',
         period: input.period,
+        page: 0,
+        size: 10,
       })
       .catch((err) => err);
 
@@ -178,10 +189,24 @@ describe('Get Bills Payable Month Usecase', () => {
   });
 
   it('should return empty list if no bills returned from gateway', async () => {
-    billServiceMock.billsPayableMonth.mockResolvedValueOnce([]);
+    billServiceMock.billsPayableMonth.mockResolvedValueOnce({
+      content: [],
+      page: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 0,
+      ordering: null,
+    });
 
     const result = await getBillsPayableMonthUseCase.execute(input);
 
-    expect(result.data).toEqual([]);
+    expect(result.data).toEqual({
+      content: [],
+      page: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 0,
+      ordering: null,
+    });
   });
 });
