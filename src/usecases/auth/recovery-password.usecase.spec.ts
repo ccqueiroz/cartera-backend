@@ -51,12 +51,15 @@ describe('Recovery Password Usecase', () => {
 
     getPersonUserByEmailUseCase.execute.mockResolvedValue({
       data: {
+        id: 'aBj98292',
         email: 'jonh.doe@example.com',
         firstName: 'jonh',
         lastName: 'doe',
         userId: '12121',
         createdAt: 12121212,
         updatedAt: 12121212,
+        image: null,
+        fullName: 'Jonh Doe',
       },
     });
 
