@@ -24,5 +24,7 @@ export interface BillRepositoryGateway {
 
   deleteBill({ id, userId }: DeleteBillInputDTO): Promise<void>;
 
-  billsPayableMonth(input: BillsPayableMonthInputDTO): Promise<Array<BillDTO>>;
+  billsPayableMonth(
+    input: BillsPayableMonthInputDTO,
+  ): Promise<ResponseListDTO<BillDTO>>;
 }
