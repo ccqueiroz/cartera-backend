@@ -25,6 +25,20 @@ export interface PersonUserServiceGateway {
     id,
   }: Pick<PersonUserEntitieDTO, 'id'>): Promise<PersonUserEntitieDTO | null>;
 
+  getPersonUserByUserId({
+    userId,
+  }: Pick<
+    PersonUserEntitieDTO,
+    'userId'
+  >): Promise<PersonUserEntitieDTO | null>;
+
+  getPersonUserByUserId({
+    userId,
+  }: Pick<
+    PersonUserEntitieDTO,
+    'userId'
+  >): Promise<PersonUserEntitieDTO | null>;
+
   editPersonUser({
     personId,
     personData,

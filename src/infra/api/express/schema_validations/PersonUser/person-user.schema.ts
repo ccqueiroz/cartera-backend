@@ -31,3 +31,10 @@ export class EditPersonUserValidationDTO {
   @MaxLength(50)
   userId!: string;
 }
+
+export class GetPersonUserByUserIdValidationDTO {
+  @IsDefined()
+  @IsString()
+  @MaxLength(60)
+  id!: string;
+}

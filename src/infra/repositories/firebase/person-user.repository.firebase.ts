@@ -61,6 +61,36 @@ export class PersonUserRepositoryFirebase
     });
   }
 
+  public async getPersonUserByUserId({
+    userId,
+  }: Pick<PersonUserEntitieDTO, 'userId'>) {
+    const data = await this.dbCollection
+      .where('userId', '==', userId)
+      .get()
+      .then((response) =>
+        response.docs?.map((item) => ({ id: item.id, ...item.data() })),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    if (!data || data.length === 0) return null;
+
+    const user = data[0] as PersonUserEntitieDTO;
+
+    return PersonUserEntitie.with({
+      id: user.id,
+      userId: user.userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      image: user?.image,
+      createdAt: user?.createdAt,
+      fullName: user?.fullName,
+      updatedAt: user?.updatedAt,
+    });
+  }
+
   public async getPersonUserById({
     id,
   }: Required<

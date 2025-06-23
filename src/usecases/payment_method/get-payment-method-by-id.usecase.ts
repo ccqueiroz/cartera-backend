@@ -36,8 +36,17 @@ export class GetPaymentMethodByIdUseCase
       id,
     });
 
+    if (!paymentMethod || !paymentMethod?.id) {
+      return { data: null };
+    }
+
     return {
-      data: paymentMethod,
+      data: {
+        id: paymentMethod.id,
+        description: paymentMethod.description,
+        createdAt: paymentMethod.createdAt,
+        updatedAt: paymentMethod.updatedAt,
+      },
     };
   }
 }
