@@ -119,7 +119,9 @@ export type EditBillInputDTO = {
 
 export type DeleteBillInputDTO = Required<Pick<BillDTO, 'id' | 'userId'>>;
 
-export type BillsPayableMonthInputDTO = {
+export type BillsPayableMonthInputDTO = Required<
+  Pick<PaginationParams<unknown>, 'page' | 'size'>
+> & {
   period: { initialDate: number; finalDate: number };
   userId: string;
 };
