@@ -109,21 +109,15 @@ export class GetBillsPayableMonthRoute implements Route {
       try {
         const { user_auth } = request;
         const { initialDate, finalDate, page, size } = request.query;
-        console.log(
-          'initialDate, finalDate, page, size ',
-          initialDate,
-          finalDate,
-          page,
-          size,
-        );
+
         const errors = await runValidate<GetBillsPayableMonthDTO>(
           GetBillsPayableMonthDTO,
           {
-            initialDate: initialDate as unknown as number,
-            finalDate: finalDate as unknown as number,
+            initialDate: Number(initialDate),
+            finalDate: Number(finalDate),
             authUserId: user_auth?.userId as string,
-            page: page as unknown as number,
-            size: size as unknown as number,
+            page: Number(page),
+            size: Number(size),
           },
         );
 
