@@ -64,6 +64,7 @@ export class PaymentMethodRepositoryFirebase
       ? {
           id: response.id,
           description: response.description,
+          descriptionEnum: response.descriptionEnum,
           createdAt: response.createdAt,
           updatedAt: response.updatedAt,
         }
