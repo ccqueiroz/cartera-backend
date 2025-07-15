@@ -33,33 +33,27 @@ export class PaymentStatusEntitie {
       return invoiceType === 'bill'
         ? PaymentStatusDescriptionEnum.PAID
         : PaymentStatusDescriptionEnum.RECEIVED;
-    } else {
-      const diffInDays = this.calcDiffDaysBetweenInvoiceDateAndReferenceDate(
-        invoiceDate,
-        referenceDate,
-      );
-      if (referenceDate > invoiceDate) {
-        return PaymentStatusDescriptionEnum.OVERDUE;
-      }
+    }
+    const diffInDays = this.calcDiffDaysBetweenInvoiceDateAndReferenceDate(
+      invoiceDate,
+      referenceDate,
+    );
 
-      if (diffInDays > 5) {
-        return invoiceType === 'bill'
-          ? PaymentStatusDescriptionEnum.TO_PAY
-          : PaymentStatusDescriptionEnum.TO_RECEIVE;
-      }
+    if (diffInDays === 0) {
+      return PaymentStatusDescriptionEnum.DUE_DAY;
+    }
 
-      if (diffInDays > 0 && diffInDays <= 5) {
-        return PaymentStatusDescriptionEnum.DUE_SOON;
-      }
+    if (diffInDays > 0 && diffInDays <= 5) {
+      return PaymentStatusDescriptionEnum.DUE_SOON;
+    }
 
-      if (diffInDays === 0) {
-        return PaymentStatusDescriptionEnum.DUE_DAY;
-      }
-
+    if (diffInDays > 5) {
       return invoiceType === 'bill'
         ? PaymentStatusDescriptionEnum.TO_PAY
         : PaymentStatusDescriptionEnum.TO_RECEIVE;
     }
+
+    return PaymentStatusDescriptionEnum.OVERDUE;
   }
 
   public get id() {
@@ -68,6 +62,10 @@ export class PaymentStatusEntitie {
 
   public get description() {
     return this.props.description;
+  }
+
+  public get descriptionEnum() {
+    return this.props.descriptionEnum;
   }
 
   public get createdAt() {
