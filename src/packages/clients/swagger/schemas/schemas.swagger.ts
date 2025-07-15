@@ -138,6 +138,23 @@
  *           nullable: true
  *           example: 1704067200000
  *
+ *     UpdateBillByPayableMonthDTO:
+ *       type: object
+ *       properties:
+ *         payDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         payOut:
+ *           type: boolean
+ *           example: true
+ *         paymentMethodId:
+ *           type: string
+ *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
+ *         paymentMethodDescription:
+ *           type: string
+ *           example: Pix
+ *
  *     AuthDTO:
  *       type: object
  *       properties:
@@ -170,7 +187,11 @@
  *         description:
  *           type: string
  *           description: Descrição da categoria.
- *           example: App Mobilidade
+ *           example: Uber
+ *         descriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         group:
+ *           $ref: '#/components/schemas/CategoryGroupEnum'
  *         createdAt:
  *           type: number
  *           example: 1724144869975
@@ -186,7 +207,9 @@
  *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
  *         description:
  *           type: string
- *           example: Cartão de crédito
+ *           example: Cartão de Crédito
+ *         descriptionEnum:
+ *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *         createdAt:
  *           type: number
  *           example: 1724144869975
@@ -203,6 +226,8 @@
  *         description:
  *           type: string
  *           example: Pago
+ *         descriptionEnum:
+ *           $ref: '#/components/schemas/PaymentStatusDescriptionEnum'
  *         createdAt:
  *           type: number
  *           example: 1724144869975
@@ -514,4 +539,150 @@
  *               paidIncomes: 3500.0
  *               paidExpenses: 2000.0
  *               paidProfit: 1500.0
+ *
+ *     CategoryDescriptionEnum:
+ *       type: string
+ *       description: Enumeração da descrição da categoria.
+ *       enum:
+ *         - UBER
+ *         - NINY_NINE
+ *         - BLABLACAR
+ *         - LYFT
+ *         - CABIFY
+ *         - '99POP'
+ *         - BUS
+ *         - SUBWAY
+ *         - TRAIN
+ *         - AIRPLANE
+ *         - FUEL
+ *         - VEHICLE_MAINTENANCE
+ *         - TOLLS_PARKING
+ *         - IFOOD
+ *         - UBER_EATS
+ *         - RAPPI
+ *         - JAMES_DELIVERY
+ *         - NINY_NINE_FOOD
+ *         - ZE_DELIVERY
+ *         - ONLINE_FOOD_ORDERS
+ *         - RESTAURANT
+ *         - FAST_FOOD
+ *         - CAFE_BISTRO
+ *         - PHARMACY
+ *         - GYM
+ *         - BEAUTY
+ *         - SUPPLEMENTS
+ *         - RENT
+ *         - CONDOMINIUM_FEE
+ *         - ENERGY
+ *         - WATER
+ *         - GAS
+ *         - INTERNET_TV
+ *         - PHONE
+ *         - CLEANING_LAUNDRY
+ *         - REPAIR_MAINTENANCE
+ *         - VEHICLE_FINANCING
+ *         - PROPERTY_FINANCING
+ *         - VEHICLE_CREDIT_LINE
+ *         - PROPERTY_CREDIT_LINE
+ *         - AUTO_INSURANCE
+ *         - HEALTH_INSURANCE
+ *         - LIFE_INSURANCE
+ *         - HOME_INSURANCE
+ *         - CLOTHING_ACCESSORIES
+ *         - FLIGHT_TICKETS
+ *         - ACCOMMODATION
+ *         - TOURS
+ *         - CAR_RENTAL
+ *         - GIFTS_DONATIONS
+ *         - TAXES
+ *         - PET_FOOD
+ *         - PET_VETERINARY
+ *         - PET_SHOP
+ *         - DEPENDENTS_CARE
+ *         - CLEANING_LAUNDRY_SERVICE
+ *         - OFFICE_SUPPLIES
+ *         - COWORKING
+ *         - BUSINESS_SOFTWARE
+ *         - HARDWARE
+ *         - SOFTWARE_APPS
+ *         - SOFTWARE_SUBSCRIPTIONS
+ *         - ACCOUNTANT
+ *         - CONSULTING
+ *         - TECHNICAL_MAINTENANCE
+ *         - SPORTS_HOBBIES
+ *         - CREDIT_CARD_PAYMENT
+ *         - OTHER_EXPENSES
+ *         - SALARY
+ *         - PROFIT_WITHDRAWAL
+ *         - RENT_INCOME
+ *         - INVESTMENT_INCOME
+ *         - REIMBURSEMENTS
+ *         - COMMISSIONS_BONUSES
+ *         - DONATIONS_INHERITANCE
+ *         - CAPITAL_CONTRIBUTIONS
+ *         - PARTNERSHIP_SPONSOR_INCOME
+ *         - PENSIONS
+ *         - CASHBACK_REWARDS
+ *         - OTHER_INCOME
+ *       example: UBER
+ *
+ *     CategoryGroupEnum:
+ *       type: string
+ *       description: Grupo da categoria.
+ *       enum:
+ *         - MOBILITY_BY_APP
+ *         - TRANSPORT
+ *         - FOOD_DELIVERY
+ *         - FOOD
+ *         - HEALTH_AND_WELL_BEING
+ *         - HOUSING
+ *         - FINANCING
+ *         - INSURANCE
+ *         - SHOPPING
+ *         - TRAVEL_AND_TOURISM
+ *         - PET_CARE
+ *         - CARE
+ *         - SERVICES
+ *         - PROFESSIONAL_SERVICES
+ *         - BUSINESS
+ *         - TECHNOLOGY
+ *         - LEISURE
+ *         - REVENUES
+ *         - TAXES
+ *         - OTHERS
+ *       example: MOBILITY_BY_APP
+ *
+ *     PaymentMethodDescriptionEnum:
+ *       type: string
+ *       description: Enumeração das descrições dos métodos de pagamento.
+ *       enum:
+ *         - DEBIT_CARD
+ *         - CREDIT_CARD
+ *         - BANK_SLIP
+ *         - BANK_DEPOSIT
+ *         - BANK_TRANSFER
+ *         - AUTOMATIC_DEBIT
+ *         - BOOKLET
+ *         - CASH
+ *         - CHECK
+ *         - PROMISSORY
+ *         - FINANCING
+ *         - MEAL_VOUCHER
+ *         - FOOD_VOUCHER
+ *         - PIX
+ *         - CRYPTOCURRENCY
+ *       example: CREDIT_CARD
+ *
+ *     PaymentStatusDescriptionEnum:
+ *       type: string
+ *       description: Enumeração das descrições dos status de pagamento.
+ *       enum:
+ *         - PAID
+ *         - RECEIVED
+ *         - TO_PAY
+ *         - TO_RECEIVE
+ *         - DUE_SOON
+ *         - DUE_DAY
+ *         - OVERDUE
+ *       example: PAID
  */
