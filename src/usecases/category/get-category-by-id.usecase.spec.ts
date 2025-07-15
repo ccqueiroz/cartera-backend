@@ -4,6 +4,8 @@ import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 
 let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
 
@@ -27,7 +29,9 @@ describe('Get Category By Id', () => {
   it('should be call execute method and return the category when this id are provided', async () => {
     categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      description: 'Aluguel e Financiamento Residencial',
+      description: 'Aluguel',
+      descriptionEnum: CategoryDescriptionEnum.RENT,
+      group: CategoryGroupEnum.HOUSING,
       type: CategoryType.BILLS,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
