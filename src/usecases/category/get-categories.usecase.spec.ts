@@ -1,6 +1,8 @@
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 import { GetCategoriesUseCase } from './get-categories.usecase';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 
 let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
 
@@ -26,6 +28,8 @@ describe('Get Categories', () => {
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
         description: 'Restaurante',
+        descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+        group: CategoryGroupEnum.FOOD,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -33,13 +37,17 @@ describe('Get Categories', () => {
       {
         id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
         description: 'Shopping',
+        descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+        group: CategoryGroupEnum.SHOPPING,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
-        description: 'App Mobilidade',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
