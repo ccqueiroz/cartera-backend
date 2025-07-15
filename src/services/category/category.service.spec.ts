@@ -3,6 +3,8 @@ import { CategoryService } from './category.service';
 import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 
 let dbMock: jest.Mocked<CategoryRepositoryGateway>;
 let cacheMock: jest.Mocked<CacheGateway>;
@@ -47,6 +49,8 @@ describe('Category Service', () => {
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
         description: 'Restaurante',
+        descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+        group: CategoryGroupEnum.FOOD,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -54,13 +58,17 @@ describe('Category Service', () => {
       {
         id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
         description: 'Shopping',
+        descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+        group: CategoryGroupEnum.SHOPPING,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
-        description: 'App Mobilidade',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -92,6 +100,8 @@ describe('Category Service', () => {
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
         description: 'Restaurante',
+        descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+        group: CategoryGroupEnum.FOOD,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -99,13 +109,17 @@ describe('Category Service', () => {
       {
         id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
         description: 'Shopping',
+        descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+        group: CategoryGroupEnum.SHOPPING,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
-        description: 'App Mobilidade',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -150,6 +164,8 @@ describe('Category Service', () => {
     const data: CategoryDTO = {
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
@@ -176,6 +192,8 @@ describe('Category Service', () => {
     const data: CategoryDTO = {
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
@@ -200,6 +218,8 @@ describe('Category Service', () => {
     const data: CategoryDTO = {
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
