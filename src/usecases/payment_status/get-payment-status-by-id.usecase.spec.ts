@@ -3,6 +3,7 @@ import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
@@ -29,6 +30,7 @@ describe('Get Payment Status By Id', () => {
     paymentStatusServiceGatewayMock.getPaymentStatusById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'A receber',
+      descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     });
