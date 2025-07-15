@@ -1,3 +1,4 @@
+import { PaymentMethodDescriptionEnum } from './../src/domain/Payment_Method/enums/payment-method-description.enum';
 import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
 
@@ -5,42 +6,77 @@ const paymentMethods = [
   {
     id: randomUUID(),
     description: 'Cartão de Débito',
+    descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
   },
   {
     id: randomUUID(),
     description: 'Cartão de Crédito',
+    descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
   },
   {
     id: randomUUID(),
     description: 'Boleto Bancário',
+    descriptionEnum: PaymentMethodDescriptionEnum.BANK_SLIP,
+  },
+  {
+    id: randomUUID(),
+    description: 'Depósito Bancário',
+    descriptionEnum: PaymentMethodDescriptionEnum.BANK_DEPOSIT,
+  },
+  {
+    id: randomUUID(),
+    description: 'Transferência Bancária',
+    descriptionEnum: PaymentMethodDescriptionEnum.BANK_TRANSFER,
+  },
+  {
+    id: randomUUID(),
+    description: 'Débito Automático',
+    descriptionEnum: PaymentMethodDescriptionEnum.AUTOMATIC_DEBIT,
+  },
+  {
+    id: randomUUID(),
+    description: 'Carnê',
+    descriptionEnum: PaymentMethodDescriptionEnum.BOOKLET,
   },
   {
     id: randomUUID(),
     description: 'Dinheiro',
-  },
-  {
-    id: randomUUID(),
-    description: 'Vale Refeição',
-  },
-  {
-    id: randomUUID(),
-    description: 'Vale Alimentação',
-  },
-  {
-    id: randomUUID(),
-    description: 'Pix',
+    descriptionEnum: PaymentMethodDescriptionEnum.CASH,
   },
   {
     id: randomUUID(),
     description: 'Cheque',
+    descriptionEnum: PaymentMethodDescriptionEnum.CHECK,
   },
   {
     id: randomUUID(),
     description: 'Promissória',
+    descriptionEnum: PaymentMethodDescriptionEnum.PROMISSORY,
   },
   {
     id: randomUUID(),
-    description: 'Depósito',
+    description: 'Financiamento',
+    descriptionEnum: PaymentMethodDescriptionEnum.FINANCING,
+  },
+  {
+    id: randomUUID(),
+    description: 'Vale Refeição',
+    descriptionEnum: PaymentMethodDescriptionEnum.MEAL_VOUCHER,
+  },
+  {
+    id: randomUUID(),
+    description: 'Vale Alimentação',
+    descriptionEnum: PaymentMethodDescriptionEnum.FOOD_VOUCHER,
+  },
+  {
+    id: randomUUID(),
+    description: 'Pix',
+    descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+  },
+  {
+    id: randomUUID(),
+    description: 'Criptomoeda',
+    descriptionEnum: PaymentMethodDescriptionEnum.CRYPTOCURRENCY,
   },
 ];
 
