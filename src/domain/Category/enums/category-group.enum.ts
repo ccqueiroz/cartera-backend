@@ -20,4 +20,4 @@ export const CategoryGroupEnum = {
   REVENUES: 'REVENUES',
   TAXES: 'TAXES',
   OTHERS: 'OTHERS',
-};
+} as const;
