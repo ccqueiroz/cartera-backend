@@ -2,6 +2,7 @@ import { CacheGateway } from '@/domain/Cache/gateway/cache.gateway';
 import { PaymentStatusService } from './payment-status.service';
 import { PaymentStatusRepositoryGateway } from '@/domain/Payment_Status/gateway/payment-status.respository.gateway';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 let dbMock: jest.Mocked<PaymentStatusRepositoryGateway>;
 let cacheMock: jest.Mocked<CacheGateway>;
@@ -46,18 +47,21 @@ describe('Payment Status Service', () => {
       {
         id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
         description: 'Pago',
+        descriptionEnum: PaymentStatusDescriptionEnum.PAID,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '17de6833-1e75-40d3-afc3-3249c4da184f',
         description: 'A pagar',
+        descriptionEnum: PaymentStatusDescriptionEnum.TO_PAY,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
         description: 'A receber',
+        descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
@@ -135,6 +139,7 @@ describe('Payment Status Service', () => {
     const data: PaymentStatusDTO = {
       id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
       description: 'A receber',
+      descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     };
@@ -160,6 +165,7 @@ describe('Payment Status Service', () => {
     const data: PaymentStatusDTO = {
       id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
       description: 'A receber',
+      descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     };
@@ -183,6 +189,7 @@ describe('Payment Status Service', () => {
     const data: PaymentStatusDTO = {
       id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
       description: 'A receber',
+      descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     };
