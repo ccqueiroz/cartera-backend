@@ -41,7 +41,7 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        category: '2000',
+        category: 'ACCOMMODATION',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);
@@ -54,7 +54,7 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        category: '1991',
+        category: 'BUS',
         paymentStatus: 'DUE_DAY',
       },
     }).then((errors) => {
@@ -191,7 +191,7 @@ describe('Bill Schema', () => {
         payDate: { initialDate: 19999889, finalDate: 9899999 },
       },
       sort: {
-        category: '2000',
+        category: 'ACCOUNTANT',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);

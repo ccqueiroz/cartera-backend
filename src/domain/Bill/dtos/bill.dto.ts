@@ -14,10 +14,13 @@ type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
 type CategoryId = CategoryDTO['id'];
 type CategoryDescription = CategoryDTO['description'];
+type CategoryDescriptionEnum = CategoryDTO['descriptionEnum'];
+type CategoryGroupEnum = CategoryDTO['group'];
 type PaymentMethodId = PaymentMethodDTO['id'];
-type PaymentMethodDescription = CategoryDTO['description'];
-type PaymentStatusId = PaymentStatusDTO['id'];
-type PaymentStatusDescription = PaymentStatusDTO['description'];
+type PaymentMethodDescription = PaymentMethodDTO['description'];
+type PaymentMethodDescriptionEnum = PaymentMethodDTO['descriptionEnum'];
+type PaymentStatusDescriptionEnum = PaymentStatusDTO['descriptionEnum'];
+
 export type InvoiceCardData = {
   paymentCardId: string;
   invoiceCardId: string;
@@ -37,12 +40,14 @@ export type BillDTO = {
   payOut: boolean;
   icon: string | null;
   amount: number;
-  paymentStatusId: PaymentStatusId;
-  paymentStatusDescription: PaymentStatusDescription;
+  paymentStatus: PaymentStatusDescriptionEnum;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
-  paymentMethodId: PaymentMethodId;
-  paymentMethodDescription: PaymentMethodDescription;
+  categoryDescriptionEnum: CategoryDescriptionEnum;
+  categoryGroup: CategoryGroupEnum;
+  paymentMethodId?: PaymentMethodId;
+  paymentMethodDescription?: PaymentMethodDescription;
+  paymentMethodDescriptionEnum?: PaymentMethodDescriptionEnum;
   isPaymentCardBill: boolean;
   invoiceCarData?: InvoiceCardData;
   isShoppingListBill: boolean;
@@ -50,9 +55,30 @@ export type BillDTO = {
 } & BaseDto;
 
 export type SortByStatusBillsInputDTO =
-  | { paymentStatusId: string; categoryId?: never; paymentMethodId?: never }
-  | { paymentStatusId?: never; categoryId: string; paymentMethodId?: never }
-  | { paymentStatusId?: never; categoryId?: never; paymentMethodId: string };
+  | {
+      paymentStatus: PaymentStatusDescriptionEnum;
+      category?: never;
+      paymentMethod?: never;
+      categoryGroup?: never;
+    }
+  | {
+      paymentStatus?: never;
+      category: CategoryDescriptionEnum;
+      paymentMethod?: never;
+      categoryGroup?: never;
+    }
+  | {
+      paymentStatus?: never;
+      category?: never;
+      paymentMethod: PaymentMethodDescriptionEnum;
+      categoryGroup?: never;
+    }
+  | {
+      paymentStatus?: never;
+      category?: never;
+      paymentMethod?: never;
+      categoryGroup: CategoryGroupEnum;
+    };
 
 export type SortByBillTypeInputDTO = {
   fixedBill?: boolean;
@@ -70,9 +96,10 @@ export type ValuesOrderByGetBillsInputDTO =
   | 'amount'
   | 'billDate'
   | 'payDate'
-  | 'categoryId'
-  | 'paymentMethodId'
-  | 'paymentStatusId'
+  | 'category'
+  | 'categoryGroup'
+  | 'paymentMethod'
+  | 'paymentStatus'
   | 'createdAt'
   | 'updatedAt';
 
@@ -86,9 +113,10 @@ export type OrderByGetBillsInputDTO =
   | OrderByField<'amount'>
   | OrderByField<'billDate'>
   | OrderByField<'payDate'>
-  | OrderByField<'categoryId'>
-  | OrderByField<'paymentMethodId'>
-  | OrderByField<'paymentStatusId'>
+  | OrderByField<'category'>
+  | OrderByField<'categoryGroup'>
+  | OrderByField<'paymentMethod'>
+  | OrderByField<'paymentStatus'>
   | OrderByField<'createdAt'>
   | OrderByField<'updatedAt'>;
 
@@ -117,6 +145,17 @@ export type EditBillInputDTO = {
   userId: string;
 };
 
+export type EditBillByPayableMonthInputDTO = {
+  billId: string;
+  billData: Required<
+    Pick<
+      BillDTO,
+      'payOut' | 'payDate' | 'paymentMethodId' | 'paymentMethodDescription'
+    >
+  >;
+  userId: string;
+};
+
 export type DeleteBillInputDTO = Required<Pick<BillDTO, 'id' | 'userId'>>;
 
 export type BillsPayableMonthInputDTO = Required<
@@ -141,5 +180,7 @@ export type BillsPayableMonthOutPutDTO = {
   billDate: number;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
+  categoryDescriptionEnum: CategoryDescriptionEnum;
+  categoryGroup: CategoryGroupEnum;
   status: (typeof StatusBill)[keyof typeof StatusBill];
 };
