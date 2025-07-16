@@ -143,6 +143,36 @@ export class EditBillValidationDTO extends BillCommomValidations {
   updatedAt!: number | null;
 }
 
+export class EditBillByPayableMonthValidationDTO {
+  @IsDefined()
+  @IsString()
+  @MaxLength(60)
+  id!: string;
+
+  @IsDefined()
+  @IsString()
+  @MaxLength(60)
+  personUserId!: string;
+
+  @IsOptional()
+  @IsNumber()
+  payDate!: number | null;
+
+  @IsDefined()
+  @IsBoolean()
+  payOut!: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  paymentMethodId!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  paymentMethodDescription!: string;
+}
+
 export class GetBillByIdValidationDTO extends UserIdAuthValidation {
   @IsDefined()
   @IsString()
@@ -204,15 +234,19 @@ class OrderByDTO {
 
   @IsOptional()
   @IsEnum(SortOrder)
-  categoryId?: SortOrder;
+  category?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  paymentMethodId?: SortOrder;
+  categoryGroup?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  paymentStatusId?: SortOrder;
+  paymentMethod?: SortOrder;
+
+  @IsOptional()
+  @IsEnum(SortOrder)
+  paymentStatus?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
@@ -226,9 +260,10 @@ class OrderByDTO {
     'amount',
     'billDate',
     'payDate',
-    'categoryId',
-    'paymentMethodId',
-    'paymentStatusId',
+    'category',
+    'categoryGroup',
+    'paymentMethod',
+    'paymentStatus',
     'createdAt',
     'updatedAt',
   ])

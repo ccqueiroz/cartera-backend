@@ -41,7 +41,7 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        categoryId: '2000',
+        category: '2000',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);
@@ -54,15 +54,15 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        categoryId: '1991',
-        paymentStatusId: '1991',
+        category: '1991',
+        paymentStatus: 'DUE_DAY',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(1);
       expect(errors[0].children?.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [categoryId, paymentStatusId, paymentMethodId] defined.',
+          'Only a accept a one of [category, categoryGroup, paymentStatus, paymentMethod] defined.',
       });
     });
   });
@@ -168,13 +168,13 @@ describe('Bill Schema', () => {
       authUserId: '1991',
       ordering: {
         amount: SortOrder.ASC,
-        categoryId: SortOrder.ASC,
+        category: SortOrder.ASC,
       },
     }).then((errors) => {
       expect(errors.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [amount, billDate, payDate, categoryId, paymentMethodId, paymentStatusId, createdAt, updatedAt] defined.',
+          'Only a accept a one of [amount, billDate, payDate, category, categoryGroup, paymentMethod, paymentStatus, createdAt, updatedAt] defined.',
       });
     });
   });
@@ -191,7 +191,7 @@ describe('Bill Schema', () => {
         payDate: { initialDate: 19999889, finalDate: 9899999 },
       },
       sort: {
-        categoryId: '2000',
+        category: '2000',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);
