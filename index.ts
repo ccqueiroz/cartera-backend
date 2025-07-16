@@ -13,7 +13,7 @@ import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-con
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
 import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
 import { BillsRepositoryFirebase } from './src/infra/repositories/firebase/bill.repository.firebase';
-import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from './src/usecases/validate_entities/validate-category-payment-method.usecase';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
 import { ReceivablesRepositoryFirebase } from './src/infra/repositories/firebase/receivables.repository.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
@@ -108,11 +108,10 @@ function main() {
   );
 
   // ------- VALIDATION - CASES -----------
-  const validateCategoryPaymentMethodStatusUseCase =
-    ValidateCategoryPaymentMethodStatusUseCase.create({
+  const validateCategoryPaymentMethodUseCase =
+    ValidateCategoryPaymentMethodUseCase.create({
       categoryService: categoryService,
       paymentMethodService: paymentMethodService,
-      paymentStatusServiceGateway: paymentStatusService,
     });
 
   //MIDDLEWARES
@@ -154,13 +153,13 @@ function main() {
   const receivableRoutes = ReceivableRoute.create(
     receivableService,
     authVerifyTokenMiddleware,
-    validateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase,
   ).execute();
 
   const billRoutes = BillRoute.create(
     billService,
     authVerifyTokenMiddleware,
-    validateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase,
   ).execute();
 
   const cashFlowRoutes = CashFlowRoute.create(
