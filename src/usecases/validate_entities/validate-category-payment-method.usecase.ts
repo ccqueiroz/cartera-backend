@@ -1,14 +1,11 @@
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { GetCategoryByIdUseCase } from '../category/get-category-by-id.usecase';
 import { GetPaymentMethodByIdUseCase } from '../payment_method/get-payment-method-by-id.usecase';
-import { GetPaymentStatusByIdUseCase } from '../payment_status/get-payment-status-by-id.usecase';
 import { Usecase } from '../usecase';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
-import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 
-export type ValidateEntitiesCategoryPaymentMethodStatusInputDTO = {
-  paymentMethodId: string;
-  paymentStatusId: string;
+export type ValidateEntitiesCategoryPaymentMethodInputDTO = {
+  paymentMethodId?: string;
   categoryId: string;
 };
 
@@ -19,21 +16,19 @@ type PromiseReturnType = {
 
 export type ValidateEntitiesCategoryPaymentMethodStatusOutputDTO = boolean;
 
-export class ValidateCategoryPaymentMethodStatusUseCase
+export class ValidateCategoryPaymentMethodUseCase
   implements
     Usecase<
-      ValidateEntitiesCategoryPaymentMethodStatusInputDTO,
+      ValidateEntitiesCategoryPaymentMethodInputDTO,
       ValidateEntitiesCategoryPaymentMethodStatusOutputDTO
     >
 {
   private getCategoryByIdService: GetCategoryByIdUseCase;
   private getPaymentMethodByIdService: GetPaymentMethodByIdUseCase;
-  private getPaymentStatusByIdService: GetPaymentStatusByIdUseCase;
 
   private constructor(
     private categoryService: CategoryServiceGateway,
     private paymentMethodService: PaymentMethodServiceGateway,
-    private paymentStatusServiceGateway: PaymentStatusServiceGateway,
   ) {
     this.getCategoryByIdService = GetCategoryByIdUseCase.create({
       categoryService: this.categoryService,
@@ -41,24 +36,18 @@ export class ValidateCategoryPaymentMethodStatusUseCase
     this.getPaymentMethodByIdService = GetPaymentMethodByIdUseCase.create({
       paymentMethodService: this.paymentMethodService,
     });
-    this.getPaymentStatusByIdService = GetPaymentStatusByIdUseCase.create({
-      paymentStatusService: this.paymentStatusServiceGateway,
-    });
   }
 
   public static create({
     categoryService,
     paymentMethodService,
-    paymentStatusServiceGateway,
   }: {
     categoryService: CategoryServiceGateway;
     paymentMethodService: PaymentMethodServiceGateway;
-    paymentStatusServiceGateway: PaymentStatusServiceGateway;
   }) {
-    return new ValidateCategoryPaymentMethodStatusUseCase(
+    return new ValidateCategoryPaymentMethodUseCase(
       categoryService,
       paymentMethodService,
-      paymentStatusServiceGateway,
     );
   }
 
@@ -70,25 +59,29 @@ export class ValidateCategoryPaymentMethodStatusUseCase
 
   public async execute({
     paymentMethodId,
-    paymentStatusId,
     categoryId,
-  }: ValidateEntitiesCategoryPaymentMethodStatusInputDTO): Promise<ValidateEntitiesCategoryPaymentMethodStatusOutputDTO> {
-    const [category, paymentMethod, paymentStatus] = await Promise.allSettled([
+  }: ValidateEntitiesCategoryPaymentMethodInputDTO): Promise<ValidateEntitiesCategoryPaymentMethodStatusOutputDTO> {
+    const [category, paymentMethod] = await Promise.allSettled([
       this.getCategoryByIdService.execute({ id: categoryId }),
-      this.getPaymentMethodByIdService.execute({ id: paymentMethodId }),
-      this.getPaymentStatusByIdService.execute({ id: paymentStatusId }),
+      ...[
+        paymentMethodId
+          ? this.getPaymentMethodByIdService.execute({
+              id: paymentMethodId ?? '',
+            })
+          : [],
+      ],
     ]);
 
-    return (
-      this.checkIfEntitieHasValidReturn(
-        category as unknown as PromiseReturnType,
-      ) &&
-      this.checkIfEntitieHasValidReturn(
-        paymentMethod as unknown as PromiseReturnType,
-      ) &&
-      this.checkIfEntitieHasValidReturn(
-        paymentStatus as unknown as PromiseReturnType,
-      )
+    const isCategoryValid = this.checkIfEntitieHasValidReturn(
+      category as unknown as PromiseReturnType,
     );
+
+    const isPaymentMethodValid = paymentMethodId
+      ? this.checkIfEntitieHasValidReturn(
+          paymentMethod as unknown as PromiseReturnType,
+        )
+      : true;
+
+    return isCategoryValid && isPaymentMethodValid;
   }
 }
