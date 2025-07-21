@@ -7,12 +7,14 @@ import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 let billServiceMock: jest.Mocked<BillServiceGateway>;
 let getBillsUseCase: GetBillsUseCase;
 const userIdMock = '1234567d';
 
-const billsItemsMock = [
+const billsItemsMock: Array<BillDTO> = [
   {
     id: '24177d92-1aee-4479-859b-72f01c9ade24',
     personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
@@ -26,11 +28,12 @@ const billsItemsMock = [
     payOut: true,
     icon: null,
     amount: 8209.56,
-    paymentStatus: PaymentStatusDescriptionEnum.DUE_SOON,
     categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
     categoryDescription: 'Educação e Leitura',
     paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
     paymentMethodDescription: 'Pix',
+    paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    paymentStatus: PaymentStatusDescriptionEnum.PAID,
     isPaymentCardBill: false,
     isShoppingListBill: false,
     createdAt: new Date().getTime(),
@@ -49,11 +52,12 @@ const billsItemsMock = [
     payOut: true,
     icon: null,
     amount: 1200.0,
-    paymentStatus: PaymentStatusDescriptionEnum.DUE_SOON,
+    paymentStatus: PaymentStatusDescriptionEnum.PAID,
     categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
     categoryDescription: 'Supermercado',
     paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
     paymentMethodDescription: 'Pix',
+    paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
     isPaymentCardBill: false,
     isShoppingListBill: true,
     createdAt: new Date().getTime(),
@@ -72,11 +76,12 @@ const billsItemsMock = [
     payOut: true,
     icon: null,
     amount: 148.0,
-    paymentStatus: PaymentStatusDescriptionEnum.DUE_SOON,
+    paymentStatus: PaymentStatusDescriptionEnum.PAID,
     categoryId: 'deb29e2b-edb0-441e-be56-78d7e10f2e12',
     categoryDescription: 'Moradia e Manutenção Residencial',
     paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
     paymentMethodDescription: 'Pix',
+    paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
     isPaymentCardBill: false,
     isShoppingListBill: false,
     createdAt: new Date().getTime(),
