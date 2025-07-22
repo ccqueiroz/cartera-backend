@@ -3,11 +3,13 @@ import { BillEntitie } from './bill.entitie';
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
 import { BillDTO } from '../dtos/bill.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 let maskAmountGatewayMock: jest.Mocked<MaskAmountGateway>;
 
-type BillDTOCreate = Omit<BillDTO, 'id' | 'updatedAt'>;
-type BillDTOUpdate = BillDTO;
+type BillDTOCreate = Omit<BillDTO, 'id' | 'updatedAt' | 'paymentStatus'>;
+type BillDTOUpdate = Omit<BillDTO, 'paymentStatus'>;
 
 describe('Bill Entitie', () => {
   beforeEach(() => {
@@ -34,11 +36,11 @@ describe('Bill Entitie', () => {
       payOut: true,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -54,7 +56,7 @@ describe('Bill Entitie', () => {
     expect(bill.payDate).toEqual(expect.any(Number));
     expect(bill.icon).toBeNull();
     expect(bill.amount).toBe(billObject.amount);
-    expect(bill.paymentStatus).toBe(billObject.paymentStatus);
+    expect(bill.paymentStatus).toBe(PaymentStatusDescriptionEnum.PAID);
     expect(bill.categoryId).toBe(billObject.categoryId);
     expect(bill.categoryDescription).toBe(billObject.categoryDescription);
     expect(bill.categoryDescriptionEnum).toBe(
@@ -64,6 +66,9 @@ describe('Bill Entitie', () => {
     expect(bill.paymentMethodId).toBe(billObject.paymentMethodId);
     expect(bill.paymentMethodDescription).toBe(
       billObject.paymentMethodDescription,
+    );
+    expect(bill.paymentMethodDescriptionEnum).toBe(
+      billObject.paymentMethodDescriptionEnum,
     );
     expect(bill.isPaymentCardBill).toBe(billObject.isPaymentCardBill);
     expect(bill.invoiceCarData).toBe(undefined);
@@ -91,11 +96,11 @@ describe('Bill Entitie', () => {
       payOut: true,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -113,7 +118,7 @@ describe('Bill Entitie', () => {
     expect(bill.payDate).toEqual(expect.any(Number));
     expect(bill.icon).toBeNull();
     expect(bill.amount).toBe(8209.56);
-    expect(bill.paymentStatus).toBe(billObject.paymentStatus);
+    expect(bill.paymentStatus).toBe(PaymentStatusDescriptionEnum.PAID);
     expect(bill.categoryId).toBe(billObject.categoryId);
     expect(bill.categoryDescription).toBe(billObject.categoryDescription);
     expect(bill.categoryDescriptionEnum).toBe(
@@ -124,6 +129,9 @@ describe('Bill Entitie', () => {
     expect(bill.paymentMethodId).toBe(billObject.paymentMethodId);
     expect(bill.paymentMethodDescription).toBe(
       billObject.paymentMethodDescription,
+    );
+    expect(bill.paymentMethodDescriptionEnum).toBe(
+      billObject.paymentMethodDescriptionEnum,
     );
     expect(bill.isPaymentCardBill).toBe(billObject.isPaymentCardBill);
     expect(bill.invoiceCarData).toBe(undefined);
@@ -148,7 +156,6 @@ describe('Bill Entitie', () => {
       payOut: true,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
@@ -181,7 +188,6 @@ describe('Bill Entitie', () => {
       payOut: true,
       icon: null,
       amount: null as any,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
@@ -212,7 +218,6 @@ describe('Bill Entitie', () => {
       payOut: true,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
@@ -245,7 +250,6 @@ describe('Bill Entitie', () => {
       payOut: false,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
@@ -280,7 +284,6 @@ describe('Bill Entitie', () => {
       payOut: false,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
@@ -293,7 +296,7 @@ describe('Bill Entitie', () => {
     const bill = BillEntitie.create(billObject);
 
     expect(bill.payOut).toBe(billObject.payOut);
-    expect(bill.paymentStatus).not.toBe(billObject.paymentStatus);
+    expect(bill.paymentStatus).toBe(PaymentStatusDescriptionEnum.DUE_DAY);
     expect(bill.paymentStatus).toBe('DUE_DAY');
   });
 
@@ -315,7 +318,6 @@ describe('Bill Entitie', () => {
       payOut: false,
       icon: null,
       amount: 8209.56,
-      paymentStatus: 'PAID',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Educação',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',

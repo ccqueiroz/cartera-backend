@@ -2,6 +2,7 @@ import { MaskAmountGateway } from '@/domain/Masks/MaskNumbers/gateway/mask-amoun
 import { BillDTO } from '../dtos/bill.dto';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 import { ApiError } from '@/helpers/errors';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 export type BillEntitieProps = BillDTO;
 
@@ -47,15 +48,15 @@ export class BillEntitie {
     categoryDescription,
     categoryDescriptionEnum,
     categoryGroup,
-    paymentStatus,
     paymentMethodId = undefined,
     paymentMethodDescription = undefined,
+    paymentMethodDescriptionEnum = undefined,
     isPaymentCardBill = false,
     invoiceCarData,
     isShoppingListBill = false,
     shoppingListData,
     createdAt,
-  }: Omit<BillEntitieProps, 'updatedAt' | 'id'>) {
+  }: Omit<BillEntitieProps, 'updatedAt' | 'id' | 'paymentStatus'>) {
     this.validateProps({ billDate, amount });
 
     return new BillEntitie({
@@ -68,13 +69,14 @@ export class BillEntitie {
       payOut,
       icon,
       amount,
-      paymentStatus,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_PAY,
       categoryId,
       categoryDescription,
       categoryDescriptionEnum,
       categoryGroup,
       paymentMethodId,
       paymentMethodDescription,
+      paymentMethodDescriptionEnum,
       isPaymentCardBill,
       invoiceCarData,
       isShoppingListBill,
@@ -84,17 +86,17 @@ export class BillEntitie {
     });
   }
 
-  public static with(props: BillEntitieProps) {
+  public static with(props: Omit<BillEntitieProps, 'paymentStatus'>) {
     this.validateProps({ billDate: props.billDate, amount: props.amount });
 
     return new BillEntitie({
       ...props,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_PAY,
     });
   }
 
   private unMaskAmount(amount: number) {
     const amountUnmasked = BillEntitie.maskAmountGateway?.mask(amount).unmask;
-
     return amountUnmasked ? +amountUnmasked : 0;
   }
 
@@ -180,6 +182,12 @@ export class BillEntitie {
 
   public get paymentMethodDescription() {
     return this.props.payOut ? this.props.paymentMethodDescription : undefined;
+  }
+
+  public get paymentMethodDescriptionEnum() {
+    return this.props.payOut
+      ? this.props.paymentMethodDescriptionEnum
+      : undefined;
   }
 
   public get isPaymentCardBill() {
