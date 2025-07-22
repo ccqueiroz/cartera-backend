@@ -1,4 +1,5 @@
 import { ApplyPaginationHelper } from './apply-pagination.helpers';
+import { ApplySortStatusHelper } from './apply-sort-status.helpers';
 import { CheckIfIsNecessaryCreateNewTokenHelpers } from './check-if-is-necessary-create-new-token.helpers';
 import { DeterministicSerializationObjectHelper } from './deterministic-serialization-object.helpers';
 import { GenerateHashHelper } from './generate-hash.helpers';
@@ -9,7 +10,7 @@ import { NormalizeIpHelper } from './normalize-ip.helpers';
 const checkIfIsNecessaryCreateNewTokenHelpers =
   new CheckIfIsNecessaryCreateNewTokenHelpers();
 
-const applayPaginationHelpers = new ApplyPaginationHelper();
+const applyPaginationHelpers = new ApplyPaginationHelper();
 
 const mergeSortHelpers = new MargeSortHelper();
 
@@ -25,11 +26,14 @@ const generateHashHelper = GenerateHashHelper.create(
   deterministSerializationObjectHelper.execute,
 );
 
+const applySortStatusHelpers = new ApplySortStatusHelper();
+
 export {
   checkIfIsNecessaryCreateNewTokenHelpers,
-  applayPaginationHelpers,
+  applyPaginationHelpers,
   mergeSortHelpers,
   handleCanProgressToWritteOperation,
   normalizeIp,
   generateHashHelper,
+  applySortStatusHelpers,
 };
