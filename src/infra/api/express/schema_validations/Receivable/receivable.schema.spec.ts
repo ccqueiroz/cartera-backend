@@ -355,7 +355,6 @@ describe('Receivable Schema', () => {
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
-      updatedAt: 127899999939339,
     };
     return runValidate<EditReceivableValidationDTO>(
       EditReceivableValidationDTO,
@@ -384,7 +383,6 @@ describe('Receivable Schema', () => {
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
-      updatedAt: null,
     };
     return runValidate<EditReceivableValidationDTO>(
       EditReceivableValidationDTO,
@@ -413,9 +411,7 @@ describe('Receivable Schema', () => {
       paymentMethodDescription: 'paymentMethod',
       paymentMethodDescriptionEnum: 'any' as any,
       createdAt: 18783929293293,
-      updatedAt: null,
     };
-
     return runValidate<EditReceivableValidationDTO>(
       EditReceivableValidationDTO,
       model,
