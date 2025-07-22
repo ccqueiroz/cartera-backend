@@ -4,7 +4,7 @@ import {
 } from '@/domain/Bill/dtos/bill.dto';
 import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
-import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '../validate_entities/validate-category-payment-method.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
@@ -16,19 +16,19 @@ export class CreateBillUseCase
 {
   private constructor(
     private readonly billService: BillServiceGateway,
-    private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
+    private readonly validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase,
   ) {}
 
   public static create({
     billService,
-    validateCategoryPaymentMethodStatusService,
+    validateCategoryPaymentMethodService,
   }: {
     billService: BillServiceGateway;
-    validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
+    validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase;
   }) {
     return new CreateBillUseCase(
       billService,
-      validateCategoryPaymentMethodStatusService,
+      validateCategoryPaymentMethodService,
     );
   }
 
@@ -40,16 +40,15 @@ export class CreateBillUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
 
-    const validateCategoryPaymentMethodStatusService =
-      await this.validateCategoryPaymentMethodStatusService.execute({
+    const validateCategoryPaymentMethodService =
+      await this.validateCategoryPaymentMethodService.execute({
         categoryId: billData.categoryId,
-        paymentMethodId: billData.paymentMethodId,
-        paymentStatusId: billData.paymentStatusId,
+        paymentMethodId: billData?.paymentMethodId,
       });
 
-    if (!validateCategoryPaymentMethodStatusService) {
+    if (!validateCategoryPaymentMethodService) {
       throw new ApiError(
-        ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
+        ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
       );
     }

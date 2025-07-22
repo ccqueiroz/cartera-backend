@@ -1,12 +1,15 @@
-import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '../validate_entities/validate-category-payment-method.usecase';
 import { CreateBillUseCase } from './create-bill.usecase';
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
-import { PaymentStatusServiceGateway } from '@/domain/Payment_Status/gateway/payment-status.service.gateway';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 const userIdMock = '1234567d';
 
@@ -16,9 +19,8 @@ let createBillUseCase: CreateBillUseCase;
 
 let categoryServiceGatewayMock: jest.Mocked<CategoryServiceGateway>;
 let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
-let paymentStatusServiceGatewayMock: jest.Mocked<PaymentStatusServiceGateway>;
 
-let validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase;
+let validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase;
 describe('CreateBillUseCase', () => {
   beforeEach(() => {
     billServiceMock = {
@@ -33,21 +35,16 @@ describe('CreateBillUseCase', () => {
       getPaymentMethods: jest.fn(),
     } as any;
 
-    paymentStatusServiceGatewayMock = {
-      getPaymentStatus: jest.fn(),
-    } as any;
-
-    validateCategoryPaymentMethodStatusUseCase =
-      ValidateCategoryPaymentMethodStatusUseCase.create({
+    validateCategoryPaymentMethodService =
+      ValidateCategoryPaymentMethodUseCase.create({
         categoryService: categoryServiceGatewayMock,
         paymentMethodService: paymentMethodServiceGatewayMock,
-        paymentStatusServiceGateway: paymentStatusServiceGatewayMock,
       });
 
     createBillUseCase = CreateBillUseCase.create({
       billService: billServiceMock,
-      validateCategoryPaymentMethodStatusService:
-        validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodService:
+        validateCategoryPaymentMethodService,
     });
   });
 
@@ -60,21 +57,23 @@ describe('CreateBillUseCase', () => {
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
+      amount: 1200.0,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Educação',
-      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
-      isShoppingListBill: false,
+      isShoppingListBill: true,
       createdAt: new Date().getTime(),
     };
 
@@ -86,7 +85,7 @@ describe('CreateBillUseCase', () => {
       id: 'd41d8cd98f00b204e9800998ecf8427e',
     });
 
-    validateCategoryPaymentMethodStatusUseCase.execute = jest
+    validateCategoryPaymentMethodService.execute = jest
       .fn()
       .mockResolvedValue(true);
 
@@ -109,27 +108,29 @@ describe('CreateBillUseCase', () => {
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
+      amount: 1200.0,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Educação',
-      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
-      isShoppingListBill: false,
+      isShoppingListBill: true,
       createdAt: new Date().getTime(),
     };
 
     billServiceMock.createBill.mockResolvedValue(null);
 
-    validateCategoryPaymentMethodStatusUseCase.execute = jest
+    validateCategoryPaymentMethodService.execute = jest
       .fn()
       .mockResolvedValue(true);
 
@@ -151,21 +152,23 @@ describe('CreateBillUseCase', () => {
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
+      amount: 1200.0,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Educação',
-      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
-      isShoppingListBill: false,
+      isShoppingListBill: true,
       createdAt: new Date().getTime(),
     };
 
@@ -187,25 +190,27 @@ describe('CreateBillUseCase', () => {
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
+      amount: 1200.0,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Educação',
-      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
-      isShoppingListBill: false,
+      isShoppingListBill: true,
       createdAt: new Date().getTime(),
     };
 
-    validateCategoryPaymentMethodStatusUseCase.execute = jest
+    validateCategoryPaymentMethodService.execute = jest
       .fn()
       .mockResolvedValue(true);
 
