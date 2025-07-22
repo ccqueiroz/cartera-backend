@@ -9,6 +9,7 @@ import {
   SearchByDate,
   SortOrder,
 } from '@/domain/dtos/listParamsDto.dto';
+import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
@@ -54,32 +55,6 @@ export type BillDTO = {
   shoppingListData?: ShoppingListData;
 } & BaseDto;
 
-export type SortByStatusBillsInputDTO =
-  | {
-      paymentStatus: PaymentStatusDescriptionEnum;
-      category?: never;
-      paymentMethod?: never;
-      categoryGroup?: never;
-    }
-  | {
-      paymentStatus?: never;
-      category: CategoryDescriptionEnum;
-      paymentMethod?: never;
-      categoryGroup?: never;
-    }
-  | {
-      paymentStatus?: never;
-      category?: never;
-      paymentMethod: PaymentMethodDescriptionEnum;
-      categoryGroup?: never;
-    }
-  | {
-      paymentStatus?: never;
-      category?: never;
-      paymentMethod?: never;
-      categoryGroup: CategoryGroupEnum;
-    };
-
 export type SortByBillTypeInputDTO = {
   fixedBill?: boolean;
   payOut?: boolean;
@@ -121,7 +96,7 @@ export type OrderByGetBillsInputDTO =
   | OrderByField<'updatedAt'>;
 
 export type GetBillsInputDTO = Omit<
-  PaginationParams<SortByStatusBillsInputDTO>,
+  PaginationParams<SortByStatusInputDTO>,
   'searchByDate' | 'ordering'
 > & {
   userId: string;
@@ -133,7 +108,7 @@ export type GetBillsInputDTO = Omit<
 export type GetBillByIdInputDTO = Required<Pick<BillDTO, 'id' | 'userId'>>;
 
 export type CreateBillInputDTO = {
-  billData: Omit<BillDTO, 'id' | 'updatedAt'>;
+  billData: Omit<BillDTO, 'id' | 'paymentStatus' | 'createdAt' | 'updatedAt'>;
   userId: string;
 };
 
@@ -141,7 +116,7 @@ export type CreateBillOutputDTO = Pick<BillDTO, 'id'>;
 
 export type EditBillInputDTO = {
   billId: string;
-  billData: BillDTO;
+  billData: Omit<BillDTO, 'paymentStatus' | 'updatedAt'>;
   userId: string;
 };
 
@@ -150,7 +125,11 @@ export type EditBillByPayableMonthInputDTO = {
   billData: Required<
     Pick<
       BillDTO,
-      'payOut' | 'payDate' | 'paymentMethodId' | 'paymentMethodDescription'
+      | 'payOut'
+      | 'payDate'
+      | 'paymentMethodId'
+      | 'paymentMethodDescription'
+      | 'paymentMethodDescriptionEnum'
     >
   >;
   userId: string;
