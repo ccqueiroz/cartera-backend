@@ -38,24 +38,26 @@
  *         amount:
  *           type: number
  *           example: 1200.76
- *         paymentStatusId:
- *           type: string
- *           example: 68e47c3b-6d34-4604-bf7c-f9e2da704107
- *         paymentStatusDescription:
- *           type: string
- *           example: A receber
+ *         paymentStatus:
+ *           $ref: '#/components/schemas/PaymentStatusDescriptionEnum'
  *         categoryId:
  *           type: string
  *           example: c2ecc075-82d2-406b-88cd-491c686654eb
  *         categoryDescription:
  *           type: string
- *           example: Salário/Pró-labore
+ *           example: Uber
+ *         categoryDescriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         categoryGroup:
+ *           $ref: '#/components/schemas/CategoryGroupEnum'
  *         paymentMethodId:
  *           type: string
  *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
  *         paymentMethodDescription:
  *           type: string
- *           example: Depósito
+ *           example: Pix
+ *         paymentMethodDescriptionEnum:
+ *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *         createdAt:
  *           type: number
  *           nullable: true
@@ -143,9 +145,6 @@
  *     CreateBillInputDTO:
  *       type: object
  *       properties:
- *         id:
- *           type: string
- *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
  *         personUserId:
  *           type: string
  *           example: diWBib6eEDK490GGMngi
@@ -204,6 +203,58 @@
  *           example: false
  *         shoppingListData:
  *           $ref: '#/components/schemas/ShoppingListData'
+ *
+ *     CreateReceivableInputDTO:
+ *       type: object
+ *       properties:
+ *         personUserId:
+ *           type: string
+ *           example: diWBib6eEDK490GGMngi
+ *         userId:
+ *           type: string
+ *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         descriptionReceivable:
+ *           type: string
+ *           example: Salário
+ *         fixedReceivable:
+ *           type: boolean
+ *           example: true
+ *         receivableDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         receivalDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         receival:
+ *           type: boolean
+ *           example: true
+ *         icon:
+ *           type: string
+ *           nullable: true
+ *           example: https://example.com/icon.jpg
+ *         amount:
+ *           type: number
+ *           example: 1200.76
+ *         categoryId:
+ *           type: string
+ *           example: c2ecc075-82d2-406b-88cd-491c686654eb
+ *         categoryDescription:
+ *           type: string
+ *           example: Uber
+ *         categoryDescriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         categoryGroup:
+ *           $ref: '#/components/schemas/CategoryGroupEnum'
+ *         paymentMethodId:
+ *           type: string
+ *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
+ *         paymentMethodDescription:
+ *           type: string
+ *           example: Pix
+ *         paymentMethodDescriptionEnum:
+ *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *
  *     UpdateBillInputDTO:
  *       type: object
@@ -272,6 +323,63 @@
  *           nullable: true
  *           example: 1704067200000
  *
+ *     UpdateReceivableInputDTO:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
+ *         personUserId:
+ *           type: string
+ *           example: diWBib6eEDK490GGMngi
+ *         userId:
+ *           type: string
+ *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         descriptionReceivable:
+ *           type: string
+ *           example: Salário
+ *         fixedReceivable:
+ *           type: boolean
+ *           example: true
+ *         receivableDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         receivalDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         receival:
+ *           type: boolean
+ *           example: true
+ *         icon:
+ *           type: string
+ *           nullable: true
+ *           example: https://example.com/icon.jpg
+ *         amount:
+ *           type: number
+ *           example: 1200.76
+ *         categoryId:
+ *           type: string
+ *           example: c2ecc075-82d2-406b-88cd-491c686654eb
+ *         categoryDescription:
+ *           type: string
+ *           example: Uber
+ *         categoryDescriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         paymentMethodId:
+ *           type: string
+ *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
+ *         paymentMethodDescription:
+ *           type: string
+ *           example: Pix
+ *         paymentMethodDescriptionEnum:
+ *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
+ *         createdAt:
+ *           type: number
+ *           nullable: true
+ *           example: 1704067200000
+ *
  *     UpdateBillByPayableMonthDTO:
  *       type: object
  *       properties:
@@ -280,6 +388,25 @@
  *           nullable: true
  *           example: 1739751148154
  *         payOut:
+ *           type: boolean
+ *           example: true
+ *         paymentMethodId:
+ *           type: string
+ *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
+ *         paymentMethodDescription:
+ *           type: string
+ *           example: Pix
+ *         paymentMethodDescriptionEnum:
+ *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
+ *
+ *     UpdateReceivableByMonthDTO:
+ *       type: object
+ *       properties:
+ *         receivalDate:
+ *           type: number
+ *           nullable: true
+ *           example: 1739751148154
+ *         receival:
  *           type: boolean
  *           example: true
  *         paymentMethodId:
