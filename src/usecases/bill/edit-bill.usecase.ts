@@ -42,6 +42,14 @@ export class EditBillUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
+    if (billData.payOut && !billData?.payDate) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
+    }
+
+    if (billData.payOut && !billData?.paymentMethodId) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
+    }
+
     const hasBill = await this.billService.getBillById({
       id: billId,
       userId,
