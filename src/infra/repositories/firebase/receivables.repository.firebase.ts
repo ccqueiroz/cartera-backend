@@ -436,7 +436,7 @@ export class ReceivablesRepositoryFirebase
       });
   }
 
-  public async receivablesPayableMonth({
+  public async receivablesByMonth({
     period,
     userId,
     page,

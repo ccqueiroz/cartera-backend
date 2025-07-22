@@ -33,7 +33,7 @@ export interface ReceivableRepositoryGateway {
 
   deleteReceivable({ id, userId }: DeleteReceivableInputDTO): Promise<void>;
 
-  receivablesPayableMonth(
+  receivablesByMonth(
     input: ReceivablesByMonthInputDTO,
   ): Promise<ResponseListDTO<ReceivableDTO>>;
 }

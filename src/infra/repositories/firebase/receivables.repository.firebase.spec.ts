@@ -556,12 +556,12 @@ describe('Receivable Repository Firebase', () => {
     expect(firestore.doc().delete).toHaveBeenCalledTimes(1);
   });
 
-  it('should be call receivablesPayableMonth and returns receivables list that attend the requirements of period and receival false', async () => {
+  it('should be call receivablesByMonth and returns receivables list that attend the requirements of period and receival false', async () => {
     firestore.where().orderBy().get.mockResolvedValueOnce({
       docs: receivableItemsSearchByPeriod,
     });
 
-    const result = await receivableRepo.receivablesPayableMonth({
+    const result = await receivableRepo.receivablesByMonth({
       userId: userIdMock,
       period: {
         initialDate: new Date('03-01-2025').getTime(),
@@ -583,9 +583,9 @@ describe('Receivable Repository Firebase', () => {
     );
   });
 
-  it('should be throw an error when call receivablesPayableMonth if the userId dont exist in param', async () => {
+  it('should be throw an error when call receivablesByMonth if the userId dont exist in param', async () => {
     const error = await receivableRepo
-      .receivablesPayableMonth({
+      .receivablesByMonth({
         userId: '',
         period: {
           initialDate: new Date('03-01-2025').getTime(),
@@ -605,7 +605,7 @@ describe('Receivable Repository Firebase', () => {
 
   it('should be throw an error when call receivablePayableMonth if the period dont defined or initialDate or finalDate dont be defined/exist', async () => {
     let error = await receivableRepo
-      .receivablesPayableMonth({
+      .receivablesByMonth({
         userId: userIdMock,
         period: undefined as any,
         page: 0,
@@ -620,7 +620,7 @@ describe('Receivable Repository Firebase', () => {
     });
 
     error = await receivableRepo
-      .receivablesPayableMonth({
+      .receivablesByMonth({
         userId: userIdMock,
         period: {
           initialDate: new Date().getTime(),
@@ -638,7 +638,7 @@ describe('Receivable Repository Firebase', () => {
     });
 
     error = await receivableRepo
-      .receivablesPayableMonth({
+      .receivablesByMonth({
         userId: userIdMock,
         period: {
           initialDate: undefined as any,
