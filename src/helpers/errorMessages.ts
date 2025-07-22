@@ -21,8 +21,8 @@ export const ERROR_MESSAGES = {
   PAYMENT_STATUS_NOT_FOUND: 'Status não encontrada.',
   CATEGORY_NOT_EXIST:
     'O valor fornecido para o parâmetro "type" não corresponde a nenhuma categoria válida.',
-  INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS:
-    'Categoria, Método de Pagamento ou Status de Pagamento inválidos.',
+  INVALID_CATEGORY_OR_PAYMENT_METHOD:
+    'Categoria ou Método de Pagamento inválidos.',
   RECEIVABLE_NOT_FOUND:
     'Nenhum valor a receber foi encontrado para o "id" fornecido. Verifique se o identificador está correto.',
   BILL_NOT_FOUND:
@@ -31,4 +31,10 @@ export const ERROR_MESSAGES = {
     'Período de pesquisa inválido. Por favor, informe o período de análise.',
   INVALID_PARAMETERS: 'Parâmetros de entrada inválidos',
   CACHE_CLIENT_ERROR: 'Erro no client de Cache.',
+  BILL_HAS_ALREADY_BEEN_PAY:
+    'Conta já "{billDescription}" foi paga. Para alterar os status da conta. Por favor, Acesse a sessão de "Pagamentos".',
+  INFORME_PAY_DATE_BILL: 'Data de pagamento não informada.',
+  INFORME_PAYMENT_METHOD: 'Método de pagamento não informado.',
+  BILL_PAY_DATE_CANNOT_BE_PRIOR_THE_ACCOUNT_CREATE_DATE:
+    'A data de pagamento não pode ser anterior à data de criação da conta, Por favor, Acesse a sessão de "Pagamentos".',
 } as const;
