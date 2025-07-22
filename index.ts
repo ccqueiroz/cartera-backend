@@ -24,7 +24,8 @@ import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/fireba
 import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
 import {
-  applayPaginationHelpers,
+  applyPaginationHelpers,
+  applySortStatusHelpers,
   checkIfIsNecessaryCreateNewTokenHelpers,
   generateHashHelper,
   handleCanProgressToWritteOperation,
@@ -62,15 +63,16 @@ function main() {
   const receivableRepository = ReceivablesRepositoryFirebase.create(
     dbFirestore,
     mergeSortHelpers,
-    applayPaginationHelpers,
+    applyPaginationHelpers,
     handleCanProgressToWritteOperation,
   );
 
   const billRepository = BillsRepositoryFirebase.create(
     dbFirestore,
     mergeSortHelpers,
-    applayPaginationHelpers,
+    applyPaginationHelpers,
     handleCanProgressToWritteOperation,
+    applySortStatusHelpers,
   );
   //
 
