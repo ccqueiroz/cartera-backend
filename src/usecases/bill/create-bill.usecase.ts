@@ -40,6 +40,14 @@ export class CreateBillUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
 
+    if (billData.payOut && !billData?.payDate) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
+    }
+
+    if (billData.payOut && !billData?.paymentMethodId) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
+    }
+
     const validateCategoryPaymentMethodService =
       await this.validateCategoryPaymentMethodService.execute({
         categoryId: billData.categoryId,
