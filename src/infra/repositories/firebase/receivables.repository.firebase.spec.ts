@@ -10,71 +10,138 @@ import { firestore } from '@/test/mocks/firebase-admin.mock';
 import { MargeSortHelper } from '../../helpers/merge-sort.helpers';
 import { ApplyPaginationHelper } from '../../helpers/apply-pagination.helpers';
 import { HandleCanProgressToWritteOperationHelper } from '../../helpers/handle-can-progress-to-writte-operation.helpers';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { ApplySortStatusHelper } from '@/infra/helpers/apply-sort-status.helpers';
 
 const receivablesItemsMocks = [
   {
     id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
     data: () => ({
-      categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
       personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
       userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
       descriptionReceivable: 'Test Receivable 1',
       fixedReceivable: true,
       receivableDate: new Date().getTime(),
-      icon: null,
-      amount: 100,
-      categoryDescription: 'Test Category 1',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Paid',
-      createdAt: new Date().getTime(),
       receivalDate: null,
       receival: false,
+      icon: null,
+      amount: 100,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Comissões e Bonificações',
+      categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      createdAt: new Date().getTime(),
       updatedAt: null,
     }),
   },
   {
     id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
     data: () => ({
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
       personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
       userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
       amount: 200,
-      categoryDescription: 'Test Category 2',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Pending',
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: null,
     }),
   },
   {
     id: 'c3d4e5f6-a1b2-9012-3456-7890abcdef23',
     data: () => ({
-      categoryId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef24',
-      paymentMethodId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef25',
-      paymentStatusId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef26',
       personUserId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef27',
       userId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef28',
       descriptionReceivable: 'Test Receivable 3',
       fixedReceivable: true,
       receivableDate: new Date().getTime(),
-      icon: null,
-      amount: 300,
-      categoryDescription: 'Test Category 3',
-      paymentMethodDescription: 'Test Payment Method 3',
-      paymentStatusDescription: 'Overdue',
-      createdAt: new Date().getTime(),
       receivalDate: null,
       receival: false,
+      icon: null,
+      amount: 300,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Recebimento por Serviço Prestado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.PROFIT_WITHDRAWAL,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      createdAt: new Date().getTime(),
+      updatedAt: null,
+    }),
+  },
+];
+
+const receivableItemsSearchByPeriod = [
+  {
+    id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
+    data: () => ({
+      personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+      userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+      descriptionReceivable: 'Test Receivable 1',
+      fixedReceivable: true,
+      receivableDate: new Date('03-01-2025').getTime(),
+      receivalDate: null,
+      receival: false,
+      icon: null,
+      amount: 100,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Comissões e Bonificações',
+      categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      createdAt: new Date().getTime(),
+      updatedAt: null,
+    }),
+  },
+  {
+    id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+    data: () => ({
+      personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+      userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+      descriptionReceivable: 'Test Receivable 2',
+      fixedReceivable: false,
+      receivableDate: new Date('03-26-2025').getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
+      icon: null,
+      amount: 200,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      createdAt: new Date().getTime(),
+      updatedAt: null,
+    }),
+  },
+  {
+    id: 'c3d4e5f6-a1b2-9012-3456-7890abcdef23',
+    data: () => ({
+      personUserId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef27',
+      userId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef28',
+      descriptionReceivable: 'Test Receivable 3',
+      fixedReceivable: true,
+      receivableDate: new Date('03-12-2025').getTime(),
+      receivalDate: null,
+      receival: false,
+      icon: null,
+      amount: 300,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Recebimento por Serviço Prestado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.PROFIT_WITHDRAWAL,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      createdAt: new Date().getTime(),
       updatedAt: null,
     }),
   },
@@ -88,6 +155,7 @@ describe('Receivable Repository Firebase', () => {
   const applayPagination: ApplyPaginationHelper = new ApplyPaginationHelper();
   const handleCanProgressToWritteOperation: HandleCanProgressToWritteOperationHelper =
     new HandleCanProgressToWritteOperationHelper();
+  const applySortStatus: ApplySortStatusHelper = new ApplySortStatusHelper();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -98,6 +166,7 @@ describe('Receivable Repository Firebase', () => {
       mergeSortMock,
       applayPagination,
       handleCanProgressToWritteOperation,
+      applySortStatus,
     );
   });
 
@@ -218,12 +287,12 @@ describe('Receivable Repository Firebase', () => {
     const result = await receivableRepo.getReceivables({
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.REIMBURSEMENTS },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
-        amount: 12000,
+        amount: 100,
         fixedReceivable: true,
-        receival: true,
+        receival: false,
       },
       searchByDate: {
         receivableDate: {
@@ -233,12 +302,13 @@ describe('Receivable Repository Firebase', () => {
       userId: userIdMock,
     });
 
-    expect(result.content.length).toEqual(0);
-    expect(result.totalElements).toEqual(0);
+    expect(result.content.length).toEqual(1);
+    expect(result.totalElements).toEqual(1);
     expect(result.page).toEqual(0);
     expect(result.size).toEqual(10);
-    expect(result.totalPages).toEqual(0);
+    expect(result.totalPages).toEqual(1);
     expect(result.ordering).toEqual({ amount: 'desc' });
+    expect(result.content[0].id).toEqual(receivablesItemsMocks[0].id);
   });
 
   it('should be search with searchByDate parameter with initial and final date request.', async () => {
@@ -484,5 +554,105 @@ describe('Receivable Repository Firebase', () => {
 
     expect(firestore.doc().get).toHaveBeenCalledTimes(1);
     expect(firestore.doc().delete).toHaveBeenCalledTimes(1);
+  });
+
+  it('should be call receivablesPayableMonth and returns receivables list that attend the requirements of period and receival false', async () => {
+    firestore.where().orderBy().get.mockResolvedValueOnce({
+      docs: receivableItemsSearchByPeriod,
+    });
+
+    const result = await receivableRepo.receivablesPayableMonth({
+      userId: userIdMock,
+      period: {
+        initialDate: new Date('03-01-2025').getTime(),
+        finalDate: new Date('03-31-2025').getTime(),
+      },
+      page: 0,
+      size: 10,
+    });
+
+    expect(result.content.length).toEqual(2);
+    expect(result.content[0].receivableDate).toEqual(
+      new Date('03-01-2025').getTime(),
+    );
+    expect(result.content[0].receival).toBeFalsy();
+
+    expect(result.content[1].receival).toBeFalsy();
+    expect(result.content[1].receivableDate).toEqual(
+      new Date('03-12-2025').getTime(),
+    );
+  });
+
+  it('should be throw an error when call receivablesPayableMonth if the userId dont exist in param', async () => {
+    const error = await receivableRepo
+      .receivablesPayableMonth({
+        userId: '',
+        period: {
+          initialDate: new Date('03-01-2025').getTime(),
+          finalDate: new Date('03-31-2025').getTime(),
+        },
+        page: 0,
+        size: 10,
+      })
+      .catch((err) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_CREDENTIALS,
+      statusCode: 401,
+    });
+  });
+
+  it('should be throw an error when call receivablePayableMonth if the period dont defined or initialDate or finalDate dont be defined/exist', async () => {
+    let error = await receivableRepo
+      .receivablesPayableMonth({
+        userId: userIdMock,
+        period: undefined as any,
+        page: 0,
+        size: 10,
+      })
+      .catch((err) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_PERIOD,
+      statusCode: 400,
+    });
+
+    error = await receivableRepo
+      .receivablesPayableMonth({
+        userId: userIdMock,
+        period: {
+          initialDate: new Date().getTime(),
+          finalDate: 'abs121212' as any,
+        },
+        page: 0,
+        size: 10,
+      })
+      .catch((err) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_PERIOD,
+      statusCode: 400,
+    });
+
+    error = await receivableRepo
+      .receivablesPayableMonth({
+        userId: userIdMock,
+        period: {
+          initialDate: undefined as any,
+          finalDate: new Date().getTime(),
+        },
+        page: 0,
+        size: 10,
+      })
+      .catch((err) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(convertOutputErrorToObject(error)).toEqual({
+      message: ERROR_MESSAGES.INVALID_PERIOD,
+      statusCode: 400,
+    });
   });
 });

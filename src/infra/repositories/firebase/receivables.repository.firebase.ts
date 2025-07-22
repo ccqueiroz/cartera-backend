@@ -9,8 +9,9 @@ import {
   GetReceivablesInputDTO,
   OrderByGetReceivablesInputDTO,
   ReceivableDTO,
+  ReceivablesByMonthInputDTO,
   SearchByDateGetReceivablesInputDTO,
-  SortByStatusReceivablesInputDTO,
+  SortByReceivableTypeInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableEntitie } from '@/domain/Receivable/entitie/receivable.entitie';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
@@ -22,6 +23,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
 import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
+import { ApplySortStatusGateway } from '@/domain/Helpers/gateway/apply-sort-status.gateway';
 
 export class ReceivablesRepositoryFirebase
   implements ReceivableRepositoryGateway
@@ -29,12 +31,19 @@ export class ReceivablesRepositoryFirebase
   private static instance: ReceivablesRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Receivable';
+  private mapOrderingKeysToBillAttribute = {
+    paymentStatus: 'paymentStatus',
+    category: 'categoryDescriptionEnum',
+    categoryGroup: 'categoryGroup',
+    paymentMethod: 'paymentMethodDescriptionEnum',
+  } as const;
 
   private constructor(
     private readonly db: admin.firestore.Firestore,
     private mergeSortHelper: MergeSortGateway,
-    private applayPaginationHelpers: ApplyPaginationGateway,
+    private applyPaginationHelpers: ApplyPaginationGateway,
     private handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
+    private applySortStatusHelper: ApplySortStatusGateway,
   ) {
     this.dbCollection = this.db.collection(this.collection);
     ReceivableEntitie.setMaskAmountGateway(new MaskAmountMaskService());
@@ -43,16 +52,18 @@ export class ReceivablesRepositoryFirebase
   public static create(
     db: admin.firestore.Firestore,
     mergeSortHelper: MergeSortGateway,
-    applayPaginationHelpers: ApplyPaginationGateway,
+    applyPaginationHelpers: ApplyPaginationGateway,
     handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
+    applySortStatusHelper: ApplySortStatusGateway,
   ) {
     if (!ReceivablesRepositoryFirebase.instance) {
       ReceivablesRepositoryFirebase.instance =
         new ReceivablesRepositoryFirebase(
           db,
           mergeSortHelper,
-          applayPaginationHelpers,
+          applyPaginationHelpers,
           handleCanProgressToWritteOperation,
+          applySortStatusHelper,
         );
     }
     return ReceivablesRepositoryFirebase.instance;
@@ -69,14 +80,11 @@ export class ReceivablesRepositoryFirebase
     const applyFiltersInData: Array<(item: ReceivableDTO) => boolean> = [];
 
     if (sortByStatus) {
-      const key = Object.keys(sortByStatus).find(
-        (k) =>
-          sortByStatus[k as keyof SortByStatusReceivablesInputDTO] !==
-          undefined,
-      ) as keyof SortByStatusReceivablesInputDTO;
-
-      const statusId = sortByStatus[key];
-      applyFiltersInData.push((item) => item[key] === statusId);
+      this.applySortStatusHelper.execute({
+        listToIncludeSortItems: applyFiltersInData,
+        sortByStatus,
+        invoiceType: 'receivable',
+      });
     }
 
     if (sortByReceivables) {
@@ -94,7 +102,7 @@ export class ReceivablesRepositoryFirebase
       }
     }
 
-    if (searchByDate?.receivableDate) {
+    if (searchByDate) {
       const key = Object.keys(searchByDate).find(
         (k) =>
           searchByDate[k as keyof SearchByDateGetReceivablesInputDTO] !==
@@ -128,6 +136,14 @@ export class ReceivablesRepositoryFirebase
         );
   }
 
+  private mapOrderingKey(key: keyof OrderByGetReceivablesInputDTO | undefined) {
+    const map = this.mapOrderingKeysToBillAttribute;
+
+    return key && key in map
+      ? (map[key as keyof typeof map] as keyof ReceivableDTO)
+      : (key as keyof ReceivableDTO | undefined);
+  }
+
   private applyOrderingReceivables(
     input: GetReceivablesInputDTO,
     data: Array<ReceivableDTO>,
@@ -138,7 +154,15 @@ export class ReceivablesRepositoryFirebase
       ? (Object.keys(ordering)[0] as keyof OrderByGetReceivablesInputDTO)
       : undefined;
 
-    if (!ordering || !orderingKey || orderingKey === 'createdAt') return data;
+    const mapOrderingKey = this.mapOrderingKey(orderingKey);
+
+    if (
+      !ordering ||
+      !orderingKey ||
+      !mapOrderingKey ||
+      orderingKey === 'createdAt'
+    )
+      return data;
 
     const orderingDirection =
       orderingKey !== undefined
@@ -147,44 +171,88 @@ export class ReceivablesRepositoryFirebase
 
     const dataOrdering = this.mergeSortHelper.execute<ReceivableDTO>(
       data,
-      orderingKey,
+      mapOrderingKey,
       orderingDirection,
     );
 
     return dataOrdering;
   }
 
-  private async handleSearchReceivables(
-    input: GetReceivablesInputDTO,
-  ): Promise<ResponseListDTO<ReceivableDTO>> {
-    const { ordering, userId } = input;
+  private createInstanceReceivableEntitie(receivable: ReceivableDTO) {
+    const receivableEntitie = ReceivableEntitie.with(receivable);
 
+    return {
+      id: receivableEntitie.id,
+      personUserId: receivableEntitie.personUserId,
+      userId: receivableEntitie.userId,
+      descriptionReceivable: receivableEntitie.descriptionReceivable,
+      fixedReceivable: receivableEntitie.fixedReceivable,
+      receivableDate: receivableEntitie.receivableDate,
+      receivalDate: receivableEntitie.receivalDate,
+      receival: receivableEntitie.receival,
+      icon: receivableEntitie.icon,
+      amount: receivableEntitie.amount,
+      paymentStatus: receivableEntitie.paymentStatus,
+      categoryId: receivableEntitie.categoryId,
+      categoryDescription: receivableEntitie.categoryDescription,
+      categoryDescriptionEnum: receivableEntitie.categoryDescriptionEnum,
+      categoryGroup: receivableEntitie.categoryGroup,
+      paymentMethodId: receivableEntitie.paymentMethodId,
+      paymentMethodDescription: receivableEntitie.paymentMethodDescription,
+      paymentMethodDescriptionEnum:
+        receivableEntitie.paymentMethodDescriptionEnum,
+      createdAt: receivableEntitie.createdAt,
+      updatedAt: receivableEntitie.updatedAt,
+    };
+  }
+
+  private async handleQueryReceivables({
+    userId,
+    direction,
+  }: {
+    userId: string;
+    direction: SortOrder;
+  }) {
     const query: admin.firestore.Query<admin.firestore.DocumentData> =
       this.dbCollection;
 
-    const direction =
-      ordering && Object.prototype.hasOwnProperty.call(ordering, 'createdAt')
-        ? ordering['createdAt']
-        : SortOrder.ASC;
-
-    let data = await query
+    const data = await query
       .where('userId', '==', userId)
       .orderBy('createdAt', direction)
       .get()
       .then((response) =>
-        response.docs?.map(
-          (item) => ({ id: item.id, ...item.data() } as ReceivableDTO),
+        response.docs?.map((item) =>
+          this.createInstanceReceivableEntitie({
+            id: item.id,
+            ...item.data(),
+          } as ReceivableDTO),
         ),
       )
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
       });
 
+    return data as Array<ReceivableDTO>;
+  }
+
+  private async handleBuildSearchReceivables(
+    input: GetReceivablesInputDTO,
+  ): Promise<ResponseListDTO<ReceivableDTO>> {
+    const { ordering, userId } = input;
+
+    const direction = (
+      ordering && Object.prototype.hasOwnProperty.call(ordering, 'createdAt')
+        ? ordering['createdAt']
+        : SortOrder.ASC
+    ) as SortOrder;
+
+    let data = await this.handleQueryReceivables({ userId, direction });
+
     data = this.applyFilterReceivables(input, data as Array<ReceivableDTO>);
 
     data = this.applyOrderingReceivables(input, data as Array<ReceivableDTO>);
 
-    return this.applayPaginationHelpers.execute<
+    return this.applyPaginationHelpers.execute<
       GetReceivablesInputDTO,
       OrderByGetReceivablesInputDTO,
       ReceivableDTO
@@ -194,7 +262,7 @@ export class ReceivablesRepositoryFirebase
   public async getReceivables(
     input: GetReceivablesInputDTO,
   ): Promise<ResponseListDTO<ReceivableDTO>> {
-    const data = await this.handleSearchReceivables(input);
+    const data = await this.handleBuildSearchReceivables(input);
 
     return data;
   }
@@ -211,7 +279,10 @@ export class ReceivablesRepositoryFirebase
           if (response.data()?.userId !== userId) {
             throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
           }
-          return { id: response.id, ...(response.data() as ReceivableDTO) };
+          return this.createInstanceReceivableEntitie({
+            id: response.id,
+            ...(response.data() as ReceivableDTO),
+          });
         } else {
           return null;
         }
@@ -250,14 +321,19 @@ export class ReceivablesRepositoryFirebase
         descriptionReceivable: newReceivable.descriptionReceivable,
         fixedReceivable: newReceivable.fixedReceivable,
         receivableDate: newReceivable.receivableDate,
+        receivalDate: newReceivable.receivalDate,
+        receival: newReceivable.receival,
         icon: newReceivable.icon,
         amount: newReceivable.amount,
-        paymentStatusId: newReceivable.paymentStatusId,
-        paymentStatusDescription: newReceivable.paymentStatusDescription,
+        paymentStatus: newReceivable.paymentStatus,
         categoryId: newReceivable.categoryId,
         categoryDescription: newReceivable.categoryDescription,
+        categoryDescriptionEnum: newReceivable.categoryDescriptionEnum,
+        categoryGroup: newReceivable.categoryGroup,
         paymentMethodId: newReceivable.paymentMethodId,
         paymentMethodDescription: newReceivable.paymentMethodDescription,
+        paymentMethodDescriptionEnum:
+          newReceivable.paymentMethodDescriptionEnum,
         createdAt: newReceivable.createdAt,
       })
       .then((response) => response)
@@ -298,14 +374,17 @@ export class ReceivablesRepositoryFirebase
         fixedReceivable: receivable.fixedReceivable,
         receivableDate: receivable.receivableDate,
         receivalDate: receivable.receivalDate,
+        receival: receivable.receival,
         icon: receivable.icon,
         amount: receivable.amount,
-        paymentStatusId: receivable.paymentStatusId,
-        paymentStatusDescription: receivable.paymentStatusDescription,
+        paymentStatus: receivable.paymentStatus,
         categoryId: receivable.categoryId,
         categoryDescription: receivable.categoryDescription,
+        categoryDescriptionEnum: receivable.categoryDescriptionEnum,
+        categoryGroup: receivable.categoryGroup,
         paymentMethodId: receivable.paymentMethodId,
         paymentMethodDescription: receivable.paymentMethodDescription,
+        paymentMethodDescriptionEnum: receivable.paymentMethodDescriptionEnum,
         createdAt: receivable.createdAt,
         updatedAt: receivable.updatedAt,
       })
@@ -315,9 +394,26 @@ export class ReceivablesRepositoryFirebase
       });
 
     return {
-      id: receivableId,
-      ...receivableData,
-      updatedAt,
+      id: receivable.id,
+      personUserId: receivable.personUserId,
+      userId: receivable.userId,
+      descriptionReceivable: receivable.descriptionReceivable,
+      fixedReceivable: receivable.fixedReceivable,
+      receivableDate: receivable.receivableDate,
+      receivalDate: receivable.receivalDate,
+      receival: receivable.receival,
+      icon: receivable.icon,
+      amount: receivable.amount,
+      paymentStatus: receivable.paymentStatus,
+      categoryId: receivable.categoryId,
+      categoryDescription: receivable.categoryDescription,
+      categoryDescriptionEnum: receivable.categoryDescriptionEnum,
+      categoryGroup: receivable.categoryGroup,
+      paymentMethodId: receivable.paymentMethodId,
+      paymentMethodDescription: receivable.paymentMethodDescription,
+      paymentMethodDescriptionEnum: receivable.paymentMethodDescriptionEnum,
+      createdAt: receivable.createdAt,
+      updatedAt: receivable.updatedAt,
     };
   }
 
@@ -338,5 +434,67 @@ export class ReceivablesRepositoryFirebase
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
       });
+  }
+
+  public async receivablesPayableMonth({
+    period,
+    userId,
+    page,
+    size,
+  }: ReceivablesByMonthInputDTO): Promise<ResponseListDTO<ReceivableDTO>> {
+    if (!userId) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
+
+    if (
+      !period ||
+      !period?.initialDate ||
+      !period?.finalDate ||
+      isNaN(period.initialDate) ||
+      isNaN(period.finalDate)
+    ) {
+      throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
+    }
+
+    let data = await this.handleQueryReceivables({
+      userId,
+      direction: SortOrder.ASC,
+    });
+
+    const searchByDate: SearchByDateGetReceivablesInputDTO = {
+      receivableDate: period,
+    };
+
+    const sortByReceivables: SortByReceivableTypeInputDTO = {
+      receival: false,
+    };
+
+    const ordering: OrderByGetReceivablesInputDTO = {
+      receivableDate: SortOrder.ASC,
+    };
+
+    data = this.applyFilterReceivables(
+      {
+        userId,
+        sortByReceivables,
+        searchByDate,
+        ordering,
+      } as GetReceivablesInputDTO,
+      data as Array<ReceivableDTO>,
+    );
+
+    data = this.applyOrderingReceivables(
+      {
+        userId,
+        sortByReceivables,
+        searchByDate,
+        ordering,
+      } as GetReceivablesInputDTO,
+      data as Array<ReceivableDTO>,
+    );
+
+    return this.applyPaginationHelpers.execute<
+      GetReceivablesInputDTO,
+      OrderByGetReceivablesInputDTO,
+      ReceivableDTO
+    >({ page, size }, data as Array<ReceivableDTO>);
   }
 }
