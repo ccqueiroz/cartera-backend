@@ -11,11 +11,14 @@ import {
   Type,
   ValidateIf,
   OnlyOnePropertieDefined,
+  IsIn,
 } from '@/packages/clients/class-validator';
 import { UserIdAuthValidation } from '../Auth/auth.schema';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusDTO } from '../Common/sort-by-status.schema';
 import { SearchByDateDTO } from '../Common/search-by-date.schema';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 class InvoiceCardDataDTO {
   @IsDefined()
@@ -80,16 +83,6 @@ class BillCommomValidations extends UserIdAuthValidation {
   @IsDefined()
   @IsString()
   @MaxLength(60)
-  paymentStatusId!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(255)
-  paymentStatusDescription!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(60)
   categoryId!: string;
 
   @IsDefined()
@@ -97,15 +90,27 @@ class BillCommomValidations extends UserIdAuthValidation {
   @MaxLength(255)
   categoryDescription!: string;
 
+  @IsDefined()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(CategoryDescriptionEnum))
+  categoryDescriptionEnum!: keyof typeof CategoryDescriptionEnum;
+
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  paymentMethodId!: string;
+  paymentMethodId?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  paymentMethodDescription!: string;
+  paymentMethodDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(PaymentMethodDescriptionEnum))
+  paymentMethodDescriptionEnum?: keyof typeof PaymentMethodDescriptionEnum;
 
   @IsDefined()
   @IsBoolean()
@@ -137,10 +142,6 @@ export class EditBillValidationDTO extends BillCommomValidations {
   @IsDefined()
   @IsNumber()
   createdAt!: number;
-
-  @IsOptional()
-  @IsNumber()
-  updatedAt!: number | null;
 }
 
 export class EditBillByPayableMonthValidationDTO {
@@ -165,12 +166,18 @@ export class EditBillByPayableMonthValidationDTO {
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  paymentMethodId!: string;
+  paymentMethodId?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  paymentMethodDescription!: string;
+  paymentMethodDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(PaymentMethodDescriptionEnum))
+  paymentMethodDescriptionEnum?: keyof typeof PaymentMethodDescriptionEnum;
 }
 
 export class GetBillByIdValidationDTO extends UserIdAuthValidation {
