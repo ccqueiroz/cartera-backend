@@ -4,6 +4,10 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ApiError } from '@/helpers/errors';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 
@@ -11,63 +15,42 @@ const userIdMock = '1234567d';
 
 const receivablesItemsMocks = [
   {
-    id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
-    categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-    paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-    paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
     personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
     userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
     descriptionReceivable: 'Test Receivable 1',
     fixedReceivable: true,
     receivableDate: new Date().getTime(),
-    icon: null,
-    amount: 100,
-    categoryDescription: 'Test Category 1',
-    paymentMethodDescription: 'Test Payment Method 1',
-    paymentStatusDescription: 'Paid',
-    createdAt: new Date().getTime(),
     receivalDate: null,
     receival: false,
+    icon: null,
+    amount: 100,
+    categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+    categoryDescription: 'Comissões e Bonificações',
+    categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+    categoryGroup: CategoryGroupEnum.REVENUES,
+    paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+    createdAt: new Date().getTime(),
     updatedAt: null,
   },
   {
     id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
-    categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-    paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-    paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
     personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
     userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
     descriptionReceivable: 'Test Receivable 2',
     fixedReceivable: false,
     receivableDate: new Date().getTime(),
+    receivalDate: new Date().getTime(),
+    receival: true,
     icon: null,
     amount: 200,
-    categoryDescription: 'Test Category 2',
-    paymentMethodDescription: 'Test Payment Method 1',
-    paymentStatusDescription: 'Pending',
+    categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+    categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+    categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+    categoryGroup: CategoryGroupEnum.REVENUES,
+    paymentMethodDescription: 'Pix',
+    paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    paymentStatus: PaymentStatusDescriptionEnum.PAID,
     createdAt: new Date().getTime(),
-    receivalDate: null,
-    receival: false,
-    updatedAt: null,
-  },
-  {
-    id: 'c3d4e5f6-a1b2-9012-3456-7890abcdef23',
-    categoryId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef24',
-    paymentMethodId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef25',
-    paymentStatusId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef26',
-    personUserId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef27',
-    userId: 'c3d4e5f6-a1b2-9012-3456-7890abcdef28',
-    descriptionReceivable: 'Test Receivable 3',
-    fixedReceivable: true,
-    receivableDate: new Date().getTime(),
-    icon: null,
-    amount: 300,
-    categoryDescription: 'Test Category 3',
-    paymentMethodDescription: 'Test Payment Method 3',
-    paymentStatusDescription: 'Overdue',
-    createdAt: new Date().getTime(),
-    receivalDate: null,
-    receival: false,
     updatedAt: null,
   },
 ];
@@ -105,7 +88,7 @@ describe('GetReceivablesUseCase', () => {
       userId: userIdMock,
     });
 
-    expect(result.data.content.length).toEqual(3);
+    expect(result.data.content.length).toEqual(2);
     expect(receivableServiceMock.getReceivables).toHaveBeenCalledWith({
       size: 10,
       page: 0,
@@ -191,7 +174,7 @@ describe('GetReceivablesUseCase', () => {
     const params = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.RENT_INCOME },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
