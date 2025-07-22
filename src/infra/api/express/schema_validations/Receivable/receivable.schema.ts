@@ -105,10 +105,6 @@ export class EditReceivableValidationDTO extends ReceivableCommomValidations {
   @IsDefined()
   @IsNumber()
   createdAt!: number;
-
-  @IsOptional()
-  @IsNumber()
-  updatedAt!: number | null;
 }
 
 export class EditReceivableByMonthValidationDTO {
