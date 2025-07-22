@@ -4,6 +4,7 @@ import {
   DeleteReceivableValidationDTO,
   EditReceivableValidationDTO,
   GetReceivableByIdValidationDTO,
+  GetReceivablesByMonthDTO,
   GetReceivablesInputValidationDTO,
 } from './receivable.schema';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
@@ -47,7 +48,7 @@ describe('Receivable Schema', () => {
         size: 10,
         authUserId: '1991',
         sort: {
-          categoryId: '2000',
+          category: 'ACCOMMODATION',
         },
       },
     ).then((errors) => {
@@ -63,8 +64,8 @@ describe('Receivable Schema', () => {
         size: 10,
         authUserId: '1991',
         sort: {
-          categoryId: '1991',
-          paymentStatusId: '1991',
+          category: 'BUS',
+          paymentStatus: 'DUE_DAY',
         },
       },
     ).then((errors) => {
@@ -72,7 +73,7 @@ describe('Receivable Schema', () => {
       expect(errors[0].children?.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [categoryId, paymentStatusId, paymentMethodId] defined.',
+          'Only a accept a one of [category, categoryGroup, paymentStatus, paymentMethod] defined.',
       });
     });
   });
@@ -196,14 +197,14 @@ describe('Receivable Schema', () => {
         authUserId: '1991',
         ordering: {
           amount: SortOrder.ASC,
-          categoryId: SortOrder.ASC,
+          category: SortOrder.ASC,
         },
       },
     ).then((errors) => {
       expect(errors.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [amount, receivableDate, receivalDate, categoryId, paymentMethodId, paymentStatusId, createdAt, updatedAt] defined.',
+          'Only a accept a one of [amount, receivableDate, receivalDate, category, categoryGroup, paymentMethod, paymentStatus, createdAt, updatedAt] defined.',
       });
     });
   });
@@ -222,7 +223,7 @@ describe('Receivable Schema', () => {
           receivalDate: { initialDate: 19999889, finalDate: 9899999 },
         },
         sort: {
-          categoryId: '2000',
+          category: 'ACCOUNTANT',
         },
       },
     ).then((errors) => {
@@ -266,10 +267,9 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
     };
@@ -293,10 +293,9 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'this-is-not-url',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
     };
@@ -323,10 +322,9 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: null,
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
     };
@@ -351,10 +349,9 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
@@ -381,10 +378,9 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
@@ -398,6 +394,39 @@ describe('Receivable Schema', () => {
     });
   });
 
+  it('should be validate the paymentMethodDescriptionEnum attribute when this is not equals to "PaymentMethodDescriptionEnum" Enum', () => {
+    const model: EditReceivableValidationDTO = {
+      authUserId: '2991',
+      id: '7282929',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionReceivable: 'Description to Receivable',
+      fixedReceivable: true,
+      receivableDate: 1982828888888,
+      receivalDate: 98398787878,
+      receival: false,
+      icon: 'https://wwww.teste-icon.com',
+      amount: 7627.89,
+      categoryId: '267890',
+      categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
+      paymentMethodDescription: 'paymentMethod',
+      paymentMethodDescriptionEnum: 'any' as any,
+      createdAt: 18783929293293,
+      updatedAt: null,
+    };
+
+    return runValidate<EditReceivableValidationDTO>(
+      EditReceivableValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(1);
+      expect(errors[0].constraints).toEqual({
+        isIn: 'paymentMethodDescriptionEnum must be one of the following values: DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY',
+      });
+    });
+  });
+
   it('should be validate the input attributes of the DeleteReceivableValidationDTO withou errors', async () => {
     return runValidate<DeleteReceivableValidationDTO>(
       DeleteReceivableValidationDTO,
@@ -406,6 +435,18 @@ describe('Receivable Schema', () => {
         authUserId: '20000',
       },
     ).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the input attributes of the GetReceivablesByMonthDTO withou errors', async () => {
+    return runValidate<GetReceivablesByMonthDTO>(GetReceivablesByMonthDTO, {
+      initialDate: 1212121212121212,
+      finalDate: 1212121212121212,
+      authUserId: '20000',
+      page: 0,
+      size: 10,
+    }).then((errors) => {
       expect(errors.length).toEqual(0);
     });
   });
