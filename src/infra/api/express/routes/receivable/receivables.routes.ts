@@ -12,6 +12,8 @@ import { EditReceivableRoute } from './edit-receivable.route';
 import { DeleteReceivableUseCase } from '@/usecases/receivable/delete-receivable.usecase';
 import { DeleteReceivableRoute } from './delete-receivable.route';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
+import { GetReceivablesByMonthUseCase } from '@/usecases/receivable/get-receivables-by-month.usecase';
+import { GetReceivablesByMonthRoute } from './get-receivabes-by-month.route';
 
 export class ReceivableRoute implements MapRoutes {
   private constructor(
@@ -94,12 +96,24 @@ export class ReceivableRoute implements MapRoutes {
     this.routes.push(deleteReceivableRoute);
   }
 
+  private factoryReceivableByMonth() {
+    const receivableByMonthService = GetReceivablesByMonthUseCase.create({
+      receivableService: this.receivableServiceGateway,
+    });
+    const receivableByMonthRoute = GetReceivablesByMonthRoute.create(
+      receivableByMonthService,
+      [this.authVerifyMiddleware.getHandler()],
+    );
+    this.routes.push(receivableByMonthRoute);
+  }
+
   private joinRoutes() {
     this.factoryGetReceivables();
     this.factoryGetReceivableById();
     this.factoryCreateReceivable();
     this.factoryUpdateReceivable();
     this.factoryDeleteReceivable();
+    this.factoryReceivableByMonth();
   }
 
   public execute() {
