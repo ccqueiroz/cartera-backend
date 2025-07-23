@@ -10,7 +10,6 @@ import {
   OrderByGetReceivablesInputDTO,
   ReceivableDTO,
   ReceivablesByMonthInputDTO,
-  SearchByDateGetReceivablesInputDTO,
   SortByReceivableTypeInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableEntitie } from '@/domain/Receivable/entitie/receivable.entitie';
@@ -24,6 +23,8 @@ import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import { ApplyPaginationGateway } from '@/domain/Helpers/gateway/apply-pagination.gateway';
 import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
 import { ApplySortStatusGateway } from '@/domain/Helpers/gateway/apply-sort-status.gateway';
+import { ApplySearchByDateGateway } from '@/domain/Helpers/gateway/apply-search-by-date.gateway';
+import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 export class ReceivablesRepositoryFirebase
   implements ReceivableRepositoryGateway
@@ -44,6 +45,7 @@ export class ReceivablesRepositoryFirebase
     private applyPaginationHelpers: ApplyPaginationGateway,
     private handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
     private applySortStatusHelper: ApplySortStatusGateway,
+    private applySearchByDate: ApplySearchByDateGateway,
   ) {
     this.dbCollection = this.db.collection(this.collection);
     ReceivableEntitie.setMaskAmountGateway(new MaskAmountMaskService());
@@ -55,6 +57,7 @@ export class ReceivablesRepositoryFirebase
     applyPaginationHelpers: ApplyPaginationGateway,
     handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
     applySortStatusHelper: ApplySortStatusGateway,
+    applySearchByDate: ApplySearchByDateGateway,
   ) {
     if (!ReceivablesRepositoryFirebase.instance) {
       ReceivablesRepositoryFirebase.instance =
@@ -64,6 +67,7 @@ export class ReceivablesRepositoryFirebase
           applyPaginationHelpers,
           handleCanProgressToWritteOperation,
           applySortStatusHelper,
+          applySearchByDate,
         );
     }
     return ReceivablesRepositoryFirebase.instance;
@@ -103,30 +107,13 @@ export class ReceivablesRepositoryFirebase
     }
 
     if (searchByDate) {
-      const key = Object.keys(searchByDate).find(
-        (k) =>
-          searchByDate[k as keyof SearchByDateGetReceivablesInputDTO] !==
-          undefined,
-      ) as keyof SearchByDateGetReceivablesInputDTO;
-      const dateFilter = searchByDate[key];
-
-      if (dateFilter) {
-        if ('exactlyDate' in dateFilter) {
-          const exactDate = Number(dateFilter.exactlyDate);
-          applyFiltersInData.push((item) => Number(item[key]) === exactDate);
-        } else {
-          const initial = dateFilter.initialDate
-            ? Number(dateFilter.initialDate)
-            : -Infinity;
-          const final = dateFilter.finalDate
-            ? Number(dateFilter.finalDate)
-            : Infinity;
-          applyFiltersInData.push((item) => {
-            const date = Number(item[key]);
-            return date >= initial && date <= final;
-          });
-        }
-      }
+      this.applySearchByDate.execute({
+        listToIncludeSearchItems: applyFiltersInData,
+        searchByDate: {
+          typeDTO: searchByDate,
+          invoiceType: 'receivable',
+        },
+      });
     }
 
     return applyFiltersInData.length === 0
@@ -459,7 +446,7 @@ export class ReceivablesRepositoryFirebase
       direction: SortOrder.ASC,
     });
 
-    const searchByDate: SearchByDateGetReceivablesInputDTO = {
+    const searchByDate: ReceivableSearchByDateDTO = {
       receivableDate: period,
     };
 
