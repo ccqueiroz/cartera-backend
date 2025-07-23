@@ -5,6 +5,11 @@ import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { GenerateHashGateway } from '@/domain/Helpers/gateway/generate-hash.gateway';
 import { generateHashHelper } from '@/infra/helpers';
 import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
+import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 let dbMock: jest.Mocked<BillRepositoryGateway>;
 let cacheMock: jest.Mocked<CacheGateway>;
@@ -55,46 +60,27 @@ describe('Bill Service', () => {
     const data = {
       content: [
         {
-          id: '24177d92-1aee-4479-859b-72f01c9ade24',
-          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-          descriptionBill: 'Faculdade',
-          fixedBill: false,
-          billDate: new Date().getTime(),
-          payDate: new Date().getTime(),
-          payOut: true,
-          icon: null,
-          amount: 8209.56,
-          paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-          paymentStatusDescription: 'Pago',
-          categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-          categoryDescription: 'Educação e Leitura',
-          paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-          paymentMethodDescription: 'Pix',
-          isPaymentCardBill: false,
-          isShoppingListBill: false,
-          createdAt: new Date().getTime(),
-          updatedAt: null,
-        },
-        {
           id: '121377d92-1aee-4479-859b-72f01c9ade24',
           personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
           userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-          descriptionBill: 'Supermercado',
+          descriptionBill: 'Compras no Supermercado',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Supermercado',
+          categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+          categoryGroup: CategoryGroupEnum.SHOPPING,
           fixedBill: false,
           billDate: new Date().getTime(),
           payDate: new Date().getTime(),
           payOut: true,
           icon: null,
-          amount: 1200.0,
-          paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-          paymentStatusDescription: 'Pago',
-          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-          categoryDescription: 'Supermercado',
-          paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-          paymentMethodDescription: 'Pix',
+          amount: 1200.56,
+          paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+          paymentMethodDescription: 'Cartão de Crédito',
+          paymmentMethodDescriptionEnum:
+            PaymentMethodDescriptionEnum.CREDIT_CARD,
           isPaymentCardBill: false,
-          isShoppingListBill: true,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
+          isShoppingListBill: false,
           createdAt: new Date().getTime(),
           updatedAt: null,
         },
@@ -109,14 +95,11 @@ describe('Bill Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.SUPERMARKET },
       ordering: { amount: SortOrder.DESC },
       sortByBills: {
-        amount: 12000,
-        fixedBill: true,
+        amount: 1200.0,
         payOut: true,
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
       },
       searchByDate: {
         billDate: {
@@ -140,58 +123,39 @@ describe('Bill Service', () => {
     expect(dbMock.getBills).toHaveBeenCalled();
     expect(dbMock.getBills).toHaveBeenCalledWith(input);
     expect(cacheMock.save).toHaveBeenCalled();
-    expect(result.content.length).toEqual(2);
+    expect(result.content.length).toEqual(1);
   });
 
   it('should be call getBills and return the data from cache provider', async () => {
     const data = {
       content: [
         {
-          id: '24177d92-1aee-4479-859b-72f01c9ade24',
+          id: '121377d92-1aee-4479-859b-72f01c9ade24',
           personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
           userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-          descriptionBill: 'Faculdade',
+          descriptionBill: 'Compras no Supermercado',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Supermercado',
+          categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+          categoryGroup: CategoryGroupEnum.SHOPPING,
           fixedBill: false,
           billDate: new Date().getTime(),
           payDate: new Date().getTime(),
           payOut: true,
           icon: null,
-          amount: 8209.56,
-          paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-          paymentStatusDescription: 'Pago',
-          categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-          categoryDescription: 'Educação e Leitura',
+          amount: 1200.56,
           paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-          paymentMethodDescription: 'Pix',
+          paymentMethodDescription: 'Cartão de Crédito',
+          paymmentMethodDescriptionEnum:
+            PaymentMethodDescriptionEnum.CREDIT_CARD,
           isPaymentCardBill: false,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
           isShoppingListBill: false,
           createdAt: new Date().getTime(),
           updatedAt: null,
         },
-        {
-          id: '121377d92-1aee-4479-859b-72f01c9ade24',
-          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-          descriptionBill: 'Supermercado',
-          fixedBill: false,
-          billDate: new Date().getTime(),
-          payDate: new Date().getTime(),
-          payOut: true,
-          icon: null,
-          amount: 1200.0,
-          paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-          paymentStatusDescription: 'Pago',
-          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-          categoryDescription: 'Supermercado',
-          paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-          paymentMethodDescription: 'Pix',
-          isPaymentCardBill: false,
-          isShoppingListBill: true,
-          createdAt: new Date().getTime(),
-          updatedAt: null,
-        },
       ],
-      totalElements: 2,
+      totalElements: 1,
       totalPages: 1,
       page: 0,
       size: 10,
@@ -201,14 +165,11 @@ describe('Bill Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.SUPERMARKET },
       ordering: { amount: SortOrder.DESC },
       sortByBills: {
-        amount: 12000,
-        fixedBill: true,
+        amount: 1200.0,
         payOut: true,
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
       },
       searchByDate: {
         billDate: {
@@ -230,7 +191,7 @@ describe('Bill Service', () => {
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.getBills).not.toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
-    expect(result.content.length).toEqual(2);
+    expect(result.content.length).toEqual(1);
   });
 
   it('should be call getBills and mustnt be not call the save method of the cache provider when the content attribute of the repository data response to be empty list', async () => {
@@ -246,14 +207,11 @@ describe('Bill Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.SUPERMARKET },
       ordering: { amount: SortOrder.DESC },
       sortByBills: {
-        amount: 12000,
-        fixedBill: true,
+        amount: 1200.0,
         payOut: true,
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
       },
       searchByDate: {
         billDate: {
@@ -292,14 +250,11 @@ describe('Bill Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.SUPERMARKET },
       ordering: { amount: SortOrder.DESC },
       sortByBills: {
-        amount: 12000,
-        fixedBill: true,
+        amount: 1200.0,
         payOut: true,
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
       },
       searchByDate: {
         billDate: {
@@ -308,7 +263,6 @@ describe('Bill Service', () => {
       },
       userId: userIdMock,
     };
-
     cacheMock.recover.mockResolvedValue(data);
     dbMock.getBills.mockResolvedValue(data);
     const generateHashFromInput = generateHashHelper.execute(input);
@@ -327,30 +281,32 @@ describe('Bill Service', () => {
 
   it('should be call getBillById and return the data from db', async () => {
     const data = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
     const input = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       userId: userIdMock,
     };
 
@@ -370,30 +326,32 @@ describe('Bill Service', () => {
 
   it('should be call getBillById and return the data from cache provider', async () => {
     const data = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
     const input = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       userId: userIdMock,
     };
 
@@ -458,19 +416,20 @@ describe('Bill Service', () => {
     const data = {
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -487,7 +446,7 @@ describe('Bill Service', () => {
       billData: data,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list-all`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
 
     expect(dbMock.createBill).toHaveBeenCalled();
     expect(dbMock.createBill).toHaveBeenCalledWith({
@@ -505,19 +464,20 @@ describe('Bill Service', () => {
     const data = {
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -544,26 +504,28 @@ describe('Bill Service', () => {
 
   it('should be call method updateBill from db provider and after response this provider, must delete the all stored keys that represent list-all from cache provider and find the data from key in cache and data replace.', async () => {
     const data = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
+      updatedAt: null,
     };
 
     dbMock.updateBill.mockResolvedValue(data);
@@ -574,9 +536,9 @@ describe('Bill Service', () => {
       billId: data.id,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list-all`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
 
-    const keyToDataReplace = `${userIdMock}:${keyController}-list-by-id-${data.id}`;
+    const keyToDataReplace = `${userIdMock}:${keyController}-bill-by-id-${data.id}`;
 
     expect(dbMock.updateBill).toHaveBeenCalled();
     expect(dbMock.updateBill).toHaveBeenCalledWith({
@@ -595,26 +557,28 @@ describe('Bill Service', () => {
 
   it('should be call method updateBill from db provider and after response failed, mustnt call deleteWithPattern from cache provider and save this data.', async () => {
     const data = {
-      id: '24177d92-1aee-4479-859b-72f01c9ade24',
+      id: '121377d92-1aee-4479-859b-72f01c9ade24',
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
+      amount: 1200.56,
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
+      updatedAt: null,
     };
 
     dbMock.updateBill.mockResolvedValue(undefined as any);
@@ -656,118 +620,98 @@ describe('Bill Service', () => {
   });
 
   it('should be call billsPayableMonth and return the data from cache provider', async () => {
-    const data = [
-      {
-        id: '24177d92-1aee-4479-859b-72f01c9ade24',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Supermercado',
-        fixedBill: false,
-        billDate: new Date('03-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: true,
-        icon: null,
-        amount: 1200.0,
-        paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-        paymentStatusDescription: 'Pago',
-        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-        categoryDescription: 'Supermercado',
-        paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-        paymentMethodDescription: 'Pix',
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
-        createdAt: new Date('03-01-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '19582167-7jwr-1142-65cb-74d03d7az318',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Tim',
-        fixedBill: true,
-        billDate: new Date('03-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 60.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-        categoryDescription: 'Assinatura de Internet, Telefonia e Streamings',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-01-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '48273619-3gtd-7831-92ad-83b18e3bp932',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Luz',
-        fixedBill: true,
-        billDate: new Date('03-12-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 120.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Serviços e Utilidades Públicas',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-12-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '48273619-3gtd-7831-92ad-83b18e3bp932',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Água',
-        fixedBill: true,
-        billDate: new Date('03-26-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 90.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Serviços e Utilidades Públicas',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-26-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '87263410-4qws-3409-81ab-63c09b8bk215',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Cartão Visa',
-        fixedBill: true,
-        billDate: new Date('04-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 5200.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Despesa com Cartão de Crédito',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('04-01-2025').getTime(),
-        updatedAt: null,
-      },
-    ];
+    const data = {
+      content: [
+        {
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Mensalidade Faculdade',
+          fixedBill: false,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Educação',
+          categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+          categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '19582167-7jwr-1142-65cb-74d03d7az318',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Tim',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Internet/TV',
+          categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 60.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '48273619-3gtd-7831-92ad-83b18e3bp932',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Luz',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Energia',
+          categoryDescriptionEnum: CategoryDescriptionEnum.ENERGY,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-12-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 120.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-12-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '48273619-3gtd-7831-92ad-83b18e3bp932',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Compras no Supermercado',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Supermercado',
+          categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+          categoryGroup: CategoryGroupEnum.SHOPPING,
+          fixedBill: false,
+          billDate: new Date('03-26-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-26-2025').getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 4,
+      totalPages: 1,
+      ordering: null,
+    };
 
     const input = {
       period: {
@@ -775,11 +719,13 @@ describe('Bill Service', () => {
         finalDate: new Date('2025, 05, 01').getTime(),
       },
       userId: userIdMock,
+      page: 0,
+      size: 10,
     };
 
     cacheMock.recover.mockResolvedValue(data);
 
-    const key = `${input.userId}:${keyController}-by-month-status-${input.period.initialDate}-${input.period.finalDate}`;
+    const key = `${input.userId}:${keyController}-list-by-payable-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
 
     const result = await billService.billsPayableMonth(input);
 
@@ -787,122 +733,102 @@ describe('Bill Service', () => {
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.billsPayableMonth).not.toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
-    expect(result.length).toEqual(5);
+    expect(result.content.length).toEqual(4);
   });
 
   it('should be call billsPayableMonth and return the data from db provider', async () => {
-    const data = [
-      {
-        id: '24177d92-1aee-4479-859b-72f01c9ade24',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Supermercado',
-        fixedBill: false,
-        billDate: new Date('03-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: true,
-        icon: null,
-        amount: 1200.0,
-        paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-        paymentStatusDescription: 'Pago',
-        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-        categoryDescription: 'Supermercado',
-        paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-        paymentMethodDescription: 'Pix',
-        isPaymentCardBill: false,
-        isShoppingListBill: true,
-        createdAt: new Date('03-01-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '19582167-7jwr-1142-65cb-74d03d7az318',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Tim',
-        fixedBill: true,
-        billDate: new Date('03-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 60.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-        categoryDescription: 'Assinatura de Internet, Telefonia e Streamings',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-01-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '48273619-3gtd-7831-92ad-83b18e3bp932',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Luz',
-        fixedBill: true,
-        billDate: new Date('03-12-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 120.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Serviços e Utilidades Públicas',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-12-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '48273619-3gtd-7831-92ad-83b18e3bp932',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Água',
-        fixedBill: true,
-        billDate: new Date('03-26-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 90.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Serviços e Utilidades Públicas',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('03-26-2025').getTime(),
-        updatedAt: null,
-      },
-      {
-        id: '87263410-4qws-3409-81ab-63c09b8bk215',
-        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-        descriptionBill: 'Cartão Visa',
-        fixedBill: true,
-        billDate: new Date('04-01-2025').getTime(),
-        payDate: new Date().getTime(),
-        payOut: false,
-        icon: null,
-        amount: 5200.0,
-        paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-        paymentStatusDescription: 'A pagar',
-        categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-        categoryDescription: 'Despesa com Cartão de Crédito',
-        paymentMethodId: '',
-        paymentMethodDescription: '',
-        isPaymentCardBill: false,
-        isShoppingListBill: false,
-        createdAt: new Date('04-01-2025').getTime(),
-        updatedAt: null,
-      },
-    ];
+    const data = {
+      content: [
+        {
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Mensalidade Faculdade',
+          fixedBill: false,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Educação',
+          categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+          categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '19582167-7jwr-1142-65cb-74d03d7az318',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Tim',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Internet/TV',
+          categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 60.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '48273619-3gtd-7831-92ad-83b18e3bp932',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Luz',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Energia',
+          categoryDescriptionEnum: CategoryDescriptionEnum.ENERGY,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-12-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 120.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-12-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '48273619-3gtd-7831-92ad-83b18e3bp932',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Compras no Supermercado',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Supermercado',
+          categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+          categoryGroup: CategoryGroupEnum.SHOPPING,
+          fixedBill: false,
+          billDate: new Date('03-26-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-26-2025').getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 4,
+      totalPages: 1,
+      ordering: null,
+    };
 
     const input = {
       period: {
@@ -910,12 +836,14 @@ describe('Bill Service', () => {
         finalDate: new Date('2025, 05, 01').getTime(),
       },
       userId: userIdMock,
+      page: 0,
+      size: 10,
     };
+
+    const key = `${input.userId}:${keyController}-list-by-payable-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
 
     cacheMock.recover.mockResolvedValue(null);
     dbMock.billsPayableMonth.mockResolvedValue(data);
-
-    const key = `${input.userId}:${keyController}-by-month-status-${input.period.initialDate}-${input.period.finalDate}`;
 
     const result = await billService.billsPayableMonth(input);
 
@@ -923,11 +851,18 @@ describe('Bill Service', () => {
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.billsPayableMonth).toHaveBeenCalled();
     expect(cacheMock.save).toHaveBeenCalled();
-    expect(result.length).toEqual(5);
+    expect(result.content.length).toEqual(4);
   });
 
   it('should be call billsPayableMonth and mustnt be not call the save method of the cache provider when the data response from db provider to be empty list', async () => {
-    const data: Array<BillDTO> = [];
+    const data: ResponseListDTO<BillDTO> = {
+      content: [],
+      page: 0,
+      size: 10,
+      totalPages: 0,
+      totalElements: 0,
+      ordering: null,
+    };
 
     const input = {
       period: {
@@ -935,12 +870,14 @@ describe('Bill Service', () => {
         finalDate: new Date('2025, 05, 01').getTime(),
       },
       userId: userIdMock,
+      page: 0,
+      size: 10,
     };
 
     cacheMock.recover.mockResolvedValue(null);
     dbMock.billsPayableMonth.mockResolvedValue(data);
 
-    const key = `${input.userId}:${keyController}-by-month-status-${input.period.initialDate}-${input.period.finalDate}`;
+    const key = `${input.userId}:${keyController}-list-by-payable-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
 
     const result = await billService.billsPayableMonth(input);
 
@@ -948,11 +885,18 @@ describe('Bill Service', () => {
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.billsPayableMonth).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
-    expect(result.length).toEqual(0);
+    expect(result.content.length).toEqual(0);
   });
 
   it('should be call billsPayableMonth and must be call the db repository when the data response of the cache repository return empty list', async () => {
-    const data: Array<BillDTO> = [];
+    const data: ResponseListDTO<BillDTO> = {
+      content: [],
+      page: 0,
+      size: 10,
+      totalPages: 0,
+      totalElements: 0,
+      ordering: null,
+    };
 
     const input = {
       period: {
@@ -960,12 +904,14 @@ describe('Bill Service', () => {
         finalDate: new Date('2025, 05, 01').getTime(),
       },
       userId: userIdMock,
+      page: 0,
+      size: 10,
     };
 
     cacheMock.recover.mockResolvedValue(data);
     dbMock.billsPayableMonth.mockResolvedValue(data);
 
-    const key = `${input.userId}:${keyController}-by-month-status-${input.period.initialDate}-${input.period.finalDate}`;
+    const key = `${input.userId}:${keyController}-list-by-payable-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
 
     const result = await billService.billsPayableMonth(input);
 
@@ -973,6 +919,6 @@ describe('Bill Service', () => {
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.billsPayableMonth).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
-    expect(result.length).toEqual(0);
+    expect(result.content.length).toEqual(0);
   });
 });

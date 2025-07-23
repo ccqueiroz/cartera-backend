@@ -4,6 +4,8 @@ import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 
 describe('Category Repository Firebase', () => {
   let categoryRepo: CategoryRepositoryFirebase;
@@ -27,6 +29,8 @@ describe('Category Repository Firebase', () => {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
           data: () => ({
             description: 'Restaurante',
+            descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+            group: CategoryGroupEnum.FOOD,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -36,6 +40,8 @@ describe('Category Repository Firebase', () => {
           id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
           data: () => ({
             description: 'Shopping',
+            descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+            group: CategoryGroupEnum.SHOPPING,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -44,7 +50,9 @@ describe('Category Repository Firebase', () => {
         {
           id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
           data: () => ({
-            description: 'App Mobilidade',
+            description: 'Uber',
+            descriptionEnum: CategoryDescriptionEnum.UBER,
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -53,7 +61,9 @@ describe('Category Repository Firebase', () => {
         {
           id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
           data: () => ({
-            description: 'Aluguel e Financiamento Residencial',
+            description: 'Aluguel',
+            descriptionEnum: CategoryDescriptionEnum.RENT,
+            group: CategoryGroupEnum.HOUSING,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -83,6 +93,8 @@ describe('Category Repository Firebase', () => {
     expect(result.shift()).toEqual({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
@@ -109,6 +121,8 @@ describe('Category Repository Firebase', () => {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
           data: () => ({
             description: 'Restaurante',
+            descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+            group: CategoryGroupEnum.FOOD,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -118,6 +132,8 @@ describe('Category Repository Firebase', () => {
           id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
           data: () => ({
             description: 'Shopping',
+            descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+            group: CategoryGroupEnum.SHOPPING,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -126,7 +142,9 @@ describe('Category Repository Firebase', () => {
         {
           id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
           data: () => ({
-            description: 'App Mobilidade',
+            description: 'Uber',
+            descriptionEnum: CategoryDescriptionEnum.UBER,
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -135,7 +153,9 @@ describe('Category Repository Firebase', () => {
         {
           id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
           data: () => ({
-            description: 'Aluguel e Financiamento Residencial',
+            description: 'Aluguel',
+            descriptionEnum: CategoryDescriptionEnum.RENT,
+            group: CategoryGroupEnum.HOUSING,
             type: CategoryType.BILLS,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -169,7 +189,9 @@ describe('Category Repository Firebase', () => {
         {
           id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
           data: () => ({
-            description: 'Aportes e Financiamentos',
+            description: 'Receitas de Parcerias e Patrocínios',
+            descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+            group: CategoryGroupEnum.REVENUES,
             type: CategoryType.RECEIVABLE,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -179,6 +201,8 @@ describe('Category Repository Firebase', () => {
           id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
           data: () => ({
             description: 'Aposentadorias e Pensões',
+            descriptionEnum: CategoryDescriptionEnum.PENSIONS,
+            group: CategoryGroupEnum.REVENUES,
             type: CategoryType.RECEIVABLE,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -187,7 +211,9 @@ describe('Category Repository Firebase', () => {
         {
           id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
           data: () => ({
-            description: 'Comissões e Bonificações',
+            description: 'Cashbacks e Recompensas',
+            descriptionEnum: CategoryDescriptionEnum.CASHBACK_REWARDS,
+            group: CategoryGroupEnum.REVENUES,
             type: CategoryType.RECEIVABLE,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
@@ -225,7 +251,9 @@ describe('Category Repository Firebase', () => {
       exists: true,
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       data: () => ({
-        description: 'App Mobilidade',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
         type: CategoryType.BILLS,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
@@ -240,7 +268,9 @@ describe('Category Repository Firebase', () => {
     expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
-    expect(result?.description).toBe('App Mobilidade');
+    expect(result?.description).toBe('Uber');
+    expect(result?.descriptionEnum).toBe(CategoryDescriptionEnum.UBER);
+    expect(result?.group).toBe(CategoryGroupEnum.MOBILITY_BY_APP);
     expect(result?.type).toBe(CategoryType.BILLS);
     expect(result?.createdAt).toEqual(expect.any(Number));
     expect(result?.updatedAt).toEqual(expect.any(Number));

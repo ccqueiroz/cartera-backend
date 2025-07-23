@@ -9,6 +9,7 @@ import {
   GetBillsPayableMonthDTO,
 } from './bill.schema';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 describe('Bill Schema', () => {
   it('should be validate the attributes of the GetBillsInputValidationDTO withou errors.', async () => {
@@ -41,7 +42,7 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        categoryId: '2000',
+        category: 'ACCOMMODATION',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);
@@ -54,15 +55,15 @@ describe('Bill Schema', () => {
       size: 10,
       authUserId: '1991',
       sort: {
-        categoryId: '1991',
-        paymentStatusId: '1991',
+        category: 'BUS',
+        paymentStatus: 'DUE_DAY',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(1);
       expect(errors[0].children?.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [categoryId, paymentStatusId, paymentMethodId] defined.',
+          'Only a accept a one of [category, categoryGroup, paymentStatus, paymentMethod] defined.',
       });
     });
   });
@@ -168,13 +169,13 @@ describe('Bill Schema', () => {
       authUserId: '1991',
       ordering: {
         amount: SortOrder.ASC,
-        categoryId: SortOrder.ASC,
+        category: SortOrder.ASC,
       },
     }).then((errors) => {
       expect(errors.length).toEqual(1);
       expect(errors[0].children![0].constraints).toEqual({
         OnlyOnePropertieDefined:
-          'Only a accept a one of [amount, billDate, payDate, categoryId, paymentMethodId, paymentStatusId, createdAt, updatedAt] defined.',
+          'Only a accept a one of [amount, billDate, payDate, category, categoryGroup, paymentMethod, paymentStatus, createdAt, updatedAt] defined.',
       });
     });
   });
@@ -191,7 +192,7 @@ describe('Bill Schema', () => {
         payDate: { initialDate: 19999889, finalDate: 9899999 },
       },
       sort: {
-        categoryId: '2000',
+        category: 'ACCOUNTANT',
       },
     }).then((errors) => {
       expect(errors.length).toEqual(0);
@@ -228,10 +229,9 @@ describe('Bill Schema', () => {
       payOut: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       isPaymentCardBill: true,
@@ -259,10 +259,9 @@ describe('Bill Schema', () => {
       payOut: false,
       icon: 'this-is-not-url',
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       isPaymentCardBill: true,
@@ -293,10 +292,9 @@ describe('Bill Schema', () => {
       payOut: false,
       icon: null,
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
       isPaymentCardBill: true,
@@ -309,6 +307,74 @@ describe('Bill Schema', () => {
       model,
     ).then((errors) => {
       expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the categoryDescriptionEnum attribute when this is not equals to "CategoryDescriptionEnum" Enum', () => {
+    const model: CreateBillValidationDTO = {
+      authUserId: '2991',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionBill: 'Description to Bill',
+      fixedBill: true,
+      billDate: 1982828888888,
+      payDate: 98398787878,
+      payOut: false,
+      icon: null,
+      amount: 7627.89,
+      categoryId: '267890',
+      categoryDescription: 'category',
+      categoryDescriptionEnum: 'any' as any,
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+      isPaymentCardBill: true,
+      invoiceCarData: { invoiceCardId: '18287287', paymentCardId: '65762783' },
+      isShoppingListBill: true,
+      shoppingListData: { shoppingListId: '571621111' },
+    };
+    return runValidate<CreateBillValidationDTO>(
+      CreateBillValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(1);
+      expect(errors[0].constraints).toEqual({
+        isIn: 'categoryDescriptionEnum must be one of the following values: UBER, NINY_NINE, BLABLACAR, LYFT, CABIFY, 99POP, BUS, SUBWAY, TRAIN, AIRPLANE, FUEL, VEHICLE_MAINTENANCE, TOLLS_PARKING, IFOOD, UBER_EATS, RAPPI, JAMES_DELIVERY, NINY_NINE_FOOD, ZE_DELIVERY, ONLINE_FOOD_ORDERS, RESTAURANT, FAST_FOOD, CAFE_BISTRO, PHARMACY, GYM, BEAUTY, SUPPLEMENTS, RENT, CONDOMINIUM_FEE, ENERGY, WATER, GAS, INTERNET_TV, PHONE, CLEANING_LAUNDRY, REPAIR_MAINTENANCE, VEHICLE_FINANCING, PROPERTY_FINANCING, VEHICLE_CREDIT_LINE, PROPERTY_CREDIT_LINE, AUTO_INSURANCE, HEALTH_INSURANCE, LIFE_INSURANCE, HOME_INSURANCE, CLOTHING_ACCESSORIES, SUPERMARKET, FLIGHT_TICKETS, ACCOMMODATION, TOURS, CAR_RENTAL, SCHOOL_TUITION, COLLEGE_TUITION, POSTGRADUATE_TUITION, LANGUAGE_COURSES, TECH_COURSES, ONLINE_COURSES, CERTIFICATIONS, TUTORING, SCHOOL_SUPPLIES, UNIFORM, EDUCATIONAL_SUBSCRIPTIONS, SCHOOL_TRANSPORT, GIFTS_DONATIONS, TAXES, PET_FOOD, PET_VETERINARY, PET_SHOP, DEPENDENTS_CARE, CLEANING_LAUNDRY_SERVICE, OFFICE_SUPPLIES, COWORKING, BUSINESS_SOFTWARE, HARDWARE, SOFTWARE_APPS, SOFTWARE_SUBSCRIPTIONS, ACCOUNTANT, CONSULTING, TECHNICAL_MAINTENANCE, SPORTS_HOBBIES, CREDIT_CARD_PAYMENT, OTHER_EXPENSES, SALARY, PROFIT_WITHDRAWAL, RENT_INCOME, INVESTMENT_INCOME, REIMBURSEMENTS, COMMISSIONS_BONUSES, DONATIONS_INHERITANCE, CAPITAL_CONTRIBUTIONS, PARTNERSHIP_SPONSOR_INCOME, PENSIONS, CASHBACK_REWARDS, OTHER_INCOME',
+      });
+    });
+  });
+
+  it('should be validate the paymentMethodDescriptionEnum attribute when this is not equals to "PaymentMethodDescriptionEnum" Enum', () => {
+    const model: CreateBillValidationDTO = {
+      authUserId: '2991',
+      userId: '12339',
+      personUserId: '1928abc',
+      descriptionBill: 'Description to Bill',
+      fixedBill: true,
+      billDate: 1982828888888,
+      payDate: 98398787878,
+      payOut: false,
+      icon: null,
+      amount: 7627.89,
+      categoryId: '267890',
+      categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
+      paymentMethodId: '267890',
+      paymentMethodDescription: 'paymentMethod',
+      paymentMethodDescriptionEnum: 'any' as any,
+      isPaymentCardBill: true,
+      invoiceCarData: { invoiceCardId: '18287287', paymentCardId: '65762783' },
+      isShoppingListBill: true,
+      shoppingListData: { shoppingListId: '571621111' },
+    };
+
+    return runValidate<CreateBillValidationDTO>(
+      CreateBillValidationDTO,
+      model,
+    ).then((errors) => {
+      expect(errors.length).toEqual(1);
+      expect(errors[0].constraints).toEqual({
+        isIn: 'paymentMethodDescriptionEnum must be one of the following values: DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY',
+      });
     });
   });
 
@@ -325,18 +391,17 @@ describe('Bill Schema', () => {
       payOut: false,
       icon: null,
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CASH,
       isPaymentCardBill: true,
       invoiceCarData: { invoiceCardId: '18287287', paymentCardId: '65762783' },
       isShoppingListBill: true,
       shoppingListData: { shoppingListId: '571621111' },
       createdAt: 18783929293293,
-      updatedAt: 127899999939339,
     };
     return runValidate<EditBillValidationDTO>(
       EditBillValidationDTO,
@@ -359,18 +424,17 @@ describe('Bill Schema', () => {
       payOut: false,
       icon: null,
       amount: 7627.89,
-      paymentStatusId: '267890',
-      paymentStatusDescription: 'paymentStatus',
       categoryId: '267890',
       categoryDescription: 'category',
+      categoryDescriptionEnum: 'BUS',
       paymentMethodId: '267890',
       paymentMethodDescription: 'paymentMethod',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CASH,
       isPaymentCardBill: true,
       invoiceCarData: { invoiceCardId: '18287287', paymentCardId: '65762783' },
       isShoppingListBill: true,
       shoppingListData: { shoppingListId: '571621111' },
       createdAt: 18783929293293,
-      updatedAt: null,
     };
     return runValidate<EditBillValidationDTO>(
       EditBillValidationDTO,
@@ -394,6 +458,8 @@ describe('Bill Schema', () => {
       initialDate: 1212121212121212,
       finalDate: 1212121212121212,
       authUserId: '20000',
+      page: 0,
+      size: 10,
     }).then((errors) => {
       expect(errors.length).toEqual(0);
     });

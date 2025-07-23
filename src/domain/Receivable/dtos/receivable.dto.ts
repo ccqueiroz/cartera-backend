@@ -4,20 +4,20 @@ import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto'
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import {
-  PaginationParams,
-  SearchByDate,
-  SortOrder,
-} from '@/domain/dtos/listParamsDto.dto';
+import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
+import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
+import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
 type CategoryId = CategoryDTO['id'];
 type CategoryDescription = CategoryDTO['description'];
+type CategoryDescriptionEnum = CategoryDTO['descriptionEnum'];
+type CategoryGroupEnum = CategoryDTO['group'];
 type PaymentMethodId = PaymentMethodDTO['id'];
-type PaymentMethodDescription = CategoryDTO['description'];
-type PaymentStatusId = PaymentStatusDTO['id'];
-type PaymentStatusDescription = PaymentStatusDTO['description'];
+type PaymentMethodDescription = PaymentMethodDTO['description'];
+type PaymentMethodDescriptionEnum = PaymentMethodDTO['descriptionEnum'];
+type PaymentStatusDescriptionEnum = PaymentStatusDTO['descriptionEnum'];
 
 export type ReceivableDTO = {
   id?: string;
@@ -30,18 +30,15 @@ export type ReceivableDTO = {
   receival: boolean;
   icon: string | null;
   amount: number;
-  paymentStatusId: PaymentStatusId;
-  paymentStatusDescription: PaymentStatusDescription;
+  paymentStatus: PaymentStatusDescriptionEnum;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
-  paymentMethodId: PaymentMethodId;
-  paymentMethodDescription: PaymentMethodDescription;
+  categoryDescriptionEnum: CategoryDescriptionEnum;
+  categoryGroup: CategoryGroupEnum;
+  paymentMethodId?: PaymentMethodId;
+  paymentMethodDescription?: PaymentMethodDescription;
+  paymentMethodDescriptionEnum?: PaymentMethodDescriptionEnum;
 } & BaseDto;
-
-export type SortByStatusReceivablesInputDTO =
-  | { paymentStatusId: string; categoryId?: never; paymentMethodId?: never }
-  | { paymentStatusId?: never; categoryId: string; paymentMethodId?: never }
-  | { paymentStatusId?: never; categoryId?: never; paymentMethodId: string };
 
 export type SortByReceivableTypeInputDTO = {
   fixedReceivable?: boolean;
@@ -49,17 +46,14 @@ export type SortByReceivableTypeInputDTO = {
   amount?: number;
 };
 
-export type SearchByDateGetReceivablesInputDTO =
-  | { receivableDate: SearchByDate; receivalDate?: never }
-  | { receivalDate: SearchByDate; receivableDate?: never };
-
 export type ValuesOrderByGetReceivablesInputDTO =
   | 'amount'
   | 'receivableDate'
   | 'receivalDate'
-  | 'categoryId'
-  | 'paymentMethodId'
-  | 'paymentStatusId'
+  | 'category'
+  | 'categoryGroup'
+  | 'paymentMethod'
+  | 'paymentStatus'
   | 'createdAt'
   | 'updatedAt';
 
@@ -73,19 +67,20 @@ export type OrderByGetReceivablesInputDTO =
   | OrderByField<'amount'>
   | OrderByField<'receivableDate'>
   | OrderByField<'receivalDate'>
-  | OrderByField<'categoryId'>
-  | OrderByField<'paymentMethodId'>
-  | OrderByField<'paymentStatusId'>
+  | OrderByField<'category'>
+  | OrderByField<'categoryGroup'>
+  | OrderByField<'paymentMethod'>
+  | OrderByField<'paymentStatus'>
   | OrderByField<'createdAt'>
   | OrderByField<'updatedAt'>;
 
 export type GetReceivablesInputDTO = Omit<
-  PaginationParams<SortByStatusReceivablesInputDTO>,
+  PaginationParams<SortByStatusInputDTO>,
   'searchByDate' | 'ordering'
 > & {
   userId: string;
   sortByReceivables?: SortByReceivableTypeInputDTO;
-  searchByDate?: SearchByDateGetReceivablesInputDTO;
+  searchByDate?: ReceivableSearchByDateDTO;
   ordering?: OrderByGetReceivablesInputDTO;
 };
 
@@ -96,7 +91,10 @@ export type GetReceivableByIdInputDTO = Required<
 export type DataAuthByRequest = Pick<AuthEntitieDTO, 'userId' | 'email'>;
 
 export type CreateReceivableInputDTO = {
-  receivableData: Omit<ReceivableDTO, 'id' | 'updatedAt'>;
+  receivableData: Omit<
+    ReceivableDTO,
+    'id' | 'paymentStatus' | 'createdAt' | 'updatedAt'
+  >;
   userId: string;
 };
 
@@ -104,10 +102,52 @@ export type CreateReceivableOutputDTO = Pick<ReceivableDTO, 'id'>;
 
 export type EditReceivableInputDTO = {
   receivableId: string;
-  receivableData: ReceivableDTO;
+  receivableData: Omit<ReceivableDTO, 'paymentStatus' | 'updatedAt'>;
+  userId: string;
+};
+
+export type EditReceivableByMonthInputDTO = {
+  billId: string;
+  billData: Required<
+    Pick<
+      ReceivableDTO,
+      | 'receival'
+      | 'receivalDate'
+      | 'paymentMethodId'
+      | 'paymentMethodDescription'
+      | 'paymentMethodDescriptionEnum'
+    >
+  >;
   userId: string;
 };
 
 export type DeleteReceivableInputDTO = Required<
   Pick<ReceivableDTO, 'id' | 'userId'>
 >;
+
+export type ReceivablesByMonthInputDTO = Required<
+  Pick<PaginationParams<unknown>, 'page' | 'size'>
+> & {
+  period: { initialDate: number; finalDate: number };
+  userId: string;
+};
+
+export const StatusReceival = {
+  PENDING: 'PENDING',
+  DUE_SOON: 'DUE_SOON',
+  DUE_DAY: 'DUE_DAY',
+  OVERDUE: 'OVERDUE',
+  RECEIVED: 'RECEIVED',
+} as const;
+
+export type ReceivablesByMonthOutputDTO = {
+  id: string;
+  amount: number;
+  descriptionReceivable: string;
+  receivableDate: number;
+  categoryId: CategoryId;
+  categoryDescription: CategoryDescription;
+  categoryDescriptionEnum: CategoryDescriptionEnum;
+  categoryGroup: CategoryGroupEnum;
+  status: (typeof StatusReceival)[keyof typeof StatusReceival];
+};

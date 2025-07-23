@@ -3,6 +3,7 @@ import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 describe('Payment Status Repository Firebase', () => {
   let paymentStatusRepo: PaymentStatusRepositoryFirebase;
@@ -27,6 +28,7 @@ describe('Payment Status Repository Firebase', () => {
           id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
           data: () => ({
             description: 'Pago',
+            descriptionEnum: PaymentStatusDescriptionEnum.PAID,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -35,6 +37,7 @@ describe('Payment Status Repository Firebase', () => {
           id: '17de6833-1e75-40d3-afc3-3249c4da184f',
           data: () => ({
             description: 'A pagar',
+            descriptionEnum: PaymentStatusDescriptionEnum.TO_PAY,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -43,6 +46,7 @@ describe('Payment Status Repository Firebase', () => {
           id: '1902e085-8c3d-4d0b-aee1-9f7db1e5ec52',
           data: () => ({
             description: 'A receber',
+            descriptionEnum: PaymentStatusDescriptionEnum.TO_RECEIVE,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -51,6 +55,7 @@ describe('Payment Status Repository Firebase', () => {
           id: '2b8c9278-f5c6-439d-995e-20d30c2871a5',
           data: () => ({
             description: 'Recebido',
+            descriptionEnum: PaymentStatusDescriptionEnum.RECEIVED,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -65,6 +70,7 @@ describe('Payment Status Repository Firebase', () => {
         expect.objectContaining({
           id: expect.any(String),
           description: expect.any(String),
+          descriptionEnum: expect.any(String),
           createdAt: expect.any(Number),
           updatedAt: expect.any(Number),
         }),
@@ -76,6 +82,7 @@ describe('Payment Status Repository Firebase', () => {
     expect(result.shift()).toEqual({
       id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
       description: 'Pago',
+      descriptionEnum: PaymentStatusDescriptionEnum.PAID,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -110,6 +117,7 @@ describe('Payment Status Repository Firebase', () => {
       id: '0e8f775d-07c1-4ca1-abea-57157ff173b0',
       data: () => ({
         description: 'Pago',
+        descriptionEnum: PaymentStatusDescriptionEnum.PAID,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       }),
@@ -124,6 +132,7 @@ describe('Payment Status Repository Firebase', () => {
 
     expect(result?.id).toBe('0e8f775d-07c1-4ca1-abea-57157ff173b0');
     expect(result?.description).toBe('Pago');
+    expect(result?.descriptionEnum).toBe(PaymentStatusDescriptionEnum.PAID);
     expect(result?.createdAt).toEqual(expect.any(Number));
     expect(result?.updatedAt).toEqual(expect.any(Number));
   });

@@ -106,7 +106,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       userId: data.localId,
       accessToken: data?.idToken,
       refreshToken: data?.refreshToken,
-      expirationTime: new Date().getTime() + +data?.expiresIn,
+      expirationTime: new Date().getTime() + +data?.expiresIn + 5 * 60 * 1000,
       lastLoginAt: 0,
       updatedAt: null,
       createdAt: data?.createdAt,

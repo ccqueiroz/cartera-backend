@@ -26,7 +26,7 @@ import { CreateBillValidationDTO } from '../../schema_validations/Bill/bill.sche
  *             type: object
  *             properties:
  *              payload:
- *                $ref: '#/components/schemas/BillDTO'
+ *                $ref: '#/components/schemas/CreateBillInputDTO'
  *     responses:
  *       201:
  *         description: Dados da conta/despesa cadastrada para o usuário com sucesso.
@@ -42,7 +42,7 @@ import { CreateBillValidationDTO } from '../../schema_validations/Bill/bill.sche
  *                       type: string
  *                       example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
  *       400:
- *         description: Categoria, Método de Pagamento ou Status de Pagamento inválidos. | Parâmetros de entrada inválidos.
+ *         description: Categoria ou Método de Pagamento inválidos. | Parâmetros de entrada inválidos. | Data de pagamento não informada. | Método de pagamento não informado.
  *       401:
  *         description: Credenciais inválidas.
  *       429:

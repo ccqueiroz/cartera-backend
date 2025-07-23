@@ -1,6 +1,6 @@
 import { MapRoutes, Route } from '../route';
 import { Middleware } from '../../middlewares/middleware';
-import { ValidateCategoryPaymentMethodStatusUseCase } from '@/usecases/validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '@/usecases/validate_entities/validate-category-payment-method.usecase';
 import { GetBillsUseCase } from '@/usecases/bill/get-bills.usecase';
 import { GetBillsRoute } from './get-bills.route';
 import { GetBillByIdUseCase } from '@/usecases/bill/get-bill-by-id.usecase';
@@ -14,12 +14,14 @@ import { DeleteBillRoute } from './delete-bill.route';
 import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month.usecase';
 import { GetBillsPayableMonthRoute } from './get-bills-payable-month.route';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { EditBillByPayableMonthUseCase } from '@/usecases/bill/edit-bill-by-payable-month.usecase';
+import { EditBillByPayableMonthRoute } from './edit-bill-by-payable-month.route';
 
 export class BillRoute implements MapRoutes {
   private constructor(
     private readonly billServiceGateway: BillServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
-    private readonly validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
+    private readonly validateCategoryPaymentMethodUseCase: ValidateCategoryPaymentMethodUseCase,
     private readonly routes: Array<Route> = [],
   ) {
     this.joinRoutes();
@@ -28,12 +30,12 @@ export class BillRoute implements MapRoutes {
   public static create(
     billServiceGateway: BillServiceGateway,
     authVerifyMiddleware: Middleware,
-    validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase: ValidateCategoryPaymentMethodUseCase,
   ) {
     return new BillRoute(
       billServiceGateway,
       authVerifyMiddleware,
-      validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodUseCase,
     );
   }
 
@@ -60,8 +62,8 @@ export class BillRoute implements MapRoutes {
   private factoryCreateBill() {
     const createBillService = CreateBillUseCase.create({
       billService: this.billServiceGateway,
-      validateCategoryPaymentMethodStatusService:
-        this.validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodService:
+        this.validateCategoryPaymentMethodUseCase,
     });
     const createBillRoute = CreateBillRoute.create(createBillService, [
       this.authVerifyMiddleware.getHandler(),
@@ -72,8 +74,8 @@ export class BillRoute implements MapRoutes {
   private factoryUpdateBill() {
     const updateBillService = EditBillUseCase.create({
       billService: this.billServiceGateway,
-      validateCategoryPaymentMethodStatusService:
-        this.validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodService:
+        this.validateCategoryPaymentMethodUseCase,
     });
     const updateBillRoute = EditBillRoute.create(updateBillService, [
       this.authVerifyMiddleware.getHandler(),
@@ -102,6 +104,20 @@ export class BillRoute implements MapRoutes {
     this.routes.push(getBillsPayableMonthServiceRoute);
   }
 
+  private factoryUpdateBillByPayableMonth() {
+    const updateBillByPayableMonthService =
+      EditBillByPayableMonthUseCase.create({
+        billService: this.billServiceGateway,
+        validateCategoryPaymentMethodService:
+          this.validateCategoryPaymentMethodUseCase,
+      });
+    const updateBillByPayableMonthRoute = EditBillByPayableMonthRoute.create(
+      updateBillByPayableMonthService,
+      [this.authVerifyMiddleware.getHandler()],
+    );
+    this.routes.push(updateBillByPayableMonthRoute);
+  }
+
   private joinRoutes() {
     this.factoryGetBills();
     this.factoryGetBillById();
@@ -109,6 +125,7 @@ export class BillRoute implements MapRoutes {
     this.factoryUpdateBill();
     this.factoryDeleteBill();
     this.factoryGetBillsPayableMonth();
+    this.factoryUpdateBillByPayableMonth();
   }
 
   public execute() {

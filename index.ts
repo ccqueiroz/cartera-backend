@@ -11,9 +11,9 @@ import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
-import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
+import { BillRoute } from './src/infra/api/express/routes/bill/bill.routes';
 import { BillsRepositoryFirebase } from './src/infra/repositories/firebase/bill.repository.firebase';
-import { ValidateCategoryPaymentMethodStatusUseCase } from './src/usecases/validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from './src/usecases/validate_entities/validate-category-payment-method.usecase';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
 import { ReceivablesRepositoryFirebase } from './src/infra/repositories/firebase/receivables.repository.firebase';
 import { PaymentStatusRoute } from './src/infra/api/express/routes/paymentStatus/payment-status.routes';
@@ -24,7 +24,9 @@ import { PaymentMethodRepositoryFirebase } from './src/infra/repositories/fireba
 import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod/payment-method.routes';
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
 import {
-  applayPaginationHelpers,
+  applyPaginationHelpers,
+  applySearchByDateHelpers,
+  applySortStatusHelpers,
   checkIfIsNecessaryCreateNewTokenHelpers,
   generateHashHelper,
   handleCanProgressToWritteOperation,
@@ -62,15 +64,19 @@ function main() {
   const receivableRepository = ReceivablesRepositoryFirebase.create(
     dbFirestore,
     mergeSortHelpers,
-    applayPaginationHelpers,
+    applyPaginationHelpers,
     handleCanProgressToWritteOperation,
+    applySortStatusHelpers,
+    applySearchByDateHelpers,
   );
 
   const billRepository = BillsRepositoryFirebase.create(
     dbFirestore,
     mergeSortHelpers,
-    applayPaginationHelpers,
+    applyPaginationHelpers,
     handleCanProgressToWritteOperation,
+    applySortStatusHelpers,
+    applySearchByDateHelpers,
   );
   //
 
@@ -108,11 +114,10 @@ function main() {
   );
 
   // ------- VALIDATION - CASES -----------
-  const validateCategoryPaymentMethodStatusUseCase =
-    ValidateCategoryPaymentMethodStatusUseCase.create({
+  const validateCategoryPaymentMethodUseCase =
+    ValidateCategoryPaymentMethodUseCase.create({
       categoryService: categoryService,
       paymentMethodService: paymentMethodService,
-      paymentStatusServiceGateway: paymentStatusService,
     });
 
   //MIDDLEWARES
@@ -154,13 +159,13 @@ function main() {
   const receivableRoutes = ReceivableRoute.create(
     receivableService,
     authVerifyTokenMiddleware,
-    validateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase,
   ).execute();
 
   const billRoutes = BillRoute.create(
     billService,
     authVerifyTokenMiddleware,
-    validateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase,
   ).execute();
 
   const cashFlowRoutes = CashFlowRoute.create(

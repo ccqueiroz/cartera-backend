@@ -97,7 +97,7 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
     }
 
@@ -113,10 +113,10 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
 
-      const keyToSave = `${userId}:${this.keyController}-list-by-id-${bill.id}`;
+      const keyToSave = `${userId}:${this.keyController}-bill-by-id-${bill.id}`;
       await this.cache.save<BillDTO>(keyToSave, bill, this.TTL_DEFAULT);
     }
 
@@ -132,19 +132,30 @@ export class BillService implements BillServiceGateway {
   public async billsPayableMonth({
     period,
     userId,
-  }: BillsPayableMonthInputDTO): Promise<Array<BillDTO>> {
-    const key = `${userId}:${this.keyController}-by-month-status-${period.initialDate}-${period.finalDate}`;
+    page,
+    size,
+  }: BillsPayableMonthInputDTO): Promise<ResponseListDTO<BillDTO>> {
+    const key = `${userId}:${this.keyController}-list-by-payable-month-${period.initialDate}-${period.finalDate}-${page}-${size}`;
 
-    const billsCache = await this.cache.recover<Array<BillDTO>>(key);
+    const billsCache = await this.cache.recover<ResponseListDTO<BillDTO>>(key);
 
-    if (Array.isArray(billsCache) && billsCache.length > 0) {
+    if (billsCache && billsCache.content.length > 0) {
       return billsCache;
     }
 
-    const billsDb = await this.db.billsPayableMonth({ period, userId });
+    const billsDb = await this.db.billsPayableMonth({
+      period,
+      userId,
+      page,
+      size,
+    });
 
-    if (billsDb.length > 0) {
-      await this.cache.save<Array<BillDTO>>(key, billsDb, this.TTL_DEFAULT);
+    if (billsDb.content.length > 0) {
+      await this.cache.save<ResponseListDTO<BillDTO>>(
+        key,
+        billsDb,
+        this.TTL_DEFAULT,
+      );
     }
 
     return billsDb;

@@ -3,6 +3,7 @@ import { GetPaymentMethodByIdUseCase } from './get-payment-method-by-id.usecase'
 import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
 
@@ -28,7 +29,8 @@ describe('Get Payment Method By Id', () => {
   it('should be call execute method and return the payment method when this id are provided', async () => {
     paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      description: 'Cartão de crédito',
+      description: 'Cartão de Crédito',
+      descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       createdAt: new Date().getTime(),
       updatedAt: new Date().getTime(),
     });

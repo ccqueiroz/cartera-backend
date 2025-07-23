@@ -5,7 +5,7 @@ import { GetReceivablesUseCase } from '@/usecases/receivable/get-receivables.use
 import { GetReceivableByIdUseCase } from '@/usecases/receivable/get-receivable-by-id.usecase';
 import { GetReceivableByIdRoute } from './get-receivable-by-id.route';
 import { CreateReceivableUseCase } from '@/usecases/receivable/create-receivable.usecase';
-import { ValidateCategoryPaymentMethodStatusUseCase } from '@/usecases/validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '@/usecases/validate_entities/validate-category-payment-method.usecase';
 import { CreateReceivableRoute } from './create-receivable.route';
 import { EditReceivableUseCase } from '@/usecases/receivable/edit-receivable.usecase';
 import { EditReceivableRoute } from './edit-receivable.route';
@@ -17,7 +17,7 @@ export class ReceivableRoute implements MapRoutes {
   private constructor(
     private readonly receivableServiceGateway: ReceivableServiceGateway,
     private readonly authVerifyMiddleware: Middleware,
-    private readonly validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
+    private readonly validateCategoryPaymentMethodUseCase: ValidateCategoryPaymentMethodUseCase,
     private readonly routes: Array<Route> = [],
   ) {
     this.joinRoutes();
@@ -26,12 +26,12 @@ export class ReceivableRoute implements MapRoutes {
   public static create(
     receivableServiceGateway: ReceivableServiceGateway,
     authVerifyMiddleware: Middleware,
-    validateCategoryPaymentMethodStatusUseCase: ValidateCategoryPaymentMethodStatusUseCase,
+    validateCategoryPaymentMethodUseCase: ValidateCategoryPaymentMethodUseCase,
   ) {
     return new ReceivableRoute(
       receivableServiceGateway,
       authVerifyMiddleware,
-      validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodUseCase,
     );
   }
 
@@ -60,8 +60,8 @@ export class ReceivableRoute implements MapRoutes {
   private factoryCreateReceivable() {
     const createReceivableService = CreateReceivableUseCase.create({
       receivableService: this.receivableServiceGateway,
-      validateCategoryPaymentMethodStatusService:
-        this.validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodService:
+        this.validateCategoryPaymentMethodUseCase,
     });
     const createReceivableRoute = CreateReceivableRoute.create(
       createReceivableService,
@@ -73,8 +73,8 @@ export class ReceivableRoute implements MapRoutes {
   private factoryUpdateReceivable() {
     const updateReceivableService = EditReceivableUseCase.create({
       receivableService: this.receivableServiceGateway,
-      validateCategoryPaymentMethodStatusService:
-        this.validateCategoryPaymentMethodStatusUseCase,
+      validateCategoryPaymentMethodService:
+        this.validateCategoryPaymentMethodUseCase,
     });
     const updateReceivableRoute = EditReceivableRoute.create(
       updateReceivableService,

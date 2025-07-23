@@ -1,5 +1,8 @@
 import { MaskAmountGateway } from '@/domain/Masks/MaskNumbers/gateway/mask-amount.gateway';
 import { ReceivableDTO } from '../dtos/receivable.dto';
+import { ApiError } from '@/helpers/errors';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
 
 export type ReceivableEntitieProps = ReceivableDTO;
 
@@ -9,6 +12,26 @@ export class ReceivableEntitie {
 
   public static setMaskAmountGateway(maskAmountGateway: MaskAmountGateway) {
     this.maskAmountGateway = maskAmountGateway;
+  }
+
+  private static validateProps(props: Partial<ReceivableEntitieProps>) {
+    if (!props.receivableDate) {
+      throw new ApiError(
+        'Receivable Date is not set. Please set the Receivable date.',
+        400,
+      );
+    }
+
+    if (props.amount == null) {
+      throw new ApiError('Amount is required.', 400);
+    }
+
+    if (!ReceivableEntitie.maskAmountGateway) {
+      throw new ApiError(
+        'MaskAmountGateway is not set. Please configure it first.',
+        400,
+      );
+    }
   }
 
   public static create({
@@ -21,15 +44,16 @@ export class ReceivableEntitie {
     receival = false,
     icon,
     amount,
-    paymentStatusId,
-    paymentStatusDescription,
     categoryId,
     categoryDescription,
-    paymentMethodId,
-    paymentMethodDescription,
+    categoryDescriptionEnum,
+    categoryGroup,
+    paymentMethodId = undefined,
+    paymentMethodDescription = undefined,
+    paymentMethodDescriptionEnum = undefined,
     createdAt,
-  }: Omit<ReceivableEntitieProps, 'updatedAt' | 'id'>) {
-    const maskedAmount = this.unMaskAmount(amount);
+  }: Omit<ReceivableEntitieProps, 'updatedAt' | 'id' | 'paymentStatus'>) {
+    this.validateProps({ receivableDate, amount });
 
     return new ReceivableEntitie({
       personUserId,
@@ -40,35 +64,46 @@ export class ReceivableEntitie {
       receivalDate,
       receival,
       icon,
-      amount: maskedAmount,
-      paymentStatusId,
-      paymentStatusDescription,
+      amount,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_RECEIVE,
       categoryId,
       categoryDescription,
+      categoryDescriptionEnum,
+      categoryGroup,
       paymentMethodId,
       paymentMethodDescription,
+      paymentMethodDescriptionEnum,
       createdAt,
       updatedAt: null,
     });
   }
 
-  private static unMaskAmount(amount: number) {
-    if (!ReceivableEntitie.maskAmountGateway) {
-      throw new Error(
-        'MaskAmountGateway is not set. Please configure it first.',
-      );
-    }
-
+  private unMaskAmount(amount: number) {
     const amountUnmasked =
-      ReceivableEntitie.maskAmountGateway.mask(amount).unmask;
-
+      ReceivableEntitie.maskAmountGateway?.mask(amount).unmask;
     return amountUnmasked ? +amountUnmasked : 0;
   }
 
-  public static with(props: ReceivableEntitieProps) {
-    const maskedAmount = this.unMaskAmount(props.amount);
+  private setPaymentStatus(wasPaid: boolean, receivableDate: number) {
+    const currentDay = new Date().getTime();
+    return PaymentStatusEntitie.setInvoiceStatus(
+      wasPaid,
+      receivableDate,
+      currentDay,
+      'receivable',
+    );
+  }
 
-    return new ReceivableEntitie({ ...props, amount: maskedAmount });
+  public static with(props: Omit<ReceivableEntitieProps, 'paymentStatus'>) {
+    this.validateProps({
+      receivableDate: props.receivableDate,
+      amount: props.amount,
+    });
+
+    return new ReceivableEntitie({
+      ...props,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_RECEIVE,
+    });
   }
 
   public get id() {
@@ -96,7 +131,7 @@ export class ReceivableEntitie {
   }
 
   public get receivalDate() {
-    return this.props.receivalDate;
+    return this.props.receival ? this.props.receivalDate : null;
   }
 
   public get receival() {
@@ -108,15 +143,17 @@ export class ReceivableEntitie {
   }
 
   public get amount() {
-    return this.props.amount;
+    const maskedAmount = this.unMaskAmount(this.props.amount);
+    return maskedAmount;
   }
 
-  public get paymentStatusId() {
-    return this.props.paymentStatusId;
-  }
+  public get paymentStatus() {
+    const definePaymentStatus = this.setPaymentStatus(
+      this.props.receival,
+      this.props.receivableDate as number,
+    );
 
-  public get paymentStatusDescription() {
-    return this.props.paymentStatusDescription;
+    return definePaymentStatus;
   }
 
   public get categoryId() {
@@ -127,12 +164,28 @@ export class ReceivableEntitie {
     return this.props.categoryDescription;
   }
 
+  public get categoryDescriptionEnum() {
+    return this.props.categoryDescriptionEnum;
+  }
+
+  public get categoryGroup() {
+    return this.props.categoryGroup;
+  }
+
   public get paymentMethodId() {
-    return this.props.paymentMethodId;
+    return this.props.receival ? this.props.paymentMethodId : undefined;
   }
 
   public get paymentMethodDescription() {
-    return this.props.paymentMethodDescription;
+    return this.props.receival
+      ? this.props.paymentMethodDescription
+      : undefined;
+  }
+
+  public get paymentMethodDescriptionEnum() {
+    return this.props.receival
+      ? this.props.paymentMethodDescriptionEnum
+      : undefined;
   }
 
   public get createdAt() {

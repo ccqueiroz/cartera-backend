@@ -5,12 +5,12 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import {
   BillsPayableMonthInputDTO,
   BillsPayableMonthOutPutDTO,
-  StatusBill,
 } from '@/domain/Bill/dtos/bill.dto';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
 
 export type GetBillsPayableMonthOutputDTO = OutputDTO<
-  Array<BillsPayableMonthOutPutDTO>
+  ResponseListDTO<BillsPayableMonthOutPutDTO>
 >;
 
 export class GetBillsPayableMonthUseCase
@@ -20,31 +20,6 @@ export class GetBillsPayableMonthUseCase
 
   public static create({ billService }: { billService: BillServiceGateway }) {
     return new GetBillsPayableMonthUseCase(billService);
-  }
-
-  private handleSetInvoiceStatus(billDate: number, referenceDate: number) {
-    const milleSecondsPerDay = 1000 * 60 * 60 * 24;
-    const diffInDays = Math.floor(
-      (billDate - referenceDate) / milleSecondsPerDay,
-    );
-
-    if (referenceDate > billDate) {
-      return StatusBill.OVERDUE;
-    }
-
-    if (diffInDays > 5) {
-      return StatusBill.PENDING;
-    }
-
-    if (diffInDays > 0 && diffInDays <= 5) {
-      return StatusBill.DUE_SOON;
-    }
-
-    if (diffInDays === 0) {
-      return StatusBill.DUE_DAY;
-    }
-
-    return StatusBill.PENDING;
   }
 
   public async execute(
@@ -68,23 +43,30 @@ export class GetBillsPayableMonthUseCase
       ...inputGetBills,
     });
 
-    const data = bills.map((item) => {
+    const data = bills.content.map((item) => {
       return {
         id: item.id,
+        personUserId: item.personUserId,
+        userId: item.userId,
+        descriptionBill: item.descriptionBill,
+        fixedBill: item.fixedBill,
         amount: item.amount,
         billDate: item.billDate,
-        descriptionBill: item.descriptionBill,
         categoryId: item.categoryId,
         categoryDescription: item.categoryDescription,
-        status: this.handleSetInvoiceStatus(
-          Number(item.billDate),
-          new Date().getTime(),
-        ),
+        categoryDescriptionEnum: item.categoryDescriptionEnum,
+        categoryGroup: item.categoryGroup,
+        status: item.paymentStatus,
       };
     }) as Array<BillsPayableMonthOutPutDTO>;
 
+    const billsPayables: ResponseListDTO<BillsPayableMonthOutPutDTO> = {
+      ...bills,
+      content: data,
+    };
+
     return {
-      data,
+      data: billsPayables,
     };
   }
 }

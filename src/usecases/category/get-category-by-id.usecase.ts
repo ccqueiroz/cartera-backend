@@ -36,8 +36,20 @@ export class GetCategoryByIdUseCase
       id,
     });
 
+    if (!category || !category?.id) {
+      return { data: null };
+    }
+
     return {
-      data: category,
+      data: {
+        id: category.id,
+        description: category.description,
+        descriptionEnum: category.descriptionEnum,
+        group: category.group,
+        type: category.type,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt,
+      },
     };
   }
 }

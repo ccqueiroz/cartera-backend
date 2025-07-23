@@ -36,8 +36,18 @@ export class GetPaymentStatusByIdUseCase
       id,
     });
 
+    if (!paymentStatus || !paymentStatus?.id) {
+      return { data: null };
+    }
+
     return {
-      data: paymentStatus,
+      data: {
+        id: paymentStatus.id,
+        description: paymentStatus.description,
+        descriptionEnum: paymentStatus.descriptionEnum,
+        createdAt: paymentStatus.createdAt,
+        updatedAt: paymentStatus.updatedAt,
+      },
     };
   }
 }

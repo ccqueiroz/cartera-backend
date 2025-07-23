@@ -13,9 +13,7 @@ import {
   GetBillByIdInputDTO,
   GetBillsInputDTO,
   OrderByGetBillsInputDTO,
-  SearchByDateGetBillsInputDTO,
   SortByBillTypeInputDTO,
-  SortByStatusBillsInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { ResponseListDTO } from '@/domain/dtos/responseListDto.dto';
@@ -24,17 +22,28 @@ import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HandleCanProgressToWriteOperationGateway } from '../../database/firebase/core/gateway/handleCanProgressToWriteOperation.gateway';
+import { ApplySortStatusGateway } from '@/domain/Helpers/gateway/apply-sort-status.gateway';
+import { ApplySearchByDateGateway } from '@/domain/Helpers/gateway/apply-search-by-date.gateway';
+import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 export class BillsRepositoryFirebase implements BillRepositoryGateway {
   private static instance: BillsRepositoryFirebase;
   private dbCollection: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
   private collection = 'Bill';
+  private mapOrderingKeysToBillAttribute = {
+    paymentStatus: 'paymentStatus',
+    category: 'categoryDescriptionEnum',
+    categoryGroup: 'categoryGroup',
+    paymentMethod: 'paymentMethodDescriptionEnum',
+  } as const;
 
   private constructor(
     private readonly db: admin.firestore.Firestore,
     private mergeSortHelper: MergeSortGateway,
-    private applayPaginationHelpers: ApplyPaginationGateway,
+    private applyPaginationHelpers: ApplyPaginationGateway,
     private handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
+    private applySortStatusHelper: ApplySortStatusGateway,
+    private applySearchByDate: ApplySearchByDateGateway,
   ) {
     this.dbCollection = this.db.collection(this.collection);
     BillEntitie.setMaskAmountGateway(new MaskAmountMaskService());
@@ -43,15 +52,19 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
   public static create(
     db: admin.firestore.Firestore,
     mergeSortHelper: MergeSortGateway,
-    applayPaginationHelpers: ApplyPaginationGateway,
+    applyPaginationHelpers: ApplyPaginationGateway,
     handleCanProgressToWritteOperation: HandleCanProgressToWriteOperationGateway,
+    applySortStatusHelper: ApplySortStatusGateway,
+    applySearchByDate: ApplySearchByDateGateway,
   ) {
     if (!BillsRepositoryFirebase.instance) {
       BillsRepositoryFirebase.instance = new BillsRepositoryFirebase(
         db,
         mergeSortHelper,
-        applayPaginationHelpers,
+        applyPaginationHelpers,
         handleCanProgressToWritteOperation,
+        applySortStatusHelper,
+        applySearchByDate,
       );
     }
     return BillsRepositoryFirebase.instance;
@@ -65,12 +78,11 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
     const applyFiltersInData: Array<(item: BillDTO) => boolean> = [];
 
     if (sortByStatus) {
-      const key = Object.keys(sortByStatus).find(
-        (k) => sortByStatus[k as keyof SortByStatusBillsInputDTO] !== undefined,
-      ) as keyof SortByStatusBillsInputDTO;
-
-      const statusId = sortByStatus[key];
-      applyFiltersInData.push((item) => item[key] === statusId);
+      this.applySortStatusHelper.execute({
+        listToIncludeSortItems: applyFiltersInData,
+        sortByStatus,
+        invoiceType: 'bill',
+      });
     }
 
     if (sortByBills) {
@@ -97,29 +109,13 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
     }
 
     if (searchByDate) {
-      const key = Object.keys(searchByDate).find(
-        (k) =>
-          searchByDate[k as keyof SearchByDateGetBillsInputDTO] !== undefined,
-      ) as keyof SearchByDateGetBillsInputDTO;
-      const dateFilter = searchByDate[key];
-
-      if (dateFilter) {
-        if ('exactlyDate' in dateFilter) {
-          const exactDate = Number(dateFilter.exactlyDate);
-          applyFiltersInData.push((item) => Number(item[key]) === exactDate);
-        } else {
-          const initial = dateFilter.initialDate
-            ? Number(dateFilter.initialDate)
-            : -Infinity;
-          const final = dateFilter.finalDate
-            ? Number(dateFilter.finalDate)
-            : Infinity;
-          applyFiltersInData.push((item) => {
-            const date = Number(item[key]);
-            return date >= initial && date <= final;
-          });
-        }
-      }
+      this.applySearchByDate.execute({
+        listToIncludeSearchItems: applyFiltersInData,
+        searchByDate: {
+          typeDTO: searchByDate,
+          invoiceType: 'bill',
+        },
+      });
     }
 
     return applyFiltersInData.length === 0
@@ -129,6 +125,14 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
         );
   }
 
+  private mapOrderingKey(key: keyof OrderByGetBillsInputDTO | undefined) {
+    const map = this.mapOrderingKeysToBillAttribute;
+
+    return key && key in map
+      ? (map[key as keyof typeof map] as keyof BillDTO)
+      : (key as keyof BillDTO | undefined);
+  }
+
   private applyOrderingBills(input: GetBillsInputDTO, data: Array<BillDTO>) {
     const { ordering } = input;
 
@@ -136,7 +140,15 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       ? (Object.keys(ordering)[0] as keyof OrderByGetBillsInputDTO)
       : undefined;
 
-    if (!ordering || !orderingKey || orderingKey === 'createdAt') return data;
+    const mapOrderingKey = this.mapOrderingKey(orderingKey);
+
+    if (
+      !ordering ||
+      !orderingKey ||
+      !mapOrderingKey ||
+      orderingKey === 'createdAt'
+    )
+      return data;
 
     const orderingDirection =
       orderingKey !== undefined
@@ -145,11 +157,40 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
 
     const dataOrdering = this.mergeSortHelper.execute<BillDTO>(
       data,
-      orderingKey,
+      mapOrderingKey,
       orderingDirection,
     );
 
     return dataOrdering;
+  }
+
+  private createInstanceBillEntitie(bill: BillDTO) {
+    const billEntitie = BillEntitie.with(bill);
+
+    return {
+      id: billEntitie.id,
+      personUserId: billEntitie.personUserId,
+      userId: billEntitie.userId,
+      descriptionBill: billEntitie.descriptionBill,
+      fixedBill: billEntitie.fixedBill,
+      billDate: billEntitie.billDate,
+      payDate: billEntitie.payDate,
+      payOut: billEntitie.payOut,
+      icon: billEntitie.icon,
+      amount: billEntitie.amount,
+      paymentStatus: billEntitie.paymentStatus,
+      categoryId: billEntitie.categoryId,
+      categoryDescription: billEntitie.categoryDescription,
+      categoryDescriptionEnum: billEntitie.categoryDescriptionEnum,
+      categoryGroup: billEntitie.categoryGroup,
+      paymentMethodId: billEntitie.paymentMethodId,
+      paymentMethodDescription: billEntitie.paymentMethodDescription,
+      paymentMethodDescriptionEnum: billEntitie.paymentMethodDescriptionEnum,
+      isPaymentCardBill: billEntitie.isPaymentCardBill,
+      isShoppingListBill: billEntitie.isShoppingListBill,
+      createdAt: billEntitie.createdAt,
+      updatedAt: billEntitie.updatedAt,
+    };
   }
 
   private async handleQueryBills({
@@ -167,8 +208,11 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       .orderBy('createdAt', direction)
       .get()
       .then((response) =>
-        response.docs?.map(
-          (item) => ({ id: item.id, ...item.data() } as BillDTO),
+        response.docs?.map((item) =>
+          this.createInstanceBillEntitie({
+            id: item.id,
+            ...item.data(),
+          } as BillDTO),
         ),
       )
       .catch((error) => {
@@ -195,7 +239,7 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
 
     data = this.applyOrderingBills(input, data as Array<BillDTO>);
 
-    return this.applayPaginationHelpers.execute<
+    return this.applyPaginationHelpers.execute<
       GetBillsInputDTO,
       OrderByGetBillsInputDTO,
       BillDTO
@@ -222,7 +266,10 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
           if (response.data()?.userId !== userId) {
             throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
           }
-          return { id: response.id, ...(response.data() as BillDTO) };
+          return this.createInstanceBillEntitie({
+            id: response.id,
+            ...(response.data() as BillDTO),
+          });
         } else {
           return null;
         }
@@ -265,12 +312,14 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
         payOut: newBill.payOut,
         icon: newBill.icon,
         amount: newBill.amount,
-        paymentStatusId: newBill.paymentStatusId,
-        paymentStatusDescription: newBill.paymentStatusDescription,
+        paymentStatus: newBill.paymentStatus,
         categoryId: newBill.categoryId,
         categoryDescription: newBill.categoryDescription,
+        categoryDescriptionEnum: newBill.categoryDescriptionEnum,
+        categoryGroup: newBill.categoryGroup,
         paymentMethodId: newBill.paymentMethodId,
         paymentMethodDescription: newBill.paymentMethodDescription,
+        paymentMethodDescriptionEnum: newBill.paymentMethodDescriptionEnum,
         isPaymentCardBill: newBill.isPaymentCardBill,
         isShoppingListBill: newBill.isShoppingListBill,
         createdAt: newBill.createdAt,
@@ -316,12 +365,14 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
         payOut: bill.payOut,
         icon: bill.icon,
         amount: bill.amount,
-        paymentStatusId: bill.paymentStatusId,
-        paymentStatusDescription: bill.paymentStatusDescription,
+        paymentStatus: bill.paymentStatus,
         categoryId: bill.categoryId,
         categoryDescription: bill.categoryDescription,
+        categoryDescriptionEnum: bill.categoryDescriptionEnum,
+        categoryGroup: bill.categoryGroup,
         paymentMethodId: bill.paymentMethodId,
         paymentMethodDescription: bill.paymentMethodDescription,
+        paymentMethodDescriptionEnum: bill.paymentMethodDescriptionEnum,
         isPaymentCardBill: bill.isPaymentCardBill,
         isShoppingListBill: bill.isShoppingListBill,
         createdAt: bill.createdAt,
@@ -333,9 +384,28 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       });
 
     return {
-      id: billId,
-      ...billData,
-      updatedAt,
+      id: bill.id,
+      personUserId: bill.personUserId,
+      userId: bill.userId,
+      descriptionBill: bill.descriptionBill,
+      fixedBill: bill.fixedBill,
+      billDate: bill.billDate,
+      payDate: bill.payDate,
+      payOut: bill.payOut,
+      icon: bill.icon,
+      amount: bill.amount,
+      paymentStatus: bill.paymentStatus,
+      categoryId: bill.categoryId,
+      categoryDescription: bill.categoryDescription,
+      categoryDescriptionEnum: bill.categoryDescriptionEnum,
+      categoryGroup: bill.categoryGroup,
+      paymentMethodId: bill.paymentMethodId,
+      paymentMethodDescription: bill.paymentMethodDescription,
+      paymentMethodDescriptionEnum: bill.paymentMethodDescriptionEnum,
+      isPaymentCardBill: bill.isPaymentCardBill,
+      isShoppingListBill: bill.isShoppingListBill,
+      createdAt: bill.createdAt,
+      updatedAt: bill.updatedAt,
     };
   }
 
@@ -358,7 +428,9 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
   public async billsPayableMonth({
     period,
     userId,
-  }: BillsPayableMonthInputDTO): Promise<Array<BillDTO>> {
+    page,
+    size,
+  }: BillsPayableMonthInputDTO): Promise<ResponseListDTO<BillDTO>> {
     if (!userId) throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
 
     if (
@@ -376,7 +448,7 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       direction: SortOrder.ASC,
     });
 
-    const searchByDate: SearchByDateGetBillsInputDTO = {
+    const searchByDate: BillSearchByDateDTO = {
       billDate: period,
     };
 
@@ -398,6 +470,10 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       data as Array<BillDTO>,
     );
 
-    return data;
+    return this.applyPaginationHelpers.execute<
+      GetBillsInputDTO,
+      OrderByGetBillsInputDTO,
+      BillDTO
+    >({ page, size }, data as Array<BillDTO>);
   }
 }

@@ -7,13 +7,13 @@ import { GetBillsUseCase } from '@/usecases/bill/get-bills.usecase';
 import {
   GetBillsInputDTO,
   OrderByGetBillsInputDTO,
-  SearchByDateGetBillsInputDTO,
   SortByBillTypeInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { runValidate } from '@/packages/clients/class-validator';
 import { GetBillsInputValidationDTO } from '../../schema_validations/Bill/bill.schema';
 import { GetBillsInputRouteDTO } from '../../dtos/get-bills-input-route.dto';
-import { SortByStatusReceivablesInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
+import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
+import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 /**
  * @swagger
@@ -81,15 +81,15 @@ import { SortByStatusReceivablesInputDTO } from '@/domain/Receivable/dtos/receiv
  *         required: false
  *         schema:
  *           type: string
- *           enum: [categoryId, paymentMethodId, paymentStatusId]
- *           example: categoryId
- *         description: Filtra por uma categoria de status usando o ID.
+ *           enum: [category, categoryGroup, paymentMethod, paymentStatus]
+ *           example: category
+ *         description: Filtra por uma categoria de status usando o enum.
  *       - in: query
  *         name: sort_value
  *         required: false
  *         schema:
  *           type: string
- *           example: 12zgh2822-9863abs-7zhts
+ *           example: MOBILITY_BY_APP
  *         description: Valor correspondente ao campo de filtro.
  *       - in: query
  *         name: search_by_date
@@ -111,7 +111,7 @@ import { SortByStatusReceivablesInputDTO } from '@/domain/Receivable/dtos/receiv
  *         required: false
  *         schema:
  *           type: string
- *           enum: [amount, billDate, payDate, categoryId, paymentMethodId, paymentStatusId, createdAt, updatedAt]
+ *           enum: [amount, billDate, payDate, category, categoryGroup, paymentMethod, paymentStatus, createdAt, updatedAt]
  *           example: amount
  *         description: Ordena em função do atributo escolhido.
  *       - in: query
@@ -198,7 +198,7 @@ export class GetBillsRoute implements Route {
         ? {
             sort: {
               [sort]: sort_value,
-            } as Partial<SortByStatusReceivablesInputDTO>,
+            } as Partial<SortByStatusInputDTO>,
           }
         : {};
 
@@ -210,7 +210,7 @@ export class GetBillsRoute implements Route {
       ...(amount !== undefined && { amount }),
     };
 
-    let searchByDate: Partial<SearchByDateGetBillsInputDTO> = {};
+    let searchByDate: Partial<BillSearchByDateDTO> = {};
     if (search_by_date && search_by_date_value) {
       const [startDate, endDate] = search_by_date_value.split('-');
       searchByDate = {

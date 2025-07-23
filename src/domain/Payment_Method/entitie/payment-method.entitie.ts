@@ -17,6 +17,10 @@ export class PaymentMethodEntitie {
     return this.props.description;
   }
 
+  public get descriptionEnum() {
+    return this.props.descriptionEnum;
+  }
+
   public get createdAt() {
     return this.props.createdAt;
   }

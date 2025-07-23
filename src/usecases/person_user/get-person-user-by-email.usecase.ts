@@ -42,8 +42,22 @@ export class GetPersonUserByEmailUseCase
       email,
     });
 
+    if (!personUser || !personUser?.id) {
+      return { data: null };
+    }
+
     return {
-      data: personUser,
+      data: {
+        id: personUser.id,
+        userId: personUser.userId,
+        firstName: personUser.firstName,
+        lastName: personUser.lastName,
+        fullName: personUser.fullName,
+        email: personUser.email,
+        image: personUser.image,
+        createdAt: personUser.createdAt,
+        updatedAt: personUser.updatedAt,
+      },
     };
   }
 }
