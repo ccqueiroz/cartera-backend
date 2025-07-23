@@ -25,6 +25,7 @@ import { PaymentMethodRoute } from './src/infra/api/express/routes/paymentMethod
 import { PersonUserRoutes } from './src/infra/api/express/routes/personUser/person-user.routes';
 import {
   applyPaginationHelpers,
+  applySearchByDateHelpers,
   applySortStatusHelpers,
   checkIfIsNecessaryCreateNewTokenHelpers,
   generateHashHelper,
@@ -66,6 +67,7 @@ function main() {
     applyPaginationHelpers,
     handleCanProgressToWritteOperation,
     applySortStatusHelpers,
+    applySearchByDateHelpers,
   );
 
   const billRepository = BillsRepositoryFirebase.create(
@@ -74,6 +76,7 @@ function main() {
     applyPaginationHelpers,
     handleCanProgressToWritteOperation,
     applySortStatusHelpers,
+    applySearchByDateHelpers,
   );
   //
 
