@@ -4,7 +4,7 @@ import {
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
 import { OutputDTO } from '@/domain/dtos/output.dto';
-import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '../validate_entities/validate-category-payment-method.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
@@ -17,19 +17,19 @@ export class CreateReceivableUseCase
 {
   private constructor(
     private readonly receivableService: ReceivableServiceGateway,
-    private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
+    private readonly validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase,
   ) {}
 
   public static create({
     receivableService,
-    validateCategoryPaymentMethodStatusService,
+    validateCategoryPaymentMethodService,
   }: {
     receivableService: ReceivableServiceGateway;
-    validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
+    validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase;
   }) {
     return new CreateReceivableUseCase(
       receivableService,
-      validateCategoryPaymentMethodStatusService,
+      validateCategoryPaymentMethodService,
     );
   }
 
@@ -41,16 +41,23 @@ export class CreateReceivableUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
 
-    const validateCategoryPaymentMethodStatusService =
-      await this.validateCategoryPaymentMethodStatusService.execute({
+    if (receivableData.receival && !receivableData?.receivalDate) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
+    }
+
+    if (receivableData.receival && !receivableData?.paymentMethodId) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
+    }
+
+    const validateCategoryPaymentMethodService =
+      await this.validateCategoryPaymentMethodService.execute({
         categoryId: receivableData.categoryId,
-        paymentMethodId: receivableData.paymentMethodId,
-        paymentStatusId: receivableData.paymentStatusId,
+        paymentMethodId: receivableData?.paymentMethodId,
       });
 
-    if (!validateCategoryPaymentMethodStatusService) {
+    if (!validateCategoryPaymentMethodService) {
       throw new ApiError(
-        ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
+        ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
       );
     }
