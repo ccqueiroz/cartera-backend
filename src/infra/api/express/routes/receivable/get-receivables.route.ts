@@ -7,13 +7,13 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import {
   GetReceivablesInputDTO,
   OrderByGetReceivablesInputDTO,
-  SearchByDateGetReceivablesInputDTO,
   SortByReceivableTypeInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { runValidate } from '@/packages/clients/class-validator';
 import { GetReceivablesInputValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
 import { GetReceivablesInputRouteDTO } from '../../dtos/get-receivables-input-route.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
+import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 /**
  * @swagger
@@ -192,7 +192,7 @@ export class GetReceivablesRoute implements Route {
       ...(amount !== undefined && { amount }),
     };
 
-    let searchByDate: Partial<SearchByDateGetReceivablesInputDTO> = {};
+    let searchByDate: Partial<ReceivableSearchByDateDTO> = {};
     if (search_by_date && search_by_date_value) {
       const [startDate, endDate] = search_by_date_value.split('-');
       searchByDate = {
