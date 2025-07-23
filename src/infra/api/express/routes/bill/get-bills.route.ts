@@ -7,13 +7,13 @@ import { GetBillsUseCase } from '@/usecases/bill/get-bills.usecase';
 import {
   GetBillsInputDTO,
   OrderByGetBillsInputDTO,
-  SearchByDateGetBillsInputDTO,
   SortByBillTypeInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { runValidate } from '@/packages/clients/class-validator';
 import { GetBillsInputValidationDTO } from '../../schema_validations/Bill/bill.schema';
 import { GetBillsInputRouteDTO } from '../../dtos/get-bills-input-route.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
+import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 /**
  * @swagger
@@ -210,7 +210,7 @@ export class GetBillsRoute implements Route {
       ...(amount !== undefined && { amount }),
     };
 
-    let searchByDate: Partial<SearchByDateGetBillsInputDTO> = {};
+    let searchByDate: Partial<BillSearchByDateDTO> = {};
     if (search_by_date && search_by_date_value) {
       const [startDate, endDate] = search_by_date_value.split('-');
       searchByDate = {
