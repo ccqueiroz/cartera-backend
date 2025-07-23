@@ -9,11 +9,11 @@ import {
   OrderByGetReceivablesInputDTO,
   SearchByDateGetReceivablesInputDTO,
   SortByReceivableTypeInputDTO,
-  SortByStatusReceivablesInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { runValidate } from '@/packages/clients/class-validator';
 import { GetReceivablesInputValidationDTO } from '../../schema_validations/Receivable/receivable.schema';
 import { GetReceivablesInputRouteDTO } from '../../dtos/get-receivables-input-route.dto';
+import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 
 /**
  * @swagger
@@ -66,15 +66,15 @@ import { GetReceivablesInputRouteDTO } from '../../dtos/get-receivables-input-ro
  *         required: false
  *         schema:
  *           type: string
- *           enum: [categoryId, paymentMethodId, paymentStatusId]
- *           example: categoryId
- *         description: Filtra por uma categoria de status usando o ID.
+ *           enum: [category, categoryGroup, paymentMethod, paymentStatus]
+ *           example: category
+ *         description: Filtra por uma categoria de status usando o enum.
  *       - in: query
  *         name: sort_value
  *         required: false
  *         schema:
  *           type: string
- *           example: 12zgh2822-9863abs-7zhts
+ *           example: MOBILITY_BY_APP
  *         description: Valor correspondente ao campo de filtro.
  *       - in: query
  *         name: search_by_date
@@ -182,7 +182,7 @@ export class GetReceivablesRoute implements Route {
         ? {
             sort: {
               [sort]: sort_value,
-            } as Partial<SortByStatusReceivablesInputDTO>,
+            } as Partial<SortByStatusInputDTO>,
           }
         : {};
 
