@@ -7,6 +7,7 @@ import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dt
 import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
@@ -137,22 +138,17 @@ export type BillsPayableMonthInputDTO = Required<
   userId: string;
 };
 
-export const StatusBill = {
-  PENDING: 'PENDING',
-  DUE_SOON: 'DUE_SOON',
-  DUE_DAY: 'DUE_DAY',
-  OVERDUE: 'OVERDUE',
-  PAID: 'PAID',
-} as const;
-
 export type BillsPayableMonthOutPutDTO = {
   id: string;
-  amount: number;
+  personUserId: string;
+  userId: string;
   descriptionBill: string;
+  fixedBill: boolean;
+  amount: number;
   billDate: number;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
   categoryDescriptionEnum: CategoryDescriptionEnum;
   categoryGroup: CategoryGroupEnum;
-  status: (typeof StatusBill)[keyof typeof StatusBill];
+  status: (typeof PaymentStatusDescriptionEnum)[keyof typeof PaymentStatusDescriptionEnum];
 };
