@@ -15,6 +15,7 @@ import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-descri
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { ApplySearchByDateHelper } from '@/infra/helpers/apply-search-by-date.helpers';
 
 const billsItemsMock = [
   {
@@ -199,6 +200,8 @@ const applyPagination: ApplyPaginationHelper = new ApplyPaginationHelper();
 const applySortStatus: ApplySortStatusHelper = new ApplySortStatusHelper();
 const handleCanProgressToWritteOperation: HandleCanProgressToWritteOperationHelper =
   new HandleCanProgressToWritteOperationHelper();
+const applySearchByDateMock: ApplySearchByDateHelper =
+  new ApplySearchByDateHelper();
 
 describe('Bill Repository Firebase', () => {
   beforeEach(() => {
@@ -211,6 +214,7 @@ describe('Bill Repository Firebase', () => {
       applyPagination,
       handleCanProgressToWritteOperation,
       applySortStatus,
+      applySearchByDateMock,
     );
   });
 
