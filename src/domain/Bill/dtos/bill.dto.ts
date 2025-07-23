@@ -4,12 +4,9 @@ import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto'
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import {
-  PaginationParams,
-  SearchByDate,
-  SortOrder,
-} from '@/domain/dtos/listParamsDto.dto';
+import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
+import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
@@ -63,10 +60,6 @@ export type SortByBillTypeInputDTO = {
   amount?: number;
 };
 
-export type SearchByDateGetBillsInputDTO =
-  | { billDate: SearchByDate; payDate?: never }
-  | { payDate: SearchByDate; billDate?: never };
-
 export type ValuesOrderByGetBillsInputDTO =
   | 'amount'
   | 'billDate'
@@ -101,7 +94,7 @@ export type GetBillsInputDTO = Omit<
 > & {
   userId: string;
   sortByBills?: SortByBillTypeInputDTO;
-  searchByDate?: SearchByDateGetBillsInputDTO;
+  searchByDate?: BillSearchByDateDTO;
   ordering?: OrderByGetBillsInputDTO;
 };
 
