@@ -34,7 +34,7 @@ import { runValidate } from '@/packages/clients/class-validator';
  *             type: object
  *             properties:
  *              payload:
- *                $ref: '#/components/schemas/BillDTO'
+ *                $ref: '#/components/schemas/UpdateBillInputDTO'
  *     responses:
  *       200:
  *         description: Dados da conta/despesa cadastrada para o usuário atualizados com sucesso
@@ -46,7 +46,7 @@ import { runValidate } from '@/packages/clients/class-validator';
  *                 data:
  *                  $ref: '#/components/schemas/BillDTO'
  *       400:
- *         description: Parâmetros obrigatórios ausentes. | Categoria, Método de Pagamento ou Status de Pagamento inválidos. | Parâmetros de entrada inválidos.
+ *         description: Parâmetros obrigatórios ausentes. | Categoria ou Método de Pagamento inválidos. | Parâmetros de entrada inválidos. | Data de pagamento não informada. | Método de pagamento não informado.
  *       401:
  *         description: Credenciais inválidas.
  *       404:

@@ -44,6 +44,7 @@ export class GetPaymentStatusByIdUseCase
       data: {
         id: paymentStatus.id,
         description: paymentStatus.description,
+        descriptionEnum: paymentStatus.descriptionEnum,
         createdAt: paymentStatus.createdAt,
         updatedAt: paymentStatus.updatedAt,
       },

@@ -3,6 +3,10 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 let deleteReceivableUseCase: DeleteReceivableUseCase;
@@ -27,22 +31,23 @@ describe('DeleteReceivableUseCase', () => {
 
   it('should delete a receivable when a valid ID is provided', async () => {
     const receivableData = {
-      id: 'e76176ad-c2d8-4526-95cb-1434d5149dd4',
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
-      paymentStatusId: 'e76176ad-c2d8-4526-95cb-0440d0149d87',
-      personUserId: 'e76176ad-c2d8-4526-95cb-123456749d87',
-      userId: '1234567d-c2d8-4526-95cb-123456749d87',
-      descriptionReceivable: 'Test Receivable',
-      fixedReceivable: true,
+      id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+      personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+      userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+      descriptionReceivable: 'Test Receivable 2',
+      fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
-      amount: 100,
-      categoryDescription: 'Test Category',
-      paymentMethodDescription: 'Test Payment Method',
-      paymentStatusDescription: 'Paid',
-      receival: false,
-      receivalDate: null,
+      amount: 200,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };

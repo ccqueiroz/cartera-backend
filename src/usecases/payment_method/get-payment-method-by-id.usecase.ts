@@ -44,6 +44,7 @@ export class GetPaymentMethodByIdUseCase
       data: {
         id: paymentMethod.id,
         description: paymentMethod.description,
+        descriptionEnum: paymentMethod.descriptionEnum,
         createdAt: paymentMethod.createdAt,
         updatedAt: paymentMethod.updatedAt,
       },

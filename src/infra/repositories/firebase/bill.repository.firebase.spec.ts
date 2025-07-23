@@ -10,6 +10,12 @@ import { ApiError } from '@/helpers/errors';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { HandleCanProgressToWritteOperationHelper } from '../../helpers/handle-can-progress-to-writte-operation.helpers';
+import { ApplySortStatusHelper } from '@/infra/helpers/apply-sort-status.helpers';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { ApplySearchByDateHelper } from '@/infra/helpers/apply-search-by-date.helpers';
 
 const billsItemsMock = [
   {
@@ -17,19 +23,20 @@ const billsItemsMock = [
     data: () => ({
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Faculdade',
+      descriptionBill: 'Mensalidade Faculdade',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Educação',
+      categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+      categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
       amount: 8209.56,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'efc9c97d-70b8-49ce-8674-9b0cedf2c3f0',
-      categoryDescription: 'Educação e Leitura',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
       paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -41,21 +48,22 @@ const billsItemsMock = [
     data: () => ({
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Supermercado',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
       payOut: true,
       icon: null,
-      amount: 1200.0,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      amount: 1200.56,
+      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Cartão de Crédito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       isPaymentCardBill: false,
-      isShoppingListBill: true,
+      isShoppingListBill: false,
       createdAt: new Date().getTime(),
       updatedAt: null,
     }),
@@ -65,19 +73,20 @@ const billsItemsMock = [
     data: () => ({
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Energia',
+      descriptionBill: 'Compras no Supermercado',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
-      payDate: new Date().getTime(),
-      payOut: true,
+      payDate: null,
+      payOut: false,
       icon: null,
       amount: 148.0,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
-      categoryId: 'deb29e2b-edb0-441e-be56-78d7e10f2e12',
-      categoryDescription: 'Moradia e Manutenção Residencial',
       paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
+      paymentMethodDescription: 'Cartão de Débito',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
       isPaymentCardBill: false,
       isShoppingListBill: false,
       createdAt: new Date().getTime(),
@@ -92,46 +101,20 @@ const billsItemsSearchByPeriod = [
     data: () => ({
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Supermercado',
-      fixedBill: false,
-      billDate: new Date('03-01-2025').getTime(),
-      payDate: new Date().getTime(),
-      payOut: true,
-      icon: null,
-      amount: 1200.0,
-      paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-      paymentStatusDescription: 'Pago',
+      descriptionBill: 'Compras no Supermercado',
       categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
       categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
-      isPaymentCardBill: false,
-      isShoppingListBill: true,
-      createdAt: new Date('03-01-2025').getTime(),
-      updatedAt: null,
-    }),
-  },
-  {
-    id: '19582167-7jwr-1142-65cb-74d03d7az318',
-    data: () => ({
-      personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-      userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Tim',
-      fixedBill: true,
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
+      fixedBill: false,
       billDate: new Date('03-01-2025').getTime(),
-      payDate: new Date().getTime(),
+      payDate: null,
       payOut: false,
       icon: null,
-      amount: 60.0,
-      paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-      paymentStatusDescription: 'A pagar',
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Assinatura de Internet, Telefonia e Streamings',
-      paymentMethodId: '',
-      paymentMethodDescription: '',
+      amount: 1200.0,
       isPaymentCardBill: false,
       isShoppingListBill: false,
-      createdAt: new Date('03-01-2025').getTime(),
+      createdAt: new Date().getTime(),
       updatedAt: null,
     }),
   },
@@ -141,21 +124,44 @@ const billsItemsSearchByPeriod = [
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Luz',
-      fixedBill: true,
-      billDate: new Date('03-12-2025').getTime(),
-      payDate: new Date().getTime(),
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Energia',
+      categoryDescriptionEnum: CategoryDescriptionEnum.ENERGY,
+      categoryGroup: CategoryGroupEnum.HOUSING,
+      fixedBill: false,
+      billDate: new Date('03-26-2025').getTime(),
+      payDate: null,
       payOut: false,
       icon: null,
-      amount: 120.0,
-      paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-      paymentStatusDescription: 'A pagar',
-      categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-      categoryDescription: 'Serviços e Utilidades Públicas',
-      paymentMethodId: '',
-      paymentMethodDescription: '',
+      amount: 62.9,
+      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Boleto Bancário',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.BANK_SLIP,
       isPaymentCardBill: false,
       isShoppingListBill: false,
-      createdAt: new Date('03-12-2025').getTime(),
+      createdAt: new Date().getTime(),
+      updatedAt: null,
+    }),
+  },
+  {
+    id: '19582167-7jwr-1142-65cb-74d03d7az318',
+    data: () => ({
+      personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+      userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+      descriptionBill: 'Tim',
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Internet/TV',
+      categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+      categoryGroup: CategoryGroupEnum.HOUSING,
+      fixedBill: false,
+      billDate: new Date('03-12-2025').getTime(),
+      payDate: null,
+      payOut: false,
+      icon: null,
+      amount: 62.9,
+      isPaymentCardBill: false,
+      isShoppingListBill: false,
+      createdAt: new Date().getTime(),
       updatedAt: null,
     }),
   },
@@ -165,45 +171,22 @@ const billsItemsSearchByPeriod = [
       personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Água',
-      fixedBill: true,
-      billDate: new Date('03-26-2025').getTime(),
-      payDate: new Date().getTime(),
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Água',
+      categoryDescriptionEnum: CategoryDescriptionEnum.WATER,
+      categoryGroup: CategoryGroupEnum.HOUSING,
+      fixedBill: false,
+      billDate: new Date('03-08-2025').getTime(),
+      payDate: null,
       payOut: false,
       icon: null,
       amount: 90.0,
-      paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-      paymentStatusDescription: 'A pagar',
-      categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-      categoryDescription: 'Serviços e Utilidades Públicas',
-      paymentMethodId: '',
-      paymentMethodDescription: '',
+      paymentMethodId: 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Boleto Bancário',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.BANK_SLIP,
       isPaymentCardBill: false,
       isShoppingListBill: false,
-      createdAt: new Date('03-26-2025').getTime(),
-      updatedAt: null,
-    }),
-  },
-  {
-    id: '87263410-4qws-3409-81ab-63c09b8bk215',
-    data: () => ({
-      personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-      userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-      descriptionBill: 'Cartão Visa',
-      fixedBill: true,
-      billDate: new Date('04-01-2025').getTime(),
-      payDate: new Date().getTime(),
-      payOut: false,
-      icon: null,
-      amount: 5200.0,
-      paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-      paymentStatusDescription: 'A pagar',
-      categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-      categoryDescription: 'Despesa com Cartão de Crédito',
-      paymentMethodId: '',
-      paymentMethodDescription: '',
-      isPaymentCardBill: false,
-      isShoppingListBill: false,
-      createdAt: new Date('04-01-2025').getTime(),
+      createdAt: new Date().getTime(),
       updatedAt: null,
     }),
   },
@@ -213,9 +196,12 @@ const userIdMock = '1234567d';
 
 let billRepo: BillsRepositoryFirebase;
 const mergeSortMock: MergeSortGateway = new MargeSortHelper();
-const applayPagination: ApplyPaginationHelper = new ApplyPaginationHelper();
+const applyPagination: ApplyPaginationHelper = new ApplyPaginationHelper();
+const applySortStatus: ApplySortStatusHelper = new ApplySortStatusHelper();
 const handleCanProgressToWritteOperation: HandleCanProgressToWritteOperationHelper =
   new HandleCanProgressToWritteOperationHelper();
+const applySearchByDateMock: ApplySearchByDateHelper =
+  new ApplySearchByDateHelper();
 
 describe('Bill Repository Firebase', () => {
   beforeEach(() => {
@@ -225,8 +211,10 @@ describe('Bill Repository Firebase', () => {
     billRepo = BillsRepositoryFirebase.create(
       dbFirestore,
       mergeSortMock,
-      applayPagination,
+      applyPagination,
       handleCanProgressToWritteOperation,
+      applySortStatus,
+      applySearchByDateMock,
     );
   });
 
@@ -315,7 +303,7 @@ describe('Bill Repository Firebase', () => {
     const items = result.content;
 
     expect(items[0].amount).toEqual(8209.56);
-    expect(items[1].amount).toEqual(1200);
+    expect(items[1].amount).toEqual(1200.56);
     expect(items[2].amount).toEqual(148);
   });
 
@@ -347,14 +335,14 @@ describe('Bill Repository Firebase', () => {
     const result = await billRepo.getBills({
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.SUPERMARKET },
       ordering: { amount: SortOrder.DESC },
       sortByBills: {
-        amount: 12000,
-        fixedBill: true,
+        amount: 140,
+        fixedBill: false,
         payOut: true,
         isPaymentCardBill: false,
-        isShoppingListBill: true,
+        isShoppingListBill: false,
       },
       searchByDate: {
         billDate: {
@@ -364,12 +352,54 @@ describe('Bill Repository Firebase', () => {
       userId: userIdMock,
     });
 
-    expect(result.content.length).toEqual(0);
-    expect(result.totalElements).toEqual(0);
+    expect(result.content.length).toEqual(1);
+    expect(result.totalElements).toEqual(1);
     expect(result.page).toEqual(0);
     expect(result.size).toEqual(10);
-    expect(result.totalPages).toEqual(0);
+    expect(result.totalPages).toEqual(1);
     expect(result.ordering).toEqual({ amount: 'desc' });
+    expect(result.content[0].id).toEqual(billsItemsMock[1].id);
+  });
+
+  it('should be can search by paymentStatus "DUE_DAY" analyzing the payout, billDate and payDate attributes to return the items that match the search.', async () => {
+    firestore.where().orderBy().get.mockResolvedValueOnce({
+      docs: billsItemsMock,
+    });
+
+    const result = await billRepo.getBills({
+      size: 10,
+      page: 0,
+      sort: { paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY },
+      userId: userIdMock,
+    });
+
+    expect(result.content.length).toEqual(1);
+    expect(result.totalElements).toEqual(1);
+    expect(result.page).toEqual(0);
+    expect(result.size).toEqual(10);
+    expect(result.totalPages).toEqual(1);
+    expect(result.content[0].id).toEqual(billsItemsMock[2].id);
+  });
+
+  it('should be can search by paymentStatus "PAID" analyzing the payout, billDate and payDate attributes to return the items that match the search.', async () => {
+    firestore.where().orderBy().get.mockResolvedValueOnce({
+      docs: billsItemsMock,
+    });
+
+    const result = await billRepo.getBills({
+      size: 10,
+      page: 0,
+      sort: { paymentStatus: PaymentStatusDescriptionEnum.PAID },
+      userId: userIdMock,
+    });
+
+    expect(result.content.length).toEqual(2);
+    expect(result.totalElements).toEqual(2);
+    expect(result.page).toEqual(0);
+    expect(result.size).toEqual(10);
+    expect(result.totalPages).toEqual(1);
+    expect(result.content[0].id).toEqual(billsItemsMock[0].id);
+    expect(result.content[1].id).toEqual(billsItemsMock[1].id);
   });
 
   it('should be search with searchByDate parameter with initial and final date request.', async () => {
@@ -389,8 +419,8 @@ describe('Bill Repository Firebase', () => {
       userId: userIdMock,
     });
 
-    expect(result.content.length).toEqual(3);
-    expect(result.totalElements).toEqual(3);
+    expect(result.content.length).toEqual(2);
+    expect(result.totalElements).toEqual(2);
     expect(result.page).toEqual(0);
     expect(result.size).toEqual(10);
     expect(result.totalPages).toEqual(1);
@@ -627,17 +657,17 @@ describe('Bill Repository Firebase', () => {
       size: 10,
     });
 
-    expect(result.content.length).toEqual(3);
+    expect(result.content.length).toEqual(4);
     expect(result.content[0].billDate).toEqual(
       new Date('03-01-2025').getTime(),
     );
     expect(result.content[0].payOut).toBeFalsy();
-    expect(result.content[1].billDate).toEqual(
-      new Date('03-12-2025').getTime(),
+    expect(result.content[3].billDate).toEqual(
+      new Date('03-26-2025').getTime(),
     );
     expect(result.content[1].payOut).toBeFalsy();
     expect(result.content[2].billDate).toEqual(
-      new Date('03-26-2025').getTime(),
+      new Date('03-12-2025').getTime(),
     );
     expect(result.content[2].payOut).toBeFalsy();
   });

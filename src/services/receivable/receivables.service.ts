@@ -9,6 +9,7 @@ import {
   GetReceivableByIdInputDTO,
   GetReceivablesInputDTO,
   ReceivableDTO,
+  ReceivablesByMonthInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableRepositoryGateway } from '@/domain/Receivable/gateway/receivable.repository.gateway';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
@@ -105,7 +106,7 @@ export class ReceivableService implements ReceivableServiceGateway {
 
     if (receivable?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
     }
 
@@ -125,7 +126,7 @@ export class ReceivableService implements ReceivableServiceGateway {
 
     if (receivable?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
 
       const keyToSave = `${userId}:${this.keyController}-list-by-id-${receivable.id}`;
@@ -146,5 +147,39 @@ export class ReceivableService implements ReceivableServiceGateway {
     await this.db.deleteReceivable({ id, userId });
 
     await this.cache.deleteWithPattern(`${userId}:${this.keyController}`);
+  }
+
+  public async receivablesByMonth({
+    period,
+    userId,
+    page,
+    size,
+  }: ReceivablesByMonthInputDTO): Promise<ResponseListDTO<ReceivableDTO>> {
+    const key = `${userId}:${this.keyController}-list-by-receivables-by-month-${period.initialDate}-${period.finalDate}-${page}-${size}`;
+
+    const receivablesCache = await this.cache.recover<
+      ResponseListDTO<ReceivableDTO>
+    >(key);
+
+    if (receivablesCache && receivablesCache.content.length > 0) {
+      return receivablesCache;
+    }
+
+    const receivablesDb = await this.db.receivablesByMonth({
+      period,
+      userId,
+      page,
+      size,
+    });
+
+    if (receivablesDb.content.length > 0) {
+      await this.cache.save<ResponseListDTO<ReceivableDTO>>(
+        key,
+        receivablesDb,
+        this.TTL_DEFAULT,
+      );
+    }
+
+    return receivablesDb;
   }
 }

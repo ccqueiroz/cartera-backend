@@ -97,7 +97,7 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
     }
 
@@ -113,10 +113,10 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list-all`,
+        `${userId}:${this.keyController}-list`,
       );
 
-      const keyToSave = `${userId}:${this.keyController}-list-by-id-${bill.id}`;
+      const keyToSave = `${userId}:${this.keyController}-bill-by-id-${bill.id}`;
       await this.cache.save<BillDTO>(keyToSave, bill, this.TTL_DEFAULT);
     }
 
@@ -135,7 +135,7 @@ export class BillService implements BillServiceGateway {
     page,
     size,
   }: BillsPayableMonthInputDTO): Promise<ResponseListDTO<BillDTO>> {
-    const key = `${userId}:${this.keyController}-by-month-status-${period.initialDate}-${period.finalDate}-${page}-${size}`;
+    const key = `${userId}:${this.keyController}-list-by-payable-month-${period.initialDate}-${period.finalDate}-${page}-${size}`;
 
     const billsCache = await this.cache.recover<ResponseListDTO<BillDTO>>(key);
 

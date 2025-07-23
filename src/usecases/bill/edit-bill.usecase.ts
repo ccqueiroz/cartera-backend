@@ -1,7 +1,7 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
 import { EditBillInputDTO, BillDTO } from '@/domain/Bill/dtos/bill.dto';
 import { Usecase } from '../usecase';
-import { ValidateCategoryPaymentMethodStatusUseCase } from '../validate_entities/validate-category-payment-method-status.usecase';
+import { ValidateCategoryPaymentMethodUseCase } from '../validate_entities/validate-category-payment-method.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
@@ -13,19 +13,19 @@ export class EditBillUseCase
 {
   private constructor(
     private readonly billService: BillServiceGateway,
-    private readonly validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase,
+    private readonly validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase,
   ) {}
 
   public static create({
     billService,
-    validateCategoryPaymentMethodStatusService,
+    validateCategoryPaymentMethodService,
   }: {
     billService: BillServiceGateway;
-    validateCategoryPaymentMethodStatusService: ValidateCategoryPaymentMethodStatusUseCase;
+    validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase;
   }) {
     return new EditBillUseCase(
       billService,
-      validateCategoryPaymentMethodStatusService,
+      validateCategoryPaymentMethodService,
     );
   }
 
@@ -42,25 +42,32 @@ export class EditBillUseCase
       throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);
     }
 
-    const hasReceivable = await this.billService.getBillById({
+    if (billData.payOut && !billData?.payDate) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
+    }
+
+    if (billData.payOut && !billData?.paymentMethodId) {
+      throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
+    }
+
+    const hasBill = await this.billService.getBillById({
       id: billId,
       userId,
     });
 
-    if (!hasReceivable) {
+    if (!hasBill) {
       throw new ApiError(ERROR_MESSAGES.BILL_NOT_FOUND, 404);
     }
 
-    const validateCategoryPaymentMethodStatusService =
-      await this.validateCategoryPaymentMethodStatusService.execute({
+    const validateCategoryPaymentMethodService =
+      await this.validateCategoryPaymentMethodService.execute({
         categoryId: billData.categoryId,
         paymentMethodId: billData.paymentMethodId,
-        paymentStatusId: billData.paymentStatusId,
       });
 
-    if (!validateCategoryPaymentMethodStatusService) {
+    if (!validateCategoryPaymentMethodService) {
       throw new ApiError(
-        ERROR_MESSAGES.INVALID_CATEGORY_PAYMENT_METHOD_OR_PAYMENT_STATUS,
+        ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
       );
     }
@@ -79,20 +86,22 @@ export class EditBillUseCase
         descriptionBill: bill.descriptionBill,
         fixedBill: bill.fixedBill,
         billDate: bill.billDate,
-        payDate: bill.payDate,
-        payOut: bill.payOut,
         icon: bill?.icon ?? null,
         amount: bill.amount,
-        paymentStatusId: bill.paymentStatusId,
-        paymentStatusDescription: bill.paymentStatusDescription,
         categoryId: bill.categoryId,
         categoryDescription: bill.categoryDescription,
+        categoryDescriptionEnum: bill.categoryDescriptionEnum,
+        categoryGroup: bill.categoryGroup,
         paymentMethodId: bill.paymentMethodId,
         paymentMethodDescription: bill.paymentMethodDescription,
-        isPaymentCardBill: bill.isPaymentCardBill,
+        paymentMethodDescriptionEnum: bill.paymentMethodDescriptionEnum,
+        paymentStatus: bill.paymentStatus,
+        payOut: bill.payOut,
+        payDate: bill.payDate,
         invoiceCarData: bill.invoiceCarData,
-        isShoppingListBill: bill.isShoppingListBill,
         shoppingListData: bill.shoppingListData,
+        isPaymentCardBill: bill.isPaymentCardBill,
+        isShoppingListBill: bill.isShoppingListBill,
         createdAt: bill.createdAt,
         updatedAt: bill.updatedAt,
       },

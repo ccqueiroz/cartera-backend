@@ -3,6 +3,7 @@ import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { PaymentMethodEntitie } from '@/domain/Payment_Method/entitie/payment-method.entitie';
 import { dbFirestore } from '../../database/firebase/firebase.database';
 import { firestore } from '@/test/mocks/firebase-admin.mock';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 describe('Payment Method Repository Firebase', () => {
   let paymentMethodRepo: PaymentMethodRepositoryFirebase;
@@ -26,7 +27,8 @@ describe('Payment Method Repository Firebase', () => {
         {
           id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
           data: () => ({
-            description: 'Cartão de crédito',
+            description: 'Cartão de Crédito',
+            descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -34,7 +36,8 @@ describe('Payment Method Repository Firebase', () => {
         {
           id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
           data: () => ({
-            description: 'Cartão de débito',
+            description: 'Cartão de Débito',
+            descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -43,6 +46,7 @@ describe('Payment Method Repository Firebase', () => {
           id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
           data: () => ({
             description: 'Pix',
+            descriptionEnum: PaymentMethodDescriptionEnum.PIX,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -51,6 +55,7 @@ describe('Payment Method Repository Firebase', () => {
           id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
           data: () => ({
             description: 'Dinheiro',
+            descriptionEnum: PaymentMethodDescriptionEnum.CASH,
             createdAt: new Date().getTime(),
             updatedAt: new Date().getTime(),
           }),
@@ -65,6 +70,7 @@ describe('Payment Method Repository Firebase', () => {
         expect.objectContaining({
           id: expect.any(String),
           description: expect.any(String),
+          descriptionEnum: expect.any(String),
           createdAt: expect.any(Number),
           updatedAt: expect.any(Number),
         }),
@@ -75,7 +81,8 @@ describe('Payment Method Repository Firebase', () => {
     expect(result.length).toEqual(4);
     expect(result.shift()).toEqual({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      description: 'Cartão de crédito',
+      description: 'Cartão de Crédito',
+      descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -109,7 +116,8 @@ describe('Payment Method Repository Firebase', () => {
       exists: true,
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       data: () => ({
-        description: 'Cartão de crédito',
+        description: 'Cartão de Crédito',
+        descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       }),
@@ -122,7 +130,10 @@ describe('Payment Method Repository Firebase', () => {
     expect(firestore.get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
-    expect(result?.description).toBe('Cartão de crédito');
+    expect(result?.description).toBe('Cartão de Crédito');
+    expect(result?.descriptionEnum).toBe(
+      PaymentMethodDescriptionEnum.CREDIT_CARD,
+    );
     expect(result?.createdAt).toEqual(expect.any(Number));
     expect(result?.updatedAt).toEqual(expect.any(Number));
   });

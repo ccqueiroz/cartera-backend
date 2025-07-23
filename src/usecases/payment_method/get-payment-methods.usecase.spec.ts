@@ -1,5 +1,6 @@
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
 import { GetPaymentMethodsUseCase } from './get-payment-methods.usecase';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 let paymentMethodServiceGatewayMock: jest.Mocked<PaymentMethodServiceGateway>;
 
@@ -24,25 +25,29 @@ describe('Get Payment Methods', () => {
     paymentMethodServiceGatewayMock.getPaymentMethods.mockResolvedValue([
       {
         id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-        description: 'Cartão de crédito',
+        description: 'Cartão de Crédito',
+        descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
-        description: 'Cartão de débito',
+        description: 'Cartão de Débito',
+        descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
         description: 'Pix',
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },
       {
         id: 'e6c30985-de80-4d5b-aebd-95e9eb49dc8d',
         description: 'Dinheiro',
+        descriptionEnum: PaymentMethodDescriptionEnum.CASH,
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
       },

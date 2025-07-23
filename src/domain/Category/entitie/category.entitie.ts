@@ -17,6 +17,14 @@ export class CategoryEntitie {
     return this.props.description;
   }
 
+  public get descriptionEnum() {
+    return this.props.descriptionEnum;
+  }
+
+  public get group() {
+    return this.props.group;
+  }
+
   public get type() {
     return this.props.type;
   }

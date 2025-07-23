@@ -7,6 +7,7 @@ import {
   GetReceivableByIdInputDTO,
   GetReceivablesInputDTO,
   ReceivableDTO,
+  ReceivablesByMonthInputDTO,
 } from '../dtos/receivable.dto';
 
 export interface ReceivableRepositoryGateway {
@@ -31,4 +32,8 @@ export interface ReceivableRepositoryGateway {
   }: EditReceivableInputDTO): Promise<ReceivableDTO>;
 
   deleteReceivable({ id, userId }: DeleteReceivableInputDTO): Promise<void>;
+
+  receivablesByMonth(
+    input: ReceivablesByMonthInputDTO,
+  ): Promise<ResponseListDTO<ReceivableDTO>>;
 }

@@ -1,7 +1,11 @@
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
 import { CashFlowEntitie } from './cash-flow.entitie';
 import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 import { ReceivableDTO } from '@/domain/Receivable/dtos/receivable.dto';
 import { Months } from '@/domain/dtos/months.dto';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 const createMockBill = (amount: number, paid = false): BillDTO => ({
   personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
@@ -13,12 +17,18 @@ const createMockBill = (amount: number, paid = false): BillDTO => ({
   payOut: paid,
   icon: null,
   amount,
-  paymentStatusId: 'status-id',
-  paymentStatusDescription: 'Paid',
-  categoryId: 'cat-id',
-  categoryDescription: 'Education',
-  paymentMethodId: 'method-id',
-  paymentMethodDescription: 'Pix',
+  categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+  categoryDescription: 'Educação',
+  paymentMethodId: paid ? 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d' : undefined,
+  paymentMethodDescription: paid ? 'Pix' : undefined,
+  paymentMethodDescriptionEnum: paid
+    ? PaymentMethodDescriptionEnum.CASH
+    : undefined,
+  categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+  categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+  paymentStatus: paid
+    ? PaymentStatusDescriptionEnum.PAID
+    : PaymentStatusDescriptionEnum.DUE_DAY,
   isPaymentCardBill: false,
   isShoppingListBill: false,
   createdAt: new Date().getTime(),
@@ -36,12 +46,18 @@ const createMockReceivable = (amount: number, paid = false): ReceivableDTO => ({
   receival: paid,
   icon: null,
   amount,
-  paymentStatusId: 'status-id',
-  paymentStatusDescription: 'Paid',
-  categoryId: 'cat-id',
-  categoryDescription: 'Salary',
-  paymentMethodId: 'method-id',
-  paymentMethodDescription: 'Deposit',
+  categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+  categoryDescription: 'Educação',
+  paymentMethodId: paid ? 'f8c3e2b7-4a9e-4f6b-8d2e-3b7c6a1e5f9d' : undefined,
+  paymentMethodDescription: paid ? 'Pix' : undefined,
+  paymentMethodDescriptionEnum: paid
+    ? PaymentMethodDescriptionEnum.CASH
+    : undefined,
+  categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+  categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+  paymentStatus: paid
+    ? PaymentStatusDescriptionEnum.PAID
+    : PaymentStatusDescriptionEnum.DUE_DAY,
   createdAt: new Date().getTime(),
   updatedAt: new Date().getTime(),
 });

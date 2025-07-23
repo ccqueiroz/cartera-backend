@@ -11,11 +11,14 @@ import {
   Type,
   ValidateIf,
   OnlyOnePropertieDefined,
+  IsIn,
 } from '@/packages/clients/class-validator';
 import { UserIdAuthValidation } from '../Auth/auth.schema';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusDTO } from '../Common/sort-by-status.schema';
 import { SearchByDateDTO } from '../Common/search-by-date.schema';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 
 class ReceivableCommomValidations extends UserIdAuthValidation {
   @IsDefined()
@@ -61,16 +64,6 @@ class ReceivableCommomValidations extends UserIdAuthValidation {
   @IsDefined()
   @IsString()
   @MaxLength(60)
-  paymentStatusId!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(255)
-  paymentStatusDescription!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(60)
   categoryId!: string;
 
   @IsDefined()
@@ -78,15 +71,27 @@ class ReceivableCommomValidations extends UserIdAuthValidation {
   @MaxLength(255)
   categoryDescription!: string;
 
+  @IsDefined()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(CategoryDescriptionEnum))
+  categoryDescriptionEnum!: keyof typeof CategoryDescriptionEnum;
+
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  paymentMethodId!: string;
+  paymentMethodId?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  paymentMethodDescription!: string;
+  paymentMethodDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(PaymentMethodDescriptionEnum))
+  paymentMethodDescriptionEnum?: keyof typeof PaymentMethodDescriptionEnum;
 }
 
 export class CreateReceivableValidationDTO extends ReceivableCommomValidations {}
@@ -100,10 +105,42 @@ export class EditReceivableValidationDTO extends ReceivableCommomValidations {
   @IsDefined()
   @IsNumber()
   createdAt!: number;
+}
+
+export class EditReceivableByMonthValidationDTO {
+  @IsDefined()
+  @IsString()
+  @MaxLength(60)
+  id!: string;
+
+  @IsDefined()
+  @IsString()
+  @MaxLength(60)
+  personUserId!: string;
 
   @IsOptional()
   @IsNumber()
-  updatedAt!: number | null;
+  receivalDate!: number | null;
+
+  @IsDefined()
+  @IsBoolean()
+  receival!: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  paymentMethodId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  paymentMethodDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  @IsIn(Object.values(PaymentMethodDescriptionEnum))
+  paymentMethodDescriptionEnum?: keyof typeof PaymentMethodDescriptionEnum;
 }
 
 export class GetReceivableByIdValidationDTO extends UserIdAuthValidation {
@@ -159,15 +196,19 @@ class OrderByDTO {
 
   @IsOptional()
   @IsEnum(SortOrder)
-  categoryId?: SortOrder;
+  category?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  paymentMethodId?: SortOrder;
+  categoryGroup?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
-  paymentStatusId?: SortOrder;
+  paymentMethod?: SortOrder;
+
+  @IsOptional()
+  @IsEnum(SortOrder)
+  paymentStatus?: SortOrder;
 
   @IsOptional()
   @IsEnum(SortOrder)
@@ -181,9 +222,10 @@ class OrderByDTO {
     'amount',
     'receivableDate',
     'receivalDate',
-    'categoryId',
-    'paymentMethodId',
-    'paymentStatusId',
+    'category',
+    'categoryGroup',
+    'paymentMethod',
+    'paymentStatus',
     'createdAt',
     'updatedAt',
   ])
@@ -216,4 +258,20 @@ export class GetReceivablesInputValidationDTO extends UserIdAuthValidation {
   @ValidateNested()
   @Type(() => OrderByDTO)
   ordering?: OrderByDTO;
+}
+
+export class GetReceivablesByMonthDTO extends UserIdAuthValidation {
+  @IsDefined()
+  @IsNumber()
+  initialDate!: number;
+
+  @IsDefined()
+  @IsNumber()
+  finalDate!: number;
+
+  @IsNumber()
+  page!: number;
+
+  @IsNumber()
+  size!: number;
 }

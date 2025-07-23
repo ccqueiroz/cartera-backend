@@ -4,6 +4,10 @@ import { ReceivableRepositoryGateway } from '@/domain/Receivable/gateway/receiva
 import { ReceivableService } from './receivables.service';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { generateHashHelper } from '@/infra/helpers';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
+import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 let dbMock: jest.Mocked<ReceivableRepositoryGateway>;
 let cacheMock: jest.Mocked<CacheGateway>;
@@ -25,6 +29,7 @@ describe('Receivable Service', () => {
       createReceivable: jest.fn(),
       updateReceivable: jest.fn(),
       deleteReceivable: jest.fn(),
+      receivablesByMonth: jest.fn(),
     };
 
     cacheMock = {
@@ -57,43 +62,42 @@ describe('Receivable Service', () => {
     const data = {
       content: [
         {
-          id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
-          categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-          paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-          paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
           personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
           userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
           descriptionReceivable: 'Test Receivable 1',
           fixedReceivable: true,
           receivableDate: new Date().getTime(),
-          icon: null,
-          amount: 100,
-          categoryDescription: 'Test Category 1',
-          paymentMethodDescription: 'Test Payment Method 1',
-          paymentStatusDescription: 'Paid',
-          createdAt: new Date().getTime(),
           receivalDate: null,
           receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
           updatedAt: null,
         },
         {
           id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
-          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-          paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-          paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
           personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
           userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
           descriptionReceivable: 'Test Receivable 2',
           fixedReceivable: false,
           receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
           icon: null,
           amount: 200,
-          categoryDescription: 'Test Category 2',
-          paymentMethodDescription: 'Test Payment Method 1',
-          paymentStatusDescription: 'Pending',
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
           createdAt: new Date().getTime(),
-          receivalDate: null,
-          receival: false,
           updatedAt: null,
         },
       ],
@@ -107,7 +111,7 @@ describe('Receivable Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.RENT_INCOME },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
@@ -143,42 +147,42 @@ describe('Receivable Service', () => {
     const data = {
       content: [
         {
-          categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-          paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-          paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
           personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
           userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
           descriptionReceivable: 'Test Receivable 1',
           fixedReceivable: true,
           receivableDate: new Date().getTime(),
-          icon: null,
-          amount: 100,
-          categoryDescription: 'Test Category 1',
-          paymentMethodDescription: 'Test Payment Method 1',
-          paymentStatusDescription: 'Paid',
-          createdAt: new Date().getTime(),
           receivalDate: null,
           receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
           updatedAt: null,
         },
         {
           id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
-          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-          paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-          paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
           personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
           userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
           descriptionReceivable: 'Test Receivable 2',
           fixedReceivable: false,
           receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
           icon: null,
           amount: 200,
-          categoryDescription: 'Test Category 2',
-          paymentMethodDescription: 'Test Payment Method 1',
-          paymentStatusDescription: 'Pending',
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
           createdAt: new Date().getTime(),
-          receivalDate: null,
-          receival: false,
           updatedAt: null,
         },
       ],
@@ -192,7 +196,7 @@ describe('Receivable Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.RENT_INCOME },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
@@ -235,7 +239,7 @@ describe('Receivable Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.RENT_INCOME },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
@@ -279,7 +283,7 @@ describe('Receivable Service', () => {
     const input = {
       size: 10,
       page: 0,
-      sort: { categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1' },
+      sort: { category: CategoryDescriptionEnum.RENT_INCOME },
       ordering: { amount: SortOrder.DESC },
       sortByReceivables: {
         amount: 12000,
@@ -313,22 +317,23 @@ describe('Receivable Service', () => {
   it('should be call getReceivableById and return the data from db', async () => {
     const data = {
       id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
       personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
       userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
       amount: 200,
-      categoryDescription: 'Test Category 2',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Pending',
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: null,
     };
 
@@ -354,22 +359,23 @@ describe('Receivable Service', () => {
   it('should be call getReceivableById and return the data from cache provider', async () => {
     const data = {
       id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
       personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
       userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
       amount: 200,
-      categoryDescription: 'Test Category 2',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Pending',
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: null,
     };
 
@@ -437,22 +443,22 @@ describe('Receivable Service', () => {
 
   it('should be call method createReceivable from db provider and after response this provider, must delete the all stored keys that represent list-all from cache provider', async () => {
     const data = {
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
       personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
       userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
       amount: 200,
-      categoryDescription: 'Test Category 2',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Pending',
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: null,
     };
 
@@ -467,7 +473,7 @@ describe('Receivable Service', () => {
       receivableData: data,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list-all`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
 
     expect(dbMock.createReceivable).toHaveBeenCalled();
     expect(dbMock.createReceivable).toHaveBeenCalledWith({
@@ -483,22 +489,22 @@ describe('Receivable Service', () => {
 
   it('should be call method createReceivable from db provider and after response failed, mustnt call deleteWithPattern from cache provider.', async () => {
     const data = {
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'b2c3d4e5-f6a1-8901-2345-67890abcde15',
       personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
       userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
       amount: 200,
-      categoryDescription: 'Test Category 2',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Pending',
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: null,
     };
 
@@ -524,22 +530,23 @@ describe('Receivable Service', () => {
   it('should be call method updateReceivable from db provider and after response this provider, must delete the all stored keys that represent list-all from cache provider and find the data from key in cache and data replace.', async () => {
     const data = {
       id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
-      categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
-      personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
-      userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
-      descriptionReceivable: 'Test Receivable 1',
-      fixedReceivable: true,
+      personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+      userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+      descriptionReceivable: 'Test Receivable 2',
+      fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
-      amount: 100,
-      categoryDescription: 'Test Category 1',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Paid',
+      amount: 200,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: new Date().getTime(),
     };
 
@@ -551,7 +558,7 @@ describe('Receivable Service', () => {
       receivableId: data.id,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list-all`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
 
     const keyToDataReplace = `${userIdMock}:${keyController}-list-by-id-${data.id}`;
 
@@ -573,22 +580,23 @@ describe('Receivable Service', () => {
   it('should be call method updateBill from db provider and after response failed, mustnt call deleteWithPattern from cache provider and save this data.', async () => {
     const data = {
       id: 'a1b2c3d4-e5f6-7890-1234-56789abcdef0',
-      categoryId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef1',
-      paymentMethodId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef2',
-      paymentStatusId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef3',
-      personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
-      userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
-      descriptionReceivable: 'Test Receivable 1',
-      fixedReceivable: true,
+      personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+      userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+      descriptionReceivable: 'Test Receivable 2',
+      fixedReceivable: false,
       receivableDate: new Date().getTime(),
+      receivalDate: new Date().getTime(),
+      receival: true,
       icon: null,
-      amount: 100,
-      categoryDescription: 'Test Category 1',
-      paymentMethodDescription: 'Test Payment Method 1',
-      paymentStatusDescription: 'Paid',
+      amount: 200,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodDescription: 'Pix',
+      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
-      receivalDate: null,
-      receival: false,
       updatedAt: new Date().getTime(),
     };
 
@@ -628,5 +636,220 @@ describe('Receivable Service', () => {
     expect(cacheMock.deleteWithPattern).toHaveBeenCalledWith(
       patternKeysToDelete,
     );
+  });
+
+  it('should be call receivablesByMonth and return the data from cache provider', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+          userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+          descriptionReceivable: 'Test Receivable 1',
+          fixedReceivable: true,
+          receivableDate: new Date().getTime(),
+          receivalDate: null,
+          receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+        {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+          personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+          userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+          descriptionReceivable: 'Test Receivable 2',
+          fixedReceivable: false,
+          receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
+          icon: null,
+          amount: 200,
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 2,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    const input = {
+      period: {
+        initialDate: new Date('2025, 02, 01').getTime(),
+        finalDate: new Date('2025, 05, 01').getTime(),
+      },
+      userId: userIdMock,
+      page: 0,
+      size: 10,
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+
+    const key = `${input.userId}:${keyController}-list-by-receivables-by-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
+
+    const result = await receivableService.receivablesByMonth(input);
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.receivablesByMonth).not.toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result.content.length).toEqual(2);
+  });
+
+  it('should be call receivablesByMonth and return the data from db provider', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+          userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+          descriptionReceivable: 'Test Receivable 1',
+          fixedReceivable: true,
+          receivableDate: new Date().getTime(),
+          receivalDate: null,
+          receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+        {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+          personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+          userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+          descriptionReceivable: 'Test Receivable 2',
+          fixedReceivable: false,
+          receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
+          icon: null,
+          amount: 200,
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 2,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    const input = {
+      period: {
+        initialDate: new Date('2025, 02, 01').getTime(),
+        finalDate: new Date('2025, 05, 01').getTime(),
+      },
+      userId: userIdMock,
+      page: 0,
+      size: 10,
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.receivablesByMonth.mockResolvedValue(data);
+
+    const key = `${input.userId}:${keyController}-list-by-receivables-by-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
+
+    const result = await receivableService.receivablesByMonth(input);
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.receivablesByMonth).toHaveBeenCalled();
+    expect(cacheMock.save).toHaveBeenCalled();
+    expect(result.content.length).toEqual(2);
+  });
+
+  it('should be call receivablesByMonth and mustnt be not call the save method of the cache provider when the data response from db provider to be empty list', async () => {
+    const data = {
+      content: [],
+      page: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    const input = {
+      period: {
+        initialDate: new Date('2025, 02, 01').getTime(),
+        finalDate: new Date('2025, 05, 01').getTime(),
+      },
+      userId: userIdMock,
+      page: 0,
+      size: 10,
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.receivablesByMonth.mockResolvedValue(data);
+
+    const key = `${input.userId}:${keyController}-list-by-receivables-by-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
+
+    const result = await receivableService.receivablesByMonth(input);
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.receivablesByMonth).toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result.content.length).toEqual(0);
+  });
+
+  it('should be call receivablesByMonth and must be call the db repository when the data response of the cache repository return empty list', async () => {
+    const data = {
+      content: [],
+      page: 0,
+      size: 10,
+      totalElements: 0,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    const input = {
+      period: {
+        initialDate: new Date('2025, 02, 01').getTime(),
+        finalDate: new Date('2025, 05, 01').getTime(),
+      },
+      userId: userIdMock,
+      page: 0,
+      size: 10,
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.receivablesByMonth.mockResolvedValue(data);
+
+    const key = `${input.userId}:${keyController}-list-by-receivables-by-month-${input.period.initialDate}-${input.period.finalDate}-${input.page}-${input.size}`;
+
+    const result = await receivableService.receivablesByMonth(input);
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.receivablesByMonth).toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result.content.length).toEqual(0);
   });
 });

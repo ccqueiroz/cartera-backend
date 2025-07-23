@@ -1,5 +1,8 @@
 import { MaskAmountGateway } from '@/domain/Masks/MaskNumbers/gateway/mask-amount.gateway';
 import { BillDTO } from '../dtos/bill.dto';
+import { PaymentStatusEntitie } from '@/domain/Payment_Status/entitie/payment-status.entitie';
+import { ApiError } from '@/helpers/errors';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 export type BillEntitieProps = BillDTO;
 
@@ -9,6 +12,26 @@ export class BillEntitie {
 
   public static setMaskAmountGateway(maskAmountGateway: MaskAmountGateway) {
     this.maskAmountGateway = maskAmountGateway;
+  }
+
+  private static validateProps(props: Partial<BillEntitieProps>) {
+    if (!props.billDate) {
+      throw new ApiError(
+        'Bill Date is not set. Please set the Bill date.',
+        400,
+      );
+    }
+
+    if (props.amount == null) {
+      throw new ApiError('Amount is required.', 400);
+    }
+
+    if (!BillEntitie.maskAmountGateway) {
+      throw new ApiError(
+        'MaskAmountGateway is not set. Please configure it first.',
+        400,
+      );
+    }
   }
 
   public static create({
@@ -21,19 +44,20 @@ export class BillEntitie {
     payOut = false,
     icon,
     amount,
-    paymentStatusId,
-    paymentStatusDescription,
     categoryId,
     categoryDescription,
-    paymentMethodId,
-    paymentMethodDescription,
+    categoryDescriptionEnum,
+    categoryGroup,
+    paymentMethodId = undefined,
+    paymentMethodDescription = undefined,
+    paymentMethodDescriptionEnum = undefined,
     isPaymentCardBill = false,
     invoiceCarData,
     isShoppingListBill = false,
     shoppingListData,
     createdAt,
-  }: Omit<BillEntitieProps, 'updatedAt' | 'id'>) {
-    const maskedAmount = this.unMaskAmount(amount);
+  }: Omit<BillEntitieProps, 'updatedAt' | 'id' | 'paymentStatus'>) {
+    this.validateProps({ billDate, amount });
 
     return new BillEntitie({
       personUserId,
@@ -44,13 +68,15 @@ export class BillEntitie {
       payDate,
       payOut,
       icon,
-      amount: maskedAmount,
-      paymentStatusId,
-      paymentStatusDescription,
+      amount,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_PAY,
       categoryId,
       categoryDescription,
+      categoryDescriptionEnum,
+      categoryGroup,
       paymentMethodId,
       paymentMethodDescription,
+      paymentMethodDescriptionEnum,
       isPaymentCardBill,
       invoiceCarData,
       isShoppingListBill,
@@ -60,22 +86,28 @@ export class BillEntitie {
     });
   }
 
-  private static unMaskAmount(amount: number) {
-    if (!BillEntitie.maskAmountGateway) {
-      throw new Error(
-        'MaskAmountGateway is not set. Please configure it first.',
-      );
-    }
+  public static with(props: Omit<BillEntitieProps, 'paymentStatus'>) {
+    this.validateProps({ billDate: props.billDate, amount: props.amount });
 
-    const amountUnmasked = BillEntitie.maskAmountGateway.mask(amount).unmask;
+    return new BillEntitie({
+      ...props,
+      paymentStatus: PaymentStatusDescriptionEnum.TO_PAY,
+    });
+  }
 
+  private unMaskAmount(amount: number) {
+    const amountUnmasked = BillEntitie.maskAmountGateway?.mask(amount).unmask;
     return amountUnmasked ? +amountUnmasked : 0;
   }
 
-  public static with(props: BillEntitieProps) {
-    const maskedAmount = this.unMaskAmount(props.amount);
-
-    return new BillEntitie({ ...props, amount: maskedAmount });
+  private setPaymentStatus(wasPaid: boolean, billDate: number) {
+    const currentDay = new Date().getTime();
+    return PaymentStatusEntitie.setInvoiceStatus(
+      wasPaid,
+      billDate,
+      currentDay,
+      'bill',
+    );
   }
 
   public get id() {
@@ -103,7 +135,7 @@ export class BillEntitie {
   }
 
   public get payDate() {
-    return this.props.payDate;
+    return this.props.payOut ? this.props.payDate : null;
   }
 
   public get payOut() {
@@ -115,15 +147,17 @@ export class BillEntitie {
   }
 
   public get amount() {
-    return this.props.amount;
+    const maskedAmount = this.unMaskAmount(this.props.amount);
+    return maskedAmount;
   }
 
-  public get paymentStatusId() {
-    return this.props.paymentStatusId;
-  }
+  public get paymentStatus() {
+    const definePaymentStatus = this.setPaymentStatus(
+      this.props.payOut,
+      this.props.billDate as number,
+    );
 
-  public get paymentStatusDescription() {
-    return this.props.paymentStatusDescription;
+    return definePaymentStatus;
   }
 
   public get categoryId() {
@@ -134,12 +168,26 @@ export class BillEntitie {
     return this.props.categoryDescription;
   }
 
+  public get categoryDescriptionEnum() {
+    return this.props.categoryDescriptionEnum;
+  }
+
+  public get categoryGroup() {
+    return this.props.categoryGroup;
+  }
+
   public get paymentMethodId() {
-    return this.props.paymentMethodId;
+    return this.props.payOut ? this.props.paymentMethodId : undefined;
   }
 
   public get paymentMethodDescription() {
-    return this.props.paymentMethodDescription;
+    return this.props.payOut ? this.props.paymentMethodDescription : undefined;
+  }
+
+  public get paymentMethodDescriptionEnum() {
+    return this.props.payOut
+      ? this.props.paymentMethodDescriptionEnum
+      : undefined;
   }
 
   public get isPaymentCardBill() {

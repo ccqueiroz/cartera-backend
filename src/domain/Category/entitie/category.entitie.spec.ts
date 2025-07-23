@@ -1,3 +1,5 @@
+import { CategoryDescriptionEnum } from '../enums/category-description.enum';
+import { CategoryGroupEnum } from '../enums/category-group.enum';
 import { CategoryType } from '../enums/category-type.enum';
 import { CategoryEntitie } from './category.entitie';
 
@@ -6,6 +8,8 @@ describe('Category Entitie', () => {
     const categoryObject = {
       id: 'Ak982jkk118279',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: 1724708206117,
       updatedAt: 1724708206118,
@@ -22,6 +26,8 @@ describe('Category Entitie', () => {
     const categoryObject = {
       id: 'Ak982jkk118279',
       description: 'Restaurante',
+      descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+      group: CategoryGroupEnum.FOOD,
       type: CategoryType.BILLS,
       createdAt: 1724708206117,
       updatedAt: 1724708206118,
