@@ -1,4 +1,5 @@
 import { ApplyPaginationHelper } from './apply-pagination.helpers';
+import { ApplySearchByDateHelper } from './apply-search-by-date.helpers';
 import { ApplySortStatusHelper } from './apply-sort-status.helpers';
 import { CheckIfIsNecessaryCreateNewTokenHelpers } from './check-if-is-necessary-create-new-token.helpers';
 import { DeterministicSerializationObjectHelper } from './deterministic-serialization-object.helpers';
@@ -28,6 +29,8 @@ const generateHashHelper = GenerateHashHelper.create(
 
 const applySortStatusHelpers = new ApplySortStatusHelper();
 
+const applySearchByDateHelpers = new ApplySearchByDateHelper();
+
 export {
   checkIfIsNecessaryCreateNewTokenHelpers,
   applyPaginationHelpers,
@@ -36,4 +39,5 @@ export {
   normalizeIp,
   generateHashHelper,
   applySortStatusHelpers,
+  applySearchByDateHelpers,
 };
