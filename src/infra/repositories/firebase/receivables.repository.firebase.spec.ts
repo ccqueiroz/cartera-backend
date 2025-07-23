@@ -14,6 +14,7 @@ import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-descri
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 import { ApplySortStatusHelper } from '@/infra/helpers/apply-sort-status.helpers';
+import { ApplySearchByDateHelper } from '@/infra/helpers/apply-search-by-date.helpers';
 
 const receivablesItemsMocks = [
   {
@@ -156,6 +157,8 @@ describe('Receivable Repository Firebase', () => {
   const handleCanProgressToWritteOperation: HandleCanProgressToWritteOperationHelper =
     new HandleCanProgressToWritteOperationHelper();
   const applySortStatus: ApplySortStatusHelper = new ApplySortStatusHelper();
+  const applySearchByDateMock: ApplySearchByDateHelper =
+    new ApplySearchByDateHelper();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -167,6 +170,7 @@ describe('Receivable Repository Firebase', () => {
       applayPagination,
       handleCanProgressToWritteOperation,
       applySortStatus,
+      applySearchByDateMock,
     );
   });
 
