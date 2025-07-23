@@ -1,14 +1,15 @@
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ApiError } from '@/helpers/errors';
-import { StatusBill } from '@/domain/Bill/dtos/bill.dto';
+import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
 import { GetBillsPayableMonthUseCase } from './get-bills-payable-month.usecase';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 
 let billServiceMock: jest.Mocked<BillServiceGateway>;
 let getBillsPayableMonthUseCase: GetBillsPayableMonthUseCase;
 const userIdMock = '1234567d';
-
-jest.useFakeTimers().setSystemTime(new Date('2025-03-10').getTime());
 
 const input = {
   userId: userIdMock,
@@ -22,48 +23,18 @@ const input = {
 
 const billsMock = [
   {
-    id: '24177d92-1aee-4479-859b-72f01c9ade24',
-    personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
-    userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
-    descriptionBill: 'Supermercado',
-    fixedBill: false,
-    billDate: new Date('03-05-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: true,
-    icon: null,
-    amount: 1200.0,
-    paymentStatusId: 'd5a2f9c1-3e6a-41b9-9e6d-5c8eaf39b1b2',
-    paymentStatusDescription: 'Pago',
-    categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-    categoryDescription: 'Supermercado',
-    paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-    paymentMethodDescription: 'Pix',
-    isPaymentCardBill: false,
-    isShoppingListBill: true,
-    createdAt: new Date('03-05-2025').getTime(),
-    updatedAt: null,
-  },
-  {
     id: '19582167-7jwr-1142-65cb-74d03d7az318',
     personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
     userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
     descriptionBill: 'Tim',
     fixedBill: true,
-    billDate: new Date('03-12-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: false,
-    icon: null,
     amount: 60.0,
-    paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-    paymentStatusDescription: 'A pagar',
+    billDate: new Date('03-12-2025').getTime(),
     categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
     categoryDescription: 'Assinatura de Internet, Telefonia e Streamings',
-    paymentMethodId: '',
-    paymentMethodDescription: '',
-    isPaymentCardBill: false,
-    isShoppingListBill: false,
-    createdAt: new Date('03-12-2025').getTime(),
-    updatedAt: null,
+    categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+    categoryGroup: CategoryGroupEnum.HOUSING,
+    paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
   },
   {
     id: '48273619-3gtd-7831-92ad-83b18e3bp932',
@@ -72,20 +43,12 @@ const billsMock = [
     descriptionBill: 'Luz',
     fixedBill: true,
     billDate: new Date('03-10-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: false,
-    icon: null,
     amount: 120.0,
-    paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-    paymentStatusDescription: 'A pagar',
-    categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-    categoryDescription: 'Serviços e Utilidades Públicas',
-    paymentMethodId: '',
-    paymentMethodDescription: '',
-    isPaymentCardBill: false,
-    isShoppingListBill: false,
-    createdAt: new Date('03-10-2025').getTime(),
-    updatedAt: null,
+    categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+    categoryDescription: 'Energia',
+    categoryDescriptionEnum: CategoryDescriptionEnum.ENERGY,
+    categoryGroup: CategoryGroupEnum.HOUSING,
+    paymentStatus: PaymentStatusDescriptionEnum.DUE_SOON,
   },
   {
     id: '48273619-3gtd-7831-92ad-83b18e3bp932',
@@ -94,20 +57,12 @@ const billsMock = [
     descriptionBill: 'Água',
     fixedBill: true,
     billDate: new Date('03-26-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: false,
-    icon: null,
     amount: 90.0,
-    paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-    paymentStatusDescription: 'A pagar',
-    categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
-    categoryDescription: 'Serviços e Utilidades Públicas',
-    paymentMethodId: '',
-    paymentMethodDescription: '',
-    isPaymentCardBill: false,
-    isShoppingListBill: false,
-    createdAt: new Date('03-26-2025').getTime(),
-    updatedAt: null,
+    categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+    categoryDescription: 'Água',
+    categoryDescriptionEnum: CategoryDescriptionEnum.WATER,
+    categoryGroup: CategoryGroupEnum.HOUSING,
+    paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
   },
   {
     id: '87263410-4qws-3409-81ab-63c09b8bk215',
@@ -116,22 +71,14 @@ const billsMock = [
     descriptionBill: 'Cartão Visa',
     fixedBill: true,
     billDate: new Date('03-30-2025').getTime(),
-    payDate: new Date().getTime(),
-    payOut: false,
-    icon: null,
     amount: 5200.0,
-    paymentStatusId: 'b78994ce-b7cb-4eed-9bdc-b7443358300c',
-    paymentStatusDescription: 'A pagar',
-    categoryId: '67815e45-44c3-415c-ba5f-5ab8998d7da6',
+    categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
     categoryDescription: 'Despesa com Cartão de Crédito',
-    paymentMethodId: '',
-    paymentMethodDescription: '',
-    isPaymentCardBill: false,
-    isShoppingListBill: false,
-    createdAt: new Date('04-01-2025').getTime(),
-    updatedAt: null,
+    categoryDescriptionEnum: CategoryDescriptionEnum.CREDIT_CARD_PAYMENT,
+    categoryGroup: CategoryGroupEnum.OTHERS,
+    paymentStatus: PaymentStatusDescriptionEnum.TO_PAY,
   },
-];
+] as Array<BillDTO>;
 
 describe('Get Bills Payable Month Usecase', () => {
   beforeEach(() => {
@@ -156,19 +103,26 @@ describe('Get Bills Payable Month Usecase', () => {
       content: billsMock,
       page: 1,
       size: 10,
-      totalElements: 5,
+      totalElements: 4,
       totalPages: 1,
       ordering: null,
     });
 
     const result = await getBillsPayableMonthUseCase.execute(input);
 
-    expect(result.data.content.length).toBe(5);
-    expect(result.data.content[0].status).toBe(StatusBill.OVERDUE);
-    expect(result.data.content[1].status).toBe(StatusBill.DUE_SOON);
-    expect(result.data.content[2].status).toBe(StatusBill.DUE_DAY);
-    expect(result.data.content[3].status).toBe(StatusBill.PENDING);
-    expect(result.data.content[4].status).toBe(StatusBill.PENDING);
+    expect(result.data.content.length).toBe(4);
+    expect(result.data.content[0].status).toBe(
+      PaymentStatusDescriptionEnum.OVERDUE,
+    );
+    expect(result.data.content[1].status).toBe(
+      PaymentStatusDescriptionEnum.DUE_SOON,
+    );
+    expect(result.data.content[2].status).toBe(
+      PaymentStatusDescriptionEnum.DUE_DAY,
+    );
+    expect(result.data.content[3].status).toBe(
+      PaymentStatusDescriptionEnum.TO_PAY,
+    );
 
     expect(billServiceMock.billsPayableMonth).toHaveBeenCalledWith(input);
   });
