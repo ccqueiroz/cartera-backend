@@ -70,6 +70,7 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
@@ -123,6 +124,7 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
@@ -171,6 +173,7 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
@@ -212,6 +215,7 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
@@ -251,6 +255,7 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
@@ -279,7 +284,7 @@ describe('EditReceivableUseCase', () => {
       descriptionReceivable: 'Test Receivable 2',
       fixedReceivable: false,
       receivableDate: new Date().getTime(),
-      receivalDate: new Date().getTime(),
+      receivalDate: null,
       receival: true,
       icon: null,
       amount: 200,
@@ -287,12 +292,15 @@ describe('EditReceivableUseCase', () => {
       categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
       categoryGroup: CategoryGroupEnum.REVENUES,
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
       paymentMethodDescription: 'Pix',
       paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
+
+    receivableServiceMock.getReceivableById.mockResolvedValue(receivableData);
 
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
@@ -312,7 +320,7 @@ describe('EditReceivableUseCase', () => {
       statusCode: 400,
     });
 
-    expect(receivableServiceMock.createReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 
   it('should throw if paymentMethodId is missing and receival are true', async () => {
@@ -338,6 +346,8 @@ describe('EditReceivableUseCase', () => {
       updatedAt: null,
     };
 
+    receivableServiceMock.getReceivableById.mockResolvedValue(receivableData);
+
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
       .mockResolvedValue(true);
@@ -356,6 +366,6 @@ describe('EditReceivableUseCase', () => {
       statusCode: 400,
     });
 
-    expect(receivableServiceMock.createReceivable).not.toHaveBeenCalled();
+    expect(receivableServiceMock.updateReceivable).not.toHaveBeenCalled();
   });
 });
