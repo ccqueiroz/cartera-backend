@@ -11,7 +11,7 @@ import { clientRedis } from './src/packages/clients/redis';
 import { CashFlowRoute } from './src/infra/api/express/routes/cashFlow/cash-flow.route';
 import { IpControllMiddleware } from './src/infra/api/express/middlewares/ip-controll.middleware';
 import { CorsMiddleware } from './src/infra/api/express/middlewares/cors.middleware';
-import { BillRoute } from './src/infra/api/express/routes/bill/bill.route.routes';
+import { BillRoute } from './src/infra/api/express/routes/bill/bill.routes';
 import { BillsRepositoryFirebase } from './src/infra/repositories/firebase/bill.repository.firebase';
 import { ValidateCategoryPaymentMethodUseCase } from './src/usecases/validate_entities/validate-category-payment-method.usecase';
 import { ReceivableRoute } from './src/infra/api/express/routes/receivable/receivables.routes';
@@ -65,6 +65,7 @@ function main() {
     mergeSortHelpers,
     applyPaginationHelpers,
     handleCanProgressToWritteOperation,
+    applySortStatusHelpers,
   );
 
   const billRepository = BillsRepositoryFirebase.create(
