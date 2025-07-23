@@ -10,14 +10,23 @@ export class PaymentStatusEntitie {
     return new PaymentStatusEntitie(props);
   }
 
+  private static normalizeToStartOfDay(date: number): number {
+    const dateToFormat = new Date(date);
+    dateToFormat.setHours(0, 0, 0, 0);
+    return dateToFormat.getTime();
+  }
+
   private static calcDiffDaysBetweenInvoiceDateAndReferenceDate(
     invoiceDate: number,
     referenceDate: number,
   ) {
     const milleSecondsPerDay = 1000 * 60 * 60 * 24;
 
+    const invoiceDateFormated = this.normalizeToStartOfDay(invoiceDate);
+    const referenceDateFormated = this.normalizeToStartOfDay(referenceDate);
+
     const diffInDays = Math.floor(
-      (invoiceDate - referenceDate) / milleSecondsPerDay,
+      (invoiceDateFormated - referenceDateFormated) / milleSecondsPerDay,
     );
 
     return diffInDays;
