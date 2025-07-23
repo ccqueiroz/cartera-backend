@@ -7,6 +7,7 @@ import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dt
 import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
@@ -132,22 +133,17 @@ export type ReceivablesByMonthInputDTO = Required<
   userId: string;
 };
 
-export const StatusReceival = {
-  PENDING: 'PENDING',
-  DUE_SOON: 'DUE_SOON',
-  DUE_DAY: 'DUE_DAY',
-  OVERDUE: 'OVERDUE',
-  RECEIVED: 'RECEIVED',
-} as const;
-
 export type ReceivablesByMonthOutputDTO = {
   id: string;
-  amount: number;
+  personUserId: string;
+  userId: string;
   descriptionReceivable: string;
+  fixedReceivable: boolean;
+  amount: number;
   receivableDate: number;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
   categoryDescriptionEnum: CategoryDescriptionEnum;
   categoryGroup: CategoryGroupEnum;
-  status: (typeof StatusReceival)[keyof typeof StatusReceival];
+  status: (typeof PaymentStatusDescriptionEnum)[keyof typeof PaymentStatusDescriptionEnum];
 };
