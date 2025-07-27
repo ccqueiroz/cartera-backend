@@ -26,14 +26,14 @@ import { ReceivablesByMonthInputDTO } from '@/domain/Receivable/dtos/receivable.
  *         schema:
  *           type: number
  *           example: 1740798000000
- *         description: Início do período para análise.
+ *         description: Timestamp do início do período para análise da receita.
  *       - in: query
  *         name: finalDate
  *         required: true
  *         schema:
  *           type: number
  *           example: 1743390000000
- *         description: Final do período para análise.
+ *         description: Timestamp do final do período para análise da receita.
  *       - in: query
  *         name: page
  *         required: true
