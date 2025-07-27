@@ -1,10 +1,14 @@
+import {
+  SearchByDate,
+  PaginationParams,
+  SortOrder,
+} from './../../dtos/listParamsDto.dto';
 import { BaseDto } from '@/domain/dtos/baseDto.dto';
 import { AuthEntitieDTO } from '@/domain/Auth/dtos/auth.dto';
 import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto';
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
@@ -151,4 +155,34 @@ export type BillsPayableMonthOutPutDTO = {
   categoryDescriptionEnum: CategoryDescriptionEnum;
   categoryGroup: CategoryGroupEnum;
   status: (typeof PaymentStatusDescriptionEnum)[keyof typeof PaymentStatusDescriptionEnum];
+};
+
+export type BillsSearchFilter = {
+  paid?: boolean;
+  category?: CategoryDescriptionEnum;
+  categoryGroup?: CategoryGroupEnum;
+  paymentMethod?: PaymentMethodDescriptionEnum;
+  paymentStatus?: PaymentStatusDescriptionEnum;
+  isPaymentCardBill?: boolean;
+  isShoppingListBill?: boolean;
+  fixed?: boolean;
+};
+
+export type QueryBillsByFilterInputDTO = {
+  period: SearchByDate;
+  userId: string;
+  filters?: BillsSearchFilter;
+};
+
+type BillCostFilterCategory = {
+  categoryFilter: CategoryDescriptionEnum;
+  paid?: boolean;
+  paymentMethod?: PaymentMethodDescriptionEnum;
+  paymentStatus?: PaymentStatusDescriptionEnum;
+};
+
+export type GetBillsCostsByCategoryAndByPeriod = {
+  period: SearchByDate;
+  userId: string;
+  filters: BillCostFilterCategory;
 };
