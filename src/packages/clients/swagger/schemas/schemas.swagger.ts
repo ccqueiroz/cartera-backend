@@ -610,6 +610,49 @@
  *             - RECEIVED
  *           example: DUE_SOON
  *
+ *     InvoiceByCategoryAndByPeriodDTO:
+ *       type: object
+ *       properties:
+ *         listInvoices:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/InvoiceCategoryDTO'
+ *         period:
+ *           type: string
+ *           example: 01/01/2025 - 31/07/2025
+ *         type:
+ *           type: string
+ *           enum:
+ *             - BILLS
+ *             - RECEIVABLE
+ *           example: BILLS
+ *         totalInvoicedAmount:
+ *           type: number
+ *           example: 7200.88
+ *
+ *     InvoiceCategoryDTO:
+ *       type: object
+ *       properties:
+ *         description:
+ *           type: string
+ *           example: Uber
+ *         descriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         group:
+ *           $ref: '#/components/schemas/CategoryGroupEnum'
+ *         type:
+ *           type: string
+ *           enum:
+ *             - BILLS
+ *             - RECEIVABLE
+ *           example: BILLS
+ *         totalAmount:
+ *           type: number
+ *           example: 7200.88
+ *         percentByPeriod:
+ *           type: number
+ *           example: 50.0
+ *
  *     OrderByAmount:
  *       type: object
  *       properties:
