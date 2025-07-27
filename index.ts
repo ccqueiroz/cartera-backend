@@ -44,6 +44,7 @@ import {
   dbFirestore,
 } from './src/infra/database/firebase/firebase.database';
 import { logger } from './src/infra/logger';
+import { InvoiceRoute } from '@/infra/api/express/routes/invoice/invoice.routes';
 
 function main() {
   // ----- REPOSITORIES -----
@@ -173,6 +174,12 @@ function main() {
     receivableService,
     authVerifyTokenMiddleware,
   ).execute();
+
+  const invoicesRoutes = InvoiceRoute.create(
+    billService,
+    receivableService,
+    authVerifyTokenMiddleware,
+  ).execute();
   //
 
   // ----- GLOBAL MIDDLEWARES ----
@@ -193,6 +200,7 @@ function main() {
       ...receivableRoutes,
       ...billRoutes,
       ...cashFlowRoutes,
+      ...invoicesRoutes,
     ],
     [cors, ipControll],
     errorMiddleware,
