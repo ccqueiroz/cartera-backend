@@ -14,7 +14,7 @@ describe('Category Schema', () => {
     });
   });
 
-  it('should be validate the attributes of the GetCategoriesValidationDTO with email error must be defined', async () => {
+  it('should be validate the attributes of the GetCategoriesValidationDTO with type error must be defined', async () => {
     return runValidate<GetCategoriesValidationDTO>(GetCategoriesValidationDTO, {
       type: 'ANY_TYPE' as any,
     }).then((errors) => {
