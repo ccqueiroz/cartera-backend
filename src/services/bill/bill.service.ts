@@ -7,6 +7,7 @@ import {
   EditBillInputDTO,
   GetBillByIdInputDTO,
   GetBillsInputDTO,
+  QueryBillsByFilterInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { BillRepositoryGateway } from '@/domain/Bill/gateway/bill.repository.gateway';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
@@ -159,5 +160,67 @@ export class BillService implements BillServiceGateway {
     }
 
     return billsDb;
+  }
+
+  private buildKeyToHandleQueryBillsByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryBillsByFilterInputDTO) {
+    const periodKey = period.exactlyDate
+      ? `exactlyDate-${period.exactlyDate}`
+      : `initialDate-${period.initialDate ?? 'null'}-finalDate-${
+          period.finalDate ?? 'null'
+        }`;
+
+    const filterKey =
+      filters && Object.keys(filters).length > 0
+        ? Object.entries(filters)
+            .filter(([_, value]) => value !== undefined)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&')
+        : '';
+
+    const key = `${userId}:${
+      this.keyController
+    }-list-bills-by-filters-${periodKey}${filterKey ? `?${filterKey}` : ''}`;
+
+    return key;
+  }
+
+  public async handleQueryBillsByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryBillsByFilterInputDTO): Promise<ResponseListDTO<BillDTO>> {
+    const ttl = 2 * 60; // 2 minutes
+
+    const key = this.buildKeyToHandleQueryBillsByFilters({
+      period,
+      userId,
+      filters,
+    });
+
+    const billsCache = await this.cache.recover<ResponseListDTO<BillDTO>>(key);
+
+    if (billsCache && billsCache.content.length > 0) {
+      return billsCache;
+    }
+
+    const billsDb = await this.db.handleQueryBillsByFilters({
+      period,
+      userId,
+      filters,
+    });
+
+    if (billsDb.content.length > 0) {
+      await this.cache.save<ResponseListDTO<BillDTO>>(key, billsDb, ttl);
+    }
+
+    return billsDb;
+  }
+
+  public totalAmountBills(bills: Array<BillDTO>): number {
+    return this.db.totalAmountBills(bills);
   }
 }
