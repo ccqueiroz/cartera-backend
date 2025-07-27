@@ -6,6 +6,7 @@ import {
   EditReceivableInputDTO,
   GetReceivableByIdInputDTO,
   GetReceivablesInputDTO,
+  QueryReceivablesByFilterInputDTO,
   ReceivableDTO,
   ReceivablesByMonthInputDTO,
 } from '../dtos/receivable.dto';
@@ -36,4 +37,12 @@ export interface ReceivableServiceGateway {
   receivablesByMonth(
     input: ReceivablesByMonthInputDTO,
   ): Promise<ResponseListDTO<ReceivableDTO>>;
+
+  totalAmountReceivables(receivables: Array<ReceivableDTO>): number;
+
+  handleQueryReceivablesByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryReceivablesByFilterInputDTO): Promise<ResponseListDTO<ReceivableDTO>>;
 }
