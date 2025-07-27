@@ -8,6 +8,7 @@ import {
   EditBillInputDTO,
   GetBillByIdInputDTO,
   GetBillsInputDTO,
+  QueryBillsByFilterInputDTO,
 } from '../dtos/bill.dto';
 
 export interface BillServiceGateway {
@@ -27,4 +28,12 @@ export interface BillServiceGateway {
   billsPayableMonth(
     input: BillsPayableMonthInputDTO,
   ): Promise<ResponseListDTO<BillDTO>>;
+
+  totalAmountBills(bills: Array<BillDTO>): number;
+
+  handleQueryBillsByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryBillsByFilterInputDTO): Promise<ResponseListDTO<BillDTO>>;
 }
