@@ -8,6 +8,7 @@ import {
   EditReceivableInputDTO,
   GetReceivableByIdInputDTO,
   GetReceivablesInputDTO,
+  QueryReceivablesByFilterInputDTO,
   ReceivableDTO,
   ReceivablesByMonthInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
@@ -181,5 +182,76 @@ export class ReceivableService implements ReceivableServiceGateway {
     }
 
     return receivablesDb;
+  }
+  private buildKeyToHandleQueryReceivablesByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryReceivablesByFilterInputDTO) {
+    const periodKey = period.exactlyDate
+      ? `exactlyDate-${period.exactlyDate}`
+      : `initialDate-${period.initialDate ?? 'null'}-finalDate-${
+          period.finalDate ?? 'null'
+        }`;
+
+    const filterKey =
+      filters && Object.keys(filters).length > 0
+        ? Object.entries(filters)
+            .filter(([_, value]) => value !== undefined)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&')
+        : '';
+
+    const key = `${userId}:${
+      this.keyController
+    }-list-receivables-by-filters-${periodKey}${
+      filterKey ? `?${filterKey}` : ''
+    }`;
+
+    return key;
+  }
+
+  public async handleQueryReceivablesByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryReceivablesByFilterInputDTO): Promise<
+    ResponseListDTO<ReceivableDTO>
+  > {
+    const ttl = 2 * 60; // 2 minutes
+
+    const key = this.buildKeyToHandleQueryReceivablesByFilters({
+      period,
+      userId,
+      filters,
+    });
+
+    const receivablesCache = await this.cache.recover<
+      ResponseListDTO<ReceivableDTO>
+    >(key);
+
+    if (receivablesCache && receivablesCache.content.length > 0) {
+      return receivablesCache;
+    }
+
+    const receivablesDb = await this.db.handleQueryReceivablesByFilters({
+      period,
+      userId,
+      filters,
+    });
+
+    if (receivablesDb.content.length > 0) {
+      await this.cache.save<ResponseListDTO<ReceivableDTO>>(
+        key,
+        receivablesDb,
+        ttl,
+      );
+    }
+
+    return receivablesDb;
+  }
+
+  public totalAmountReceivables(receivables: Array<ReceivableDTO>): number {
+    return this.db.totalAmountReceivables(receivables);
   }
 }
