@@ -8,8 +8,10 @@ import {
   GetReceivableByIdInputDTO,
   GetReceivablesInputDTO,
   OrderByGetReceivablesInputDTO,
+  QueryReceivablesByFilterInputDTO,
   ReceivableDTO,
   ReceivablesByMonthInputDTO,
+  ReceivablesSearchFilter,
   SortByReceivableTypeInputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { ReceivableEntitie } from '@/domain/Receivable/entitie/receivable.entitie';
@@ -193,7 +195,90 @@ export class ReceivablesRepositoryFirebase
     };
   }
 
-  private async handleQueryReceivables({
+  private handleExtractKeysByFiltersFromQueryBillsByFilters(
+    filters: ReceivablesSearchFilter,
+    query: admin.firestore.Query<admin.firestore.DocumentData>,
+  ) {
+    if ('paid' in filters) {
+      query = query.where('receival', '==', filters.paid);
+    }
+
+    if ('category' in filters) {
+      query = query.where('categoryDescriptionEnum', '==', filters.category);
+    }
+
+    if ('categoryGroup' in filters) {
+      query = query.where(
+        'categoryDescriptionEnum',
+        '==',
+        filters.categoryGroup,
+      );
+    }
+
+    if ('paymentMethod' in filters) {
+      query = query.where(
+        'paymentMethodDescriptionEnum',
+        '==',
+        filters.paymentMethod,
+      );
+    }
+
+    if ('paymentStatus' in filters) {
+      query = query.where('paymentStatus', '==', filters.paymentStatus);
+    }
+
+    if ('fixed' in filters) {
+      query = query.where('fixedReceivable', '==', filters.fixed);
+    }
+
+    return query;
+  }
+
+  public async handleQueryReceivablesByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryReceivablesByFilterInputDTO) {
+    let query: admin.firestore.Query<admin.firestore.DocumentData> =
+      this.dbCollection;
+
+    query = query
+      .where('userId', '==', userId)
+      .where('receivableDate', '>=', period.initialDate)
+      .where('receivableDate', '<=', period.finalDate);
+
+    if (filters) {
+      query = this.handleExtractKeysByFiltersFromQueryBillsByFilters(
+        filters,
+        query,
+      );
+    }
+
+    const bills = await query
+      .get()
+      .then((response) =>
+        response.docs?.map((item) =>
+          this.createInstanceReceivableEntitie({
+            id: item.id,
+            ...item.data(),
+          } as ReceivableDTO),
+        ),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return {
+      content: bills,
+      totalElements: (bills as Array<ReceivableDTO>).length,
+      totalPages: 1,
+      ordering: null,
+      page: 0,
+      size: 0,
+    } as ResponseListDTO<ReceivableDTO>;
+  }
+
+  private async handleQueryReceivablesOrderedByDate({
     userId,
     direction,
   }: {
@@ -233,7 +318,10 @@ export class ReceivablesRepositoryFirebase
         : SortOrder.ASC
     ) as SortOrder;
 
-    let data = await this.handleQueryReceivables({ userId, direction });
+    let data = await this.handleQueryReceivablesOrderedByDate({
+      userId,
+      direction,
+    });
 
     data = this.applyFilterReceivables(input, data as Array<ReceivableDTO>);
 
@@ -441,7 +529,7 @@ export class ReceivablesRepositoryFirebase
       throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
     }
 
-    let data = await this.handleQueryReceivables({
+    let data = await this.handleQueryReceivablesOrderedByDate({
       userId,
       direction: SortOrder.ASC,
     });
@@ -483,5 +571,14 @@ export class ReceivablesRepositoryFirebase
       OrderByGetReceivablesInputDTO,
       ReceivableDTO
     >({ page, size }, data as Array<ReceivableDTO>);
+  }
+
+  public totalAmountReceivables(receivables: Array<ReceivableDTO>) {
+    const totalAmount = receivables.reduce(
+      (prev, current) => prev + current.amount,
+      0,
+    );
+
+    return totalAmount;
   }
 }
