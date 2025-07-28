@@ -32,6 +32,8 @@ describe('Bill Service', () => {
       updateBill: jest.fn(),
       deleteBill: jest.fn(),
       billsPayableMonth: jest.fn(),
+      totalAmountBills: jest.fn(),
+      handleQueryBillsByFilters: jest.fn(),
     };
 
     cacheMock = {
@@ -920,5 +922,211 @@ describe('Bill Service', () => {
     expect(dbMock.billsPayableMonth).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
     expect(result.content.length).toEqual(0);
+  });
+
+  it('should be call totalAmountBills from db and retgurn total amount bills', () => {
+    const bills = [
+      {
+        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+        descriptionBill: 'Mensalidade Faculdade',
+        fixedBill: false,
+        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        categoryDescription: 'Educação',
+        categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+        categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+        billDate: new Date('03-01-2025').getTime(),
+        payDate: null,
+        payOut: false,
+        icon: null,
+        amount: 1200.0,
+        paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+        isPaymentCardBill: false,
+        isShoppingListBill: false,
+        createdAt: new Date('03-01-2025').getTime(),
+        updatedAt: null,
+      },
+      {
+        id: '19582167-7jwr-1142-65cb-74d03d7az318',
+        personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+        userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+        descriptionBill: 'Tim',
+        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        categoryDescription: 'Internet/TV',
+        categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+        categoryGroup: CategoryGroupEnum.HOUSING,
+        fixedBill: true,
+        billDate: new Date('03-01-2025').getTime(),
+        payDate: null,
+        payOut: false,
+        icon: null,
+        amount: 60.0,
+        paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+        isPaymentCardBill: false,
+        isShoppingListBill: false,
+        createdAt: new Date('03-01-2025').getTime(),
+        updatedAt: null,
+      },
+    ];
+
+    dbMock.totalAmountBills.mockReturnValue(1800);
+
+    const result = billService.totalAmountBills(bills);
+
+    expect(dbMock.totalAmountBills).toHaveBeenCalled();
+    expect(dbMock.totalAmountBills).toHaveBeenCalledWith(bills);
+    expect(result).toEqual(1800);
+  });
+
+  it('should be call handleQueryBillsByFilters and return the data from db', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Mensalidade Faculdade',
+          fixedBill: false,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Educação',
+          categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+          categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '19582167-7jwr-1142-65cb-74d03d7az318',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Tim',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Internet/TV',
+          categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 60.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 2,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.handleQueryBillsByFilters.mockResolvedValue(data);
+
+    const initialDate = new Date('2025-07-01').getTime();
+    const finalDate = new Date('2025-07-31').getTime();
+
+    const key = `${userIdMock}:${keyController}-list-bills-by-filters-initialDate-${initialDate}-finalDate-${finalDate}`;
+
+    const result = await billService.handleQueryBillsByFilters({
+      userId: userIdMock,
+      period: {
+        initialDate,
+        finalDate,
+      },
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(result.content.length).toEqual(2);
+    expect(cacheMock.save).toHaveBeenCalled();
+  });
+
+  it('should be call handleQueryBillsByFilters and return the data from cache', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Mensalidade Faculdade',
+          fixedBill: false,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Educação',
+          categoryDescriptionEnum: CategoryDescriptionEnum.COLLEGE_TUITION,
+          categoryGroup: CategoryGroupEnum.EDUCATION_AND_STUDIES,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 1200.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+        {
+          id: '19582167-7jwr-1142-65cb-74d03d7az318',
+          personUserId: '06627d91-1aee-4479-859b-72f01c9ade24',
+          userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
+          descriptionBill: 'Tim',
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Internet/TV',
+          categoryDescriptionEnum: CategoryDescriptionEnum.INTERNET_TV,
+          categoryGroup: CategoryGroupEnum.HOUSING,
+          fixedBill: true,
+          billDate: new Date('03-01-2025').getTime(),
+          payDate: null,
+          payOut: false,
+          icon: null,
+          amount: 60.0,
+          paymentStatus: PaymentStatusDescriptionEnum.OVERDUE,
+          isPaymentCardBill: false,
+          isShoppingListBill: false,
+          createdAt: new Date('03-01-2025').getTime(),
+          updatedAt: null,
+        },
+      ],
+      page: 0,
+      size: 10,
+      totalElements: 2,
+      totalPages: 1,
+      ordering: null,
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.handleQueryBillsByFilters.mockResolvedValue({
+      ...data,
+      content: [],
+      totalElements: 0,
+    });
+
+    const initialDate = new Date('2025-07-01').getTime();
+    const finalDate = new Date('2025-07-31').getTime();
+
+    const key = `${userIdMock}:${keyController}-list-bills-by-filters-initialDate-${initialDate}-finalDate-${finalDate}`;
+
+    const result = await billService.handleQueryBillsByFilters({
+      userId: userIdMock,
+      period: {
+        initialDate,
+        finalDate,
+      },
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(result.content.length).toEqual(2);
+    expect(cacheMock.save).not.toHaveBeenCalled();
   });
 });
