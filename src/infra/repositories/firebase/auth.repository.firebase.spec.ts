@@ -5,7 +5,11 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { convertOutputErrorToObject } from '@/helpers/convertOutputErrorToObject';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { auth } from '@/test/mocks/firebase-admin.mock';
-import { ResetPasswordUrl, signInUrl } from '@/packages/clients/firebase';
+import {
+  refreshTokenUrl,
+  ResetPasswordUrl,
+  signInUrl,
+} from '@/packages/clients/firebase';
 
 describe('Auth Repository Firebase', () => {
   let authRepo: AuthRepositoryFirebase;
@@ -321,5 +325,40 @@ describe('Auth Repository Firebase', () => {
     await expect(
       authRepo.getUserByEmail({ email: 'error@example.com' }),
     ).rejects.toThrow(error);
+  });
+
+  it('should be call refreshToken method passed refreshToken param and return the new token', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          kind: 'kind',
+          user_id: '1234562',
+          id_token: 'access-token',
+          registered: true,
+          refresh_token: 'refresh-token',
+          expires_in: '3600',
+        }),
+    } as Response);
+
+    const result = await authRepo.refreshToken({
+      refreshToken: 'refres-token',
+    });
+
+    expect(result).toEqual({
+      userId: '1234562',
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      expirationTime: expect.any(Number),
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(refreshTokenUrl, {
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: 'refres-token',
+      }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      method: 'POST',
+    });
   });
 });
