@@ -15,5 +15,9 @@ export type AuthSignDTO = {
   password: string;
 } & Pick<AuthEntitieDTO, 'email' | 'updatedAt'>;
 
+export type AuthRefreshTokenDTO = Required<
+  Pick<AuthEntitieDTO, 'refreshToken'>
+>;
+
 export type AuthRegisterDTO = AuthSignDTO &
   Required<Pick<AuthEntitieDTO, 'firstName' | 'lastName'>>;
