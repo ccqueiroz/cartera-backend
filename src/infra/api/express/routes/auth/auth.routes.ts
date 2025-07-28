@@ -13,6 +13,8 @@ import { GetPersonUserByEmailUseCase } from '@/usecases/person_user/get-person-u
 import { CreatePersonUserUseCase } from '@/usecases/person_user/create-person-user.usecase';
 import { Middleware } from '../../middlewares/middleware';
 import { PersonUserServiceGateway } from '@/domain/Person_User/gateway/person-user.service.gateway';
+import { RefreshTokenUseCase } from '@/usecases/auth/refresh-token.usecase';
+import { RefreshTokenRoute } from './refresh-token.route';
 
 export class AuthRoutes implements MapRoutes {
   private getPersonUserByEmail: GetPersonUserByEmailUseCase;
@@ -84,11 +86,18 @@ export class AuthRoutes implements MapRoutes {
     this.routes.push(registerAccountRoute);
   }
 
+  private factoryRefreshToken() {
+    const refreshTokenService = RefreshTokenUseCase.create(this.authGateway);
+    const refreshTokenRoute = RefreshTokenRoute.create(refreshTokenService);
+    this.routes.push(refreshTokenRoute);
+  }
+
   private joinRoutes() {
     this.factoryLogin();
     this.factorySignout();
     this.factoryRecoveryPassword();
     this.factoryRegisterAccount();
+    this.factoryRefreshToken();
   }
 
   public execute() {
