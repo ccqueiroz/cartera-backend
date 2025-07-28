@@ -34,7 +34,8 @@ export class GetBillsPayableMonthUseCase
       !inputGetBills?.period?.initialDate ||
       !inputGetBills?.period?.finalDate ||
       isNaN(inputGetBills?.period.initialDate) ||
-      isNaN(inputGetBills?.period.finalDate)
+      isNaN(inputGetBills?.period.finalDate) ||
+      inputGetBills.period.initialDate > inputGetBills.period.finalDate
     ) {
       throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
     }

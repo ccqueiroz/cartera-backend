@@ -30,6 +30,8 @@ describe('Receivable Service', () => {
       updateReceivable: jest.fn(),
       deleteReceivable: jest.fn(),
       receivablesByMonth: jest.fn(),
+      totalAmountReceivables: jest.fn(),
+      handleQueryReceivablesByFilters: jest.fn(),
     };
 
     cacheMock = {
@@ -851,5 +853,205 @@ describe('Receivable Service', () => {
     expect(dbMock.receivablesByMonth).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
     expect(result.content.length).toEqual(0);
+  });
+
+  it('should be call totalAmountReceivables from db and return the total amount receivables', () => {
+    const receivables = [
+      {
+        personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+        userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+        descriptionReceivable: 'Test Receivable 1',
+        fixedReceivable: true,
+        receivableDate: new Date().getTime(),
+        receivalDate: null,
+        receival: false,
+        icon: null,
+        amount: 100,
+        categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        categoryDescription: 'Comissões e Bonificações',
+        categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+        categoryGroup: CategoryGroupEnum.REVENUES,
+        paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+        createdAt: new Date().getTime(),
+        updatedAt: null,
+      },
+      {
+        id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+        personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+        userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+        descriptionReceivable: 'Test Receivable 2',
+        fixedReceivable: false,
+        receivableDate: new Date().getTime(),
+        receivalDate: new Date().getTime(),
+        receival: true,
+        icon: null,
+        amount: 200,
+        categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+        categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+        categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+        categoryGroup: CategoryGroupEnum.REVENUES,
+        paymentMethodDescription: 'Pix',
+        paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        paymentStatus: PaymentStatusDescriptionEnum.PAID,
+        createdAt: new Date().getTime(),
+        updatedAt: null,
+      },
+    ];
+
+    dbMock.totalAmountReceivables.mockReturnValue(300);
+
+    const result = receivableService.totalAmountReceivables(receivables);
+
+    expect(dbMock.totalAmountReceivables).toHaveBeenCalled();
+    expect(dbMock.totalAmountReceivables).toHaveBeenCalledWith(receivables);
+    expect(result).toEqual(300);
+  });
+
+  it('should be call handleQueryReceivablesByFilters and return the data from db', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+          userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+          descriptionReceivable: 'Test Receivable 1',
+          fixedReceivable: true,
+          receivableDate: new Date().getTime(),
+          receivalDate: null,
+          receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+        {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+          personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+          userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+          descriptionReceivable: 'Test Receivable 2',
+          fixedReceivable: false,
+          receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
+          icon: null,
+          amount: 200,
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+      ],
+      totalElements: 2,
+      totalPages: 1,
+      page: 0,
+      size: 10,
+      ordering: null,
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.handleQueryReceivablesByFilters.mockResolvedValue(data);
+
+    const initialDate = new Date('2025-07-01').getTime();
+    const finalDate = new Date('2025-07-31').getTime();
+
+    const key = `${userIdMock}:${keyController}-list-receivables-by-filters-initialDate-${initialDate}-finalDate-${finalDate}`;
+
+    const result = await receivableService.handleQueryReceivablesByFilters({
+      userId: userIdMock,
+      period: {
+        initialDate,
+        finalDate,
+      },
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(result.content.length).toEqual(2);
+    expect(cacheMock.save).toHaveBeenCalled();
+  });
+
+  it('should be call handleQueryReceivablesByFilters and return the data from cache', async () => {
+    const data = {
+      content: [
+        {
+          personUserId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef4',
+          userId: 'a1b2c3d4-e5f6-7890-1234-56789abcdef5',
+          descriptionReceivable: 'Test Receivable 1',
+          fixedReceivable: true,
+          receivableDate: new Date().getTime(),
+          receivalDate: null,
+          receival: false,
+          icon: null,
+          amount: 100,
+          categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+          categoryDescription: 'Comissões e Bonificações',
+          categoryDescriptionEnum: CategoryDescriptionEnum.REIMBURSEMENTS,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentStatus: PaymentStatusDescriptionEnum.DUE_DAY,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+        {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde12',
+          personUserId: 'b2c3d4e5-f6a1-8901-2345-67890abcde16',
+          userId: 'b2c3d4e5-f6a1-8901-2345-67890abcde17',
+          descriptionReceivable: 'Test Receivable 2',
+          fixedReceivable: false,
+          receivableDate: new Date().getTime(),
+          receivalDate: new Date().getTime(),
+          receival: true,
+          icon: null,
+          amount: 200,
+          categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+          categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          categoryGroup: CategoryGroupEnum.REVENUES,
+          paymentMethodDescription: 'Pix',
+          paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          paymentStatus: PaymentStatusDescriptionEnum.PAID,
+          createdAt: new Date().getTime(),
+          updatedAt: null,
+        },
+      ],
+      totalElements: 2,
+      totalPages: 1,
+      page: 0,
+      size: 10,
+      ordering: null,
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.handleQueryReceivablesByFilters.mockResolvedValue({
+      ...data,
+      content: [],
+      totalElements: 0,
+    });
+
+    const initialDate = new Date('2025-07-01').getTime();
+    const finalDate = new Date('2025-07-31').getTime();
+
+    const key = `${userIdMock}:${keyController}-list-receivables-by-filters-initialDate-${initialDate}-finalDate-${finalDate}`;
+
+    const result = await receivableService.handleQueryReceivablesByFilters({
+      userId: userIdMock,
+      period: {
+        initialDate,
+        finalDate,
+      },
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(result.content.length).toEqual(2);
+    expect(cacheMock.save).not.toHaveBeenCalled();
   });
 });

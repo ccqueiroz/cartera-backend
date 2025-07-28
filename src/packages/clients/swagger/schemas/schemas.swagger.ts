@@ -503,7 +503,10 @@
  *       properties:
  *         id:
  *           type: string
- *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
+ *         personUserId:
+ *           type: string
+ *           example: diWBib6eEDK490GGMngi
  *         userId:
  *           type: string
  *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
@@ -534,6 +537,12 @@
  *       properties:
  *         id:
  *           type: string
+ *           example: e8305798-ccc3-4cb1-8de0-5df4c987a71b
+ *         personUserId:
+ *           type: string
+ *           example: diWBib6eEDK490GGMngi
+ *         userId:
+ *           type: string
  *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
  *         descriptionBill:
  *           type: string
@@ -541,6 +550,9 @@
  *         amount:
  *           type: number
  *           example: 1200.00
+ *         fixedBill:
+ *           type: boolean
+ *           example: false
  *         billDate:
  *           type: number
  *           example: 1743390000000
@@ -555,12 +567,91 @@
  *         status:
  *           type: string
  *           enum:
- *             - PENDING
+ *             - TO_PAY
  *             - DUE_SOON
  *             - DUE_DAY
  *             - OVERDUE
  *             - PAID
  *           example: DUE_SOON
+ *
+ *     ReceivablesByMonthOutPutDTO:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: PnAvaiVeApVMDZz21lKG94gU1fJ3
+ *         descriptionReceivable:
+ *           type: string
+ *           example: Compras do Supermercado
+ *         amount:
+ *           type: number
+ *           example: 1200.00
+ *         receivableDate:
+ *           type: number
+ *           example: 1743390000000
+ *         fixedReceivable:
+ *           type: boolean
+ *           example: false
+ *         categoryId:
+ *           type: string
+ *           example: 7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e
+ *         categoryDescription:
+ *           type: string
+ *           example: Uber
+ *         categoryDescriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         status:
+ *           type: string
+ *           enum:
+ *             - TO_RECEIVE
+ *             - DUE_SOON
+ *             - DUE_DAY
+ *             - OVERDUE
+ *             - RECEIVED
+ *           example: DUE_SOON
+ *
+ *     InvoiceByCategoryAndByPeriodDTO:
+ *       type: object
+ *       properties:
+ *         listInvoices:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/InvoiceCategoryDTO'
+ *         period:
+ *           type: string
+ *           example: 01/01/2025 - 31/07/2025
+ *         type:
+ *           type: string
+ *           enum:
+ *             - BILLS
+ *             - RECEIVABLE
+ *           example: BILLS
+ *         totalInvoicedAmount:
+ *           type: number
+ *           example: 7200.88
+ *
+ *     InvoiceCategoryDTO:
+ *       type: object
+ *       properties:
+ *         description:
+ *           type: string
+ *           example: Uber
+ *         descriptionEnum:
+ *           $ref: '#/components/schemas/CategoryDescriptionEnum'
+ *         group:
+ *           $ref: '#/components/schemas/CategoryGroupEnum'
+ *         type:
+ *           type: string
+ *           enum:
+ *             - BILLS
+ *             - RECEIVABLE
+ *           example: BILLS
+ *         totalAmount:
+ *           type: number
+ *           example: 7200.88
+ *         percentByPeriod:
+ *           type: number
+ *           example: 50.0
  *
  *     OrderByAmount:
  *       type: object

@@ -4,9 +4,14 @@ import { PersonUserEntitieDTO } from '@/domain/Person_User/dtos/person-user.dto'
 import { CategoryDTO } from '@/domain/Category/dtos/category.dto';
 import { PaymentMethodDTO } from '@/domain/Payment_Method/dtos/payment-method.dto';
 import { PaymentStatusDTO } from '@/domain/Payment_Status/dtos/payment-status.dto';
-import { PaginationParams, SortOrder } from '@/domain/dtos/listParamsDto.dto';
+import {
+  PaginationParams,
+  SearchByDate,
+  SortOrder,
+} from '@/domain/dtos/listParamsDto.dto';
 import { SortByStatusInputDTO } from '@/domain/Helpers/dtos/sort-by-status-input.dto';
 import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.dto';
+import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 
 type UserId = AuthEntitieDTO['userId'];
 type PersonUserId = PersonUserEntitieDTO['id'];
@@ -132,22 +137,45 @@ export type ReceivablesByMonthInputDTO = Required<
   userId: string;
 };
 
-export const StatusReceival = {
-  PENDING: 'PENDING',
-  DUE_SOON: 'DUE_SOON',
-  DUE_DAY: 'DUE_DAY',
-  OVERDUE: 'OVERDUE',
-  RECEIVED: 'RECEIVED',
-} as const;
-
 export type ReceivablesByMonthOutputDTO = {
   id: string;
-  amount: number;
+  personUserId: string;
+  userId: string;
   descriptionReceivable: string;
+  fixedReceivable: boolean;
+  amount: number;
   receivableDate: number;
   categoryId: CategoryId;
   categoryDescription: CategoryDescription;
   categoryDescriptionEnum: CategoryDescriptionEnum;
   categoryGroup: CategoryGroupEnum;
-  status: (typeof StatusReceival)[keyof typeof StatusReceival];
+  status: (typeof PaymentStatusDescriptionEnum)[keyof typeof PaymentStatusDescriptionEnum];
+};
+
+export type ReceivablesSearchFilter = {
+  paid?: boolean;
+  category?: CategoryDescriptionEnum;
+  categoryGroup?: CategoryGroupEnum;
+  paymentMethod?: PaymentMethodDescriptionEnum;
+  paymentStatus?: PaymentStatusDescriptionEnum;
+  fixed?: boolean;
+};
+
+export type QueryReceivablesByFilterInputDTO = {
+  period: SearchByDate;
+  userId: string;
+  filters?: ReceivablesSearchFilter;
+};
+
+type ReceivableCostFilterCategory = {
+  categoryFilter: CategoryDescriptionEnum;
+  paid?: boolean;
+  paymentMethod?: PaymentMethodDescriptionEnum;
+  paymentStatus?: PaymentStatusDescriptionEnum;
+};
+
+export type GetReceivablesCostsByCategoryAndByPeriod = {
+  period: SearchByDate;
+  userId: string;
+  filters: ReceivableCostFilterCategory;
 };

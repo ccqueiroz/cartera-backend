@@ -3,20 +3,20 @@ import { HttpMiddleware } from '../../middlewares/middleware';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetBillsPayableMonthUseCase } from '@/usecases/bill/get-bills-payable-month.usecase';
-import { BillsPayableMonthInputDTO } from '@/domain/Bill/dtos/bill.dto';
-import { GetBillsPayableMonthDTO } from '../../schema_validations/Bill/bill.schema';
 import { runValidate } from '@/packages/clients/class-validator';
+import { GetReceivablesByMonthUseCase } from '@/usecases/receivable/get-receivables-by-month.usecase';
+import { GetReceivablesByMonthDTO } from '../../schema_validations/Receivable/receivable.schema';
+import { ReceivablesByMonthInputDTO } from '@/domain/Receivable/dtos/receivable.dto';
 
 /**
  * @swagger
- * /api/bill/by-month-status:
+ * /api/receivable/by-month-status:
  *   get:
- *     summary: Lista todas as contas/despesas cadastradas no mês para o usuário com filtro por período.
+ *     summary: Lista todas as receitas cadastradas no mês para o usuário com filtro por período.
  *     description:
- *       Retorna uma lista todas as contas/despesas cadastradas no mês para o usuário com filtro por período.
+ *       Retorna uma lista todas as receitas cadastradas no mês para o usuário com filtro por período.
  *     tags:
- *       - Bill
+ *       - Receivable
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -26,14 +26,14 @@ import { runValidate } from '@/packages/clients/class-validator';
  *         schema:
  *           type: number
  *           example: 1740798000000
- *         description: Timestamp do início do período para análise da conta.
+ *         description: Timestamp do início do período para análise da receita.
  *       - in: query
  *         name: finalDate
  *         required: true
  *         schema:
  *           type: number
  *           example: 1743390000000
- *         description: Timestamp do final do período para análise da conta.
+ *         description: Timestamp do final do período para análise da receita.
  *       - in: query
  *         name: page
  *         required: true
@@ -50,7 +50,7 @@ import { runValidate } from '@/packages/clients/class-validator';
  *         description: Quantidade de itens por página.
  *     responses:
  *       200:
- *         description: Lista de contas/despesas retornada com sucesso.
+ *         description: Lista de receitas retornada com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -62,7 +62,7 @@ import { runValidate } from '@/packages/clients/class-validator';
  *                    content:
  *                      type: array
  *                      items:
- *                        $ref: '#/components/schemas/BillsPayableMonthOutPutDTO'
+ *                        $ref: '#/components/schemas/ReceivablesByMonthOutPutDTO'
  *                    page:
  *                      type: number
  *                      example: 0
@@ -84,22 +84,22 @@ import { runValidate } from '@/packages/clients/class-validator';
  *         description: Erro interno no servidor.
  */
 
-export class GetBillsPayableMonthRoute implements Route {
+export class GetReceivablesByMonthRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly getBillsPayableMonth: GetBillsPayableMonthUseCase,
+    private readonly getReceivablesByMonthService: GetReceivablesByMonthUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    getBillsPayableMonth: GetBillsPayableMonthUseCase,
+    getReceivablesByMonthService: GetReceivablesByMonthUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new GetBillsPayableMonthRoute(
-      'bill/by-month-status',
+    return new GetReceivablesByMonthRoute(
+      'receivable/by-month-status',
       HttpMethod.GET,
-      getBillsPayableMonth,
+      getReceivablesByMonthService,
       middlewares,
     );
   }
@@ -110,8 +110,8 @@ export class GetBillsPayableMonthRoute implements Route {
         const { user_auth } = request;
         const { initialDate, finalDate, page, size } = request.query;
 
-        const errors = await runValidate<GetBillsPayableMonthDTO>(
-          GetBillsPayableMonthDTO,
+        const errors = await runValidate<GetReceivablesByMonthDTO>(
+          GetReceivablesByMonthDTO,
           {
             initialDate: Number(initialDate),
             finalDate: Number(finalDate),
@@ -125,7 +125,7 @@ export class GetBillsPayableMonthRoute implements Route {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
         }
 
-        const bills = await this.getBillsPayableMonth.execute({
+        const bills = await this.getReceivablesByMonthService.execute({
           userId: user_auth?.userId,
           period: {
             initialDate: Number(initialDate),
@@ -133,7 +133,7 @@ export class GetBillsPayableMonthRoute implements Route {
           },
           page: Number(page),
           size: Number(size),
-        } as BillsPayableMonthInputDTO);
+        } as ReceivablesByMonthInputDTO);
 
         response.status(200).json({ ...bills });
       } catch (error) {

@@ -6,6 +6,7 @@ import { MaskAmountMaskService } from '../../masks/mask-amount.mask';
 import {
   BillDTO,
   BillsPayableMonthInputDTO,
+  BillsSearchFilter,
   CreateBillInputDTO,
   CreateBillOutputDTO,
   DeleteBillInputDTO,
@@ -13,6 +14,7 @@ import {
   GetBillByIdInputDTO,
   GetBillsInputDTO,
   OrderByGetBillsInputDTO,
+  QueryBillsByFilterInputDTO,
   SortByBillTypeInputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { SortOrder } from '@/domain/dtos/listParamsDto.dto';
@@ -193,7 +195,102 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
     };
   }
 
-  private async handleQueryBills({
+  private handleExtractKeysByFiltersFromQueryBillsByFilters(
+    filters: BillsSearchFilter,
+    query: admin.firestore.Query<admin.firestore.DocumentData>,
+  ) {
+    if ('paid' in filters) {
+      query = query.where('payOut', '==', filters.paid);
+    }
+
+    if ('category' in filters) {
+      query = query.where('categoryDescriptionEnum', '==', filters.category);
+    }
+
+    if ('categoryGroup' in filters) {
+      query = query.where(
+        'categoryDescriptionEnum',
+        '==',
+        filters.categoryGroup,
+      );
+    }
+
+    if ('paymentMethod' in filters) {
+      query = query.where(
+        'paymentMethodDescriptionEnum',
+        '==',
+        filters.paymentMethod,
+      );
+    }
+
+    if ('paymentStatus' in filters) {
+      query = query.where('paymentStatus', '==', filters.paymentStatus);
+    }
+
+    if ('isPaymentCardBill' in filters) {
+      query = query.where('isPaymentCardBill', '==', filters.isPaymentCardBill);
+    }
+
+    if ('isShoppingListBill' in filters) {
+      query = query.where(
+        'isShoppingListBill',
+        '==',
+        filters.isShoppingListBill,
+      );
+    }
+
+    if ('fixed' in filters) {
+      query = query.where('fixedBill', '==', filters.fixed);
+    }
+
+    return query;
+  }
+
+  public async handleQueryBillsByFilters({
+    period,
+    userId,
+    filters,
+  }: QueryBillsByFilterInputDTO) {
+    let query: admin.firestore.Query<admin.firestore.DocumentData> =
+      this.dbCollection;
+
+    query = query
+      .where('userId', '==', userId)
+      .where('billDate', '>=', period.initialDate)
+      .where('billDate', '<=', period.finalDate);
+
+    if (filters) {
+      query = this.handleExtractKeysByFiltersFromQueryBillsByFilters(
+        filters,
+        query,
+      );
+    }
+
+    const bills = await query
+      .get()
+      .then((response) =>
+        response.docs?.map((item) =>
+          this.createInstanceBillEntitie({
+            id: item.id,
+            ...item.data(),
+          } as BillDTO),
+        ),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return {
+      content: bills,
+      totalElements: (bills as Array<BillDTO>).length,
+      totalPages: 1,
+      ordering: null,
+      page: 0,
+      size: 0,
+    } as ResponseListDTO<BillDTO>;
+  }
+
+  private async handleQueryBillsOrderedByDate({
     userId,
     direction,
   }: {
@@ -233,7 +330,10 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
         : SortOrder.ASC
     ) as SortOrder;
 
-    let data = await this.handleQueryBills({ userId, direction });
+    let data = await this.handleQueryBillsOrderedByDate({
+      userId,
+      direction,
+    });
 
     data = this.applyFilterBills(input, data as Array<BillDTO>);
 
@@ -443,7 +543,7 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       throw new ApiError(ERROR_MESSAGES.INVALID_PERIOD, 400);
     }
 
-    let data = await this.handleQueryBills({
+    let data = await this.handleQueryBillsOrderedByDate({
       userId,
       direction: SortOrder.ASC,
     });
@@ -475,5 +575,14 @@ export class BillsRepositoryFirebase implements BillRepositoryGateway {
       OrderByGetBillsInputDTO,
       BillDTO
     >({ page, size }, data as Array<BillDTO>);
+  }
+
+  public totalAmountBills(bills: Array<BillDTO>) {
+    const totalAmount = bills.reduce(
+      (prev, current) => prev + current.amount,
+      0,
+    );
+
+    return totalAmount;
   }
 }
