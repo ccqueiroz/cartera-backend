@@ -223,7 +223,7 @@ describe('Receivable Schema', () => {
           receivalDate: { initialDate: 19999889, finalDate: 9899999 },
         },
         sort: {
-          category: 'ACCOUNTANT',
+          category: '99POP',
         },
       },
     ).then((errors) => {
