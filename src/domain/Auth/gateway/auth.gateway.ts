@@ -1,4 +1,9 @@
-import { AuthEntitieDTO, AuthRegisterDTO, AuthSignDTO } from '../dtos/auth.dto';
+import {
+  AuthEntitieDTO,
+  AuthRefreshTokenDTO,
+  AuthRegisterDTO,
+  AuthSignDTO,
+} from '../dtos/auth.dto';
 
 export interface AuthGateway {
   registerWithEmail({
@@ -41,4 +46,9 @@ export interface AuthGateway {
     AuthEntitieDTO,
     'accessToken'
   > | null>;
+  refreshToken({
+    refreshToken,
+  }: AuthRefreshTokenDTO): Promise<
+    Omit<AuthEntitieDTO, 'email' | 'lastLoginAt' | 'createdAt' | 'updatedAt'>
+  >;
 }
