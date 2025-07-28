@@ -4,12 +4,17 @@ import {
   AuthSignDTO,
   AuthEntitieDTO,
   AuthRegisterDTO,
+  AuthRefreshTokenDTO,
 } from '@/domain/Auth/dtos/auth.dto';
 import { AuthEntitie } from '@/domain/Auth/entitie/auth.entitie';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
-import { ResetPasswordUrl, signInUrl } from '@/packages/clients/firebase';
+import {
+  ResetPasswordUrl,
+  signInUrl,
+  refreshTokenUrl,
+} from '@/packages/clients/firebase';
 export class AuthRepositoryFirebase implements AuthGateway {
   private static instance: AuthRepositoryFirebase;
 
@@ -22,16 +27,40 @@ export class AuthRepositoryFirebase implements AuthGateway {
     return AuthRepositoryFirebase.instance;
   }
 
-  private async handleUseAuthUrl<T>(url: string, body: T) {
+  private async handleUseAuthUrl<T>(
+    url: string,
+    body: T,
+    isRefreshToken = false,
+  ) {
     let response;
+
     try {
-      response = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
+      let bodyInit: BodyInit | undefined;
+
+      let headers: HeadersInit | undefined;
+
+      if (!isRefreshToken) {
+        headers = { 'Content-Type': 'application/json' };
+        bodyInit = JSON.stringify({
           ...body,
           returnSecureToken: true,
-        }),
-        headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        if (typeof body !== 'string')
+          throw new ApiError('body não é string', 400);
+
+        headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+
+        bodyInit = new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: body as string,
+        });
+      }
+
+      response = await fetch(url, {
+        method: 'POST',
+        body: bodyInit,
+        headers,
       });
 
       const data = await response.json();
@@ -190,7 +219,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       .verifyIdToken(accessToken, true)
       .then((response) => response)
       .catch((error) => {
-        ErrorsFirebase.presenterError(error);
+        return ErrorsFirebase.presenterError(error);
       });
 
     if (!decodeToken) return null;
@@ -210,6 +239,38 @@ export class AuthRepositoryFirebase implements AuthGateway {
       email: user.email,
       userId: user.userId,
       expirationTime: user.expirationTime,
+    };
+  }
+
+  public async refreshToken({
+    refreshToken,
+  }: AuthRefreshTokenDTO): Promise<
+    Omit<AuthEntitieDTO, 'email' | 'lastLoginAt' | 'createdAt' | 'updatedAt'>
+  > {
+    const data = await this.handleUseAuthUrl(
+      refreshTokenUrl,
+      refreshToken,
+      true,
+    );
+
+    if (!data) throw new ApiError(ERROR_MESSAGES.INVALID_TOKEN, 401);
+
+    const authEntitie = AuthEntitie.with({
+      email: '',
+      userId: data.user_id,
+      accessToken: data?.id_token,
+      refreshToken: data?.refresh_token,
+      expirationTime: new Date().getTime() + +data?.expires_in + 5 * 60 * 1000,
+      lastLoginAt: 0,
+      updatedAt: null,
+      createdAt: null,
+    });
+
+    return {
+      userId: authEntitie.userId,
+      accessToken: authEntitie.accessToken,
+      refreshToken: authEntitie.refreshToken,
+      expirationTime: authEntitie.expirationTime,
     };
   }
 
