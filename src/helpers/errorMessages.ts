@@ -1,5 +1,7 @@
 export const ERROR_MESSAGES = {
   INVALID_TOKEN: 'Token de autorização inválido.',
+  TOKEN_EXPIRED:
+    'A credencial do usuário não é mais válida. O usuário deve efetuar login novamente.',
   MISSING_REQUIRED_PARAMETERS: 'Parâmetros obrigatórios ausentes.',
   INVALID_CREDENTIALS: 'Credenciais Inválidas.',
   USER_ALREADY_EXISTS: 'Usuário já registrado.',
