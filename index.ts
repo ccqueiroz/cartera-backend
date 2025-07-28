@@ -45,6 +45,7 @@ import {
 } from './src/infra/database/firebase/firebase.database';
 import { logger } from './src/infra/logger';
 import { InvoiceRoute } from '@/infra/api/express/routes/invoice/invoice.routes';
+import { CookiesMiddleware } from '@/infra/api/express/middlewares/cookies.middleware';
 
 function main() {
   // ----- REPOSITORIES -----
@@ -185,6 +186,7 @@ function main() {
   // ----- GLOBAL MIDDLEWARES ----
   const cors = new CorsMiddleware();
   const ipControll = new IpControllMiddleware(normalizeIp);
+  const cookies = new CookiesMiddleware();
 
   //  ----- ERROR MIDDLEWARE -----
   const errorMiddleware = new ErrorMiddleware(logger.error);
@@ -202,7 +204,7 @@ function main() {
       ...cashFlowRoutes,
       ...invoicesRoutes,
     ],
-    [cors, ipControll],
+    [cookies, cors, ipControll],
     errorMiddleware,
     logger,
     redisCacheRepository,
