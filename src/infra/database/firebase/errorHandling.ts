@@ -51,6 +51,10 @@ const errorsFirebase = {
     message: ERROR_MESSAGES.INVALID_TOKEN,
     httpCode: 401,
   },
+  TOKEN_EXPIRED: {
+    message: ERROR_MESSAGES.INVALID_TOKEN,
+    httpCode: 401,
+  },
   EMAIL_NOT_FOUND: {
     message: ERROR_MESSAGES.EMAIL_NOT_FOUND,
     httpCode: 404,
