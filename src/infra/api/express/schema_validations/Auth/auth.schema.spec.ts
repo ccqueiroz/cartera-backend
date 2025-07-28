@@ -1,6 +1,7 @@
 import {
   LoginValidation,
   RecoveryPasswordValidation,
+  RefreshTokenValidation,
   RegisterValidation,
   SignoutValidation,
   UserIdAuthValidation,
@@ -63,7 +64,7 @@ describe('Auth Schema', () => {
     });
   });
 
-  it('should be validate the attributes of the LoginValidation with password error error must be defined', async () => {
+  it('should be validate the attributes of the LoginValidation with password error must be defined', async () => {
     return runValidate<LoginValidation>(LoginValidation, {
       email: 'jonh.doe@gmail.com',
       password: undefined as any,
@@ -111,6 +112,26 @@ describe('Auth Schema', () => {
       authUserId: '1991',
     }).then((errors) => {
       expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the attribute refreshToken from RefreshTokenValidation without errors', async () => {
+    return runValidate<RefreshTokenValidation>(RefreshTokenValidation, {
+      refreshToken: '1991',
+    }).then((errors) => {
+      expect(errors.length).toEqual(0);
+    });
+  });
+
+  it('should be validate the attribute refreshToken from RefreshTokenValidation with error in refreshToken', async () => {
+    return runValidate<RefreshTokenValidation>(RefreshTokenValidation, {
+      refreshToken: undefined as any,
+    }).then((errors) => {
+      expect(errors.length).toEqual(1);
+      expect(errors[0].constraints).toEqual({
+        isDefined: 'refreshToken should not be null or undefined',
+        isString: 'refreshToken must be a string',
+      });
     });
   });
 });

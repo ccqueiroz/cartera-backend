@@ -28,6 +28,12 @@ export class LoginValidation extends ValidationWithEmail {
   password!: string;
 }
 
+export class RefreshTokenValidation {
+  @IsDefined()
+  @IsString()
+  refreshToken!: string;
+}
+
 export class RecoveryPasswordValidation extends ValidationWithEmail {}
 
 export class RegisterValidation extends ValidationWithEmail {
