@@ -61,18 +61,37 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
     );
   }
 
+  private handleBuildInputDTO({
+    year,
+    authUserId,
+  }: GetConsolidatedCashFlowByYearInputDTO & {
+    authUserId: string;
+  }): GetConsolidatedCashFlowByYearInputDTO {
+    return {
+      year: Number(year),
+      userId: authUserId,
+    };
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
         const { year } = request.params;
 
+        const buildInputDTO = this.handleBuildInputDTO({
+          year,
+          authUserId: user_auth?.userId,
+        } as unknown as GetConsolidatedCashFlowByYearInputDTO & {
+          authUserId: string;
+        });
+
         const errors =
           await runValidate<GetConsolidatedCashFlowByYearValidationDTO>(
             GetConsolidatedCashFlowByYearValidationDTO,
             {
-              year: +year,
-              authUserId: user_auth?.userId as string,
+              year: buildInputDTO.year,
+              authUserId: buildInputDTO.userId,
             },
           );
 
@@ -82,9 +101,8 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
 
         const cashFlow =
           await this.getConsolidatedCashFlowByYearService.execute({
-            userId: user_auth?.userId,
-            year,
-          } as unknown as GetConsolidatedCashFlowByYearInputDTO);
+            ...buildInputDTO,
+          });
 
         response.status(200).json({ ...cashFlow });
       } catch (error) {
