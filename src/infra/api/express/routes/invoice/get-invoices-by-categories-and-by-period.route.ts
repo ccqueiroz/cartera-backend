@@ -89,21 +89,60 @@ export class GetInvoicesByCategoriesAndByPeriodRoute implements Route {
     );
   }
 
+  private handleBuildInputDTO({
+    initialDate,
+    finalDate,
+    paid,
+    type,
+    authUserId,
+  }: Omit<GetInvoicesByCategoryAndPeriodInputDTO, 'period' | 'paid'> & {
+    initialDate: string;
+    finalDate: string;
+    authUserId: string;
+    paid?: string;
+  }): GetInvoicesByCategoryAndPeriodInputDTO {
+    return {
+      period: {
+        initialDate: Number(initialDate),
+        finalDate: Number(finalDate),
+      },
+      paid: paid === 'true',
+      type,
+      userId: authUserId,
+    };
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
         const { initialDate, finalDate, paid, type } = request.query;
 
+        const buildInputDTO = this.handleBuildInputDTO({
+          initialDate,
+          finalDate,
+          paid,
+          type,
+          authUserId: user_auth?.userId,
+        } as unknown as Omit<
+          GetInvoicesByCategoryAndPeriodInputDTO,
+          'period' | 'paid'
+        > & {
+          initialDate: string;
+          finalDate: string;
+          authUserId: string;
+          paid?: string;
+        });
+
         const errors =
           await runValidate<GetInvoicesByCategoriesAndPeriodValidationDTO>(
             GetInvoicesByCategoriesAndPeriodValidationDTO,
             {
-              initialDate: Number(initialDate),
-              finalDate: Number(finalDate),
-              paid: Boolean(paid),
-              type: type as unknown as CategoryTypeEnum,
-              authUserId: user_auth?.userId as string,
+              initialDate: buildInputDTO.period.initialDate,
+              finalDate: buildInputDTO.period.finalDate,
+              paid: buildInputDTO.paid,
+              type: buildInputDTO.type as unknown as CategoryTypeEnum,
+              authUserId: buildInputDTO.userId,
             },
           );
 
@@ -113,17 +152,12 @@ export class GetInvoicesByCategoriesAndByPeriodRoute implements Route {
 
         const cashFlow =
           await this.getInvoicesByCategoriesAndByPeriodService.execute({
-            userId: user_auth?.userId,
-            period: {
-              initialDate,
-              finalDate,
-            },
-            paid,
-            type,
-          } as unknown as GetInvoicesByCategoryAndPeriodInputDTO);
+            ...buildInputDTO,
+          });
 
         response.status(200).json({ ...cashFlow });
       } catch (error) {
+        console.log('error', error);
         next(
           error instanceof ApiError
             ? error
