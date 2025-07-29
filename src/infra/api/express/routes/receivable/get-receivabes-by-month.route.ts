@@ -104,20 +104,54 @@ export class GetReceivablesByMonthRoute implements Route {
     );
   }
 
+  private handleBuildInputDTO({
+    page,
+    size,
+    authUserId,
+    initialDate,
+    finalDate,
+  }: Omit<ReceivablesByMonthInputDTO, 'period'> & {
+    initialDate: string;
+    finalDate: string;
+    authUserId: string;
+  }): ReceivablesByMonthInputDTO {
+    return {
+      period: {
+        initialDate: Number(initialDate),
+        finalDate: Number(finalDate),
+      },
+      userId: authUserId,
+      page: Number(page),
+      size: Number(size),
+    };
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
         const { initialDate, finalDate, page, size } = request.query;
 
+        const buildInputDTO = this.handleBuildInputDTO({
+          initialDate,
+          finalDate,
+          authUserId: user_auth?.userId,
+          page,
+          size,
+        } as unknown as Omit<ReceivablesByMonthInputDTO, 'period'> & {
+          initialDate: string;
+          finalDate: string;
+          authUserId: string;
+        });
+
         const errors = await runValidate<GetReceivablesByMonthDTO>(
           GetReceivablesByMonthDTO,
           {
-            initialDate: Number(initialDate),
-            finalDate: Number(finalDate),
-            authUserId: user_auth?.userId as string,
-            page: Number(page),
-            size: Number(size),
+            initialDate: buildInputDTO.period.initialDate,
+            finalDate: buildInputDTO.period.finalDate,
+            authUserId: buildInputDTO.userId,
+            page: buildInputDTO.page,
+            size: buildInputDTO.size,
           },
         );
 
@@ -125,17 +159,11 @@ export class GetReceivablesByMonthRoute implements Route {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
         }
 
-        const bills = await this.getReceivablesByMonthService.execute({
-          userId: user_auth?.userId,
-          period: {
-            initialDate: Number(initialDate),
-            finalDate: Number(finalDate),
-          },
-          page: Number(page),
-          size: Number(size),
-        } as ReceivablesByMonthInputDTO);
+        const receivables = await this.getReceivablesByMonthService.execute({
+          ...buildInputDTO,
+        });
 
-        response.status(200).json({ ...bills });
+        response.status(200).json({ ...receivables });
       } catch (error) {
         next(
           error instanceof ApiError
