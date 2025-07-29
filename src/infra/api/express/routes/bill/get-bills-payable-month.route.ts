@@ -104,20 +104,54 @@ export class GetBillsPayableMonthRoute implements Route {
     );
   }
 
+  private handleBuildInputDTO({
+    page,
+    size,
+    authUserId,
+    initialDate,
+    finalDate,
+  }: Omit<BillsPayableMonthInputDTO, 'period'> & {
+    initialDate: string;
+    finalDate: string;
+    authUserId: string;
+  }): BillsPayableMonthInputDTO {
+    return {
+      period: {
+        initialDate: Number(initialDate),
+        finalDate: Number(finalDate),
+      },
+      userId: authUserId,
+      page: Number(page),
+      size: Number(size),
+    };
+  }
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
         const { initialDate, finalDate, page, size } = request.query;
 
+        const buildInputDTO = this.handleBuildInputDTO({
+          initialDate,
+          finalDate,
+          authUserId: user_auth?.userId,
+          page,
+          size,
+        } as unknown as Omit<BillsPayableMonthInputDTO, 'period'> & {
+          initialDate: string;
+          finalDate: string;
+          authUserId: string;
+        });
+
         const errors = await runValidate<GetBillsPayableMonthDTO>(
           GetBillsPayableMonthDTO,
           {
-            initialDate: Number(initialDate),
-            finalDate: Number(finalDate),
-            authUserId: user_auth?.userId as string,
-            page: Number(page),
-            size: Number(size),
+            initialDate: buildInputDTO.period.initialDate,
+            finalDate: buildInputDTO.period.finalDate,
+            authUserId: buildInputDTO.userId,
+            page: buildInputDTO.page,
+            size: buildInputDTO.size,
           },
         );
 
@@ -126,14 +160,8 @@ export class GetBillsPayableMonthRoute implements Route {
         }
 
         const bills = await this.getBillsPayableMonth.execute({
-          userId: user_auth?.userId,
-          period: {
-            initialDate: Number(initialDate),
-            finalDate: Number(finalDate),
-          },
-          page: Number(page),
-          size: Number(size),
-        } as BillsPayableMonthInputDTO);
+          ...buildInputDTO,
+        });
 
         response.status(200).json({ ...bills });
       } catch (error) {
