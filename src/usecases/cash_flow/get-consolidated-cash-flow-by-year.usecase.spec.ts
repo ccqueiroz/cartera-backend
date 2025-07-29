@@ -153,11 +153,11 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
     jest.clearAllMocks();
 
     billServiceMock = {
-      getBills: jest.fn(),
+      handleQueryBillsByFilters: jest.fn(),
     } as any;
 
     receivableServiceMock = {
-      getReceivables: jest.fn(),
+      handleQueryReceivablesByFilters: jest.fn(),
     } as any;
 
     getConsolidatedCashFlow = GetConsolidatedCashFlowByYearUseCase.create({
@@ -173,7 +173,7 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
   });
 
   it('should receive a year and must should receive a year and must return a cash flow list with all months containing the informations about its respective months cash flow return a cash flow list with all months and this cash flow informations of months', async () => {
-    receivableServiceMock.getReceivables.mockResolvedValue({
+    receivableServiceMock.handleQueryReceivablesByFilters.mockResolvedValue({
       content: receivablesItemsMocks,
       totalElements: 3,
       totalPages: 1,
@@ -182,7 +182,7 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       ordering: null,
     });
 
-    billServiceMock.getBills.mockResolvedValue({
+    billServiceMock.handleQueryBillsByFilters.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -247,8 +247,10 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 401,
     });
 
-    expect(billServiceMock.getBills).not.toHaveBeenCalled();
-    expect(receivableServiceMock.getReceivables).not.toHaveBeenCalled();
+    expect(billServiceMock.handleQueryBillsByFilters).not.toHaveBeenCalled();
+    expect(
+      receivableServiceMock.handleQueryReceivablesByFilters,
+    ).not.toHaveBeenCalled();
   });
 
   it('should throw an error if the year is invalid (NaN)', async () => {
@@ -265,16 +267,18 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 400,
     });
 
-    expect(billServiceMock.getBills).not.toHaveBeenCalled();
-    expect(receivableServiceMock.getReceivables).not.toHaveBeenCalled();
+    expect(billServiceMock.handleQueryBillsByFilters).not.toHaveBeenCalled();
+    expect(
+      receivableServiceMock.handleQueryReceivablesByFilters,
+    ).not.toHaveBeenCalled();
   });
 
   it('should throw an internal error if any gateway call fails', async () => {
-    receivableServiceMock.getReceivables.mockRejectedValueOnce(
+    receivableServiceMock.handleQueryReceivablesByFilters.mockRejectedValueOnce(
       new Error('Unexpected error'),
     );
 
-    billServiceMock.getBills.mockResolvedValue({
+    billServiceMock.handleQueryBillsByFilters.mockResolvedValue({
       content: billsItemsMock,
       totalElements: 3,
       totalPages: 1,
@@ -296,7 +300,9 @@ describe('GET CONSOLIDATED CASH FLOW', () => {
       statusCode: 500,
     });
 
-    expect(billServiceMock.getBills).toHaveBeenCalledTimes(1);
-    expect(receivableServiceMock.getReceivables).toHaveBeenCalledTimes(1);
+    expect(billServiceMock.handleQueryBillsByFilters).toHaveBeenCalledTimes(1);
+    expect(
+      receivableServiceMock.handleQueryReceivablesByFilters,
+    ).toHaveBeenCalledTimes(1);
   });
 });
