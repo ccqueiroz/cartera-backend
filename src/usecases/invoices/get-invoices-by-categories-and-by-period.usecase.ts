@@ -128,11 +128,14 @@ export class GetInvoicesByCategoriesAndByPeriodUseCase
         ) => Promise<ResponseListDTO<ReceivableDTO>>);
 
     if (type === CategoryType.BILLS) {
-      promise = this.billService.handleQueryBillsByFilters;
+      promise = this.billService.handleQueryBillsByFilters.bind(
+        this.billService,
+      );
     } else {
-      promise = this.receivableService.handleQueryReceivablesByFilters;
+      promise = this.receivableService.handleQueryReceivablesByFilters.bind(
+        this.receivableService,
+      );
     }
-
     const filters = paid !== undefined ? { paid } : {};
 
     const responseList = await promise({
