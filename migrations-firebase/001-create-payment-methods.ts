@@ -87,6 +87,7 @@ export default async function (db: admin.firestore.Firestore) {
     await paymentMethodsRef.doc(method.id).set({
       id: method.id,
       description: method.description,
+      descriptionEnum: method.descriptionEnum,
       createdAt: new Date().getTime(),
       updatedAt: null,
     });
