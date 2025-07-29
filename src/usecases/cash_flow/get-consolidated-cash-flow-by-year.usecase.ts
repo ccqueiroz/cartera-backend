@@ -122,26 +122,18 @@ export class GetConsolidatedCashFlowByYearUseCase
 
     const [listBillsByGateway, listReceivablesByGateway] =
       await Promise.allSettled([
-        this.billService.getBills({
+        this.billService.handleQueryBillsByFilters({
           userId,
-          page: 0,
-          size: 99999,
-          searchByDate: {
-            billDate: {
-              initialDate: new Date(initialPeriod).getTime(),
-              finalDate: new Date(finalPeriod).getTime(),
-            },
+          period: {
+            initialDate: new Date(initialPeriod).getTime(),
+            finalDate: new Date(finalPeriod).getTime(),
           },
         }),
-        this.receivableService.getReceivables({
+        this.receivableService.handleQueryReceivablesByFilters({
           userId,
-          page: 0,
-          size: 99999,
-          searchByDate: {
-            receivableDate: {
-              initialDate: new Date(initialPeriod).getTime(),
-              finalDate: new Date(finalPeriod).getTime(),
-            },
+          period: {
+            initialDate: new Date(initialPeriod).getTime(),
+            finalDate: new Date(finalPeriod).getTime(),
           },
         }),
       ]);
