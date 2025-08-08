@@ -157,7 +157,6 @@ export class GetInvoicesByCategoriesAndByPeriodRoute implements Route {
 
         response.status(200).json({ ...cashFlow });
       } catch (error) {
-        console.log('error', error);
         next(
           error instanceof ApiError
             ? error
