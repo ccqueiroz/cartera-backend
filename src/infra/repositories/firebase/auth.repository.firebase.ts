@@ -135,7 +135,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       userId: data.localId,
       accessToken: data?.idToken,
       refreshToken: data?.refreshToken,
-      expirationTime: new Date().getTime() + +data?.expiresIn + 5 * 60 * 1000,
+      expirationTime: +data?.expiresIn,
       lastLoginAt: 0,
       updatedAt: null,
       createdAt: data?.createdAt,
@@ -153,7 +153,10 @@ export class AuthRepositoryFirebase implements AuthGateway {
   public async recoveryPassword({
     email,
   }: Pick<AuthEntitieDTO, 'email'>): Promise<void> {
-    await this.handleUseAuthUrl(ResetPasswordUrl, { email });
+    await this.handleUseAuthUrl(ResetPasswordUrl, {
+      email,
+      requestType: 'PASSWORD_RESET',
+    });
   }
 
   public async signout({
@@ -260,7 +263,7 @@ export class AuthRepositoryFirebase implements AuthGateway {
       userId: data.user_id,
       accessToken: data?.id_token,
       refreshToken: data?.refresh_token,
-      expirationTime: new Date().getTime() + +data?.expires_in + 5 * 60 * 1000,
+      expirationTime: +data?.expires_in * 1000,
       lastLoginAt: 0,
       updatedAt: null,
       createdAt: null,
