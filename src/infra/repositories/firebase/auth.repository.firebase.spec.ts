@@ -219,7 +219,7 @@ describe('Auth Repository Firebase', () => {
     ).resolves.not.toThrow();
 
     expect(mockFetch).toHaveBeenCalledWith(ResetPasswordUrl, {
-      body: '{"email":"jonh.doe@example.com","returnSecureToken":true}',
+      body: '{"email":"jonh.doe@example.com","requestType":"PASSWORD_RESET","returnSecureToken":true}',
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
     });

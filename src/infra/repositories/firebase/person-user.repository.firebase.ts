@@ -38,7 +38,12 @@ export class PersonUserRepositoryFirebase
       .where('email', '==', email)
       .get()
       .then((response) =>
-        response.docs?.map((item) => ({ id: item.id, ...item.data() })),
+        response.docs?.map((item) =>
+          PersonUserEntitie.with({
+            id: item.id,
+            ...item.data(),
+          } as PersonUserEntitieDTO),
+        ),
       )
       .catch((error) => {
         ErrorsFirebase.presenterError(error);
@@ -46,19 +51,19 @@ export class PersonUserRepositoryFirebase
 
     if (!data || data.length === 0) return null;
 
-    const user = data[0] as PersonUserEntitieDTO;
+    const person = data[0] as PersonUserEntitieDTO;
 
-    return PersonUserEntitie.with({
-      id: user.id,
-      userId: user.userId,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      image: user?.image,
-      createdAt: user?.createdAt,
-      fullName: user?.fullName,
-      updatedAt: user?.updatedAt,
-    });
+    return {
+      id: person.id,
+      userId: person.userId,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      email: person.email,
+      image: person?.image,
+      createdAt: person?.createdAt,
+      fullName: person?.fullName,
+      updatedAt: person?.updatedAt,
+    };
   }
 
   public async getPersonUserByUserId({
@@ -78,7 +83,7 @@ export class PersonUserRepositoryFirebase
 
     const user = data[0] as PersonUserEntitieDTO;
 
-    return PersonUserEntitie.with({
+    const person = PersonUserEntitie.with({
       id: user.id,
       userId: user.userId,
       firstName: user.firstName,
@@ -89,6 +94,18 @@ export class PersonUserRepositoryFirebase
       fullName: user?.fullName,
       updatedAt: user?.updatedAt,
     });
+
+    return {
+      id: person.id,
+      userId: person.userId,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      email: person.email,
+      image: person?.image,
+      createdAt: person?.createdAt,
+      fullName: person?.fullName,
+      updatedAt: person?.updatedAt,
+    };
   }
 
   public async getPersonUserById({
