@@ -17,10 +17,15 @@ const swaggerDefinition: OAS3Options = {
     ],
     components: {
       securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+        sessionCookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'session',
+        },
+        refreshCookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'refresh_session',
         },
       },
     },
