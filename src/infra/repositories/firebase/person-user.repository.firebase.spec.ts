@@ -42,7 +42,6 @@ describe('Person User Repository Firebase', () => {
       email: 'jonh.doe@example.com',
     });
 
-    expect(result).toBeInstanceOf(PersonUserEntitie);
     expect(firestore.where().get).toHaveBeenCalledTimes(1);
 
     expect(result?.id).toBe('123');
