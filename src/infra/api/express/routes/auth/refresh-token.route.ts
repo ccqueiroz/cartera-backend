@@ -18,7 +18,7 @@ import { RefreshTokenUseCase } from '@/usecases/auth/refresh-token.usecase';
  *     tags:
  *       - Auth
  *     security:
- *       - cookieAuth: []
+ *       - refreshCookieAuth: []
  *     responses:
  *       200:
  *         description: Novo token de acesso gerado com sucesso.
@@ -99,7 +99,7 @@ export class RefreshTokenRoute implements Route {
           path: '/',
           sameSite: 'lax',
           secure: true,
-          expires: new Date(refreshTokenResponse.data.expirationTime ?? 0),
+          maxAge: refreshTokenResponse.data.expirationTime ?? 0,
         });
 
         response.status(200).json({ ...refreshTokenResponse });
