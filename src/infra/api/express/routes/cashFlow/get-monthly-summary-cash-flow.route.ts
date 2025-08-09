@@ -1,24 +1,31 @@
-import { GetConsolidatedCashFlowByYearUseCase } from '@/usecases/cash_flow/get-consolidated-cash-flow-by-year.usecase';
-import { HttpMiddleware } from '../../middlewares/middleware';
+import { GetMonthlySummaryCashFlowUseCase } from '@/usecases/cash_flow/get-monthly-summary-cash-flow.usecase';
 import { HttpMethod, Route } from '../route';
+import { HttpMiddleware } from '../../middlewares/middleware';
+import { GetMonthlySummaryCashFlowInputDTO } from '@/domain/Cash_Flow/dtos/cash-flow.dto';
 import { NextFunction, Request, Response } from 'express';
+import { runValidate } from '@/packages/clients/class-validator';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
-import { GetConsolidatedCashFlowByYearInputDTO } from '@/domain/Cash_Flow/dtos/cash-flow.dto';
-import { runValidate } from '@/packages/clients/class-validator';
-import { GetConsolidatedCashFlowByYearValidationDTO } from '../../schema_validations/CashFlow/cash-flow.schema';
+import { GetMonthlySummaryCashFlowValidationDTO } from '../../schema_validations/CashFlow/cash-flow.schema';
 
 /**
  * @swagger
- * /api/cash-flow/summary/{year}:
+ * /api/cash-flow/monthly-summary/{month}/{year}:
  *   get:
- *     summary: Lista de um resumo mensal de fluxo de caixa (entradas, saídas e lucro) com base no ano informado pelo o usuário.
- *     description: Retorna uma lista de resumo mensal de fluxo de caixa (entradas, saídas e lucro) para o ano informado.
+ *     summary: Resumo mensal do fluxo de caixa detalhado por mês e ano.
+ *     description: Resumo mensal do fluxo de caixa com receitas fixas e variáveis recebidas e despesas fixas e variáveis pagas, filtrado por mês (0-11) e ano.
  *     tags:
  *       - CashFlow
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         schema:
+ *           type: number
+ *           example: 7
+ *         description: Mês para o qual será feita a análise do fluxo de caixa. Esse valor corresponde ao resultado do método `getMonth()` do JavaScript aplicado em um objeto `Date`, portanto varia de 0 (janeiro) a 11 (dezembro).
  *       - in: path
  *         name: year
  *         required: true
@@ -28,11 +35,14 @@ import { GetConsolidatedCashFlowByYearValidationDTO } from '../../schema_validat
  *         description: Ano que deverá ser feita a análise do fluxo de caixa.
  *     responses:
  *       200:
- *         description: Lista do fluxo de caixa consolidado retornada com sucesso.
+ *         description: Resumo mensal do fluxo de caixa retornado com sucesso, incluindo receitas fixas e variáveis, bem como despesas fixas e variáveis pagas.
  *         content:
  *           application/json:
  *             schema:
- *                $ref: '#/components/schemas/CashFlowDTOListResponse'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                  $ref: '#/components/schemas/GetMonthlySummaryCashFlowDTO'
  *       400:
  *         description: Período de pesquisa inválido. Por favor, informe o ano corretamente. | Parâmetros de entrada inválidos.
  *       401:
@@ -41,35 +51,39 @@ import { GetConsolidatedCashFlowByYearValidationDTO } from '../../schema_validat
  *         description: Erro interno no servidor.
  */
 
-export class GetConsolidatedCashFlowByYearRoute implements Route {
+export class GetMonthlySummaryCashFlowRoute implements Route {
   private constructor(
     private readonly path: string,
     private readonly method: HttpMethod,
-    private readonly getConsolidatedCashFlowByYearService: GetConsolidatedCashFlowByYearUseCase,
+    private readonly getMonthlySummaryCashFlowService: GetMonthlySummaryCashFlowUseCase,
     private readonly middlewares: Array<HttpMiddleware> = [],
   ) {}
 
   public static create(
-    getConsolidatedCashFlowByYearService: GetConsolidatedCashFlowByYearUseCase,
+    getMonthlySummaryCashFlowService: GetMonthlySummaryCashFlowUseCase,
     middlewares: Array<HttpMiddleware> = [],
   ) {
-    return new GetConsolidatedCashFlowByYearRoute(
-      'cash-flow/summary/:year',
+    return new GetMonthlySummaryCashFlowRoute(
+      'cash-flow/monthly-summary/:month/:year',
       HttpMethod.GET,
-      getConsolidatedCashFlowByYearService,
+      getMonthlySummaryCashFlowService,
       middlewares,
     );
   }
 
   private handleBuildInputDTO({
     year,
+    month,
+    paid,
     authUserId,
-  }: GetConsolidatedCashFlowByYearInputDTO & {
+  }: GetMonthlySummaryCashFlowInputDTO & {
     authUserId: string;
-  }): GetConsolidatedCashFlowByYearInputDTO {
+  }): GetMonthlySummaryCashFlowInputDTO {
     return {
       year: Number(year),
+      month: Number(month),
       userId: authUserId,
+      paid,
     };
   }
 
@@ -82,16 +96,18 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
         const cashFlowInputDTO = this.handleBuildInputDTO({
           year,
           authUserId: user_auth?.userId,
-        } as unknown as GetConsolidatedCashFlowByYearInputDTO & {
+        } as unknown as GetMonthlySummaryCashFlowInputDTO & {
           authUserId: string;
         });
 
         const errors =
-          await runValidate<GetConsolidatedCashFlowByYearValidationDTO>(
-            GetConsolidatedCashFlowByYearValidationDTO,
+          await runValidate<GetMonthlySummaryCashFlowValidationDTO>(
+            GetMonthlySummaryCashFlowValidationDTO,
             {
               year: cashFlowInputDTO.year,
+              month: cashFlowInputDTO.month,
               authUserId: cashFlowInputDTO.userId,
+              paid: cashFlowInputDTO.paid,
             },
           );
 
@@ -99,10 +115,9 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
           throw new ApiError(ERROR_MESSAGES.INVALID_PARAMETERS, 400);
         }
 
-        const cashFlow =
-          await this.getConsolidatedCashFlowByYearService.execute({
-            ...cashFlowInputDTO,
-          });
+        const cashFlow = await this.getMonthlySummaryCashFlowService.execute({
+          ...cashFlowInputDTO,
+        });
 
         response.status(200).json({ ...cashFlow });
       } catch (error) {

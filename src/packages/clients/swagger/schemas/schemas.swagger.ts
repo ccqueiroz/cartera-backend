@@ -418,6 +418,22 @@
  *         paymentMethodDescriptionEnum:
  *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *
+ *     GetMonthlySummaryCashFlowDTO:
+ *       type: object
+ *       properties:
+ *         fixedIncome:
+ *           type: number
+ *           example: 1873.92
+ *         variableRevenue:
+ *           type: number
+ *           example: 1873.92
+ *         fixedExpenses:
+ *           type: number
+ *           example: 1873.92
+ *         variableExpenses:
+ *           type: number
+ *           example: 1873.92
+ *
  *     AuthDTO:
  *       type: object
  *       properties:
