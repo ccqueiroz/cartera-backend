@@ -38,7 +38,7 @@ export class RecoveryPasswordUseCase
       throw new ApiError(ERROR_MESSAGES.INVALID_EMAIL, 400);
     }
 
-    const hasUser = await this.getPersonUserByEmail.execute({ email }); //check se existe usuário pelo e-mail
+    const hasUser = await this.getPersonUserByEmail.execute({ email });
 
     if (!hasUser.data) throw new ApiError(ERROR_MESSAGES.USER_NOT_FOUND, 404);
 

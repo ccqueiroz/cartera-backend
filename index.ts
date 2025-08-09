@@ -27,7 +27,6 @@ import {
   applyPaginationHelpers,
   applySearchByDateHelpers,
   applySortStatusHelpers,
-  checkIfIsNecessaryCreateNewTokenHelpers,
   generateHashHelper,
   handleCanProgressToWritteOperation,
   mergeSortHelpers,
@@ -123,10 +122,8 @@ function main() {
     });
 
   //MIDDLEWARES
-  const authVerifyTokenMiddleware = VerifyTokenMiddleware.create(
-    authRepository,
-    checkIfIsNecessaryCreateNewTokenHelpers,
-  );
+  const authVerifyTokenMiddleware =
+    VerifyTokenMiddleware.create(authRepository);
   //
 
   // ----- ROUTES -----

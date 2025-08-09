@@ -79,7 +79,7 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
         const { user_auth } = request;
         const { year } = request.params;
 
-        const buildInputDTO = this.handleBuildInputDTO({
+        const cashFlowInputDTO = this.handleBuildInputDTO({
           year,
           authUserId: user_auth?.userId,
         } as unknown as GetConsolidatedCashFlowByYearInputDTO & {
@@ -90,8 +90,8 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
           await runValidate<GetConsolidatedCashFlowByYearValidationDTO>(
             GetConsolidatedCashFlowByYearValidationDTO,
             {
-              year: buildInputDTO.year,
-              authUserId: buildInputDTO.userId,
+              year: cashFlowInputDTO.year,
+              authUserId: cashFlowInputDTO.userId,
             },
           );
 
@@ -101,7 +101,7 @@ export class GetConsolidatedCashFlowByYearRoute implements Route {
 
         const cashFlow =
           await this.getConsolidatedCashFlowByYearService.execute({
-            ...buildInputDTO,
+            ...cashFlowInputDTO,
           });
 
         response.status(200).json({ ...cashFlow });

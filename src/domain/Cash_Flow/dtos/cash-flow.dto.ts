@@ -15,3 +15,17 @@ export type GetConsolidatedCashFlowByYearInputDTO = {
   year: number;
   userId: string;
 };
+
+export type GetMonthlySummaryCashFlowInputDTO = {
+  month: number;
+  year: number;
+  userId: string;
+  paid?: boolean;
+};
+
+export type MonthlySummaryCashFlowOutputDTO = {
+  fixedIncome: number;
+  variableRevenue: number;
+  fixedExpenses: number;
+  variableExpenses: number;
+};
