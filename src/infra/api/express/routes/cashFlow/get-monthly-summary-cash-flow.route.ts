@@ -33,6 +33,13 @@ import { GetMonthlySummaryCashFlowValidationDTO } from '../../schema_validations
  *           type: number
  *           example: 2025
  *         description: Ano que deverá ser feita a análise do fluxo de caixa.
+ *       - in: query
+ *         name: paid
+ *         required: false
+ *         schema:
+ *           type: boolean
+ *           example: true
+ *         description: Realiza o resumo do fluxo de caixa com apenas as receitas e despesas já efetivamente pagas.
  *     responses:
  *       200:
  *         description: Resumo mensal do fluxo de caixa retornado com sucesso, incluindo receitas fixas e variáveis, bem como despesas fixas e variáveis pagas.
@@ -91,11 +98,14 @@ export class GetMonthlySummaryCashFlowRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
-        const { year } = request.params;
+        const { year, month } = request.params;
+        const { paid } = request.query;
 
         const cashFlowInputDTO = this.handleBuildInputDTO({
           year,
+          month,
           authUserId: user_auth?.userId,
+          paid,
         } as unknown as GetMonthlySummaryCashFlowInputDTO & {
           authUserId: string;
         });
