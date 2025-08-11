@@ -70,4 +70,35 @@ export class PaymentMethodRepositoryFirebase
         }
       : response;
   }
+
+  public async getPaymentMethodByDescriptionEnum({
+    descriptionEnum,
+  }: Pick<
+    PaymentMethodDTO,
+    'descriptionEnum'
+  >): Promise<PaymentMethodDTO | null> {
+    const data = await this.dbCollection
+      .where('descriptionEnum', '==', descriptionEnum)
+      .get()
+      .then((response) =>
+        response.docs?.map((item) => ({ id: item.id, ...item.data() })),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    if (!data || data.length === 0) return null;
+
+    const paymentMethod = PaymentMethodEntitie.with(
+      data[0] as PaymentMethodDTO,
+    );
+
+    return {
+      id: paymentMethod.id,
+      description: paymentMethod.description,
+      descriptionEnum: paymentMethod.descriptionEnum,
+      createdAt: paymentMethod.createdAt,
+      updatedAt: paymentMethod.updatedAt,
+    };
+  }
 }

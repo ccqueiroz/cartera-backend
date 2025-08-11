@@ -5,4 +5,10 @@ export interface PaymentMethodServiceGateway {
   getPaymentMethodById({
     id,
   }: Pick<PaymentMethodDTO, 'id'>): Promise<PaymentMethodDTO | null>;
+  getPaymentMethodByDescriptionEnum({
+    descriptionEnum,
+  }: Pick<
+    PaymentMethodDTO,
+    'descriptionEnum'
+  >): Promise<PaymentMethodDTO | null>;
 }

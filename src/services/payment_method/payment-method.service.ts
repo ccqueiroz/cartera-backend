@@ -66,4 +66,29 @@ export class PaymentMethodService implements PaymentMethodServiceGateway {
 
     return paymentMethod;
   }
+
+  public async getPaymentMethodByDescriptionEnum({
+    descriptionEnum,
+  }: Pick<
+    PaymentMethodDTO,
+    'descriptionEnum'
+  >): Promise<PaymentMethodDTO | null> {
+    const key = `${this.keyController}-list-by-description-enum-${descriptionEnum}`;
+
+    const paymentMethodCache = await this.cache.recover<PaymentMethodDTO>(key);
+
+    if (paymentMethodCache) {
+      return paymentMethodCache;
+    }
+
+    const paymentMethod = await this.db.getPaymentMethodByDescriptionEnum({
+      descriptionEnum,
+    });
+
+    if (paymentMethod) {
+      await this.cache.save<PaymentMethodDTO>(key, paymentMethod, this.TTL);
+    }
+
+    return paymentMethod;
+  }
 }
