@@ -1,16 +1,29 @@
 import { OutputDTO } from '@/domain/dtos/output.dto';
-import { EditBillInputDTO, BillDTO } from '@/domain/Bill/dtos/bill.dto';
+import { BillDTO } from '@/domain/Bill/dtos/bill.dto';
 import { Usecase } from '../usecase';
 import { ValidateCategoryPaymentMethodUseCase } from '../validate_entities/validate-category-payment-method.usecase';
 import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
+type InputDTO = {
+  billData: Omit<
+    BillDTO,
+    | 'paymentStatus'
+    | 'updatedAt'
+    | 'categoryId'
+    | 'categoryDescription'
+    | 'categoryGroup'
+    | 'paymentMethodId'
+    | 'paymentMethodDescription'
+  >;
+  userId: string;
+  billId: string;
+};
+
 export type EditBillOutputDTO = OutputDTO<BillDTO | null>;
 
-export class EditBillUseCase
-  implements Usecase<EditBillInputDTO, EditBillOutputDTO>
-{
+export class EditBillUseCase implements Usecase<InputDTO, EditBillOutputDTO> {
   private constructor(
     private readonly billService: BillServiceGateway,
     private readonly validateCategoryPaymentMethodService: ValidateCategoryPaymentMethodUseCase,
@@ -33,7 +46,7 @@ export class EditBillUseCase
     billId,
     billData,
     userId,
-  }: EditBillInputDTO): Promise<EditBillOutputDTO> {
+  }: InputDTO): Promise<EditBillOutputDTO> {
     if (!userId) {
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
@@ -46,7 +59,7 @@ export class EditBillUseCase
       throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
     }
 
-    if (billData.payOut && !billData?.paymentMethodId) {
+    if (billData.payOut && !billData?.paymentMethodDescriptionEnum) {
       throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
     }
 
@@ -59,13 +72,13 @@ export class EditBillUseCase
       throw new ApiError(ERROR_MESSAGES.BILL_NOT_FOUND, 404);
     }
 
-    const validateCategoryPaymentMethodService =
+    const { isValidEntities, category, paymentMethod } =
       await this.validateCategoryPaymentMethodService.execute({
-        categoryId: billData.categoryId,
-        paymentMethodId: billData.paymentMethodId,
+        categoryDescriptionEnum: billData.categoryDescriptionEnum,
+        paymentMethodDescriptionEnum: billData.paymentMethodDescriptionEnum,
       });
 
-    if (!validateCategoryPaymentMethodService) {
+    if (!isValidEntities || !category) {
       throw new ApiError(
         ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
@@ -74,7 +87,16 @@ export class EditBillUseCase
 
     const bill = await this.billService.updateBill({
       billId,
-      billData,
+      billData: {
+        ...billData,
+        paymentMethodId: paymentMethod?.id,
+        paymentMethodDescription: paymentMethod?.description,
+        paymentMethodDescriptionEnum: paymentMethod?.descriptionEnum,
+        categoryId: category.id,
+        categoryDescription: category.description,
+        categoryDescriptionEnum: category.descriptionEnum,
+        categoryGroup: category.group,
+      },
       userId,
     });
 
