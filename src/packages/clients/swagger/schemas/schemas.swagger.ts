@@ -175,22 +175,8 @@
  *         amount:
  *           type: number
  *           example: 1200.76
- *         categoryId:
- *           type: string
- *           example: c2ecc075-82d2-406b-88cd-491c686654eb
- *         categoryDescription:
- *           type: string
- *           example: Uber
  *         categoryDescriptionEnum:
  *           $ref: '#/components/schemas/CategoryDescriptionEnum'
- *         categoryGroup:
- *           $ref: '#/components/schemas/CategoryGroupEnum'
- *         paymentMethodId:
- *           type: string
- *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
- *         paymentMethodDescription:
- *           type: string
- *           example: Pix
  *         paymentMethodDescriptionEnum:
  *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *         isPaymentCardBill:
@@ -292,20 +278,8 @@
  *         amount:
  *           type: number
  *           example: 1200.76
- *         categoryId:
- *           type: string
- *           example: c2ecc075-82d2-406b-88cd-491c686654eb
- *         categoryDescription:
- *           type: string
- *           example: Uber
  *         categoryDescriptionEnum:
  *           $ref: '#/components/schemas/CategoryDescriptionEnum'
- *         paymentMethodId:
- *           type: string
- *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
- *         paymentMethodDescription:
- *           type: string
- *           example: Pix
  *         paymentMethodDescriptionEnum:
  *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *         isPaymentCardBill:
@@ -390,12 +364,6 @@
  *         payOut:
  *           type: boolean
  *           example: true
- *         paymentMethodId:
- *           type: string
- *           example: c4dcb140-1c3e-411c-b6e1-f3cdb55b3c54
- *         paymentMethodDescription:
- *           type: string
- *           example: Pix
  *         paymentMethodDescriptionEnum:
  *           $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *
