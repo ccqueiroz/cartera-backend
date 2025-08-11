@@ -11,7 +11,7 @@ const paymentMethods = [
   {
     id: randomUUID(),
     description: 'Cartão de Crédito',
-    descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
+    descriptionEnum: PaymentMethodDescriptionEnum.CREDIT_CARD,
   },
   {
     id: randomUUID(),
