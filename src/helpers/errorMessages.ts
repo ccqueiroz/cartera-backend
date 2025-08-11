@@ -34,7 +34,7 @@ export const ERROR_MESSAGES = {
   INVALID_PARAMETERS: 'Parâmetros de entrada inválidos',
   CACHE_CLIENT_ERROR: 'Erro no client de Cache.',
   BILL_HAS_ALREADY_BEEN_PAY:
-    'Conta já "{billDescription}" foi paga. Para alterar os status da conta. Por favor, Acesse a sessão de "Pagamentos".',
+    'Conta "{billDescription}" já foi paga. Para alterar os status da conta. Por favor, Acesse a sessão de "Pagamentos".',
   INFORME_PAY_DATE_BILL: 'Data de pagamento não informada.',
   INFORME_PAYMENT_METHOD: 'Método de pagamento não informado.',
   BILL_PAY_DATE_CANNOT_BE_PRIOR_THE_ACCOUNT_CREATE_DATE:

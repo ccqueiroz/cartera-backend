@@ -1,5 +1,5 @@
 import {
-  CreateBillInputDTO,
+  BillDTO,
   CreateBillOutputDTO as TypeCreateBillOutputDTO,
 } from '@/domain/Bill/dtos/bill.dto';
 import { Usecase } from '../usecase';
@@ -9,10 +9,26 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { BillServiceGateway } from '@/domain/Bill/gateway/bill.service.gateway';
 
+type InputDTO = {
+  billData: Omit<
+    BillDTO,
+    | 'id'
+    | 'paymentStatus'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'categoryId'
+    | 'categoryDescription'
+    | 'categoryGroup'
+    | 'paymentMethodId'
+    | 'paymentMethodDescription'
+  >;
+  userId: string;
+};
+
 export type CreateBillOutputDTO = OutputDTO<TypeCreateBillOutputDTO | null>;
 
 export class CreateBillUseCase
-  implements Usecase<CreateBillInputDTO, CreateBillOutputDTO>
+  implements Usecase<InputDTO, CreateBillOutputDTO>
 {
   private constructor(
     private readonly billService: BillServiceGateway,
@@ -35,7 +51,7 @@ export class CreateBillUseCase
   public async execute({
     billData,
     userId,
-  }: CreateBillInputDTO): Promise<CreateBillOutputDTO> {
+  }: InputDTO): Promise<CreateBillOutputDTO> {
     if (!userId) {
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
@@ -44,17 +60,17 @@ export class CreateBillUseCase
       throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
     }
 
-    if (billData.payOut && !billData?.paymentMethodId) {
+    if (billData.payOut && !billData?.paymentMethodDescriptionEnum) {
       throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
     }
 
-    const validateCategoryPaymentMethodService =
+    const { isValidEntities, category, paymentMethod } =
       await this.validateCategoryPaymentMethodService.execute({
-        categoryId: billData.categoryId,
-        paymentMethodId: billData?.paymentMethodId,
+        categoryDescriptionEnum: billData.categoryDescriptionEnum,
+        paymentMethodDescriptionEnum: billData.paymentMethodDescriptionEnum,
       });
 
-    if (!validateCategoryPaymentMethodService) {
+    if (!isValidEntities || !category) {
       throw new ApiError(
         ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
@@ -62,7 +78,16 @@ export class CreateBillUseCase
     }
 
     const bill = await this.billService.createBill({
-      billData,
+      billData: {
+        ...billData,
+        paymentMethodId: paymentMethod?.id,
+        paymentMethodDescription: paymentMethod?.description,
+        paymentMethodDescriptionEnum: paymentMethod?.descriptionEnum,
+        categoryId: category.id,
+        categoryDescription: category.description,
+        categoryDescriptionEnum: category.descriptionEnum,
+        categoryGroup: category.group,
+      },
       userId,
     });
 

@@ -59,13 +59,7 @@ export class EditBillByPayableMonthUseCase
       );
     }
 
-    const {
-      payDate,
-      payOut,
-      paymentMethodDescription,
-      paymentMethodDescriptionEnum,
-      paymentMethodId,
-    } = billData;
+    const { payDate, payOut, paymentMethodDescriptionEnum } = billData;
 
     if (!payDate || (payOut && !payDate)) {
       throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
@@ -78,17 +72,17 @@ export class EditBillByPayableMonthUseCase
       );
     }
 
-    if (payOut && !paymentMethodId) {
+    if (payOut && !paymentMethodDescriptionEnum) {
       throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
     }
 
-    const validateCategoryPaymentMethodService =
+    const { isValidEntities, category, paymentMethod } =
       await this.validateCategoryPaymentMethodService.execute({
-        categoryId: hasBill.categoryId,
-        paymentMethodId: billData?.paymentMethodId,
+        categoryDescriptionEnum: hasBill.categoryDescriptionEnum,
+        paymentMethodDescriptionEnum: billData.paymentMethodDescriptionEnum,
       });
 
-    if (!validateCategoryPaymentMethodService) {
+    if (!isValidEntities || !category || !paymentMethod) {
       throw new ApiError(
         ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
@@ -101,9 +95,9 @@ export class EditBillByPayableMonthUseCase
         ...hasBill,
         payOut,
         payDate,
-        paymentMethodId,
-        paymentMethodDescription,
-        paymentMethodDescriptionEnum,
+        paymentMethodId: paymentMethod.id,
+        paymentMethodDescription: paymentMethod.description,
+        paymentMethodDescriptionEnum: paymentMethod.descriptionEnum,
       },
       userId,
     });
