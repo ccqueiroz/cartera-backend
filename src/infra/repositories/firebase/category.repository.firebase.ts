@@ -68,4 +68,48 @@ export class CategoryRepositoryFirebase implements CategoryRepositoryGateway {
 
     return category ? CategoryEntitie.with({ ...category }) : null;
   }
+
+  public async getCategoryByDescriptionEnum({
+    descriptionEnum,
+  }: Pick<CategoryDTO, 'descriptionEnum'>): Promise<CategoryDTO | null> {
+    const data = await this.dbCollection
+      .where('descriptionEnum', '==', descriptionEnum)
+      .get()
+      .then((response) =>
+        response.docs?.map((item) => ({ id: item.id, ...item.data() })),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    if (!data || data.length === 0) return null;
+
+    const category = CategoryEntitie.with(data[0] as CategoryDTO);
+
+    return {
+      id: category.id,
+      description: category.description,
+      descriptionEnum: category.descriptionEnum,
+      group: category.group,
+      type: category.type,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+    };
+  }
+
+  public async getCategoryByGroup({
+    group,
+  }: Pick<CategoryDTO, 'group'>): Promise<Array<CategoryDTO>> {
+    const data = await this.dbCollection
+      .where('group', '==', group)
+      .get()
+      .then((response) =>
+        response.docs?.map((item) => ({ id: item.id, ...item.data() })),
+      )
+      .catch((error) => {
+        ErrorsFirebase.presenterError(error);
+      });
+
+    return data as Array<CategoryDTO>;
+  }
 }
