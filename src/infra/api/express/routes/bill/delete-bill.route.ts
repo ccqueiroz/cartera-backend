@@ -17,7 +17,7 @@ import { DeleteBillValidationDTO } from '../../schema_validations/Bill/bill.sche
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

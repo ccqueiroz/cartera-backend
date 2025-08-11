@@ -17,7 +17,7 @@ import { GetBillByIdValidationDTO } from '../../schema_validations/Bill/bill.sch
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

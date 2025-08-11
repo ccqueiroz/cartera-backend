@@ -2,9 +2,16 @@ import { Request, Response, NextFunction } from 'express';
 import { Middleware } from './middleware';
 
 export class CorsMiddleware implements Middleware {
+  private allowedOrigins = ['http://localhost:3000', 'http://localhost:8889'];
+
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
-      response.set('access-control-allow-origin', 'http://localhost:3000');
+      const origin = request.headers.origin;
+
+      if (origin && this.allowedOrigins.includes(origin)) {
+        response.setHeader('Access-Control-Allow-Origin', origin);
+      }
+
       response.set('Access-Control-Allow-Credentials', 'true');
       response.setHeader(
         'Access-Control-Allow-Headers',

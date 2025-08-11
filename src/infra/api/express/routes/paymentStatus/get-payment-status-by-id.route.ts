@@ -16,7 +16,7 @@ import { GetPaymentStatusByIdValidationDTO } from '../../schema_validations/Paym
  *     tags:
  *       - PaymentStatus
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

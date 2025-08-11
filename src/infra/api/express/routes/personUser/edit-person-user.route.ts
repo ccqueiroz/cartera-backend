@@ -16,7 +16,7 @@ import { EditPersonUserValidationDTO } from '../../schema_validations/PersonUser
  *     tags:
  *       - PersonUser
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path
