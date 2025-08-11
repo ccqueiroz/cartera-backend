@@ -10,7 +10,7 @@ import {
   CategoryDTO,
 } from '@/domain/Category/dtos/category.dto';
 import { GetPaymentMethodByDescriptionUseCase } from '../payment_method/get-payment-method-by-description.usecase';
-import { GetCategoryByDescriptionUseCase } from '../category/get-category-by-description.usecase copy';
+import { GetCategoryByDescriptionUseCase } from '../category/get-category-by-description.usecase';
 
 export type ValidateEntitiesCategoryPaymentMethodInputDTO = {
   paymentMethodDescriptionEnum?: PaymentMethodDescriptionEnumType;
