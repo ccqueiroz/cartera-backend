@@ -18,6 +18,7 @@ describe('Payment Method Service', () => {
     dbMock = {
       getPaymentMethods: jest.fn(),
       getPaymentMethodById: jest.fn(),
+      getPaymentMethodByDescriptionEnum: jest.fn(),
     };
 
     cacheMock = {
@@ -206,6 +207,84 @@ describe('Payment Method Service', () => {
     expect(cacheMock.recover).toHaveBeenCalled();
     expect(cacheMock.recover).toHaveBeenCalledWith(key);
     expect(dbMock.getPaymentMethodById).toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result).toBeNull();
+  });
+
+  it('should be call getPaymentMethodByDescriptionEnum and return the data from db', async () => {
+    const data: PaymentMethodDTO = {
+      id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+      description: 'Pix',
+      descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-description-enum-${data.descriptionEnum}`;
+
+    const result = await paymentMethodService.getPaymentMethodByDescriptionEnum(
+      {
+        descriptionEnum: data.descriptionEnum,
+      },
+    );
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.getPaymentMethodByDescriptionEnum).toHaveBeenCalled();
+    expect(dbMock.getPaymentMethodByDescriptionEnum).toHaveBeenCalledWith({
+      descriptionEnum: data.descriptionEnum,
+    });
+    expect(cacheMock.save).toHaveBeenCalled();
+    expect(result).not.toBeNull();
+  });
+
+  it('should be call getPaymentMethodByDescriptionEnum and return the data from cache', async () => {
+    const data: PaymentMethodDTO = {
+      id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+      description: 'Pix',
+      descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(null);
+
+    const key = `${keyController}-list-by-description-enum-${data.descriptionEnum}`;
+
+    const result = await paymentMethodService.getPaymentMethodByDescriptionEnum(
+      {
+        descriptionEnum: data.descriptionEnum,
+      },
+    );
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.getPaymentMethodByDescriptionEnum).not.toHaveBeenCalled();
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(result).not.toBeNull();
+  });
+
+  it('should be call getPaymentMethodByDescriptionEnum and return null when this data dont exist in db or cache', async () => {
+    const data = null;
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-description-enum-${PaymentMethodDescriptionEnum.PIX}`;
+
+    const result = await paymentMethodService.getPaymentMethodByDescriptionEnum(
+      {
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      },
+    );
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(dbMock.getPaymentMethodByDescriptionEnum).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
     expect(result).toBeNull();
   });
