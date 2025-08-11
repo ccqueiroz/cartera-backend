@@ -17,7 +17,7 @@ import { GetMonthlySummaryCashFlowValidationDTO } from '../../schema_validations
  *     tags:
  *       - CashFlow
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: month

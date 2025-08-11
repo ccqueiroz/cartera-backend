@@ -17,7 +17,7 @@ import { CreateReceivableValidationDTO } from '../../schema_validations/Receivab
  *     tags:
  *       - Receivable
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:

@@ -16,7 +16,7 @@ import { GetCategoryByIdValidationDTO } from '../../schema_validations/Category/
  *     tags:
  *       - Category
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

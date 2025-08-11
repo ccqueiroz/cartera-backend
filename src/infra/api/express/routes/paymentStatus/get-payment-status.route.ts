@@ -14,7 +14,7 @@ import { ERROR_MESSAGES } from '@/helpers/errorMessages';
  *     tags:
  *       - PaymentStatus
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Retorna a lista de categorias de gastos com sucesso.

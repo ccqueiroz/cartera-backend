@@ -16,7 +16,7 @@ import { GetPersonUserByUserIdlUseCase } from '@/usecases/person_user/get-person
  *     tags:
  *       - PersonUser
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

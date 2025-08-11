@@ -78,7 +78,15 @@ export class ApiExpress implements Api {
   }
 
   private addSwagger() {
-    this.app.use(API_DOC, swaggerServer, swaggerSetup(swaggerSpecInstance));
+    this.app.use(
+      API_DOC,
+      swaggerServer,
+      swaggerSetup(swaggerSpecInstance, {
+        swaggerOptions: {
+          withCredentials: true,
+        },
+      }),
+    );
   }
 
   private async shutdown(signal: string) {

@@ -17,7 +17,7 @@ import { DeleteReceivableValidationDTO } from '../../schema_validations/Receivab
  *     tags:
  *       - Receivable
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path
