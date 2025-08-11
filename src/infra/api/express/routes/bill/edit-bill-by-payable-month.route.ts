@@ -84,10 +84,6 @@ export class EditBillByPayableMonthRoute implements Route {
         const { id } = request.params;
         const { payload } = request.body;
 
-        console.log('request.body', request.body);
-        console.log('id', id);
-        console.log('user_auth', user_auth);
-
         const errors = await runValidate<EditBillByPayableMonthValidationDTO>(
           EditBillByPayableMonthValidationDTO,
           {
