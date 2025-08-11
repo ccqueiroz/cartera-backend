@@ -17,7 +17,7 @@ import { EditBillByPayableMonthInputDTO } from '@/domain/Bill/dtos/bill.dto';
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -83,6 +83,10 @@ export class EditBillByPayableMonthRoute implements Route {
         const { user_auth } = request;
         const { id } = request.params;
         const { payload } = request.body;
+
+        console.log('request.body', request.body);
+        console.log('id', id);
+        console.log('user_auth', user_auth);
 
         const errors = await runValidate<EditBillByPayableMonthValidationDTO>(
           EditBillByPayableMonthValidationDTO,

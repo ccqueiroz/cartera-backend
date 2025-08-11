@@ -17,7 +17,7 @@ import { GetConsolidatedCashFlowByYearValidationDTO } from '../../schema_validat
  *     tags:
  *       - CashFlow
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: year

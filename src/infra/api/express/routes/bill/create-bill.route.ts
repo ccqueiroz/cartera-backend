@@ -17,7 +17,7 @@ import { CreateBillValidationDTO } from '../../schema_validations/Bill/bill.sche
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     requestBody:
  *       required: true
  *       content:

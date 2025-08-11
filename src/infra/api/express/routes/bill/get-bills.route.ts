@@ -25,7 +25,7 @@ import { BillSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-input.
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: page

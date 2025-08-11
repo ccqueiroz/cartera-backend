@@ -20,7 +20,7 @@ import {
  *     tags:
  *       - Category
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: type

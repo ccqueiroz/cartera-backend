@@ -24,7 +24,7 @@ import { ReceivableSearchByDateDTO } from '@/domain/Helpers/dtos/search-by-date-
  *     tags:
  *       - Receivable
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: page

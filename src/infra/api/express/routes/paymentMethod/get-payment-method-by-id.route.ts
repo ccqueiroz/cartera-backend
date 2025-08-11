@@ -16,7 +16,7 @@ import { GetPaymentMethodByIdValidationDTO } from '../../schema_validations/Paym
  *     tags:
  *       - PaymentMethod
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - name: id
  *         in: path

@@ -18,7 +18,7 @@ import { ReceivablesByMonthInputDTO } from '@/domain/Receivable/dtos/receivable.
  *     tags:
  *       - Receivable
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: initialDate

@@ -17,7 +17,7 @@ import { runValidate } from '@/packages/clients/class-validator';
  *     tags:
  *       - Bill
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
  *         name: id

@@ -18,7 +18,7 @@ import { GetInvoicesByCategoriesAndByPeriodUseCase } from '@/usecases/invoices/g
  *     tags:
  *       - Invoice
  *     security:
- *       - bearerAuth: []
+ *       - sessionCookieAuth: []
  *     parameters:
  *       - in: query
  *         name: type
