@@ -15,11 +15,11 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
 
   beforeEach(() => {
     categoryServiceGatewayMock = {
-      getCategoryById: jest.fn(),
+      getCategoryByDescriptionEnum: jest.fn(),
     } as any;
 
     paymentMethodServiceGatewayMock = {
-      getPaymentMethodById: jest.fn(),
+      getPaymentMethodByDescriptionEnum: jest.fn(),
     } as any;
 
     useCase = ValidateCategoryPaymentMethodUseCase.create({
@@ -33,7 +33,7 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
   });
 
   it('should return true if category and payment method are valid', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Uber',
       descriptionEnum: CategoryDescriptionEnum.UBER,
@@ -43,24 +43,30 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
       updatedAt: Date.now(),
     });
 
-    paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue({
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
-      description: 'Cartão de Crédito',
-      descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    paymentMethodServiceGatewayMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(
+      {
+        id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+        description: 'Cartão de Crédito',
+        descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    );
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+      categoryDescriptionEnum: CategoryDescriptionEnum.UBER,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
     });
 
-    expect(result).toBe(true);
+    expect(result.isValidEntities).toBe(true);
+    expect(result.category?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
+    expect(result.paymentMethod?.id).toBe(
+      'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+    );
   });
 
-  it('should return true if paymentMethodId is not provided and category is valid', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
+  it('should return true if paymentMethodDescriptionEnum is not provided and category is valid', async () => {
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Manutenção Veículo',
       descriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
@@ -71,33 +77,43 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
     });
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+      categoryDescriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
     });
 
-    expect(result).toBe(true);
+    expect(result.isValidEntities).toBe(true);
+    expect(result.category?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
+    expect(result.paymentMethod).toBeNull();
   });
 
   it('should return false if category is invalid', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockResolvedValue(null);
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockResolvedValue(
+      null,
+    );
 
-    paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue({
-      id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
-      description: 'Cartão de Débito',
-      descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+    paymentMethodServiceGatewayMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(
+      {
+        id: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+        description: 'Cartão de Débito',
+        descriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    );
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+      categoryDescriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
     });
 
-    expect(result).toBe(false);
+    expect(result.isValidEntities).toBe(false);
+    expect(result.category).toBeNull();
+    expect(result.paymentMethod?.id).toBe(
+      'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+    );
   });
 
   it('should return false if payment method is invalid', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Manutenção Veículo',
       descriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
@@ -107,33 +123,37 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
       updatedAt: Date.now(),
     });
 
-    paymentMethodServiceGatewayMock.getPaymentMethodById.mockResolvedValue(
+    paymentMethodServiceGatewayMock.getPaymentMethodByDescriptionEnum.mockResolvedValue(
       null,
     );
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+      categoryDescriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
     });
 
-    expect(result).toBe(false);
+    expect(result.isValidEntities).toBe(false);
+    expect(result.category?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
+    expect(result.paymentMethod).toBeNull();
   });
 
   it('should return false if category throws error', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockRejectedValue(
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockRejectedValue(
       new ApiError('erro', 500),
     );
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+      categoryDescriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
     });
 
-    expect(result).toBe(false);
+    expect(result.isValidEntities).toBe(false);
+    expect(result.category).toBeNull();
+    expect(result.paymentMethod).toBeNull();
   });
 
   it('should return false if payment method throws error', async () => {
-    categoryServiceGatewayMock.getCategoryById.mockResolvedValue({
+    categoryServiceGatewayMock.getCategoryByDescriptionEnum.mockResolvedValue({
       id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
       description: 'Manutenção Veículo',
       descriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
@@ -143,15 +163,17 @@ describe('ValidateCategoryPaymentMethodUseCase', () => {
       updatedAt: Date.now(),
     });
 
-    paymentMethodServiceGatewayMock.getPaymentMethodById.mockRejectedValue(
+    paymentMethodServiceGatewayMock.getPaymentMethodByDescriptionEnum.mockRejectedValue(
       new ApiError('erro', 500),
     );
 
     const result = await useCase.execute({
-      categoryId: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
-      paymentMethodId: 'e76176ad-c2d8-4526-95cb-0440d0149dc6',
+      categoryDescriptionEnum: CategoryDescriptionEnum.VEHICLE_MAINTENANCE,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.DEBIT_CARD,
     });
 
-    expect(result).toBe(false);
+    expect(result.isValidEntities).toBe(false);
+    expect(result.category?.id).toBe('e76176ad-c2d8-4526-95cb-0440d0149dd4');
+    expect(result.paymentMethod).toBeNull();
   });
 });
