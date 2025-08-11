@@ -20,6 +20,8 @@ describe('Category Service', () => {
     dbMock = {
       getCategories: jest.fn(),
       getCategoryById: jest.fn(),
+      getCategoryByDescriptionEnum: jest.fn(),
+      getCategoryByGroup: jest.fn(),
     };
 
     cacheMock = {
@@ -239,5 +241,195 @@ describe('Category Service', () => {
     expect(dbMock.getCategoryById).toHaveBeenCalled();
     expect(cacheMock.save).not.toHaveBeenCalled();
     expect(result).toBeNull();
+  });
+
+  it('should be call getCategoryByDescriptionEnum and return the data from db', async () => {
+    const data = {
+      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+      description: 'Receitas de Parcerias e Patrocínios',
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+      group: CategoryGroupEnum.REVENUES,
+      type: CategoryType.RECEIVABLE,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+    };
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.getCategoryByDescriptionEnum.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-description-enum-${CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME}`;
+
+    await categoryService.getCategoryByDescriptionEnum({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).toHaveBeenCalled();
+    expect(cacheMock.save).toHaveBeenCalledWith(key, data, 600);
+    expect(dbMock.getCategoryByDescriptionEnum).toHaveBeenCalled();
+    expect(dbMock.getCategoryByDescriptionEnum).toHaveBeenCalledWith({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+  });
+
+  it('should be call getCategoryByDescriptionEnum and return the data from cache', async () => {
+    const data = {
+      id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+      description: 'Receitas de Parcerias e Patrocínios',
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+      group: CategoryGroupEnum.REVENUES,
+      type: CategoryType.RECEIVABLE,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+    };
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getCategoryByDescriptionEnum.mockResolvedValue(null);
+
+    const key = `${keyController}-list-by-description-enum-${CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME}`;
+
+    await categoryService.getCategoryByDescriptionEnum({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(dbMock.getCategoryByDescriptionEnum).not.toHaveBeenCalled();
+  });
+
+  it('should be call getCategoryByDescriptionEnum and return null when this data dont exist in db or cache', async () => {
+    const data = null;
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getCategoryByDescriptionEnum.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-description-enum-${CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME}`;
+
+    const result = await categoryService.getCategoryByDescriptionEnum({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(dbMock.getCategoryByDescriptionEnum).toHaveBeenCalled();
+    expect(result).toBeNull();
+  });
+
+  it('should be call getCategoryByGroup and return the data from db', async () => {
+    const data = [
+      {
+        id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+        description: 'Restaurante',
+        descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+        group: CategoryGroupEnum.FOOD,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+      {
+        id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+        description: 'Shopping',
+        descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+      {
+        id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+    ];
+
+    cacheMock.recover.mockResolvedValue(null);
+    dbMock.getCategoryByGroup.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-group-${CategoryGroupEnum.SHOPPING}`;
+
+    await categoryService.getCategoryByGroup({
+      group: CategoryGroupEnum.SHOPPING,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).toHaveBeenCalled();
+    expect(cacheMock.save).toHaveBeenCalledWith(key, data, 600);
+    expect(dbMock.getCategoryByGroup).toHaveBeenCalled();
+    expect(dbMock.getCategoryByGroup).toHaveBeenCalledWith({
+      group: CategoryGroupEnum.SHOPPING,
+    });
+  });
+
+  it('should be call getCategoryByGroup and return the data from cache', async () => {
+    const data = [
+      {
+        id: 'e76176ad-c2d8-4526-95cb-0440d0149dd4',
+        description: 'Restaurante',
+        descriptionEnum: CategoryDescriptionEnum.RESTAURANT,
+        group: CategoryGroupEnum.FOOD,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+      {
+        id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+        description: 'Shopping',
+        descriptionEnum: CategoryDescriptionEnum.CLOTHING_ACCESSORIES,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+      {
+        id: '5157356a-48bf-42a7-b7da-b50e21e48cfe',
+        description: 'Uber',
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+        group: CategoryGroupEnum.MOBILITY_BY_APP,
+        type: CategoryType.BILLS,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      },
+    ];
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getCategoryByDescriptionEnum.mockResolvedValue(null);
+
+    const key = `${keyController}-list-by-group-${CategoryGroupEnum.SHOPPING}`;
+
+    await categoryService.getCategoryByGroup({
+      group: CategoryGroupEnum.SHOPPING,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(dbMock.getCategoryByDescriptionEnum).not.toHaveBeenCalled();
+  });
+
+  it('should be call getCategoryByGroup and return empty list when this data dont exist in db or cache', async () => {
+    const data = [] as Array<CategoryDTO>;
+
+    cacheMock.recover.mockResolvedValue(data);
+    dbMock.getCategoryByGroup.mockResolvedValue(data);
+
+    const key = `${keyController}-list-by-group-${CategoryGroupEnum.SHOPPING}`;
+
+    const result = await categoryService.getCategoryByGroup({
+      group: CategoryGroupEnum.SHOPPING,
+    });
+
+    expect(cacheMock.recover).toHaveBeenCalled();
+    expect(cacheMock.recover).toHaveBeenCalledWith(key);
+    expect(cacheMock.save).not.toHaveBeenCalled();
+    expect(dbMock.getCategoryByGroup).toHaveBeenCalled();
+    expect(result).toEqual([]);
   });
 });
