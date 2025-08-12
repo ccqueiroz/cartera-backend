@@ -267,11 +267,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodId: '267890',
-      paymentMethodDescription: 'paymentMethod',
     };
     return runValidate<CreateReceivableValidationDTO>(
       CreateReceivableValidationDTO,
@@ -293,11 +289,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'this-is-not-url',
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodId: '267890',
-      paymentMethodDescription: 'paymentMethod',
     };
     return runValidate<CreateReceivableValidationDTO>(
       CreateReceivableValidationDTO,
@@ -322,11 +314,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: null,
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodId: '267890',
-      paymentMethodDescription: 'paymentMethod',
     };
     return runValidate<CreateReceivableValidationDTO>(
       CreateReceivableValidationDTO,
@@ -349,11 +337,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodId: '267890',
-      paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
     };
     return runValidate<EditReceivableValidationDTO>(
@@ -377,11 +361,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodId: '267890',
-      paymentMethodDescription: 'paymentMethod',
       createdAt: 18783929293293,
     };
     return runValidate<EditReceivableValidationDTO>(
@@ -405,10 +385,7 @@ describe('Receivable Schema', () => {
       receival: false,
       icon: 'https://wwww.teste-icon.com',
       amount: 7627.89,
-      categoryId: '267890',
-      categoryDescription: 'category',
       categoryDescriptionEnum: 'BUS',
-      paymentMethodDescription: 'paymentMethod',
       paymentMethodDescriptionEnum: 'any' as any,
       createdAt: 18783929293293,
     };
