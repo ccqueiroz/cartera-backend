@@ -63,29 +63,9 @@ class ReceivableCommomValidations extends UserIdAuthValidation {
 
   @IsDefined()
   @IsString()
-  @MaxLength(60)
-  categoryId!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(255)
-  categoryDescription!: string;
-
-  @IsDefined()
-  @IsString()
   @MaxLength(255)
   @IsIn(Object.values(CategoryDescriptionEnum))
   categoryDescriptionEnum!: keyof typeof CategoryDescriptionEnum;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(60)
-  paymentMethodId?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  paymentMethodDescription?: string;
 
   @IsOptional()
   @IsString()
@@ -125,16 +105,6 @@ export class EditReceivableByMonthValidationDTO {
   @IsDefined()
   @IsBoolean()
   receival!: boolean;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(60)
-  paymentMethodId?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  paymentMethodDescription?: string;
 
   @IsOptional()
   @IsString()
