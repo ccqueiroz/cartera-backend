@@ -112,15 +112,11 @@ export type EditReceivableInputDTO = {
 };
 
 export type EditReceivableByMonthInputDTO = {
-  billId: string;
-  billData: Required<
+  receivableId: string;
+  receivableData: Required<
     Pick<
       ReceivableDTO,
-      | 'receival'
-      | 'receivalDate'
-      | 'paymentMethodId'
-      | 'paymentMethodDescription'
-      | 'paymentMethodDescriptionEnum'
+      'receival' | 'receivalDate' | 'paymentMethodDescriptionEnum'
     >
   >;
   userId: string;
