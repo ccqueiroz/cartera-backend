@@ -10,6 +10,7 @@ import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-descri
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
+import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 
 let receivableServiceMock: jest.Mocked<ReceivableServiceGateway>;
 
@@ -66,30 +67,55 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
     receivableServiceMock.getReceivableById.mockResolvedValue({
       ...receivableData,
+      ...complementBillToCallFunction,
       updatedAt: null,
     });
 
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
-      .mockResolvedValue(true);
+      .mockResolvedValue({
+        isValidEntities: true,
+        category: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Aluguéis e Rendimentos de Ativos',
+          descriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          group: CategoryGroupEnum.REVENUES,
+          type: CategoryType.RECEIVABLE,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        paymentMethod: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Pix',
+          descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      });
 
     receivableServiceMock.updateReceivable.mockResolvedValue({
       ...receivableData,
       descriptionReceivable: 'Test Receivable updated',
+      ...complementBillToCallFunction,
       updatedAt: new Date().getTime(),
     });
 
@@ -102,7 +128,10 @@ describe('EditReceivableUseCase', () => {
     expect(result.data?.id).toBe(receivableData.id);
     expect(receivableServiceMock.updateReceivable).toHaveBeenCalledWith({
       receivableId: receivableData.id,
-      receivableData,
+      receivableData: {
+        ...receivableData,
+        ...complementBillToCallFunction,
+      },
       userId: userIdMock,
     });
     expect(result.data?.updatedAt).toEqual(expect.any(Number));
@@ -120,26 +149,50 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
     receivableServiceMock.getReceivableById.mockResolvedValue({
       ...receivableData,
+      ...complementBillToCallFunction,
       updatedAt: null,
     });
 
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
-      .mockResolvedValue(false);
+      .mockResolvedValue({
+        isValidEntities: false,
+        category: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Aluguéis e Rendimentos de Ativos',
+          descriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          group: CategoryGroupEnum.REVENUES,
+          type: CategoryType.RECEIVABLE,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        paymentMethod: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Pix',
+          descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      });
 
     const error = await editReceivableUseCase
       .execute({
@@ -169,13 +222,8 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
@@ -211,13 +259,8 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
@@ -251,13 +294,8 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
@@ -288,23 +326,49 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
-    receivableServiceMock.getReceivableById.mockResolvedValue(receivableData);
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
+    receivableServiceMock.getReceivableById.mockResolvedValue({
+      ...receivableData,
+      ...complementBillToCallFunction,
+    });
 
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
-      .mockResolvedValue(true);
+      .mockResolvedValue({
+        isValidEntities: false,
+        category: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Aluguéis e Rendimentos de Ativos',
+          descriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          group: CategoryGroupEnum.REVENUES,
+          type: CategoryType.RECEIVABLE,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        paymentMethod: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Pix',
+          descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      });
 
     const error = await editReceivableUseCase
       .execute({
@@ -335,22 +399,48 @@ describe('EditReceivableUseCase', () => {
       receival: true,
       icon: null,
       amount: 200,
-      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
-      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
       categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
-      categoryGroup: CategoryGroupEnum.REVENUES,
-      paymentMethodDescription: 'Pix',
-      paymmentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
       createdAt: new Date().getTime(),
       updatedAt: null,
     };
 
-    receivableServiceMock.getReceivableById.mockResolvedValue(receivableData);
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+      categoryGroup: CategoryGroupEnum.REVENUES,
+      categoryId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      categoryDescription: 'Aluguéis e Rendimentos de Ativos',
+      paymentMethodId: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
+    receivableServiceMock.getReceivableById.mockResolvedValue({
+      ...receivableData,
+      ...complementBillToCallFunction,
+    });
 
     validateCategoryPaymentMethodServiceMock.execute = jest
       .fn()
-      .mockResolvedValue(true);
+      .mockResolvedValue({
+        isValidEntities: false,
+        category: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Aluguéis e Rendimentos de Ativos',
+          descriptionEnum: CategoryDescriptionEnum.RENT_INCOME,
+          group: CategoryGroupEnum.REVENUES,
+          type: CategoryType.RECEIVABLE,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+        paymentMethod: {
+          id: 'b2c3d4e5-f6a1-8901-2345-67890abcde13',
+          description: 'Pix',
+          descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        },
+      });
 
     const error = await editReceivableUseCase
       .execute({
