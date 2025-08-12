@@ -307,4 +307,119 @@ describe('Category Repository Firebase', () => {
       }),
     ).rejects.toThrow(error);
   });
+
+  it('should be return Category by description when exist this item in database.', async () => {
+    firestore.get.mockResolvedValueOnce({
+      docs: [
+        {
+          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+          data: () => ({
+            description: 'Uber',
+            descriptionEnum: CategoryDescriptionEnum.UBER,
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
+            type: CategoryType.BILLS,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+      ],
+    });
+
+    const result = await categoryRepo.getCategoryByDescriptionEnum({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+
+    expect(firestore.get).toHaveBeenCalledTimes(1);
+
+    expect(result?.id).toBe('7276fa38-39a9-4a46-983a-0aa6d1b9dc17');
+    expect(result?.description).toBe('Uber');
+    expect(result?.descriptionEnum).toBe(CategoryDescriptionEnum.UBER);
+    expect(result?.group).toBe(CategoryGroupEnum.MOBILITY_BY_APP);
+    expect(result?.type).toBe(CategoryType.BILLS);
+    expect(result?.createdAt).toEqual(expect.any(Number));
+    expect(result?.updatedAt).toEqual(expect.any(Number));
+  });
+
+  it('should be return null when provided description param, but this item not exist in database.', async () => {
+    firestore.get.mockResolvedValueOnce({
+      docs: [],
+    });
+
+    const result = await categoryRepo.getCategoryByDescriptionEnum({
+      descriptionEnum: CategoryDescriptionEnum.PARTNERSHIP_SPONSOR_INCOME,
+    });
+
+    expect(result).toBeNull();
+    expect(firestore.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('should be return Category by group when exist this item in database.', async () => {
+    firestore.get.mockResolvedValueOnce({
+      docs: [
+        {
+          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+          data: () => ({
+            description: 'Uber',
+            descriptionEnum: CategoryDescriptionEnum.UBER,
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
+            type: CategoryType.BILLS,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+        {
+          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc18',
+          data: () => ({
+            description: '99Pop',
+            descriptionEnum: CategoryDescriptionEnum['99POP'],
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
+            type: CategoryType.BILLS,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+        {
+          id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+          data: () => ({
+            description: 'BlaBlaCar',
+            descriptionEnum: CategoryDescriptionEnum.BLABLACAR,
+            group: CategoryGroupEnum.MOBILITY_BY_APP,
+            type: CategoryType.BILLS,
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          }),
+        },
+      ],
+    });
+
+    const result = await categoryRepo.getCategoryByGroup({
+      group: CategoryGroupEnum.MOBILITY_BY_APP,
+    });
+
+    expect(firestore.get).toHaveBeenCalledTimes(1);
+
+    expect(result.length).toEqual(3);
+    expect(result.shift()).toEqual({
+      id: '7276fa38-39a9-4a46-983a-0aa6d1b9dc17',
+      description: 'Uber',
+      descriptionEnum: CategoryDescriptionEnum.UBER,
+      group: CategoryGroupEnum.MOBILITY_BY_APP,
+      type: CategoryType.BILLS,
+      createdAt: expect.any(Number),
+      updatedAt: expect.any(Number),
+    });
+  });
+
+  it('should be return null when provided group param, but this item not exist in database.', async () => {
+    firestore.get.mockResolvedValueOnce({
+      docs: [],
+    });
+
+    const result = await categoryRepo.getCategoryByGroup({
+      group: CategoryGroupEnum.MOBILITY_BY_APP,
+    });
+
+    expect(result).toEqual([]);
+    expect(firestore.get).toHaveBeenCalledTimes(1);
+  });
 });

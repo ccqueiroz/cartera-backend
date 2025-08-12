@@ -10,6 +10,7 @@ import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-descri
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 
 const userIdMock = '1234567d';
 
@@ -60,7 +61,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -68,10 +68,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -79,18 +75,46 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
     billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
+      ...complementBillToCallFunction,
       updatedAt: null,
     });
 
-    validateCategoryPaymentMethodService.execute = jest
-      .fn()
-      .mockResolvedValue(true);
+    validateCategoryPaymentMethodService.execute = jest.fn().mockResolvedValue({
+      isValidEntities: true,
+      category: {
+        id: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        description: 'Supermercado',
+        descriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      paymentMethod: {
+        id: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+        description: 'Pix',
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
 
     billServiceMock.updateBill.mockResolvedValue({
       ...billObject,
       descriptionBill: 'Test Bill updated',
+      ...complementBillToCallFunction,
       updatedAt: new Date().getTime(),
     });
 
@@ -103,7 +127,10 @@ describe('EditBillUseCase', () => {
     expect(result.data?.id).toBe(billObject.id);
     expect(billServiceMock.updateBill).toHaveBeenCalledWith({
       billId: billObject.id,
-      billData: billObject,
+      billData: {
+        ...billObject,
+        ...complementBillToCallFunction,
+      },
       userId: userIdMock,
     });
     expect(result.data?.updatedAt).toEqual(expect.any(Number));
@@ -116,7 +143,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -124,10 +150,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -135,14 +157,27 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
+
     billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
+      ...complementBillToCallFunction,
       updatedAt: null,
     });
 
-    validateCategoryPaymentMethodService.execute = jest
-      .fn()
-      .mockResolvedValue(false);
+    validateCategoryPaymentMethodService.execute = jest.fn().mockResolvedValue({
+      isValidEntities: false,
+      category: null,
+      paymentMethod: null,
+    });
 
     const error = await editBillUseCase
       .execute({
@@ -167,7 +202,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -175,10 +209,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -211,7 +241,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -219,10 +248,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -254,7 +279,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -262,10 +286,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -293,7 +313,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -301,10 +320,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -312,11 +327,41 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
-    validateCategoryPaymentMethodService.execute = jest
-      .fn()
-      .mockResolvedValue(true);
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
 
-    billServiceMock.getBillById.mockResolvedValue(billObject);
+    billServiceMock.getBillById.mockResolvedValue({
+      ...billObject,
+      ...complementBillToCallFunction,
+      updatedAt: null,
+    });
+
+    validateCategoryPaymentMethodService.execute = jest.fn().mockResolvedValue({
+      isValidEntities: true,
+      category: {
+        id: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        description: 'Supermercado',
+        descriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      paymentMethod: {
+        id: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+        description: 'Pix',
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
 
     const error = await editBillUseCase
       .execute({
@@ -339,7 +384,6 @@ describe('EditBillUseCase', () => {
       userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
       descriptionBill: 'Supermercado',
       categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-      categoryGroup: CategoryGroupEnum.SHOPPING,
       fixedBill: false,
       billDate: new Date().getTime(),
       payDate: new Date().getTime(),
@@ -347,10 +391,6 @@ describe('EditBillUseCase', () => {
       icon: null,
       amount: 1200.0,
       paymentStatus: PaymentStatusDescriptionEnum.PAID,
-      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-      categoryDescription: 'Supermercado',
-      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-      paymentMethodDescription: 'Pix',
       paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
       isPaymentCardBill: false,
       isShoppingListBill: true,
@@ -358,16 +398,46 @@ describe('EditBillUseCase', () => {
       updatedAt: null,
     };
 
-    validateCategoryPaymentMethodService.execute = jest
-      .fn()
-      .mockResolvedValue(true);
+    const complementBillToCallFunction = {
+      categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+      categoryGroup: CategoryGroupEnum.SHOPPING,
+      categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+      categoryDescription: 'Supermercado',
+      paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+      paymentMethodDescription: 'Pix',
+      paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    };
 
-    billServiceMock.getBillById.mockResolvedValue(billObject);
+    billServiceMock.getBillById.mockResolvedValue({
+      ...billObject,
+      ...complementBillToCallFunction,
+      updatedAt: null,
+    });
+
+    validateCategoryPaymentMethodService.execute = jest.fn().mockResolvedValue({
+      isValidEntities: true,
+      category: {
+        id: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        description: 'Supermercado',
+        descriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      paymentMethod: {
+        id: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+        description: 'Pix',
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
 
     const error = await editBillUseCase
       .execute({
         billId: billObject.id,
-        billData: { ...billObject, paymentMethodId: undefined },
+        billData: { ...billObject, paymentMethodDescriptionEnum: undefined },
         userId: userIdMock,
       })
       .catch((err) => err);

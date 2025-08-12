@@ -62,4 +62,45 @@ export class CategoryService implements CategoryServiceGateway {
 
     return category;
   }
+
+  public async getCategoryByDescriptionEnum({
+    descriptionEnum,
+  }: Pick<CategoryDTO, 'descriptionEnum'>): Promise<CategoryDTO | null> {
+    const key = `${this.keyController}-list-by-description-enum-${descriptionEnum}`;
+
+    const categoryCache = await this.cache.recover<CategoryDTO>(key);
+
+    if (categoryCache) {
+      return categoryCache;
+    }
+
+    const category = await this.db.getCategoryByDescriptionEnum({
+      descriptionEnum,
+    });
+
+    if (category) {
+      await this.cache.save<CategoryDTO>(key, category, this.TTL);
+    }
+
+    return category;
+  }
+
+  public async getCategoryByGroup({
+    group,
+  }: Pick<CategoryDTO, 'group'>): Promise<Array<CategoryDTO>> {
+    const key = `${this.keyController}-list-by-group-${group}`;
+
+    const categoriesCache = await this.cache.recover<Array<CategoryDTO>>(key);
+
+    if (Array.isArray(categoriesCache) && categoriesCache.length > 0) {
+      return categoriesCache;
+    }
+    const categoriesDb = await this.db.getCategoryByGroup({ group });
+
+    if (categoriesDb.length > 0) {
+      await this.cache.save<Array<CategoryDTO>>(key, categoriesDb, this.TTL);
+    }
+
+    return categoriesDb;
+  }
 }

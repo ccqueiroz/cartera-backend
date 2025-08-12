@@ -10,6 +10,7 @@ import { CategoryDescriptionEnum } from '@/domain/Category/enums/category-descri
 import { CategoryGroupEnum } from '@/domain/Category/enums/category-group.enum';
 import { PaymentStatusDescriptionEnum } from '@/domain/Payment_Status/enum/payment-status-description.enum';
 import { PaymentMethodDescriptionEnum } from '@/domain/Payment_Method/enums/payment-method-description.enum';
+import { CategoryType } from '@/domain/Category/enums/category-type.enum';
 
 const userIdMock = '1234567d';
 
@@ -26,7 +27,6 @@ const billObject = {
   userId: 'b3e1c7f2-2d4e-48a5-a1f3-ef7c1e36d9b4',
   descriptionBill: 'Supermercado',
   categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
-  categoryGroup: CategoryGroupEnum.SHOPPING,
   fixedBill: false,
   billDate: new Date().getTime(),
   payDate: null,
@@ -34,15 +34,21 @@ const billObject = {
   icon: null,
   amount: 1200.0,
   paymentStatus: PaymentStatusDescriptionEnum.PAID,
-  categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
-  categoryDescription: 'Supermercado',
-  paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
-  paymentMethodDescription: 'Pix',
   paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
   isPaymentCardBill: false,
   isShoppingListBill: true,
   createdAt: new Date().getTime(),
   updatedAt: null,
+};
+
+const complementBillToCallFunction = {
+  categoryDescriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+  categoryGroup: CategoryGroupEnum.SHOPPING,
+  categoryId: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+  categoryDescription: 'Supermercado',
+  paymentMethodId: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+  paymentMethodDescription: 'Pix',
+  paymentMethodDescriptionEnum: PaymentMethodDescriptionEnum.PIX,
 };
 
 describe('EditBillByPayableMonthUseCase', () => {
@@ -73,12 +79,35 @@ describe('EditBillByPayableMonthUseCase', () => {
   });
 
   it('should update bill when input is valid', async () => {
-    billServiceMock.getBillById.mockResolvedValue(billObject);
-    (validateCategoryPaymentMethodService.execute as jest.Mock) = jest
-      .fn()
-      .mockResolvedValue(true);
+    billServiceMock.getBillById.mockResolvedValue({
+      ...billObject,
+      ...complementBillToCallFunction,
+      updatedAt: null,
+    });
+
+    validateCategoryPaymentMethodService.execute = jest.fn().mockResolvedValue({
+      isValidEntities: true,
+      category: {
+        id: '7a3f4c8d-0e1b-43a9-91b5-4c7f6d9b2a6e',
+        description: 'Supermercado',
+        descriptionEnum: CategoryDescriptionEnum.SUPERMARKET,
+        group: CategoryGroupEnum.SHOPPING,
+        type: CategoryType.BILLS,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      paymentMethod: {
+        id: 'g12c3e1b2-4a9e-4f6b-8d2e-3b7c6a1e5f9d',
+        description: 'Pix',
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    });
+
     billServiceMock.updateBill.mockResolvedValue({
       ...billObject,
+      ...complementBillToCallFunction,
       payOut: true,
       updatedAt: Date.now(),
     });
@@ -88,8 +117,6 @@ describe('EditBillByPayableMonthUseCase', () => {
       billData: {
         payOut: true,
         payDate: Date.now(),
-        paymentMethodId: billObject.paymentMethodId,
-        paymentMethodDescription: billObject.paymentMethodDescription,
         paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
       },
       userId: userIdMock,
@@ -106,8 +133,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: Date.now(),
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: '',
@@ -128,8 +153,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: Date.now(),
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,
@@ -151,8 +174,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: Date.now(),
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,
@@ -168,7 +189,9 @@ describe('EditBillByPayableMonthUseCase', () => {
   it('should throw if bill already paid', async () => {
     billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
+      ...complementBillToCallFunction,
       payOut: true,
+      updatedAt: null,
     });
 
     const error = await useCase
@@ -177,8 +200,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: Date.now(),
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,
@@ -187,12 +208,16 @@ describe('EditBillByPayableMonthUseCase', () => {
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error.message).toBe(
-      `Conta já "${billObject.descriptionBill}" foi paga. Para alterar os status da conta. Por favor, Acesse a sessão de "Pagamentos".`,
+      `Conta "${billObject.descriptionBill}" já foi paga. Para alterar os status da conta. Por favor, Acesse a sessão de "Pagamentos".`,
     );
   });
 
   it('should throw if payDate is missing', async () => {
-    billServiceMock.getBillById.mockResolvedValue(billObject);
+    billServiceMock.getBillById.mockResolvedValue({
+      ...billObject,
+      ...complementBillToCallFunction,
+      updatedAt: null,
+    });
 
     const error = await useCase
       .execute({
@@ -200,8 +225,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: undefined as any,
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,
@@ -218,15 +241,19 @@ describe('EditBillByPayableMonthUseCase', () => {
     const createdAt = Date.now();
     const payDate = createdAt - 1000;
 
-    billServiceMock.getBillById.mockResolvedValue({ ...billObject, createdAt });
+    billServiceMock.getBillById.mockResolvedValue({
+      ...billObject,
+      ...complementBillToCallFunction,
+      createdAt,
+      updatedAt: null,
+    });
+
     const error = await useCase
       .execute({
         billId: billObject.id,
         billData: {
           payOut: true,
           payDate,
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,
@@ -243,9 +270,12 @@ describe('EditBillByPayableMonthUseCase', () => {
   it('should throw if validateCategoryPaymentMethodService returns false', async () => {
     billServiceMock.getBillById.mockResolvedValue({
       ...billObject,
+      ...complementBillToCallFunction,
       payDate: null,
       payOut: false,
+      updatedAt: null,
     });
+
     (validateCategoryPaymentMethodService.execute as jest.Mock) = jest
       .fn()
       .mockResolvedValue(false);
@@ -256,8 +286,6 @@ describe('EditBillByPayableMonthUseCase', () => {
         billData: {
           payOut: true,
           payDate: Date.now(),
-          paymentMethodId: billObject.paymentMethodId,
-          paymentMethodDescription: billObject.paymentMethodDescription,
           paymentMethodDescriptionEnum: billObject.paymentMethodDescriptionEnum,
         },
         userId: userIdMock,

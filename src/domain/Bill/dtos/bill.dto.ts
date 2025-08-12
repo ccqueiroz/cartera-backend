@@ -121,14 +121,7 @@ export type EditBillInputDTO = {
 export type EditBillByPayableMonthInputDTO = {
   billId: string;
   billData: Required<
-    Pick<
-      BillDTO,
-      | 'payOut'
-      | 'payDate'
-      | 'paymentMethodId'
-      | 'paymentMethodDescription'
-      | 'paymentMethodDescriptionEnum'
-    >
+    Pick<BillDTO, 'payOut' | 'payDate' | 'paymentMethodDescriptionEnum'>
   >;
   userId: string;
 };

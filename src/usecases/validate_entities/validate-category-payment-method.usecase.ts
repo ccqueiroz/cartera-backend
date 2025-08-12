@@ -1,20 +1,34 @@
 import { PaymentMethodServiceGateway } from '@/domain/Payment_Method/gateway/payment-method.service.gateway';
-import { GetCategoryByIdUseCase } from '../category/get-category-by-id.usecase';
-import { GetPaymentMethodByIdUseCase } from '../payment_method/get-payment-method-by-id.usecase';
 import { Usecase } from '../usecase';
 import { CategoryServiceGateway } from '@/domain/Category/gateway/category.service.gateway';
+import {
+  PaymentMethodDescriptionEnumType,
+  PaymentMethodDTO,
+} from '@/domain/Payment_Method/dtos/payment-method.dto';
+import {
+  CategoryDescriptionEnumType,
+  CategoryDTO,
+} from '@/domain/Category/dtos/category.dto';
+import { GetPaymentMethodByDescriptionUseCase } from '../payment_method/get-payment-method-by-description.usecase';
+import { GetCategoryByDescriptionUseCase } from '../category/get-category-by-description.usecase';
 
 export type ValidateEntitiesCategoryPaymentMethodInputDTO = {
-  paymentMethodId?: string;
-  categoryId: string;
+  paymentMethodDescriptionEnum?: PaymentMethodDescriptionEnumType;
+  categoryDescriptionEnum: CategoryDescriptionEnumType;
 };
 
-type PromiseReturnType = {
-  status: 'fullfield' | 'rejected';
-  value: { data: unknown };
-};
+type PromiseReturnType<T> =
+  | {
+      status: 'fullfield';
+      value: { data: T };
+    }
+  | { status: 'rejected'; value: { data: null } };
 
-export type ValidateEntitiesCategoryPaymentMethodStatusOutputDTO = boolean;
+export type ValidateEntitiesCategoryPaymentMethodStatusOutputDTO = {
+  isValidEntities: boolean;
+  category: CategoryDTO | null;
+  paymentMethod: PaymentMethodDTO | null;
+};
 
 export class ValidateCategoryPaymentMethodUseCase
   implements
@@ -23,19 +37,21 @@ export class ValidateCategoryPaymentMethodUseCase
       ValidateEntitiesCategoryPaymentMethodStatusOutputDTO
     >
 {
-  private getCategoryByIdService: GetCategoryByIdUseCase;
-  private getPaymentMethodByIdService: GetPaymentMethodByIdUseCase;
+  private getCategoryByDescriptionEnumService: GetCategoryByDescriptionUseCase;
+  private getPaymentMethodByDescriptionEnumService: GetPaymentMethodByDescriptionUseCase;
 
   private constructor(
     private categoryService: CategoryServiceGateway,
     private paymentMethodService: PaymentMethodServiceGateway,
   ) {
-    this.getCategoryByIdService = GetCategoryByIdUseCase.create({
-      categoryService: this.categoryService,
-    });
-    this.getPaymentMethodByIdService = GetPaymentMethodByIdUseCase.create({
-      paymentMethodService: this.paymentMethodService,
-    });
+    this.getCategoryByDescriptionEnumService =
+      GetCategoryByDescriptionUseCase.create({
+        categoryService: this.categoryService,
+      });
+    this.getPaymentMethodByDescriptionEnumService =
+      GetPaymentMethodByDescriptionUseCase.create({
+        paymentMethodService: this.paymentMethodService,
+      });
   }
 
   public static create({
@@ -51,37 +67,44 @@ export class ValidateCategoryPaymentMethodUseCase
     );
   }
 
-  private checkIfEntitieHasValidReturn(entitie: PromiseReturnType) {
-    if (entitie.status === 'rejected') return false;
+  private checkIfEntitieHasValidReturn<T>(entitie: PromiseReturnType<T>) {
+    if (entitie.status === 'rejected' || !entitie.value) return { data: null };
 
-    return !!entitie.value?.data;
+    return entitie.value;
   }
 
   public async execute({
-    paymentMethodId,
-    categoryId,
+    paymentMethodDescriptionEnum,
+    categoryDescriptionEnum,
   }: ValidateEntitiesCategoryPaymentMethodInputDTO): Promise<ValidateEntitiesCategoryPaymentMethodStatusOutputDTO> {
     const [category, paymentMethod] = await Promise.allSettled([
-      this.getCategoryByIdService.execute({ id: categoryId }),
-      ...[
-        paymentMethodId
-          ? this.getPaymentMethodByIdService.execute({
-              id: paymentMethodId ?? '',
-            })
-          : [],
-      ],
+      this.getCategoryByDescriptionEnumService.execute({
+        descriptionEnum: categoryDescriptionEnum,
+      }),
+      paymentMethodDescriptionEnum
+        ? this.getPaymentMethodByDescriptionEnumService.execute({
+            descriptionEnum: paymentMethodDescriptionEnum,
+          })
+        : Promise.resolve(null),
     ]);
 
-    const isCategoryValid = this.checkIfEntitieHasValidReturn(
-      category as unknown as PromiseReturnType,
+    const validCategory = this.checkIfEntitieHasValidReturn<CategoryDTO>(
+      category as unknown as PromiseReturnType<CategoryDTO>,
     );
 
-    const isPaymentMethodValid = paymentMethodId
-      ? this.checkIfEntitieHasValidReturn(
-          paymentMethod as unknown as PromiseReturnType,
-        )
-      : true;
+    const validPaymentMethod =
+      this.checkIfEntitieHasValidReturn<PaymentMethodDTO>(
+        paymentMethod as unknown as PromiseReturnType<PaymentMethodDTO>,
+      );
 
-    return isCategoryValid && isPaymentMethodValid;
+    const isValidEntities =
+      !!validCategory.data &&
+      (paymentMethodDescriptionEnum ? !!validPaymentMethod.data : true);
+
+    return {
+      isValidEntities,
+      category: validCategory.data,
+      paymentMethod: validPaymentMethod.data,
+    };
   }
 }
