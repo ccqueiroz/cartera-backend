@@ -1,5 +1,5 @@
 import {
-  CreateReceivableInputDTO,
+  ReceivableDTO,
   CreateReceivableOutputDTO as TypeCreateReceivableOutputDTO,
 } from '@/domain/Receivable/dtos/receivable.dto';
 import { Usecase } from '../usecase';
@@ -9,11 +9,27 @@ import { ApiError } from '@/helpers/errors';
 import { ERROR_MESSAGES } from '@/helpers/errorMessages';
 import { ReceivableServiceGateway } from '@/domain/Receivable/gateway/receivable.service.gateway';
 
+type InputDTO = {
+  receivableData: Omit<
+    ReceivableDTO,
+    | 'id'
+    | 'paymentStatus'
+    | 'createdAt'
+    | 'updatedAt'
+    | 'categoryId'
+    | 'categoryDescription'
+    | 'categoryGroup'
+    | 'paymentMethodId'
+    | 'paymentMethodDescription'
+  >;
+  userId: string;
+};
+
 export type CreateReceivableOutputDTO =
   OutputDTO<TypeCreateReceivableOutputDTO | null>;
 
 export class CreateReceivableUseCase
-  implements Usecase<CreateReceivableInputDTO, CreateReceivableOutputDTO>
+  implements Usecase<InputDTO, CreateReceivableOutputDTO>
 {
   private constructor(
     private readonly receivableService: ReceivableServiceGateway,
@@ -36,7 +52,7 @@ export class CreateReceivableUseCase
   public async execute({
     receivableData,
     userId,
-  }: CreateReceivableInputDTO): Promise<CreateReceivableOutputDTO> {
+  }: InputDTO): Promise<CreateReceivableOutputDTO> {
     if (!userId) {
       throw new ApiError(ERROR_MESSAGES.INVALID_CREDENTIALS, 401);
     }
@@ -45,17 +61,21 @@ export class CreateReceivableUseCase
       throw new ApiError(ERROR_MESSAGES.INFORME_PAY_DATE_BILL, 400);
     }
 
-    if (receivableData.receival && !receivableData?.paymentMethodId) {
+    if (
+      receivableData.receival &&
+      !receivableData?.paymentMethodDescriptionEnum
+    ) {
       throw new ApiError(ERROR_MESSAGES.INFORME_PAYMENT_METHOD, 400);
     }
 
-    const validateCategoryPaymentMethodService =
+    const { isValidEntities, category, paymentMethod } =
       await this.validateCategoryPaymentMethodService.execute({
-        categoryId: receivableData.categoryId,
-        paymentMethodId: receivableData?.paymentMethodId,
+        categoryDescriptionEnum: receivableData.categoryDescriptionEnum,
+        paymentMethodDescriptionEnum:
+          receivableData.paymentMethodDescriptionEnum,
       });
 
-    if (!validateCategoryPaymentMethodService) {
+    if (!isValidEntities || !category) {
       throw new ApiError(
         ERROR_MESSAGES.INVALID_CATEGORY_OR_PAYMENT_METHOD,
         400,
@@ -63,7 +83,16 @@ export class CreateReceivableUseCase
     }
 
     const receivable = await this.receivableService.createReceivable({
-      receivableData,
+      receivableData: {
+        ...receivableData,
+        paymentMethodId: paymentMethod?.id,
+        paymentMethodDescription: paymentMethod?.description,
+        paymentMethodDescriptionEnum: paymentMethod?.descriptionEnum,
+        categoryId: category.id,
+        categoryDescription: category.description,
+        categoryDescriptionEnum: category.descriptionEnum,
+        categoryGroup: category.group,
+      },
       userId,
     });
 
