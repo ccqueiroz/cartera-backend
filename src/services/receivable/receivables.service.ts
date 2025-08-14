@@ -107,7 +107,7 @@ export class ReceivableService implements ReceivableServiceGateway {
 
     if (receivable?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list`,
+        `${userId}:${this.keyController}-list*`,
       );
     }
 
@@ -127,7 +127,7 @@ export class ReceivableService implements ReceivableServiceGateway {
 
     if (receivable?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list`,
+        `${userId}:${this.keyController}-list*`,
       );
 
       const keyToSave = `${userId}:${this.keyController}-list-by-id-${receivable.id}`;
@@ -147,7 +147,7 @@ export class ReceivableService implements ReceivableServiceGateway {
   }: DeleteReceivableInputDTO): Promise<void> {
     await this.db.deleteReceivable({ id, userId });
 
-    await this.cache.deleteWithPattern(`${userId}:${this.keyController}`);
+    await this.cache.deleteWithPattern(`${userId}:${this.keyController}*`);
   }
 
   public async receivablesByMonth({

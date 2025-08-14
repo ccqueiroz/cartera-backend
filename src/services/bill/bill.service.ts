@@ -98,7 +98,7 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list`,
+        `${userId}:${this.keyController}-list*`,
       );
     }
 
@@ -114,7 +114,7 @@ export class BillService implements BillServiceGateway {
 
     if (bill?.id) {
       await this.cache.deleteWithPattern(
-        `${userId}:${this.keyController}-list`,
+        `${userId}:${this.keyController}-list*`,
       );
 
       const keyToSave = `${userId}:${this.keyController}-bill-by-id-${bill.id}`;
@@ -127,7 +127,7 @@ export class BillService implements BillServiceGateway {
   public async deleteBill({ id, userId }: DeleteBillInputDTO): Promise<void> {
     await this.db.deleteBill({ id, userId });
 
-    await this.cache.deleteWithPattern(`${userId}:${this.keyController}`);
+    await this.cache.deleteWithPattern(`${userId}:${this.keyController}*`);
   }
 
   public async billsPayableMonth({
