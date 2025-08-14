@@ -475,7 +475,7 @@ describe('Receivable Service', () => {
       receivableData: data,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list*`;
 
     expect(dbMock.createReceivable).toHaveBeenCalled();
     expect(dbMock.createReceivable).toHaveBeenCalledWith({
@@ -560,7 +560,7 @@ describe('Receivable Service', () => {
       receivableId: data.id,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list*`;
 
     const keyToDataReplace = `${userIdMock}:${keyController}-list-by-id-${data.id}`;
 
@@ -622,7 +622,7 @@ describe('Receivable Service', () => {
   });
 
   it('should be call method deleteReceivable from db provider and after response this provider, must delete the all stored keys that represent list-all from cache provider', async () => {
-    const patternKeysToDelete = `${userIdMock}:${keyController}`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}*`;
 
     await receivableService.deleteReceivable({
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
