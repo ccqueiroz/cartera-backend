@@ -448,7 +448,7 @@ describe('Bill Service', () => {
       billData: data,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list*`;
 
     expect(dbMock.createBill).toHaveBeenCalled();
     expect(dbMock.createBill).toHaveBeenCalledWith({
@@ -538,7 +538,7 @@ describe('Bill Service', () => {
       billId: data.id,
     });
 
-    const patternKeysToDelete = `${userIdMock}:${keyController}-list`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}-list*`;
 
     const keyToDataReplace = `${userIdMock}:${keyController}-bill-by-id-${data.id}`;
 
@@ -603,7 +603,7 @@ describe('Bill Service', () => {
   });
 
   it('should be call method deleteBill from db provider and after response this provider, must delete the all stored keys that represent list-all from cache provider', async () => {
-    const patternKeysToDelete = `${userIdMock}:${keyController}`;
+    const patternKeysToDelete = `${userIdMock}:${keyController}*`;
 
     await billService.deleteBill({
       id: '24177d92-1aee-4479-859b-72f01c9ade24',
