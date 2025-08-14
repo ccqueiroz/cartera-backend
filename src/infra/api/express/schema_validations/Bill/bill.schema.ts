@@ -124,16 +124,11 @@ export class EditBillValidationDTO extends BillCommomValidations {
   createdAt!: number;
 }
 
-export class EditBillByPayableMonthValidationDTO {
+export class EditBillByPayableMonthValidationDTO extends UserIdAuthValidation {
   @IsDefined()
   @IsString()
   @MaxLength(60)
   id!: string;
-
-  @IsDefined()
-  @IsString()
-  @MaxLength(60)
-  personUserId!: string;
 
   @IsOptional()
   @IsNumber()
