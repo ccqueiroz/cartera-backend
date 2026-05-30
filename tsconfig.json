@@ -17,8 +17,7 @@
     "emitDecoratorMetadata": true,
     "types": ["node", "jest"],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/packages/clients/firebase/*": ["./src/packages/clients/firebase/*"]
+      "@/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types", "src/infra/api/express/@types"]
   },
