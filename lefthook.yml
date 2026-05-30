@@ -1,0 +1,26 @@
+# Git hooks gerenciados pelo lefthook.
+# Instalar/atualizar os hooks: `yarn lefthook install`
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: arch-guard
+      # Roda só quando há .ts staged. Barra violação de fronteira (errors).
+      # Warnings (órfãos do código antigo) NÃO bloqueiam — exit 0.
+      glob: "src/**/*.ts"
+      run: >-
+        npx --yes dependency-cruiser "src/**/*.ts"
+        --config .claude/skills/arch-guard/depcruise.config.js
+        --output-type err
+      fail_text: "Violação de fronteira arquitetural (arch-guard). Corrija antes de commitar — ver CLAUDE.md §4."
+
+pre-push:
+  jobs:
+    - name: block-push-main
+      # Preserva a regra antiga: push direto pra main bloqueado.
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$branch" = "main" ]; then
+          echo "🚫 Push direto para 'main' bloqueado. Use branch + Pull Request."
+          exit 1
+        fi
