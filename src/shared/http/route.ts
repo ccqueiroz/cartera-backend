@@ -1,0 +1,20 @@
+import type { NextFunction, Request, Response } from 'express';
+
+export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
+
+export type HttpHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => unknown;
+
+/**
+ * Contrato de rota que cada feature (infra) produz e o bootstrap monta.
+ * As features dependem deste contrato, não do Express diretamente.
+ */
+export interface Route {
+  readonly method: HttpMethod;
+  readonly path: string;
+  readonly handler: HttpHandler;
+  readonly middlewares?: HttpHandler[];
+}
