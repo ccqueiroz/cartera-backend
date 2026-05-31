@@ -4,7 +4,6 @@ import {
   GetCategoriesInputDTO,
 } from '@/domain/Category/dtos/category.dto';
 import { CategoryRepositoryGateway } from '@/domain/Category/gateway/category.repository.gateway';
-import firebase from 'firebase';
 import { ErrorsFirebase } from '../../database/firebase/errorHandling';
 import { CategoryEntitie } from '@/domain/Category/entitie/category.entitie';
 export class CategoryRepositoryFirebase implements CategoryRepositoryGateway {
@@ -26,8 +25,8 @@ export class CategoryRepositoryFirebase implements CategoryRepositoryGateway {
   public async getCategories({
     type,
   }: GetCategoriesInputDTO): Promise<Array<CategoryDTO>> {
-    let query = this
-      .dbCollection as unknown as firebase.firestore.Query<firebase.firestore.DocumentData>;
+    let query: admin.firestore.Query<admin.firestore.DocumentData> =
+      this.dbCollection;
 
     if (type) {
       query = query.where('type', '==', type);
