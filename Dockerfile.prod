@@ -1,4 +1,4 @@
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 
 LABEL mainteiner 'Caio Queiroz - App Cartera'
 
@@ -29,14 +29,10 @@ ENV FIREBASE_SERVICE_ACCOUNT_CLIENT_URL=$FIREBASE_SERVICE_ACCOUNT_CLIENT_URL
 ARG FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN
 ENV FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN=$FIREBASE_SERVICE_ACCOUNT_UNIVERSE_DOMAIN
 
-ENV DOCKERIZE_VERSION v0.7.0
-
-RUN apk add --no-cache wget curl bash tar \
-    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    | tar xzf - -C /usr/local/bin \
+RUN apk add --no-cache curl bash \
     && rm -rf /var/cache/apk/*
 
-COPY ./package.json ./yarn.lock .
+COPY ./package.json ./yarn.lock ./
 
 RUN yarn install --production --frozen-lockfile
 
@@ -57,7 +53,7 @@ RUN yarn remove ts-node dotenv-cli
 RUN yarn build
 
 # ====================================================================================================================== #
-FROM node:18-alpine as main
+FROM node:20-alpine as main
 
 WORKDIR /usr/src/app
 
@@ -68,7 +64,5 @@ COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 COPY --from=builder /usr/src/app/package.json ./package.json
-
-COPY --from=builder /usr/local/bin/dockerize /usr/local/bin/dockerize
 
 CMD ["yarn", "start:prod"]

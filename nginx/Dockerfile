@@ -1,13 +1,6 @@
 FROM nginx:alpine
 
-RUN echo 'Instalando Dockerize - NGINX'
-
-ENV DOCKERIZE_VERSION v0.7.0
-
-RUN apk add --no-cache wget \
-    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz | tar xzf - -C /usr/local/bin \
-    && rm -rf /var/cache/apk/*
-
+RUN apk add --no-cache curl
 
 RUN echo 'Deletando nginx.conf & default.conf'
 
