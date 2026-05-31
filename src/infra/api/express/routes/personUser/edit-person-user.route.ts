@@ -79,7 +79,7 @@ export class EditPersonUserRoute implements Route {
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
-        const { id } = request.params;
+        const { id } = request.params as { id: string };
 
         const { payload } = request.body;
 
