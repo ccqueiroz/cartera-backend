@@ -9,5 +9,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "files.exclude": { "node_modules": true },
-  "workbench.settings.editor": "json"
+  "workbench.settings.editor": "json",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
