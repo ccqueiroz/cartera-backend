@@ -27,3 +27,5 @@ export class DuplicateEntityError extends DomainError {
     super(`${entity} already exists with identifier: ${identifier}.`);
   }
 }
+
+export class UnauthorizedError extends DomainError {}

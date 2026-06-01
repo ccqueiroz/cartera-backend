@@ -2,15 +2,16 @@
   "name": "cartera-backend",
   "version": "1.0.0",
   "description": "Cartera é um sistema de controle financeiro pessoal que facilita o gerenciamento de finanças, permitindo cadastro de receitas, despesas, cartões de crédito e faturas. Oferece também ferramentas para listas de compras e metas de poupança, promovendo organização financeira e alcance de objetivos.",
-  "main": "index.ts",
+  "main": "src/bootstrap/main.ts",
   "repository": "https://github.com/ccqueiroz/cartera-backend",
   "author": "Caio Queiroz <caio.cezar.dequeiroz@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "tsup index.ts --out-dir dist --clean --target node20 --format cjs",
-    "start:prod": "node dist/index.js",
-    "start:dev": "ts-node-dev --respawn -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules index.ts",
+    "build": "tsup src/bootstrap/main.ts --out-dir dist --clean --target node20 --format cjs",
+    "start": "ts-node-dev --respawn -r tsconfig-paths/register --transpile-only src/bootstrap/main.ts",
+    "start:prod": "node dist/main.js",
+    "start:dev": "ts-node-dev --respawn -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/bootstrap/main.ts",
     "create-workspace-vscode": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/vscode/index.js",
     "create-editor-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/editorconfig/index.js",
     "create-prettier-config": "node node_modules/@caiocezarqueiroz/eslint-config/settingsGenerator/prettier/index.js",
@@ -26,7 +27,6 @@
     "stop:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml down",
     "start:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml --env-file .env.docker.prod.env up --build -d",
     "stop:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml down",
-    "start:rewrite": "ts-node-dev --respawn -r tsconfig-paths/register --transpile-only src/bootstrap/main.ts",
     "arch:check": "npx --yes dependency-cruiser \"src/**/*.ts\" --config .claude/skills/arch-guard/depcruise.config.js --output-type err"
   },
   "engines": {

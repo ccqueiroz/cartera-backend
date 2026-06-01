@@ -21,13 +21,12 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "typeRoots": ["./node_modules/@types", "src/infra/api/express/@types"]
+    "typeRoots": ["./node_modules/@types", "src/shared/http/express/@types"]
   },
   "include": [
     "src/**/*",
     "**/*.spec.ts",
-    "src/infra/api/express/@types/**/*.d.ts",
-    "index.ts"
+    "src/shared/http/express/@types/**/*.d.ts"
   ],
   "compileOnSave": true
 }
