@@ -1,5 +1,5 @@
-import { Scan } from '@/domain/Cache/dtos/cache.dto';
-import { TypeOfClientRedis } from '@/infra/database/redis/redis.database.cache';
+import { Scan } from '@/shared/database/redis/cache.gateway';
+import { TypeOfClientRedis } from '@/shared/database/redis/redis.client';
 
 const mockRedisConnect = jest.fn();
 const mockRedisOn = jest.fn();
