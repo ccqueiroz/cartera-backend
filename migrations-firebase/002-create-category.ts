@@ -1,6 +1,6 @@
-import { CategoryDescriptionEnum } from './../src/domain/Category/enums/category-description.enum';
-import { CategoryGroupEnum } from './../src/domain/Category/enums/category-group.enum';
-import { CategoryType } from './../src/domain/Category/enums/category-type.enum';
+import { CategoryDescriptionEnum } from './enums/category-description.enum';
+import { CategoryGroupEnum } from './enums/category-group.enum';
+import { CategoryType } from './enums/category-type.enum';
 import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
 

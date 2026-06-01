@@ -1,4 +1,4 @@
-import { PaymentMethodDescriptionEnum } from './../src/domain/Payment_Method/enums/payment-method-description.enum';
+import { PaymentMethodDescriptionEnum } from './enums/payment-method-description.enum';
 import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
 

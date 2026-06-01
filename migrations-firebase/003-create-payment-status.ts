@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import { randomUUID } from 'crypto';
-import { PaymentStatusDescriptionEnum } from '../src/domain/Payment_Status/enum/payment-status-description.enum';
+import { PaymentStatusDescriptionEnum } from './enums/payment-status-description.enum';
 
 const paymentStatus = [
   {
