@@ -1,7 +1,7 @@
 import { Route } from '@/shared/http/route';
-import { CheckHealthUseCase } from './application/check-health.usecase';
-import { HealthController } from './infra/health.controller';
-import { healthRoutes } from './infra/health.routes';
+import { CheckHealthUseCase } from '@/features/health/application/check-health.usecase';
+import { HealthController } from '@/features/health/infra/http/health.controller';
+import { healthRoutes } from '@/features/health/infra/http/health.routes';
 
 /**
  * Factory da feature: monta use case → controller → rotas e devolve Route[].
