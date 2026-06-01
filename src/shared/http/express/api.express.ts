@@ -1,11 +1,7 @@
-import express, {
-  type Express,
-  json,
-  type RequestHandler,
-  type ErrorRequestHandler,
-} from 'express';
+import express, { type Express, json } from 'express';
 import type { Server } from 'http';
 import { Route } from '@/shared/http/route';
+import { ErrorMiddleware, Middleware } from '@/shared/http/middleware';
 
 export interface BootstrapLogger {
   info(message: string): void;
@@ -16,20 +12,17 @@ export interface BootstrapCache {
   disconnect(): Promise<void>;
 }
 
-export interface GlobalMiddleware {
-  getHandler(): RequestHandler;
-}
-
-export interface ErrorHandlingMiddleware {
-  getHandler(): ErrorRequestHandler;
+export interface SwaggerMounter {
+  mount(app: Express): void;
 }
 
 export interface ApiExpressDeps {
   routes: Route[];
-  globalMiddlewares: GlobalMiddleware[];
-  errorMiddleware: ErrorHandlingMiddleware;
+  globalMiddlewares: Middleware[];
+  errorMiddleware: ErrorMiddleware;
   logger: BootstrapLogger;
   cache: BootstrapCache;
+  swaggerSetup: SwaggerMounter;
 }
 
 export class ApiExpress {
@@ -42,6 +35,7 @@ export class ApiExpress {
     this.app.set('x-powered-by', false);
     this.registerGlobalMiddlewares();
     this.registerRoutes();
+    this.deps.swaggerSetup.mount(this.app);
     this.registerErrorHandling();
   }
 
@@ -57,9 +51,13 @@ export class ApiExpress {
 
   private registerRoutes(): void {
     this.deps.routes.forEach((route) => {
+      const middlewares = (route.middlewares ?? []).map((middleware) =>
+        middleware.getHandler(),
+      );
+
       this.app[route.method](
         `/api/${route.path}`,
-        ...(route.middlewares ?? []),
+        ...middlewares,
         route.handler,
       );
     });
@@ -69,11 +67,20 @@ export class ApiExpress {
     this.app.use(this.deps.errorMiddleware.getHandler());
   }
 
+  private listRoutes(): void {
+    this.deps.routes.forEach((route) => {
+      this.deps.logger.info(
+        `[ROUTE] ${route.method.toUpperCase()} /api/${route.path}`,
+      );
+    });
+  }
+
   public async start(port: number): Promise<void> {
     await this.deps.cache.connect();
 
     this.server = this.app.listen(port, '0.0.0.0', () => {
       this.deps.logger.info(`Server running on port ${port}`);
+      this.listRoutes();
     });
 
     this.server.on('error', () => {
@@ -88,5 +95,9 @@ export class ApiExpress {
     this.deps.logger.info(`${signal}: safely closing application`);
     await this.deps.cache.disconnect();
     this.server?.close();
+  }
+
+  public get instance(): Express {
+    return this.app;
   }
 }

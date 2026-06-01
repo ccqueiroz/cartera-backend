@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import type { Middleware } from '@/shared/http/middleware';
 
 export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
@@ -16,5 +17,5 @@ export interface Route {
   readonly method: HttpMethod;
   readonly path: string;
   readonly handler: HttpHandler;
-  readonly middlewares?: HttpHandler[];
+  readonly middlewares?: Middleware[];
 }
