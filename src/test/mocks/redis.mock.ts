@@ -8,7 +8,7 @@ const mockRedisQuit = jest.fn();
 const mockRedisGet = jest.fn<Promise<string | null>, [string]>();
 const mockRedisSet = jest.fn<Promise<'OK'>, [string, string, any?]>();
 const mockRedisDel = jest.fn<Promise<number>, [string | string[]]>();
-const mockRedisScan = jest.fn<Promise<Scan>, [number, { MATCH: string }]>();
+const mockRedisScan = jest.fn<Promise<Scan>, [string, { MATCH: string }]>();
 
 export const mockRedisClient = {
   connect: mockRedisConnect,

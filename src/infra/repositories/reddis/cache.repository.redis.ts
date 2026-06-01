@@ -42,8 +42,11 @@ export class RedisCacheRepository implements CacheGateway {
   }
 
   public async scan(cursor: number, pattern: string): Promise<Scan> {
-    const result = await this.clientRedis.scan(cursor, { MATCH: pattern });
-    return result;
+    const { cursor: nextCursor, keys } = await this.clientRedis.scan(
+      String(cursor),
+      { MATCH: pattern },
+    );
+    return { cursor: Number(nextCursor), keys };
   }
 
   public async connect(): Promise<void> {

@@ -66,7 +66,7 @@ export class DeleteReceivableRoute implements Route {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
         const { user_auth } = request;
-        const { id } = request.params;
+        const { id } = request.params as { id: string };
 
         const errors = await runValidate<DeleteReceivableValidationDTO>(
           DeleteReceivableValidationDTO,

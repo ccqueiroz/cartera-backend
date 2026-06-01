@@ -4,6 +4,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "dist",
+    "rootDir": ".",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
@@ -11,14 +12,14 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./",
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": ["node", "jest"],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/packages/clients/firebase/*": ["./src/packages/clients/firebase/*"]
+      "@/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types", "src/infra/api/express/@types"]
   },

@@ -1,10 +1,10 @@
-import { ValidationArguments } from './../../../../node_modules/class-validator/types/validation/ValidationArguments.d';
 import 'reflect-metadata';
 import {
   validate,
   ValidationError,
   ValidatorOptions,
   ValidationOptions,
+  ValidationArguments,
   registerDecorator,
 } from 'class-validator';
 import { plainToInstance, ClassConstructor } from 'class-transformer';
@@ -20,8 +20,8 @@ const OnlyOnePropertieDefined = (
       propertyName: key,
       options: validateOptions,
       validator: {
-        validate(_: any, args: ValidationArguments) {
-          const object = args.object as any;
+        validate(_: unknown, args: ValidationArguments) {
+          const object = args.object as Record<string, unknown>;
           const isDefined = props.filter((prop) => !!object[prop]);
           return isDefined.length <= 1;
         },

@@ -70,7 +70,7 @@ export class GetPersonUserByUserIdRoute implements Route {
   public getHandler() {
     return async (request: Request, response: Response, next: NextFunction) => {
       try {
-        const { id } = request.params;
+        const { id } = request.params as { id: string };
 
         if (!id)
           throw new ApiError(ERROR_MESSAGES.MISSING_REQUIRED_PARAMETERS, 400);

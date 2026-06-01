@@ -115,7 +115,7 @@ describe('Cache Repository Redis', () => {
     await redisCacheRepository.scan(0, pattern);
 
     expect(mockRedisClient.scan).toHaveBeenCalledTimes(1);
-    expect(mockRedisClient.scan).toHaveBeenCalledWith(0, { MATCH: pattern });
+    expect(mockRedisClient.scan).toHaveBeenCalledWith('0', { MATCH: pattern });
   });
 
   it('should be delete with pattern the keys when called deleteWithPattern.', async () => {
