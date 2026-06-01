@@ -1,0 +1,37 @@
+import { OAS3Options } from 'swagger-jsdoc';
+
+export const swaggerDefinition: OAS3Options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Cartera-Api',
+      version: '1.0.0',
+      description:
+        'Cartera é um sistema de controle financeiro pessoal que facilita o gerenciamento de finanças, permitindo cadastro de receitas, despesas, cartões de crédito e faturas. Oferece também ferramentas para listas de compras e metas de poupança, promovendo organização financeira e alcance de objetivos.',
+    },
+    servers: [
+      {
+        url: process.env.SWAGGER_HOST ?? '',
+        description: 'Servidor de Desenvolvimento',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        sessionCookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'session',
+        },
+        refreshCookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'refresh_session',
+        },
+      },
+    },
+  },
+  apis: [
+    'src/shared/http/swagger/**/*.swagger.ts',
+    'src/features/**/infra/http/**/*.{route,swagger}.ts',
+  ],
+};
