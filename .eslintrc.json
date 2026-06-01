@@ -20,9 +20,64 @@
       {
         "allowComputed": true
       }
+    ],
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./src/shared/http",
+            "from": "./src/features",
+            "message": "shared/http não importa features (CLAUDE.md §4)."
+          },
+          {
+            "target": "./src/features/*/domain",
+            "from": "./src/shared/http",
+            "message": "domain não conhece HTTP/shared-http (CLAUDE.md §4 regra 5)."
+          },
+          {
+            "target": "./src/features/*/application",
+            "from": "./src/shared/http",
+            "message": "application não conhece HTTP/shared-http (CLAUDE.md §4)."
+          }
+        ]
+      }
     ]
   },
   "overrides": [
+    {
+      "files": ["src/**/*.route.ts"],
+      "excludedFiles": ["src/features/*/infra/http/**/*.route.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "Program",
+            "message": "Arquivos *.route.ts só podem existir em features/*/infra/http (CLAUDE.md §9)."
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/features/*/domain/**/*.ts",
+        "src/features/*/application/**/*.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "express",
+                "message": "domain/application não conhece Express (CLAUDE.md §4 regra 5)."
+              }
+            ],
+            "patterns": ["**/shared/http", "**/shared/http/**", "@/shared/http", "@/shared/http/**"]
+          }
+        ]
+      }
+    },
     {
       "files": [
         "src/features/**/*.ts",
