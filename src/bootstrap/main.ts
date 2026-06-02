@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import { ApiExpress } from '@/shared/http/express/api.express';
 import { makeHealthModule } from '@/features/health/health.factory';
+import { makeCategoryModule } from '@/features/category/category.factory';
+import { clientFireBaseAdmin } from '@/packages/clients/firebase';
 import { WinstonLogger } from '@/shared/logger/winston.logger';
 import { RedisCacheRepository } from '@/shared/database/redis/cache.repository.redis';
 import { clientRedis } from '@/shared/database/redis/redis.client';
@@ -25,8 +27,11 @@ function main(): void {
   const errorMiddleware = ErrorMiddleware.create(logger);
   const swaggerSetup = SwaggerSetup.create();
 
+  const db = clientFireBaseAdmin.firestore();
+  const category = makeCategoryModule({ db });
+
   const api = ApiExpress.create({
-    routes: makeHealthModule(),
+    routes: [...makeHealthModule(), ...category.routes],
     globalMiddlewares: [cookies, cors, ipControll],
     errorMiddleware,
     logger,

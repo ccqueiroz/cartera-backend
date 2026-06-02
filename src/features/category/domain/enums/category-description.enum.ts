@@ -288,3 +288,6 @@ export const CategoryDescriptionEnum = {
   GOVERNMENT_BENEFIT: 'GOVERNMENT_BENEFIT',
   ADVANCE_RECEIVED: 'ADVANCE_RECEIVED',
 } as const;
+
+export type CategoryDescription =
+  (typeof CategoryDescriptionEnum)[keyof typeof CategoryDescriptionEnum];

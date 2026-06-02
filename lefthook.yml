@@ -1,6 +1,10 @@
 # Git hooks gerenciados pelo lefthook.
 # Instalar/atualizar os hooks: `yarn lefthook install`
 
+# Carrega node/npx do nvm no PATH quando o git roda os hooks fora de um shell
+# com nvm (ex.: git de IDE/GUI). Ver .lefthookrc.
+rc: .lefthookrc
+
 pre-commit:
   parallel: true
   jobs:

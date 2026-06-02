@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HttpMiddleware, Middleware } from '@/shared/http/middleware';
 import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export interface SessionUser {
   userId: string;
@@ -33,7 +34,7 @@ export class VerifyTokenMiddleware implements Middleware {
         const token = request.cookies?.['session'];
 
         if (!token) {
-          throw new UnauthorizedError('Token de autorização inválido.');
+          throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
         }
 
         const decoded = await this.sessionVerifier.verifyToken({
@@ -41,7 +42,7 @@ export class VerifyTokenMiddleware implements Middleware {
         });
 
         if (!decoded) {
-          throw new UnauthorizedError('Token de autorização inválido.');
+          throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
         }
 
         request.user_auth = { ...decoded };

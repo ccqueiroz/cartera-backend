@@ -1,4 +1,5 @@
 import { ValidationError } from '../errors/domain.error';
+import { ErrorCode } from '../errors/error-code';
 
 /**
  * Valor monetário imutável, normalizado a 2 casas. Toda aritmética financeira
@@ -9,8 +10,8 @@ export class Money {
 
   public static create(value: number): Money {
     if (!Number.isFinite(value))
-      throw new ValidationError('Money must be a finite number');
-    if (value < 0) throw new ValidationError('Money cannot be negative');
+      throw new ValidationError(ErrorCode.MONEY_INVALID_NUMBER);
+    if (value < 0) throw new ValidationError(ErrorCode.MONEY_NEGATIVE);
     return new Money(Money.round(value));
   }
 

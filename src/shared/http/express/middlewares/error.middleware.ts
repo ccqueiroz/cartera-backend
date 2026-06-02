@@ -8,9 +8,13 @@ import {
   DomainError,
   DuplicateEntityError,
   EntityNotFoundError,
+  ForbiddenError,
   UnauthorizedError,
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { HttpStatus } from '@/shared/http/http-status';
 import { LoggerGateway } from '@/shared/logger/logger.gateway';
 
 export class ErrorMiddleware implements ErrorMiddlewareInterface {
@@ -20,14 +24,16 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
     return new ErrorMiddleware(logger);
   }
 
-  private statusFor(error: Error): number {
-    if (error instanceof ValidationError) return 400;
-    if (error instanceof UnauthorizedError) return 401;
-    if (error instanceof EntityNotFoundError) return 404;
-    if (error instanceof DuplicateEntityError) return 409;
-    if (error instanceof BusinessRuleViolationError) return 422;
-    if (error instanceof DomainError) return 400;
-    return 500;
+  private statusFor(error: Error): HttpStatus {
+    if (error instanceof ValidationError) return HttpStatus.BAD_REQUEST;
+    if (error instanceof UnauthorizedError) return HttpStatus.UNAUTHORIZED;
+    if (error instanceof ForbiddenError) return HttpStatus.FORBIDDEN;
+    if (error instanceof EntityNotFoundError) return HttpStatus.NOT_FOUND;
+    if (error instanceof DuplicateEntityError) return HttpStatus.CONFLICT;
+    if (error instanceof BusinessRuleViolationError)
+      return HttpStatus.UNPROCESSABLE_ENTITY;
+    if (error instanceof DomainError) return HttpStatus.BAD_REQUEST;
+    return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 
   public getHandler(): ErrorHttpMiddleware {
@@ -37,13 +43,19 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
       response: Response,
       _next: NextFunction,
     ) => {
-      const statusCode = this.statusFor(error);
-      const message =
-        statusCode === 500 ? 'Erro interno no servidor.' : error.message;
+      const status = this.statusFor(error);
+      const code =
+        error instanceof DomainError
+          ? error.code
+          : ErrorCode.INTERNAL_SERVER_ERROR;
+      const params = error instanceof DomainError ? error.params : undefined;
+      const message = errorCatalog[code](params);
 
-      this.logger.error(`{[STATUS]: ${statusCode}}: ${error.stack}`);
+      this.logger.error(
+        `{[STATUS]: ${status}}{[CODE]: ${code}}: ${error.stack}`,
+      );
 
-      response.status(statusCode).json({ message });
+      response.status(status).json({ message });
     };
   }
 }

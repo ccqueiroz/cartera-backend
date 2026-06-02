@@ -1,0 +1,6 @@
+# lefthook roda os hooks via sh sem o PATH do nvm quando o commit parte do git
+# de IDE/GUI — sem isto, npx/node somem e os hooks falham com exit 127.
+if ! command -v npx >/dev/null 2>&1; then
+  NODE_BIN="$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | sort -V | tail -1)"
+  [ -n "$NODE_BIN" ] && PATH="$NODE_BIN:$PATH" && export PATH
+fi
