@@ -23,3 +23,6 @@ export const CategoryGroupEnum = {
   BANK: 'BANK',
   OTHERS: 'OTHERS',
 } as const;
+
+export type CategoryGroup =
+  (typeof CategoryGroupEnum)[keyof typeof CategoryGroupEnum];

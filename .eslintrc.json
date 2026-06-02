@@ -21,6 +21,10 @@
         "allowComputed": true
       }
     ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
     "import/no-restricted-paths": [
       "error",
       {
@@ -73,7 +77,12 @@
                 "message": "domain/application não conhece Express (CLAUDE.md §4 regra 5)."
               }
             ],
-            "patterns": ["**/shared/http", "**/shared/http/**", "@/shared/http", "@/shared/http/**"]
+            "patterns": [
+              "**/shared/http",
+              "**/shared/http/**",
+              "@/shared/http",
+              "@/shared/http/**"
+            ]
           }
         ]
       }
@@ -92,10 +101,11 @@
       }
     },
     {
-      "files": ["**/*.spec.ts"],
+      "files": ["**/*.spec.ts", "**/*.mock.ts"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "@typescript-eslint/no-empty-function": "off"
       }
     }
   ],

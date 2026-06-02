@@ -1,4 +1,5 @@
 import { ValidationError } from '../errors/domain.error';
+import { ErrorCode } from '../errors/error-code';
 
 /** Intervalo de datas imutável [inicial, final]. */
 export class DateRange {
@@ -9,9 +10,7 @@ export class DateRange {
 
   public static create(initialDate: Date, finalDate: Date): DateRange {
     if (initialDate.getTime() > finalDate.getTime()) {
-      throw new ValidationError(
-        'Initial date must be before or equal to final date.',
-      );
+      throw new ValidationError(ErrorCode.INVALID_DATE_RANGE);
     }
     return new DateRange(new Date(initialDate), new Date(finalDate));
   }
