@@ -4,12 +4,15 @@ import {
   CategoryGroup,
   CategoryGroupEnum,
 } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import {
+  TransactionType,
+  TransactionTypeEnum,
+} from '@/shared/kernel/enums/transaction-type.enum';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const GROUPS = new Set<string>(Object.values(CategoryGroupEnum));
-const TYPES = new Set<string>(Object.values(CategoryType));
+const TYPES = new Set<string>(Object.values(TransactionTypeEnum));
 
 export class ListCategoriesByGroupUseCase {
   private constructor(private readonly repository: CategoryRepository) {}
@@ -31,7 +34,7 @@ export class ListCategoriesByGroupUseCase {
 
     const categories = await this.repository.findActiveByGroupAndType(
       input.group as CategoryGroup,
-      input.type as CategoryType,
+      input.type as TransactionType,
     );
     return categories.map((category) => category.toOutput());
   }

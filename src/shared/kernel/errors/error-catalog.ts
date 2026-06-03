@@ -28,6 +28,15 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_CATEGORY_GROUP]: () => 'Grupo de categoria inválido.',
   [ErrorCode.INVALID_CATEGORY_TYPE]: () => 'Tipo de categoria inválido.',
 
+  [ErrorCode.PAYMENT_STATUS_NOT_FOUND]: (params) =>
+    params?.code
+      ? `Status de pagamento "${params.code}" não encontrado.`
+      : 'Status de pagamento não encontrado.',
+  [ErrorCode.PAYMENT_STATUS_LABEL_REQUIRED]: () =>
+    'O rótulo do status de pagamento é obrigatório.',
+  [ErrorCode.INVALID_PAYMENT_STATUS_CODE]: () =>
+    'O código do status de pagamento é inválido.',
+
   [ErrorCode.PAYMENT_METHOD_NOT_FOUND]: (params) =>
     params?.descriptionEnum
       ? `Forma de pagamento "${params.descriptionEnum}" não encontrada.`

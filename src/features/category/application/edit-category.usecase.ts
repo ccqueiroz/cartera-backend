@@ -2,7 +2,7 @@ import { Category } from '@/features/category/domain/category.entity';
 import { CategoryRepository } from '@/features/category/domain/ports/category.repository.port';
 import { CategoryDescription } from '@/features/category/domain/enums/category-description.enum';
 import { CategoryGroup } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 import {
   BusinessRuleViolationError,
   EntityNotFoundError,
@@ -13,7 +13,7 @@ interface EditCategoryInput {
   descriptionEnum: CategoryDescription;
   description: string;
   group: CategoryGroup;
-  type: CategoryType;
+  type: TransactionType;
   requestedDescriptionEnum?: string;
 }
 

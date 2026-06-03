@@ -24,7 +24,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *             properties:
  *               description: { type: string }
  *               group: { type: string }
- *               type: { type: string, enum: [BILLS, RECEIVABLE] }
+ *               type: { type: string, enum: [BILLS, RECEIVABLES] }
  *     responses:
  *       200:
  *         description: Categoria atualizada.

@@ -77,7 +77,7 @@ async function runMigrations(db: admin.firestore.Firestore | Error) {
   const migrationFiles = await readdir(migrationsPath);
 
   const sortedMigrations = migrationFiles
-    .filter((file) => file.endsWith('.ts'))
+    .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
     .sort();
 
   for (const file of sortedMigrations) {

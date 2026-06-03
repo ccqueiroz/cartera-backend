@@ -19,7 +19,7 @@ import { CreateCategorySchema } from '@/features/category/infra/http/schemas/cre
 import { EditCategorySchema } from '@/features/category/infra/http/schemas/edit-category.schema';
 import { CategoryDescription } from '@/features/category/domain/enums/category-description.enum';
 import { CategoryGroup } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 
 async function assertValid<T extends object>(
   schema: ClassConstructor<T>,
@@ -98,7 +98,7 @@ export class CategoryController {
       description: req.body.description,
       descriptionEnum: req.body.descriptionEnum as CategoryDescription,
       group: req.body.group as CategoryGroup,
-      type: req.body.type as CategoryType,
+      type: req.body.type as TransactionType,
     });
     res.status(result.reactivated ? 200 : 201).json(result.category.toOutput());
   };
@@ -110,7 +110,7 @@ export class CategoryController {
       descriptionEnum: req.params.descriptionEnum as CategoryDescription,
       description: req.body.description,
       group: req.body.group as CategoryGroup,
-      type: req.body.type as CategoryType,
+      type: req.body.type as TransactionType,
       requestedDescriptionEnum: req.body.descriptionEnum,
     });
     res.status(200).json(category.toOutput());

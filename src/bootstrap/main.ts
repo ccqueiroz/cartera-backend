@@ -3,6 +3,7 @@ import { ApiExpress } from '@/shared/http/express/api.express';
 import { makeHealthModule } from '@/features/health/health.factory';
 import { makeCategoryModule } from '@/features/category/category.factory';
 import { makePaymentMethodModule } from '@/features/payment-method/payment-method.factory';
+import { makePaymentStatusModule } from '@/features/payment-status/payment-status.factory';
 import { clientFireBaseAdmin } from '@/packages/clients/firebase';
 import { WinstonLogger } from '@/shared/logger/winston.logger';
 import { RedisCacheRepository } from '@/shared/database/redis/cache.repository.redis';
@@ -31,9 +32,15 @@ function main(): void {
   const db = clientFireBaseAdmin.firestore();
   const category = makeCategoryModule({ db });
   const paymentMethod = makePaymentMethodModule({ db });
+  const paymentStatus = makePaymentStatusModule({ db });
 
   const api = ApiExpress.create({
-    routes: [...makeHealthModule(), ...category.routes, ...paymentMethod],
+    routes: [
+      ...makeHealthModule(),
+      ...category.routes,
+      ...paymentMethod,
+      ...paymentStatus,
+    ],
     globalMiddlewares: [cookies, cors, ipControll],
     errorMiddleware,
     logger,
