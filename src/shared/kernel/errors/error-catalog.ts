@@ -28,6 +28,23 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_CATEGORY_GROUP]: () => 'Grupo de categoria inválido.',
   [ErrorCode.INVALID_CATEGORY_TYPE]: () => 'Tipo de categoria inválido.',
 
+  [ErrorCode.PAYMENT_METHOD_NOT_FOUND]: (params) =>
+    params?.descriptionEnum
+      ? `Forma de pagamento "${params.descriptionEnum}" não encontrada.`
+      : 'Forma de pagamento não encontrada.',
+  [ErrorCode.PAYMENT_METHOD_ALREADY_EXISTS]: (params) =>
+    params?.descriptionEnum
+      ? `Já existe uma forma de pagamento ativa para "${params.descriptionEnum}".`
+      : 'Forma de pagamento já existe.',
+  [ErrorCode.PAYMENT_METHOD_DELETED]: () =>
+    'A forma de pagamento foi excluída e não pode ser alterada.',
+  [ErrorCode.PAYMENT_METHOD_DESCRIPTION_REQUIRED]: () =>
+    'A descrição da forma de pagamento é obrigatória.',
+  [ErrorCode.PAYMENT_METHOD_DESCRIPTION_TOO_LONG]: () =>
+    'A descrição da forma de pagamento excede o tamanho máximo permitido.',
+  [ErrorCode.INVALID_PAYMENT_METHOD_DESCRIPTION_ENUM]: () =>
+    'O valor fornecido para a forma de pagamento (descriptionEnum) é inválido.',
+
   [ErrorCode.MONEY_INVALID_NUMBER]: () =>
     'O valor monetário deve ser um número válido.',
   [ErrorCode.MONEY_NEGATIVE]: () => 'O valor monetário não pode ser negativo.',
