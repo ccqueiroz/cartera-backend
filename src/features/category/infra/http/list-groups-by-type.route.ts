@@ -14,7 +14,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *         required: true
  *         schema:
  *           type: string
- *           enum: [BILLS, RECEIVABLE]
+ *           enum: [BILLS, RECEIVABLES]
  *     responses:
  *       200:
  *         description: Grupos distintos do tipo.

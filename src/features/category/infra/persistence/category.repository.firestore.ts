@@ -6,7 +6,7 @@ import {
 import { CategoryRepository } from '@/features/category/domain/ports/category.repository.port';
 import { CategoryDescription } from '@/features/category/domain/enums/category-description.enum';
 import { CategoryGroup } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 
 export class CategoryRepositoryFirestore implements CategoryRepository {
   private static readonly COLLECTION = 'Category';
@@ -17,7 +17,7 @@ export class CategoryRepositoryFirestore implements CategoryRepository {
     return new CategoryRepositoryFirestore(db);
   }
 
-  public async findActiveByType(type: CategoryType): Promise<Category[]> {
+  public async findActiveByType(type: TransactionType): Promise<Category[]> {
     const query = await this.collection()
       .where('type', '==', type)
       .where('deletedAt', '==', null)
@@ -50,7 +50,9 @@ export class CategoryRepositoryFirestore implements CategoryRepository {
     return Category.with(query.docs[0].data() as CategoryPersistence);
   }
 
-  public async listGroupsByType(type: CategoryType): Promise<CategoryGroup[]> {
+  public async listGroupsByType(
+    type: TransactionType,
+  ): Promise<CategoryGroup[]> {
     const query = await this.collection()
       .where('type', '==', type)
       .where('deletedAt', '==', null)
@@ -65,7 +67,7 @@ export class CategoryRepositoryFirestore implements CategoryRepository {
 
   public async findActiveByGroupAndType(
     group: CategoryGroup,
-    type: CategoryType,
+    type: TransactionType,
   ): Promise<Category[]> {
     const query = await this.collection()
       .where('group', '==', group)

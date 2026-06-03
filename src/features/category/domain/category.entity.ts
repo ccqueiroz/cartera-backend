@@ -8,14 +8,17 @@ import {
   CategoryGroup,
   CategoryGroupEnum,
 } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import {
+  TransactionType,
+  TransactionTypeEnum,
+} from '@/shared/kernel/enums/transaction-type.enum';
 
 interface CategoryProps {
   id: string;
   description: string;
   descriptionEnum: CategoryDescription;
   group: CategoryGroup;
-  type: CategoryType;
+  type: TransactionType;
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
@@ -26,7 +29,7 @@ export interface CategoryPersistence {
   description: string;
   descriptionEnum: CategoryDescription;
   group: CategoryGroup;
-  type: CategoryType;
+  type: TransactionType;
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
@@ -36,7 +39,7 @@ export interface CategoryOutput {
   description: string;
   descriptionEnum: CategoryDescription;
   group: CategoryGroup;
-  type: CategoryType;
+  type: TransactionType;
   active: boolean;
   createdAt: string;
   updatedAt: string | null;
@@ -46,7 +49,7 @@ const DESCRIPTION_ENUMS = new Set<string>(
   Object.values(CategoryDescriptionEnum),
 );
 const GROUPS = new Set<string>(Object.values(CategoryGroupEnum));
-const TYPES = new Set<string>(Object.values(CategoryType));
+const TYPES = new Set<string>(Object.values(TransactionTypeEnum));
 
 export class Category {
   private constructor(private props: CategoryProps) {}
@@ -56,7 +59,7 @@ export class Category {
     description: string;
     descriptionEnum: CategoryDescription;
     group: CategoryGroup;
-    type: CategoryType;
+    type: TransactionType;
     createdAt: string;
   }): Category {
     const props: CategoryProps = {
@@ -86,7 +89,7 @@ export class Category {
   public edit(input: {
     description: string;
     group: CategoryGroup;
-    type: CategoryType;
+    type: TransactionType;
     updatedAt: string;
   }): void {
     const next: CategoryProps = {

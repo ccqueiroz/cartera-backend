@@ -13,7 +13,10 @@ import {
   CategoryGroup,
   CategoryGroupEnum,
 } from '@/features/category/domain/enums/category-group.enum';
-import { CategoryType } from '@/features/category/domain/enums/category-type.enum';
+import {
+  TransactionType,
+  TransactionTypeEnum,
+} from '@/shared/kernel/enums/transaction-type.enum';
 
 const DESCRIPTION_ENUMS = Object.values(CategoryDescriptionEnum);
 const GROUPS = Object.values(CategoryGroupEnum);
@@ -26,8 +29,8 @@ export class EditCategorySchema {
   @IsIn(GROUPS, { message: 'Grupo de categoria inválido.' })
   group!: CategoryGroup;
 
-  @IsEnum(CategoryType, { message: 'Tipo de categoria inválido.' })
-  type!: CategoryType;
+  @IsEnum(TransactionTypeEnum, { message: 'Tipo de categoria inválido.' })
+  type!: TransactionType;
 
   // Aceito mas imutável: trocá-lo é rejeitado no use case com 422, não aqui.
   @IsOptional()

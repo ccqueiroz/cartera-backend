@@ -1,7 +1,7 @@
 import { Category } from './category.entity';
 import { CategoryDescriptionEnum } from './enums/category-description.enum';
 import { CategoryGroupEnum } from './enums/category-group.enum';
-import { CategoryType } from './enums/category-type.enum';
+import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const baseInput = {
@@ -9,7 +9,7 @@ const baseInput = {
   description: 'Uber',
   descriptionEnum: CategoryDescriptionEnum.UBER,
   group: CategoryGroupEnum.MOBILITY_BY_APP,
-  type: CategoryType.BILLS,
+  type: TransactionTypeEnum.BILLS,
   createdAt: '2026-06-01T10:00:00.000Z',
 };
 
@@ -33,7 +33,7 @@ describe('Category entity', () => {
     category.edit({
       description: 'Uber Black',
       group: CategoryGroupEnum.MOBILITY_BY_APP,
-      type: CategoryType.BILLS,
+      type: TransactionTypeEnum.BILLS,
       updatedAt: '2026-06-02T10:00:00.000Z',
     });
     expect(category.descriptionEnum).toBe(CategoryDescriptionEnum.UBER);

@@ -576,7 +576,7 @@
  *           type: string
  *           enum:
  *             - BILLS
- *             - RECEIVABLE
+ *             - RECEIVABLES
  *           example: BILLS
  *         totalInvoicedAmount:
  *           type: number
@@ -596,7 +596,7 @@
  *           type: string
  *           enum:
  *             - BILLS
- *             - RECEIVABLE
+ *             - RECEIVABLES
  *           example: BILLS
  *         totalAmount:
  *           type: number

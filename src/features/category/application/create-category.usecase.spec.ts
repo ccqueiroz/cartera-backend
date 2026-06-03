@@ -2,14 +2,14 @@ import { CreateCategoryUseCase } from './create-category.usecase';
 import { Category } from '../domain/category.entity';
 import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
 import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
-import { CategoryType } from '../domain/enums/category-type.enum';
+import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const payload = {
   description: 'Uber',
   descriptionEnum: CategoryDescriptionEnum.UBER,
   group: CategoryGroupEnum.MOBILITY_BY_APP,
-  type: CategoryType.BILLS,
+  type: TransactionTypeEnum.BILLS,
 };
 
 const makeSoftDeleted = () => {
@@ -18,7 +18,7 @@ const makeSoftDeleted = () => {
     description: 'Uber',
     descriptionEnum: CategoryDescriptionEnum.UBER,
     group: CategoryGroupEnum.MOBILITY_BY_APP,
-    type: CategoryType.BILLS,
+    type: TransactionTypeEnum.BILLS,
     createdAt: '2026-06-01T10:00:00.000Z',
     updatedAt: null,
     deletedAt: '2026-06-02T10:00:00.000Z',

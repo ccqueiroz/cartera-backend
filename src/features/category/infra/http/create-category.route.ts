@@ -19,7 +19,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *               description: { type: string }
  *               descriptionEnum: { type: string }
  *               group: { type: string }
- *               type: { type: string, enum: [BILLS, RECEIVABLE] }
+ *               type: { type: string, enum: [BILLS, RECEIVABLES] }
  *     responses:
  *       201:
  *         description: Categoria criada.

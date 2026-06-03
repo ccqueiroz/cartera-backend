@@ -24,7 +24,7 @@ describe('ListGroupsByTypeUseCase', () => {
     const repository = { listGroupsByType: async () => [] } as any;
     const useCase = ListGroupsByTypeUseCase.create(repository);
 
-    expect(await useCase.execute({ type: 'RECEIVABLE' })).toEqual([]);
+    expect(await useCase.execute({ type: 'RECEIVABLES' })).toEqual([]);
   });
 
   it('rejeita type fora do enum', async () => {
