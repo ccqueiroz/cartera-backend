@@ -3,21 +3,21 @@ import { PaymentMethod } from '../domain/payment-method.entity';
 import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
-const makeMethod = (deletedAt: string | null) =>
+const makeMethod = () =>
   PaymentMethod.with({
     id: 'pm-1',
     description: 'Pix',
     descriptionEnum: PaymentMethodDescriptionEnum.PIX,
     createdAt: '2026-06-01T10:00:00.000Z',
     updatedAt: null,
-    deletedAt,
+    deletedAt: null,
   });
 
 describe('UpdatePaymentMethodUseCase', () => {
   it('atualiza description e seta updatedAt', async () => {
     const updated: PaymentMethod[] = [];
     const repository = {
-      findById: async () => makeMethod(null),
+      findActiveByEnum: async () => makeMethod(),
       update: async (m: PaymentMethod) => void updated.push(m),
     } as any;
     const useCase = UpdatePaymentMethodUseCase.create(
@@ -26,7 +26,7 @@ describe('UpdatePaymentMethodUseCase', () => {
     );
 
     const method = await useCase.execute({
-      id: 'pm-1',
+      descriptionEnum: PaymentMethodDescriptionEnum.PIX,
       description: 'Pix QR',
     });
 
@@ -35,9 +35,9 @@ describe('UpdatePaymentMethodUseCase', () => {
     expect(updated).toHaveLength(1);
   });
 
-  it('lança 404 quando o id não existe', async () => {
+  it('lança 404 quando não há método ativo para o descriptionEnum', async () => {
     const repository = {
-      findById: async () => null,
+      findActiveByEnum: async () => null,
       update: async () => {},
     } as any;
     const useCase = UpdatePaymentMethodUseCase.create(
@@ -46,28 +46,16 @@ describe('UpdatePaymentMethodUseCase', () => {
     );
 
     await expect(
-      useCase.execute({ id: 'nope', description: 'x' }),
+      useCase.execute({
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        description: 'x',
+      }),
     ).rejects.toMatchObject({ code: ErrorCode.PAYMENT_METHOD_NOT_FOUND });
-  });
-
-  it('lança PaymentMethodDeletedError quando o método está soft-deleted', async () => {
-    const repository = {
-      findById: async () => makeMethod('2026-06-02T10:00:00.000Z'),
-      update: async () => {},
-    } as any;
-    const useCase = UpdatePaymentMethodUseCase.create(
-      repository,
-      () => '2026-06-05T10:00:00.000Z',
-    );
-
-    await expect(
-      useCase.execute({ id: 'pm-1', description: 'x' }),
-    ).rejects.toMatchObject({ code: ErrorCode.PAYMENT_METHOD_DELETED });
   });
 
   it('rejeita description inválido via invariante', async () => {
     const repository = {
-      findById: async () => makeMethod(null),
+      findActiveByEnum: async () => makeMethod(),
       update: async () => {},
     } as any;
     const useCase = UpdatePaymentMethodUseCase.create(
@@ -76,7 +64,10 @@ describe('UpdatePaymentMethodUseCase', () => {
     );
 
     await expect(
-      useCase.execute({ id: 'pm-1', description: '   ' }),
+      useCase.execute({
+        descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+        description: '   ',
+      }),
     ).rejects.toMatchObject({
       code: ErrorCode.PAYMENT_METHOD_DESCRIPTION_REQUIRED,
     });

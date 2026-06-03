@@ -1,10 +1,10 @@
 import { PaymentMethod } from '@/features/payment-method/domain/payment-method.entity';
 import { PaymentMethodRepository } from '@/features/payment-method/domain/ports/payment-method.repository.port';
 import { PaymentMethodNotFoundError } from '@/features/payment-method/domain/errors/payment-method-not-found.error';
-import { PaymentMethodDeletedError } from '@/features/payment-method/domain/errors/payment-method-deleted.error';
+import { PaymentMethodDescription } from '@/features/payment-method/domain/enums/payment-method-description.enum';
 
 interface UpdatePaymentMethodInput {
-  id: string;
+  descriptionEnum: PaymentMethodDescription;
   description: string;
 }
 
@@ -24,9 +24,10 @@ export class UpdatePaymentMethodUseCase {
   public async execute(
     input: UpdatePaymentMethodInput,
   ): Promise<PaymentMethod> {
-    const method = await this.repository.findById(input.id);
-    if (!method) throw new PaymentMethodNotFoundError(input.id);
-    if (!method.isActive) throw new PaymentMethodDeletedError();
+    const method = await this.repository.findActiveByEnum(
+      input.descriptionEnum,
+    );
+    if (!method) throw new PaymentMethodNotFoundError(input.descriptionEnum);
 
     method.updateDescription(input.description, this.now());
     await this.repository.update(method);

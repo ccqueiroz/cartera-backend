@@ -15,8 +15,8 @@ describe('paymentMethodRoutes', () => {
       'GET payment-method',
       'GET payment-method/:descriptionEnum',
       'POST payment-method/create',
-      'PUT payment-method/:id',
-      'DELETE payment-method/:id',
+      'PUT payment-method/update/:descriptionEnum',
+      'DELETE payment-method/delete/:descriptionEnum',
     ]);
   });
 
@@ -33,7 +33,8 @@ describe('paymentMethodRoutes', () => {
       'payment-method': false,
       'payment-method/:descriptionEnum': false,
       'payment-method/create': true,
-      'payment-method/:id': true,
+      'payment-method/update/:descriptionEnum': true,
+      'payment-method/delete/:descriptionEnum': true,
     });
   });
 

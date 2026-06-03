@@ -4,15 +4,16 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/{id}:
+ * /api/payment-method/update/{descriptionEnum}:
  *   put:
  *     summary: Atualiza apenas a description de uma forma de pagamento ativa.
  *     tags: [PaymentMethod]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: descriptionEnum
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -26,15 +27,13 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *       200:
  *         description: Forma de pagamento atualizada.
  *       400:
- *         description: Payload inválido.
+ *         description: Payload inválido ou descriptionEnum fora do conjunto fechado.
  *       404:
- *         description: Forma de pagamento não encontrada.
- *       409:
- *         description: Forma de pagamento soft-deleted (não pode ser alterada).
+ *         description: Não existe forma de pagamento ativa para o descriptionEnum.
  */
 export class UpdatePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'payment-method/:id';
+  public readonly path: string = 'payment-method/update/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

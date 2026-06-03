@@ -4,24 +4,27 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/{id}:
+ * /api/payment-method/delete/{descriptionEnum}:
  *   delete:
- *     summary: Soft-delete de uma forma de pagamento (idempotente).
+ *     summary: Soft-delete da forma de pagamento ativa identificada por descriptionEnum.
  *     tags: [PaymentMethod]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: descriptionEnum
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
  *     responses:
  *       204:
- *         description: Forma de pagamento soft-deleted (idempotente).
+ *         description: Forma de pagamento soft-deletada.
+ *       400:
+ *         description: descriptionEnum fora do conjunto fechado.
  *       404:
- *         description: Forma de pagamento não encontrada.
+ *         description: Não existe forma de pagamento ativa (inexistente ou já soft-deletada).
  */
 export class DeletePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'payment-method/:id';
+  public readonly path: string = 'payment-method/delete/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(
