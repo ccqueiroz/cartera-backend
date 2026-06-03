@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { ApiExpress } from '@/shared/http/express/api.express';
 import { makeHealthModule } from '@/features/health/health.factory';
 import { makeCategoryModule } from '@/features/category/category.factory';
+import { makePaymentMethodModule } from '@/features/payment-method/payment-method.factory';
 import { clientFireBaseAdmin } from '@/packages/clients/firebase';
 import { WinstonLogger } from '@/shared/logger/winston.logger';
 import { RedisCacheRepository } from '@/shared/database/redis/cache.repository.redis';
@@ -29,9 +30,10 @@ function main(): void {
 
   const db = clientFireBaseAdmin.firestore();
   const category = makeCategoryModule({ db });
+  const paymentMethod = makePaymentMethodModule({ db });
 
   const api = ApiExpress.create({
-    routes: [...makeHealthModule(), ...category.routes],
+    routes: [...makeHealthModule(), ...category.routes, ...paymentMethod],
     globalMiddlewares: [cookies, cors, ipControll],
     errorMiddleware,
     logger,

@@ -16,3 +16,6 @@ export const PaymentMethodDescriptionEnum = {
   CRYPTOCURRENCY: 'CRYPTOCURRENCY',
   DIGITAL_WALLET: 'DIGITAL_WALLET',
 } as const;
+
+export type PaymentMethodDescription =
+  (typeof PaymentMethodDescriptionEnum)[keyof typeof PaymentMethodDescriptionEnum];
