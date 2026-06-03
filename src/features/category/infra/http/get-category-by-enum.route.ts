@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/list-by-enum/{descriptionEnum}:
+ * /api/category/description/{descriptionEnum}:
  *   get:
  *     summary: Busca a categoria ativa por descriptionEnum.
  *     tags: [Category]
@@ -24,14 +24,14 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class GetCategoryByEnumRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'category/list-by-enum/:descriptionEnum';
+  public readonly path: string = 'category/description/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(
     controller: CategoryController,
     public readonly middlewares: Middleware[] = [],
   ) {
-    this.handler = controller.listByEnum;
+    this.handler = controller.getByEnum;
   }
 
   public static create(

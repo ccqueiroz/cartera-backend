@@ -10,8 +10,8 @@ describe('paymentStatusRoutes', () => {
     expect(
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
     ).toEqual([
-      'GET payment-status/list-all',
-      'GET payment-status/list-by-enum/:status',
+      'GET payment-status',
+      'GET payment-status/description/:descriptionEnum',
     ]);
   });
 

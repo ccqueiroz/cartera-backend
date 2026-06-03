@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/edit/{descriptionEnum}:
+ * /api/category/{descriptionEnum}:
  *   put:
  *     summary: Edita uma categoria ativa (descriptionEnum imutável).
  *     tags: [Category]
@@ -37,22 +37,22 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *       422:
  *         description: Tentativa de trocar o descriptionEnum imutável.
  */
-export class EditCategoryRoute implements Route {
+export class UpdateCategoryRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'category/edit/:descriptionEnum';
+  public readonly path: string = 'category/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(
     controller: CategoryController,
     public readonly middlewares: Middleware[] = [],
   ) {
-    this.handler = controller.edit;
+    this.handler = controller.update;
   }
 
   public static create(
     controller: CategoryController,
     middlewares: Middleware[] = [],
-  ): EditCategoryRoute {
-    return new EditCategoryRoute(controller, middlewares);
+  ): UpdateCategoryRoute {
+    return new UpdateCategoryRoute(controller, middlewares);
   }
 }

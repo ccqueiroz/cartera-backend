@@ -30,7 +30,7 @@ describe('PaymentStatusController', () => {
     const controller = PaymentStatusController.create(useCases);
     const res = makeResponse();
 
-    await controller.list({} as Request, res);
+    await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(output);
@@ -42,7 +42,7 @@ describe('PaymentStatusController', () => {
     const controller = PaymentStatusController.create(useCases);
     const res = makeResponse();
 
-    await controller.list({} as Request, res);
+    await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith([]);
@@ -60,7 +60,9 @@ describe('PaymentStatusController', () => {
     const res = makeResponse();
 
     await controller.getByEnum(
-      { params: { status: PaymentStatusEnum.OVERDUE } } as unknown as Request,
+      {
+        params: { descriptionEnum: PaymentStatusEnum.OVERDUE },
+      } as unknown as Request,
       res,
     );
 
@@ -73,7 +75,7 @@ describe('PaymentStatusController', () => {
 
     await expect(
       controller.getByEnum(
-        { params: { status: 'NOPE' } } as unknown as Request,
+        { params: { descriptionEnum: 'NOPE' } } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(ValidationError);
@@ -88,7 +90,9 @@ describe('PaymentStatusController', () => {
 
     await expect(
       controller.getByEnum(
-        { params: { status: PaymentStatusEnum.PAID } } as unknown as Request,
+        {
+          params: { descriptionEnum: PaymentStatusEnum.PAID },
+        } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(PaymentStatusNotFoundError);

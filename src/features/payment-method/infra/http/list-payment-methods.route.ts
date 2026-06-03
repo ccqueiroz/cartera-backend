@@ -21,7 +21,7 @@ export class ListPaymentMethodsRoute implements Route {
     controller: PaymentMethodController,
     public readonly middlewares: Middleware[] = [],
   ) {
-    this.handler = controller.list;
+    this.handler = controller.listAll;
   }
 
   public static create(

@@ -73,7 +73,7 @@ describe('PaymentMethodController', () => {
     const controller = PaymentMethodController.create(useCases);
     const res = makeResponse();
 
-    await controller.list({} as Request, res);
+    await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith([]);

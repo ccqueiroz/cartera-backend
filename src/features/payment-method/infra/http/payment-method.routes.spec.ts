@@ -13,28 +13,28 @@ describe('paymentMethodRoutes', () => {
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
     ).toEqual([
       'GET payment-method',
-      'GET payment-method/:descriptionEnum',
-      'POST payment-method/create',
-      'PUT payment-method/update/:descriptionEnum',
-      'DELETE payment-method/delete/:descriptionEnum',
+      'GET payment-method/description/:descriptionEnum',
+      'POST payment-method',
+      'PUT payment-method/:descriptionEnum',
+      'DELETE payment-method/:descriptionEnum',
     ]);
   });
 
   it('applies the write guard only to create, update and delete', () => {
     const routes = paymentMethodRoutes(controller, writeGuard);
-    const guardedByPath = Object.fromEntries(
+    const guardedByRoute = Object.fromEntries(
       routes.map((route) => [
-        route.path,
+        `${route.method.toUpperCase()} ${route.path}`,
         (route.middlewares ?? []).includes(writeGuard),
       ]),
     );
 
-    expect(guardedByPath).toEqual({
-      'payment-method': false,
-      'payment-method/:descriptionEnum': false,
-      'payment-method/create': true,
-      'payment-method/update/:descriptionEnum': true,
-      'payment-method/delete/:descriptionEnum': true,
+    expect(guardedByRoute).toEqual({
+      'GET payment-method': false,
+      'GET payment-method/description/:descriptionEnum': false,
+      'POST payment-method': true,
+      'PUT payment-method/:descriptionEnum': true,
+      'DELETE payment-method/:descriptionEnum': true,
     });
   });
 

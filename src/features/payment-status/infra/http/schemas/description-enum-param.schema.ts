@@ -6,9 +6,9 @@ import {
 
 const STATUS_CODES = Object.values(PaymentStatusEnum);
 
-export class StatusEnumParamSchema {
+export class DescriptionEnumParamSchema {
   @IsIn(STATUS_CODES, {
     message: 'O código do status de pagamento é inválido.',
   })
-  status!: PaymentStatusCode;
+  descriptionEnum!: PaymentStatusCode;
 }

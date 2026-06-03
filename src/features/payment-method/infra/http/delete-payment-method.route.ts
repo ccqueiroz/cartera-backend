@@ -4,7 +4,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/delete/{descriptionEnum}:
+ * /api/payment-method/{descriptionEnum}:
  *   delete:
  *     summary: Soft-delete da forma de pagamento ativa identificada por descriptionEnum.
  *     tags: [PaymentMethod]
@@ -24,7 +24,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  */
 export class DeletePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'payment-method/delete/:descriptionEnum';
+  public readonly path: string = 'payment-method/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

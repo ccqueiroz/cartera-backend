@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/list-all:
+ * /api/category:
  *   get:
  *     summary: Lista categorias ativas de um tipo.
  *     tags: [Category]
@@ -23,7 +23,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class ListCategoriesByTypeRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'category/list-all';
+  public readonly path: string = 'category';
   public readonly handler: HttpHandler;
 
   private constructor(
