@@ -3,21 +3,21 @@ import { PaymentMethod } from '../domain/payment-method.entity';
 import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
-const makeMethod = (deletedAt: string | null) =>
+const makeMethod = () =>
   PaymentMethod.with({
     id: 'pm-1',
     description: 'Pix',
     descriptionEnum: PaymentMethodDescriptionEnum.PIX,
     createdAt: '2026-06-01T10:00:00.000Z',
     updatedAt: null,
-    deletedAt,
+    deletedAt: null,
   });
 
 describe('SoftDeletePaymentMethodUseCase', () => {
   it('soft-deleta um método ativo e persiste', async () => {
     const deleted: PaymentMethod[] = [];
     const repository = {
-      findById: async () => makeMethod(null),
+      findActiveByEnum: async () => makeMethod(),
       softDelete: async (m: PaymentMethod) => void deleted.push(m),
     } as any;
     const useCase = SoftDeletePaymentMethodUseCase.create(
@@ -25,31 +25,17 @@ describe('SoftDeletePaymentMethodUseCase', () => {
       () => '2026-06-05T10:00:00.000Z',
     );
 
-    await useCase.execute({ id: 'pm-1' });
+    await useCase.execute({
+      descriptionEnum: PaymentMethodDescriptionEnum.PIX,
+    });
 
     expect(deleted).toHaveLength(1);
     expect(deleted[0].isActive).toBe(false);
   });
 
-  it('é idempotente: já soft-deletado não persiste de novo', async () => {
-    const deleted: PaymentMethod[] = [];
+  it('lança 404 quando não há método ativo (inexistente ou já soft-deletado)', async () => {
     const repository = {
-      findById: async () => makeMethod('2026-06-02T10:00:00.000Z'),
-      softDelete: async (m: PaymentMethod) => void deleted.push(m),
-    } as any;
-    const useCase = SoftDeletePaymentMethodUseCase.create(
-      repository,
-      () => '2026-06-05T10:00:00.000Z',
-    );
-
-    await useCase.execute({ id: 'pm-1' });
-
-    expect(deleted).toHaveLength(0);
-  });
-
-  it('lança 404 quando o id não existe', async () => {
-    const repository = {
-      findById: async () => null,
+      findActiveByEnum: async () => null,
       softDelete: async () => {},
     } as any;
     const useCase = SoftDeletePaymentMethodUseCase.create(
@@ -57,7 +43,9 @@ describe('SoftDeletePaymentMethodUseCase', () => {
       () => '2026-06-05T10:00:00.000Z',
     );
 
-    await expect(useCase.execute({ id: 'nope' })).rejects.toMatchObject({
+    await expect(
+      useCase.execute({ descriptionEnum: PaymentMethodDescriptionEnum.PIX }),
+    ).rejects.toMatchObject({
       code: ErrorCode.PAYMENT_METHOD_NOT_FOUND,
     });
   });

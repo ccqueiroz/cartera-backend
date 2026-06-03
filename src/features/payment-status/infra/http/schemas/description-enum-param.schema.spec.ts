@@ -1,22 +1,22 @@
 import { runValidate } from '@/packages/clients/class-validator';
-import { StatusEnumParamSchema } from './status-enum-param.schema';
+import { DescriptionEnumParamSchema } from './description-enum-param.schema';
 
 const options = { whitelist: true, forbidNonWhitelisted: true };
 
-describe('StatusEnumParamSchema', () => {
-  it('aceita status válido', async () => {
+describe('DescriptionEnumParamSchema', () => {
+  it('aceita descriptionEnum válido', async () => {
     const errors = await runValidate(
-      StatusEnumParamSchema,
-      { status: 'OVERDUE' },
+      DescriptionEnumParamSchema,
+      { descriptionEnum: 'OVERDUE' },
       options,
     );
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita status fora do conjunto fechado', async () => {
+  it('rejeita descriptionEnum fora do conjunto fechado', async () => {
     const errors = await runValidate(
-      StatusEnumParamSchema,
-      { status: 'NOPE' },
+      DescriptionEnumParamSchema,
+      { descriptionEnum: 'NOPE' },
       options,
     );
     expect(errors.length).toBeGreaterThan(0);
@@ -24,8 +24,8 @@ describe('StatusEnumParamSchema', () => {
 
   it('rejeita props desconhecidas', async () => {
     const errors = await runValidate(
-      StatusEnumParamSchema,
-      { status: 'PAID', extra: 'x' },
+      DescriptionEnumParamSchema,
+      { descriptionEnum: 'PAID', extra: 'x' },
       options,
     );
     expect(errors.length).toBeGreaterThan(0);

@@ -8,7 +8,7 @@ import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { ListPaymentStatusesUseCase } from '@/features/payment-status/application/list-payment-statuses.usecase';
 import { GetPaymentStatusByEnumUseCase } from '@/features/payment-status/application/get-payment-status-by-enum.usecase';
-import { StatusEnumParamSchema } from '@/features/payment-status/infra/http/schemas/status-enum-param.schema';
+import { DescriptionEnumParamSchema } from '@/features/payment-status/infra/http/schemas/description-enum-param.schema';
 import { PaymentStatusCode } from '@/shared/kernel/enums/payment-status.enum';
 
 const REJECT_UNKNOWN: ValidatorOptions = {
@@ -48,15 +48,15 @@ export class PaymentStatusController {
     return new PaymentStatusController(useCases);
   }
 
-  public list = async (_req: Request, res: Response): Promise<void> => {
+  public listAll = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.list.execute();
     res.status(200).json(result);
   };
 
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
-    await assertValid(StatusEnumParamSchema, req.params, REJECT_UNKNOWN);
+    await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     const result = await this.useCases.getByEnum.execute({
-      code: String(req.params.status) as PaymentStatusCode,
+      code: String(req.params.descriptionEnum) as PaymentStatusCode,
     });
     res.status(200).json(result);
   };

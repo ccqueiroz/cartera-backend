@@ -3,7 +3,6 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { DuplicatePaymentMethodError } from '@/features/payment-method/domain/errors/duplicate-payment-method.error';
 import { PaymentMethodNotFoundError } from '@/features/payment-method/domain/errors/payment-method-not-found.error';
-import { PaymentMethodDeletedError } from '@/features/payment-method/domain/errors/payment-method-deleted.error';
 
 function makeResponse() {
   const res: Partial<Response> = {
@@ -74,7 +73,7 @@ describe('PaymentMethodController', () => {
     const controller = PaymentMethodController.create(useCases);
     const res = makeResponse();
 
-    await controller.list({} as Request, res);
+    await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith([]);
@@ -131,7 +130,7 @@ describe('PaymentMethodController', () => {
 
     await controller.update(
       {
-        params: { id: 'pm-1' },
+        params: { descriptionEnum: 'PIX' },
         body: { description: 'New' },
       } as unknown as Request,
       res,
@@ -141,36 +140,36 @@ describe('PaymentMethodController', () => {
     expect(res.json).toHaveBeenCalledWith(output);
   });
 
+  it('update rejects with ValidationError (400) on an unknown enum param', async () => {
+    const controller = PaymentMethodController.create(makeUseCases());
+
+    await expect(
+      controller.update(
+        {
+          params: { descriptionEnum: 'NOPE' },
+          body: { description: 'New' },
+        } as unknown as Request,
+        makeResponse(),
+      ),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
   it('update propagates PaymentMethodNotFoundError (404)', async () => {
     const useCases = makeUseCases();
-    useCases.update.execute.mockRejectedValue(new PaymentMethodNotFoundError());
+    useCases.update.execute.mockRejectedValue(
+      new PaymentMethodNotFoundError('PIX'),
+    );
     const controller = PaymentMethodController.create(useCases);
 
     await expect(
       controller.update(
         {
-          params: { id: 'missing' },
+          params: { descriptionEnum: 'PIX' },
           body: { description: 'New' },
         } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(PaymentMethodNotFoundError);
-  });
-
-  it('update propagates PaymentMethodDeletedError (409) for a soft-deleted method', async () => {
-    const useCases = makeUseCases();
-    useCases.update.execute.mockRejectedValue(new PaymentMethodDeletedError());
-    const controller = PaymentMethodController.create(useCases);
-
-    await expect(
-      controller.update(
-        {
-          params: { id: 'pm-1' },
-          body: { description: 'New' },
-        } as unknown as Request,
-        makeResponse(),
-      ),
-    ).rejects.toBeInstanceOf(PaymentMethodDeletedError);
   });
 
   it('remove returns 204 with no body', async () => {
@@ -180,11 +179,22 @@ describe('PaymentMethodController', () => {
     const res = makeResponse();
 
     await controller.remove(
-      { params: { id: 'pm-1' } } as unknown as Request,
+      { params: { descriptionEnum: 'PIX' } } as unknown as Request,
       res,
     );
 
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.send).toHaveBeenCalled();
+  });
+
+  it('remove rejects with ValidationError (400) on an unknown enum param', async () => {
+    const controller = PaymentMethodController.create(makeUseCases());
+
+    await expect(
+      controller.remove(
+        { params: { descriptionEnum: 'NOPE' } } as unknown as Request,
+        makeResponse(),
+      ),
+    ).rejects.toBeInstanceOf(ValidationError);
   });
 });

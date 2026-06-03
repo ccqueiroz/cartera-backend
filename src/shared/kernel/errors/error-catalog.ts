@@ -45,8 +45,6 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     params?.descriptionEnum
       ? `Já existe uma forma de pagamento ativa para "${params.descriptionEnum}".`
       : 'Forma de pagamento já existe.',
-  [ErrorCode.PAYMENT_METHOD_DELETED]: () =>
-    'A forma de pagamento foi excluída e não pode ser alterada.',
   [ErrorCode.PAYMENT_METHOD_DESCRIPTION_REQUIRED]: () =>
     'A descrição da forma de pagamento é obrigatória.',
   [ErrorCode.PAYMENT_METHOD_DESCRIPTION_TOO_LONG]: () =>

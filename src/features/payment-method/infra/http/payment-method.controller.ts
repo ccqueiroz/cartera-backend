@@ -69,7 +69,7 @@ export class PaymentMethodController {
     res.status(201).json(method.toOutput());
   };
 
-  public list = async (_req: Request, res: Response): Promise<void> => {
+  public listAll = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.list.execute();
     res.status(200).json(result);
   };
@@ -83,16 +83,20 @@ export class PaymentMethodController {
   };
 
   public update = async (req: Request, res: Response): Promise<void> => {
+    await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     await assertValid(UpdatePaymentMethodSchema, req.body, DROP_UNKNOWN);
     const method = await this.useCases.update.execute({
-      id: String(req.params.id),
+      descriptionEnum: req.params.descriptionEnum as PaymentMethodDescription,
       description: req.body.description,
     });
     res.status(200).json(method.toOutput());
   };
 
   public remove = async (req: Request, res: Response): Promise<void> => {
-    await this.useCases.remove.execute({ id: String(req.params.id) });
+    await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
+    await this.useCases.remove.execute({
+      descriptionEnum: req.params.descriptionEnum as PaymentMethodDescription,
+    });
     res.status(204).send();
   };
 }

@@ -66,7 +66,7 @@ export class CategoryController {
     res.status(200).json(result);
   };
 
-  public listByEnum = async (req: Request, res: Response): Promise<void> => {
+  public getByEnum = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params);
     const result = await this.useCases.getByEnum.execute({
       descriptionEnum: String(req.params.descriptionEnum),
@@ -103,7 +103,7 @@ export class CategoryController {
     res.status(result.reactivated ? 200 : 201).json(result.category.toOutput());
   };
 
-  public edit = async (req: Request, res: Response): Promise<void> => {
+  public update = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params);
     await assertValid(EditCategorySchema, req.body);
     const category = await this.useCases.edit.execute({
