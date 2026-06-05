@@ -3,7 +3,7 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const FIREBASE_ERROR_CODES: Record<string, ErrorCode> = {
   'auth/too-many-requests': ErrorCode.TOO_MANY_REQUESTS,
-  'auth/id-token-expired': ErrorCode.INVALID_CREDENTIALS,
+  'auth/id-token-expired': ErrorCode.TOKEN_EXPIRED,
   'auth/timeout': ErrorCode.TIMEOUT,
   'auth/invalid-email': ErrorCode.INVALID_EMAIL,
   'auth/user-disabled': ErrorCode.USER_DISABLED,
@@ -13,6 +13,7 @@ const FIREBASE_ERROR_CODES: Record<string, ErrorCode> = {
   'auth/argument-error': ErrorCode.INVALID_CREDENTIALS,
   'auth/network-request-failed': ErrorCode.INTERNAL_SERVER_ERROR,
   INVALID_LOGIN_CREDENTIALS: ErrorCode.INVALID_CREDENTIALS,
+  TOO_MANY_ATTEMPTS_TRY_LATER: ErrorCode.TOO_MANY_REQUESTS,
   INVALID_ID_TOKEN: ErrorCode.INVALID_TOKEN,
   INVALID_REFRESH_TOKEN: ErrorCode.INVALID_TOKEN,
   TOKEN_EXPIRED: ErrorCode.INVALID_TOKEN,

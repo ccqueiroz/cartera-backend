@@ -52,6 +52,22 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_PAYMENT_METHOD_DESCRIPTION_ENUM]: () =>
     'O valor fornecido para a forma de pagamento (descriptionEnum) é inválido.',
 
+  [ErrorCode.PERSON_NOT_FOUND]: () => 'Perfil não encontrado.',
+  [ErrorCode.PERSON_ALREADY_EXISTS]: () =>
+    'Já existe um perfil para esta conta.',
+  [ErrorCode.DOCUMENT_ALREADY_IN_USE]: () =>
+    'O documento informado já está em uso por outro perfil.',
+  [ErrorCode.INVALID_DOCUMENT]: () => 'O documento informado é inválido.',
+  [ErrorCode.DOCUMENT_TYPE_MISMATCH]: () =>
+    'O documento informado não corresponde ao tipo declarado.',
+  [ErrorCode.INVALID_PHONE]: () => 'O telefone informado é inválido.',
+  [ErrorCode.AVATAR_UNSUPPORTED_TYPE]: () =>
+    'Formato de imagem não suportado. Envie um arquivo JPEG ou PNG.',
+  [ErrorCode.AVATAR_TOO_LARGE]: () =>
+    'A imagem excede o tamanho máximo de 5MB.',
+  [ErrorCode.AVATAR_UPLOAD_FAILED]: () =>
+    'Não foi possível enviar a imagem. Tente novamente.',
+
   [ErrorCode.MONEY_INVALID_NUMBER]: () =>
     'O valor monetário deve ser um número válido.',
   [ErrorCode.MONEY_NEGATIVE]: () => 'O valor monetário não pode ser negativo.',
@@ -59,12 +75,15 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     'A data inicial deve ser anterior ou igual à data final.',
 
   [ErrorCode.INVALID_TOKEN]: () => 'Token de autorização inválido.',
+  [ErrorCode.TOKEN_EXPIRED]: () => 'Sessão expirada. Renove o token de acesso.',
   [ErrorCode.INVALID_CREDENTIALS]: () => 'Credenciais inválidas.',
   [ErrorCode.INVALID_EMAIL]: () => 'E-mail inválido.',
   [ErrorCode.TOO_MANY_REQUESTS]: () =>
     'O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.',
   [ErrorCode.TIMEOUT]: () => 'O tempo de espera para a operação foi excedido.',
   [ErrorCode.USER_DISABLED]: () => 'Conta do usuário desativada.',
+  [ErrorCode.ACCOUNT_DELETED]: () =>
+    'Esta conta foi encerrada e não pode mais ser acessada.',
   [ErrorCode.USER_NOT_FOUND]: () => 'Usuário não encontrado.',
   [ErrorCode.ACCOUNT_NOT_FOUND]: () => 'Conta não encontrada.',
   [ErrorCode.EMAIL_NOT_FOUND]: () => 'E-mail não encontrado.',

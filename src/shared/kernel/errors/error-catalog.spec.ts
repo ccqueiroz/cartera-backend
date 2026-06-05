@@ -24,6 +24,12 @@ describe('errorCatalog', () => {
     expect(message).toContain('UBER');
   });
 
+  it('códigos do fluxo de auth resolvem mensagem PT não-vazia', () => {
+    for (const code of [ErrorCode.TOKEN_EXPIRED, ErrorCode.ACCOUNT_DELETED]) {
+      expect(errorCatalog[code]().trim().length).toBeGreaterThan(0);
+    }
+  });
+
   it('VALIDATION_FAILED interpola details', () => {
     const message = errorCatalog[ErrorCode.VALIDATION_FAILED]({
       details: 'description não pode ser vazio',

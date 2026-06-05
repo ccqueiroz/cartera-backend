@@ -30,6 +30,8 @@ export class EntityNotFoundError extends DomainError {}
 
 export class DuplicateEntityError extends DomainError {}
 
+export class PayloadTooLargeError extends DomainError {}
+
 export class UnauthorizedError extends DomainError {}
 
 export class ForbiddenError extends DomainError {}
