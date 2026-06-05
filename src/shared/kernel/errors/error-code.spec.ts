@@ -24,4 +24,9 @@ describe('ErrorCode', () => {
     expect(ErrorCode.VALIDATION_FAILED).toBeDefined();
     expect(ErrorCode.INTERNAL_SERVER_ERROR).toBeDefined();
   });
+
+  it('inclui os tokens do fluxo de auth', () => {
+    expect(ErrorCode.TOKEN_EXPIRED).toBeDefined();
+    expect(ErrorCode.ACCOUNT_DELETED).toBeDefined();
+  });
 });

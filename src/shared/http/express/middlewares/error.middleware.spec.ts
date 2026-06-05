@@ -77,7 +77,7 @@ describe('ErrorMiddleware', () => {
     },
   );
 
-  it('resolve a mensagem PT pelo code do erro de domínio', () => {
+  it('resolve a mensagem PT pelo code do erro de domínio e expõe o code no body', () => {
     const error = new EntityNotFoundError(ErrorCode.CATEGORY_NOT_FOUND, {
       descriptionEnum: 'UBER',
     });
@@ -87,7 +87,25 @@ describe('ErrorMiddleware', () => {
       message: errorCatalog[ErrorCode.CATEGORY_NOT_FOUND]({
         descriptionEnum: 'UBER',
       }),
+      code: ErrorCode.CATEGORY_NOT_FOUND,
     });
+  });
+
+  it('code discrimina erros sob o mesmo status (TOKEN_EXPIRED vs INVALID_TOKEN)', () => {
+    const expired = run(new UnauthorizedError(ErrorCode.TOKEN_EXPIRED));
+    const invalid = run(new UnauthorizedError(ErrorCode.INVALID_TOKEN));
+    expect(expired.response.status).toHaveBeenCalledWith(
+      HttpStatus.UNAUTHORIZED,
+    );
+    expect(invalid.response.status).toHaveBeenCalledWith(
+      HttpStatus.UNAUTHORIZED,
+    );
+    expect(expired.response.json.mock.calls[0][0].code).toBe(
+      ErrorCode.TOKEN_EXPIRED,
+    );
+    expect(invalid.response.json.mock.calls[0][0].code).toBe(
+      ErrorCode.INVALID_TOKEN,
+    );
   });
 
   it('força INTERNAL_SERVER_ERROR para não-DomainError', () => {
@@ -97,6 +115,7 @@ describe('ErrorMiddleware', () => {
     );
     expect(response.json).toHaveBeenCalledWith({
       message: errorCatalog[ErrorCode.INTERNAL_SERVER_ERROR](),
+      code: ErrorCode.INTERNAL_SERVER_ERROR,
     });
   });
 

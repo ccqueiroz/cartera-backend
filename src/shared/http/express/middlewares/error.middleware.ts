@@ -58,7 +58,7 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
         `{[STATUS]: ${status}}{[CODE]: ${code}}: ${error.stack}`,
       );
 
-      response.status(status).json({ message });
+      response.status(status).json({ message, code });
     };
   }
 }

@@ -75,12 +75,15 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     'A data inicial deve ser anterior ou igual à data final.',
 
   [ErrorCode.INVALID_TOKEN]: () => 'Token de autorização inválido.',
+  [ErrorCode.TOKEN_EXPIRED]: () => 'Sessão expirada. Renove o token de acesso.',
   [ErrorCode.INVALID_CREDENTIALS]: () => 'Credenciais inválidas.',
   [ErrorCode.INVALID_EMAIL]: () => 'E-mail inválido.',
   [ErrorCode.TOO_MANY_REQUESTS]: () =>
     'O acesso a esta conta foi temporariamente desativado devido a muitas tentativas de login com falha. Tente novamente mais tarde.',
   [ErrorCode.TIMEOUT]: () => 'O tempo de espera para a operação foi excedido.',
   [ErrorCode.USER_DISABLED]: () => 'Conta do usuário desativada.',
+  [ErrorCode.ACCOUNT_DELETED]: () =>
+    'Esta conta foi encerrada e não pode mais ser acessada.',
   [ErrorCode.USER_NOT_FOUND]: () => 'Usuário não encontrado.',
   [ErrorCode.ACCOUNT_NOT_FOUND]: () => 'Conta não encontrada.',
   [ErrorCode.EMAIL_NOT_FOUND]: () => 'E-mail não encontrado.',
