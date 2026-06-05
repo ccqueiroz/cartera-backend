@@ -18,4 +18,6 @@ export interface Route {
   readonly path: string;
   readonly handler: HttpHandler;
   readonly middlewares?: Middleware[];
+  /** Limite do body parser só desta rota (ex.: '8mb' para avatar base64). */
+  readonly bodyLimit?: string;
 }

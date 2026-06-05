@@ -31,7 +31,7 @@ export class ApiExpress {
 
   private constructor(private readonly deps: ApiExpressDeps) {
     this.app = express();
-    this.app.use(json());
+    this.registerBodyParser();
     this.app.set('x-powered-by', false);
     this.registerGlobalMiddlewares();
     this.registerRoutes();
@@ -41,6 +41,24 @@ export class ApiExpress {
 
   public static create(deps: ApiExpressDeps): ApiExpress {
     return new ApiExpress(deps);
+  }
+
+  private registerBodyParser(): void {
+    const parserByRouteKey = new Map(
+      this.deps.routes
+        .filter((route) => route.bodyLimit)
+        .map((route) => [
+          `${route.method}:/api/${route.path}`,
+          json({ limit: route.bodyLimit }),
+        ]),
+    );
+    const defaultParser = json();
+
+    this.app.use((request, response, next) => {
+      const routeKey = `${request.method.toLowerCase()}:${request.path}`;
+      const parser = parserByRouteKey.get(routeKey) ?? defaultParser;
+      parser(request, response, next);
+    });
   }
 
   private registerGlobalMiddlewares(): void {

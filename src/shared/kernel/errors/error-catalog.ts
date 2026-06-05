@@ -52,6 +52,22 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_PAYMENT_METHOD_DESCRIPTION_ENUM]: () =>
     'O valor fornecido para a forma de pagamento (descriptionEnum) é inválido.',
 
+  [ErrorCode.PERSON_NOT_FOUND]: () => 'Perfil não encontrado.',
+  [ErrorCode.PERSON_ALREADY_EXISTS]: () =>
+    'Já existe um perfil para esta conta.',
+  [ErrorCode.DOCUMENT_ALREADY_IN_USE]: () =>
+    'O documento informado já está em uso por outro perfil.',
+  [ErrorCode.INVALID_DOCUMENT]: () => 'O documento informado é inválido.',
+  [ErrorCode.DOCUMENT_TYPE_MISMATCH]: () =>
+    'O documento informado não corresponde ao tipo declarado.',
+  [ErrorCode.INVALID_PHONE]: () => 'O telefone informado é inválido.',
+  [ErrorCode.AVATAR_UNSUPPORTED_TYPE]: () =>
+    'Formato de imagem não suportado. Envie um arquivo JPEG ou PNG.',
+  [ErrorCode.AVATAR_TOO_LARGE]: () =>
+    'A imagem excede o tamanho máximo de 5MB.',
+  [ErrorCode.AVATAR_UPLOAD_FAILED]: () =>
+    'Não foi possível enviar a imagem. Tente novamente.',
+
   [ErrorCode.MONEY_INVALID_NUMBER]: () =>
     'O valor monetário deve ser um número válido.',
   [ErrorCode.MONEY_NEGATIVE]: () => 'O valor monetário não pode ser negativo.',

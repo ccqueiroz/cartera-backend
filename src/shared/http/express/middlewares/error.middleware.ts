@@ -9,6 +9,7 @@ import {
   DuplicateEntityError,
   EntityNotFoundError,
   ForbiddenError,
+  PayloadTooLargeError,
   UnauthorizedError,
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
@@ -30,6 +31,8 @@ export class ErrorMiddleware implements ErrorMiddlewareInterface {
     if (error instanceof ForbiddenError) return HttpStatus.FORBIDDEN;
     if (error instanceof EntityNotFoundError) return HttpStatus.NOT_FOUND;
     if (error instanceof DuplicateEntityError) return HttpStatus.CONFLICT;
+    if (error instanceof PayloadTooLargeError)
+      return HttpStatus.PAYLOAD_TOO_LARGE;
     if (error instanceof BusinessRuleViolationError)
       return HttpStatus.UNPROCESSABLE_ENTITY;
     if (error instanceof DomainError) return HttpStatus.BAD_REQUEST;

@@ -5,6 +5,7 @@ import {
   DuplicateEntityError,
   EntityNotFoundError,
   ForbiddenError,
+  PayloadTooLargeError,
   UnauthorizedError,
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
@@ -55,6 +56,10 @@ describe('ErrorMiddleware', () => {
     [
       new DuplicateEntityError(ErrorCode.CATEGORY_ALREADY_EXISTS),
       HttpStatus.CONFLICT,
+    ],
+    [
+      new PayloadTooLargeError(ErrorCode.AVATAR_TOO_LARGE),
+      HttpStatus.PAYLOAD_TOO_LARGE,
     ],
     [
       new BusinessRuleViolationError(

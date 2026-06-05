@@ -4,6 +4,7 @@ import {
   BusinessRuleViolationError,
   EntityNotFoundError,
   DuplicateEntityError,
+  PayloadTooLargeError,
 } from './domain.error';
 import { ErrorCode } from './error-code';
 
@@ -35,6 +36,13 @@ describe('domain errors', () => {
     expect(
       new DuplicateEntityError(ErrorCode.CATEGORY_ALREADY_EXISTS).name,
     ).toBe('DuplicateEntityError');
+  });
+
+  it('PayloadTooLargeError é DomainError e mantém o próprio name', () => {
+    const error = new PayloadTooLargeError(ErrorCode.AVATAR_TOO_LARGE);
+    expect(error).toBeInstanceOf(DomainError);
+    expect(error.name).toBe('PayloadTooLargeError');
+    expect(error.code).toBe(ErrorCode.AVATAR_TOO_LARGE);
   });
 
   it('params é opcional', () => {

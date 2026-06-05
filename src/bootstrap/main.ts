@@ -4,7 +4,13 @@ import { makeHealthModule } from '@/features/health/health.factory';
 import { makeCategoryModule } from '@/features/category/category.factory';
 import { makePaymentMethodModule } from '@/features/payment-method/payment-method.factory';
 import { makePaymentStatusModule } from '@/features/payment-status/payment-status.factory';
+import { makePersonModule } from '@/features/person/person.factory';
+import { AuthGatewayFirebase } from '@/features/person/infra/gateways/auth.gateway.firebase';
+import { StorageGatewayFirebase } from '@/features/person/infra/gateways/storage.gateway.firebase';
 import { clientFireBaseAdmin } from '@/packages/clients/firebase';
+import { FirebaseStorageClient } from '@/packages/clients/firebase/firebase-storage.client';
+import { SessionVerifierFirebase } from '@/shared/http/express/session-verifier.firebase';
+import { VerifyTokenMiddleware } from '@/shared/http/express/middlewares/verify-token.middleware';
 import { WinstonLogger } from '@/shared/logger/winston.logger';
 import { RedisCacheRepository } from '@/shared/database/redis/cache.repository.redis';
 import { clientRedis } from '@/shared/database/redis/redis.client';
@@ -34,12 +40,28 @@ function main(): void {
   const paymentMethod = makePaymentMethodModule({ db });
   const paymentStatus = makePaymentStatusModule({ db });
 
+  const firebaseAuth = clientFireBaseAdmin.auth();
+  const sessionVerifier = SessionVerifierFirebase.create(firebaseAuth);
+  const authMiddleware = VerifyTokenMiddleware.create(sessionVerifier);
+  const authGateway = AuthGatewayFirebase.create(firebaseAuth);
+  const storageGateway = StorageGatewayFirebase.create(
+    FirebaseStorageClient.create(clientFireBaseAdmin.storage().bucket()),
+  );
+  const person = makePersonModule({
+    db,
+    logger,
+    authMiddleware,
+    authGateway,
+    storageGateway,
+  });
+
   const api = ApiExpress.create({
     routes: [
       ...makeHealthModule(),
       ...category.routes,
       ...paymentMethod,
       ...paymentStatus,
+      ...person.routes,
     ],
     globalMiddlewares: [cookies, cors, ipControll],
     errorMiddleware,
