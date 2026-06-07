@@ -14,11 +14,15 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *         required: true
  *         schema:
  *           type: string
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       204:
  *         description: Forma de pagamento soft-deletada.
  *       400:
  *         description: descriptionEnum fora do conjunto fechado.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       404:
  *         description: Não existe forma de pagamento ativa (inexistente ou já soft-deletada).
  */

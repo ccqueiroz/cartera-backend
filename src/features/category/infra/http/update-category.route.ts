@@ -25,11 +25,15 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *               description: { type: string }
  *               group: { type: string }
  *               type: { type: string, enum: [BILLS, RECEIVABLES] }
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Categoria atualizada.
  *       400:
  *         description: Payload inválido.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       403:
  *         description: Sem autorização de escrita (gate TBD).
  *       404:

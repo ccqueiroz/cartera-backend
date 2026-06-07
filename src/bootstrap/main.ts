@@ -38,13 +38,14 @@ function main(): void {
   const swaggerSetup = SwaggerSetup.create();
 
   const db = clientFireBaseAdmin.firestore();
-  const category = makeCategoryModule({ db });
-  const paymentMethod = makePaymentMethodModule({ db });
-  const paymentStatus = makePaymentStatusModule({ db });
-
   const firebaseAuth = clientFireBaseAdmin.auth();
   const authProviderGateway = AuthProviderGatewayFirebase.create(firebaseAuth);
   const authMiddleware = VerifyTokenMiddleware.create(authProviderGateway);
+
+  const category = makeCategoryModule({ db, authMiddleware });
+  const paymentMethod = makePaymentMethodModule({ db, authMiddleware });
+  const paymentStatus = makePaymentStatusModule({ db, authMiddleware });
+
   const authGateway = AuthGatewayFirebase.create(firebaseAuth);
   const storageGateway = StorageGatewayFirebase.create(
     FirebaseStorageClient.create(clientFireBaseAdmin.storage().bucket()),

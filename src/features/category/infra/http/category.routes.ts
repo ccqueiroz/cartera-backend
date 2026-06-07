@@ -11,17 +11,17 @@ import { DeleteCategoryRoute } from '@/features/category/infra/http/delete-categ
 
 export function categoryRoutes(
   controller: CategoryController,
-  writeGuard?: Middleware,
+  authMiddleware: Middleware,
 ): Route[] {
-  const writeMiddlewares = writeGuard ? [writeGuard] : [];
+  const authenticated = [authMiddleware];
 
   return [
-    ListCategoriesByTypeRoute.create(controller),
-    GetCategoryByEnumRoute.create(controller),
-    ListGroupsByTypeRoute.create(controller),
-    ListCategoriesByGroupRoute.create(controller),
-    CreateCategoryRoute.create(controller, writeMiddlewares),
-    UpdateCategoryRoute.create(controller, writeMiddlewares),
-    DeleteCategoryRoute.create(controller, writeMiddlewares),
+    ListCategoriesByTypeRoute.create(controller, authenticated),
+    GetCategoryByEnumRoute.create(controller, authenticated),
+    ListGroupsByTypeRoute.create(controller, authenticated),
+    ListCategoriesByGroupRoute.create(controller, authenticated),
+    CreateCategoryRoute.create(controller, authenticated),
+    UpdateCategoryRoute.create(controller, authenticated),
+    DeleteCategoryRoute.create(controller, authenticated),
   ];
 }

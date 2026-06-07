@@ -15,11 +15,15 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *         schema:
  *           type: string
  *           enum: [BILLS, RECEIVABLES]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Categorias ativas do tipo.
  *       400:
  *         description: Type ausente ou fora do enum.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  */
 export class ListCategoriesByTypeRoute implements Route {
   public readonly method: HttpMethod = 'get';

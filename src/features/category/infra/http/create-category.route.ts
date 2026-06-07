@@ -20,6 +20,8 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *               descriptionEnum: { type: string }
  *               group: { type: string }
  *               type: { type: string, enum: [BILLS, RECEIVABLES] }
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       201:
  *         description: Categoria criada.
@@ -27,6 +29,8 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *         description: Slot soft-deleted reativado.
  *       400:
  *         description: Payload inválido.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       403:
  *         description: Sem autorização de escrita (gate TBD).
  *       409:

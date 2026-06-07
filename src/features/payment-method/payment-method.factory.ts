@@ -13,8 +13,7 @@ import { paymentMethodRoutes } from '@/features/payment-method/infra/http/paymen
 
 export interface PaymentMethodModuleDeps {
   db: Firestore;
-  // Slot plugável: vira o gate 403 na história de role; ausente = escrita livre.
-  writeGuard?: Middleware;
+  authMiddleware: Middleware;
   generateId?: () => string;
   now?: () => string;
 }
@@ -35,5 +34,5 @@ export function makePaymentMethodModule(
     remove: SoftDeletePaymentMethodUseCase.create(repository, now),
   });
 
-  return paymentMethodRoutes(controller, deps.writeGuard);
+  return paymentMethodRoutes(controller, deps.authMiddleware);
 }

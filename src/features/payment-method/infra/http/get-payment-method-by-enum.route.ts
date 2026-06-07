@@ -15,11 +15,15 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *         schema:
  *           type: string
  *           enum: [DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY, DIGITAL_WALLET]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Forma de pagamento (ativa ou soft-deleted mais recente).
  *       400:
  *         description: descriptionEnum fora do conjunto fechado.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       404:
  *         description: Nenhuma forma de pagamento do tipo existe.
  */

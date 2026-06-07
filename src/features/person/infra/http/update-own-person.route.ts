@@ -38,6 +38,8 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *                   value: { type: number, nullable: true }
  *                   currency: { type: string, nullable: true }
  *               defaultCurrency: { type: string, nullable: true }
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Perfil atualizado com document re-mascarado.

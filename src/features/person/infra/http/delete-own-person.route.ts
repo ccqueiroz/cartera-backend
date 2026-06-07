@@ -8,6 +8,8 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *   delete:
  *     summary: Soft delete terminal disable-first (desabilita conta, revoga tokens, marca deletedAt).
  *     tags: [Person]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       204:
  *         description: Conta desabilitada e perfil marcado como deletado (idempotente).

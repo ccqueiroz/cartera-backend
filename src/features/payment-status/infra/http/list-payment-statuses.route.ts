@@ -8,9 +8,13 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  *   get:
  *     summary: Lista o catálogo de status de pagamento.
  *     tags: [PaymentStatus]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Lista de status de pagamento semeados (pode ser vazia).
+ *       401:
+ *         description: Sessão ausente ou inválida.
  */
 export class ListPaymentStatusesRoute implements Route {
   public readonly method: HttpMethod = 'get';
