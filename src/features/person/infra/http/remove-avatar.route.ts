@@ -8,6 +8,8 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *   delete:
  *     summary: Remove o avatar (deleta do bucket e zera avatarUrl).
  *     tags: [Person]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       204:
  *         description: Avatar removido (no-op se não havia avatar).

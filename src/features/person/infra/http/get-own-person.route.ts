@@ -8,6 +8,8 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *   get:
  *     summary: Retorna o perfil do usuário autenticado.
  *     tags: [Person]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Perfil com fullName/isActive computados e document mascarado.

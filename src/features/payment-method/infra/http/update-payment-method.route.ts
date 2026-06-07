@@ -23,11 +23,15 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *             required: [description]
  *             properties:
  *               description: { type: string, maxLength: 60 }
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Forma de pagamento atualizada.
  *       400:
  *         description: Payload inválido ou descriptionEnum fora do conjunto fechado.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       404:
  *         description: Não existe forma de pagamento ativa para o descriptionEnum.
  */

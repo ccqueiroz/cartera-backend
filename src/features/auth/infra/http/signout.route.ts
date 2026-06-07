@@ -8,6 +8,8 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *   delete:
  *     summary: Signout — revoga todos os refresh tokens do usuário (todos os devices).
  *     tags: [Auth]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       204:
  *         description: Sessão encerrada; cookie `session` expirado.

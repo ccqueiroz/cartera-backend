@@ -15,11 +15,15 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  *         schema:
  *           type: string
  *           enum: [PAID, RECEIVED, TO_PAY, TO_RECEIVE, DUE_SOON, DUE_DAY, OVERDUE]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Status de pagamento do catálogo.
  *       400:
  *         description: descriptionEnum fora do conjunto fechado.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       404:
  *         description: Nenhum status semeado para o code informado.
  */

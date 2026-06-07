@@ -1,5 +1,6 @@
 import { Firestore } from 'firebase-admin/firestore';
 import { Route } from '@/shared/http/route';
+import { Middleware } from '@/shared/http/middleware';
 import { PaymentStatusRepositoryFirestore } from '@/features/payment-status/infra/persistence/payment-status.repository.firestore';
 import { ListPaymentStatusesUseCase } from '@/features/payment-status/application/list-payment-statuses.usecase';
 import { GetPaymentStatusByEnumUseCase } from '@/features/payment-status/application/get-payment-status-by-enum.usecase';
@@ -8,6 +9,7 @@ import { paymentStatusRoutes } from '@/features/payment-status/infra/http/paymen
 
 export interface PaymentStatusModuleDeps {
   db: Firestore;
+  authMiddleware: Middleware;
 }
 
 export function makePaymentStatusModule(
@@ -20,5 +22,5 @@ export function makePaymentStatusModule(
     getByEnum: GetPaymentStatusByEnumUseCase.create(repository),
   });
 
-  return paymentStatusRoutes(controller);
+  return paymentStatusRoutes(controller, deps.authMiddleware);
 }

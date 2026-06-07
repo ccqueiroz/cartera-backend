@@ -1,11 +1,13 @@
 import { paymentStatusRoutes } from '@/features/payment-status/infra/http/payment-status.routes';
 import { PaymentStatusController } from '@/features/payment-status/infra/http/payment-status.controller';
+import { Middleware } from '@/shared/http/middleware';
 
 const controller = PaymentStatusController.create({} as any);
+const authMiddleware = { getHandler: jest.fn() } as unknown as Middleware;
 
 describe('paymentStatusRoutes', () => {
   it('registers the two read routes with fixed segments', () => {
-    const routes = paymentStatusRoutes(controller);
+    const routes = paymentStatusRoutes(controller, authMiddleware);
 
     expect(
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
@@ -15,11 +17,13 @@ describe('paymentStatusRoutes', () => {
     ]);
   });
 
-  it('leaves the read routes unguarded', () => {
-    const routes = paymentStatusRoutes(controller);
+  it('applies the auth middleware to both read routes', () => {
+    const routes = paymentStatusRoutes(controller, authMiddleware);
 
     expect(
-      routes.every((route) => (route.middlewares ?? []).length === 0),
+      routes.every((route) =>
+        (route.middlewares ?? []).includes(authMiddleware),
+      ),
     ).toBe(true);
   });
 });

@@ -17,6 +17,8 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *             required: [image]
  *             properties:
  *               image: { type: string, description: 'Imagem em base64 (com ou sem prefixo data URL)' }
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Avatar substituído; avatarUrl atualizado.

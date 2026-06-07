@@ -9,15 +9,15 @@ import { DeletePaymentMethodRoute } from '@/features/payment-method/infra/http/d
 
 export function paymentMethodRoutes(
   controller: PaymentMethodController,
-  writeGuard?: Middleware,
+  authMiddleware: Middleware,
 ): Route[] {
-  const writeMiddlewares = writeGuard ? [writeGuard] : [];
+  const authenticated = [authMiddleware];
 
   return [
-    ListPaymentMethodsRoute.create(controller),
-    GetPaymentMethodByEnumRoute.create(controller),
-    CreatePaymentMethodRoute.create(controller, writeMiddlewares),
-    UpdatePaymentMethodRoute.create(controller, writeMiddlewares),
-    DeletePaymentMethodRoute.create(controller, writeMiddlewares),
+    ListPaymentMethodsRoute.create(controller, authenticated),
+    GetPaymentMethodByEnumRoute.create(controller, authenticated),
+    CreatePaymentMethodRoute.create(controller, authenticated),
+    UpdatePaymentMethodRoute.create(controller, authenticated),
+    DeletePaymentMethodRoute.create(controller, authenticated),
   ];
 }

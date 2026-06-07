@@ -14,9 +14,13 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *         required: true
  *         schema:
  *           type: string
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       204:
  *         description: Categoria soft-deletada.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       403:
  *         description: Sem autorização de escrita (gate TBD).
  *       404:

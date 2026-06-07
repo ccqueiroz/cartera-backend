@@ -14,11 +14,15 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *         required: true
  *         schema:
  *           type: string
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Categoria ativa encontrada.
  *       400:
  *         description: descriptionEnum fora do enum.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       404:
  *         description: Não existe ou está soft-deleted.
  */

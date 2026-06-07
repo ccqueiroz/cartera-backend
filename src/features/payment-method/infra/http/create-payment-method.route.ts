@@ -20,11 +20,15 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *               descriptionEnum:
  *                 type: string
  *                 enum: [DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY, DIGITAL_WALLET]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       201:
  *         description: Forma de pagamento criada.
  *       400:
  *         description: Payload inválido.
+ *       401:
+ *         description: Sessão ausente ou inválida.
  *       409:
  *         description: Já existe forma de pagamento ativa para o descriptionEnum.
  */

@@ -15,8 +15,7 @@ import { categoryRoutes } from '@/features/category/infra/http/category.routes';
 
 export interface CategoryModuleDeps {
   db: Firestore;
-  // Slot plugável: vira o gate 403 na história de role; ausente = escrita livre.
-  writeGuard?: Middleware;
+  authMiddleware: Middleware;
   generateId?: () => string;
   now?: () => string;
 }
@@ -54,7 +53,7 @@ export function makeCategoryModule(deps: CategoryModuleDeps): CategoryModule {
   });
 
   return {
-    routes: categoryRoutes(controller, deps.writeGuard),
+    routes: categoryRoutes(controller, deps.authMiddleware),
     reads: { getByEnum, listByType },
   };
 }

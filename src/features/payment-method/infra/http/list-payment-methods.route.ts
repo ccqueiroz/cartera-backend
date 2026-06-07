@@ -8,9 +8,13 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *   get:
  *     summary: Lista as formas de pagamento ativas.
  *     tags: [PaymentMethod]
+ *     security:
+ *       - sessionCookieAuth: []
  *     responses:
  *       200:
  *         description: Lista de formas de pagamento ativas (pode ser vazia).
+ *       401:
+ *         description: Sessão ausente ou inválida.
  */
 export class ListPaymentMethodsRoute implements Route {
   public readonly method: HttpMethod = 'get';
