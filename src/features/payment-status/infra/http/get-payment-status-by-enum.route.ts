@@ -14,7 +14,7 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  *         required: true
  *         schema:
  *           type: string
- *           enum: [PAID, RECEIVED, TO_PAY, TO_RECEIVE, DUE_SOON, DUE_DAY, OVERDUE]
+ *           enum: [PAID, RECEIVED, TO_PAY, TO_RECEIVE, DUE_SOON, DUE_DAY, OVERDUE, IN_PROGRESS]
  *     security:
  *       - sessionCookieAuth: []
  *     responses:

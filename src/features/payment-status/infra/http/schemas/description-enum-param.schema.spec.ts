@@ -13,6 +13,15 @@ describe('DescriptionEnumParamSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('aceita IN_PROGRESS (novo membro do conjunto fechado)', async () => {
+    const errors = await runValidate(
+      DescriptionEnumParamSchema,
+      { descriptionEnum: 'IN_PROGRESS' },
+      options,
+    );
+    expect(errors).toHaveLength(0);
+  });
+
   it('rejeita descriptionEnum fora do conjunto fechado', async () => {
     const errors = await runValidate(
       DescriptionEnumParamSchema,

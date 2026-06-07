@@ -8,6 +8,7 @@ export interface CalculatePaymentStatusInput {
   analysisDate: string | Date;
   transactionType: TransactionType;
   isPaid: boolean;
+  hasOpenChildren?: boolean;
   today?: Date;
 }
 
@@ -26,6 +27,9 @@ export class PaymentStatus {
           ? PaymentStatusEnum.PAID
           : PaymentStatusEnum.RECEIVED,
       );
+
+    if (input.hasOpenChildren)
+      return new PaymentStatus(PaymentStatusEnum.IN_PROGRESS);
 
     const diffInDays = PaymentStatus.calendarDayDiffInUtc(
       new Date(input.analysisDate),

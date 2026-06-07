@@ -226,6 +226,7 @@
  *         - DUE_SOON
  *         - DUE_DAY
  *         - OVERDUE
+ *         - IN_PROGRESS
  *       example: PAID
  */
 export {};

@@ -524,6 +524,7 @@
  *             - DUE_DAY
  *             - OVERDUE
  *             - PAID
+ *             - IN_PROGRESS
  *           example: DUE_SOON
  *
  *     ReceivablesByMonthOutPutDTO:
@@ -560,6 +561,7 @@
  *             - DUE_DAY
  *             - OVERDUE
  *             - RECEIVED
+ *             - IN_PROGRESS
  *           example: DUE_SOON
  *
  *     InvoiceByCategoryAndByPeriodDTO:
@@ -992,5 +994,6 @@
  *         - DUE_SOON
  *         - DUE_DAY
  *         - OVERDUE
+ *         - IN_PROGRESS
  *       example: PAID
  */
