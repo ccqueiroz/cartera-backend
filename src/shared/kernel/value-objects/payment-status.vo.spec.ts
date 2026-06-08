@@ -25,6 +25,49 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.RECEIVED);
   });
 
+  it('IN_PROGRESS quando não pago e há filhas em aberto, ignorando as datas', () => {
+    const result = PaymentStatus.calculate({
+      analysisDate: '2025-01-01',
+      transactionType: TransactionTypeEnum.BILLS,
+      isPaid: false,
+      hasOpenChildren: true,
+      today,
+    });
+    expect(result.status).toBe(PaymentStatusEnum.IN_PROGRESS);
+  });
+
+  it('PAID tem precedência sobre filhas em aberto (BILLS)', () => {
+    const result = PaymentStatus.calculate({
+      analysisDate: '2025-01-01',
+      transactionType: TransactionTypeEnum.BILLS,
+      isPaid: true,
+      hasOpenChildren: true,
+      today,
+    });
+    expect(result.status).toBe(PaymentStatusEnum.PAID);
+  });
+
+  it('RECEIVED tem precedência sobre filhas em aberto (RECEIVABLES)', () => {
+    const result = PaymentStatus.calculate({
+      analysisDate: '2025-01-01',
+      transactionType: TransactionTypeEnum.RECEIVABLES,
+      isPaid: true,
+      hasOpenChildren: true,
+      today,
+    });
+    expect(result.status).toBe(PaymentStatusEnum.RECEIVED);
+  });
+
+  it('hasOpenChildren ausente segue a regra de datas (OVERDUE)', () => {
+    const result = PaymentStatus.calculate({
+      analysisDate: '2026-06-02',
+      transactionType: TransactionTypeEnum.BILLS,
+      isPaid: false,
+      today,
+    });
+    expect(result.status).toBe(PaymentStatusEnum.OVERDUE);
+  });
+
   it('OVERDUE quando não pago e a data de análise já passou', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2026-06-02',

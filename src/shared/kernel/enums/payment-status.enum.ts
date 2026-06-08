@@ -6,6 +6,7 @@ export enum PaymentStatusEnum {
   DUE_SOON = 'DUE_SOON',
   DUE_DAY = 'DUE_DAY',
   OVERDUE = 'OVERDUE',
+  IN_PROGRESS = 'IN_PROGRESS',
 }
 
 export type PaymentStatusCode = `${PaymentStatusEnum}`;
