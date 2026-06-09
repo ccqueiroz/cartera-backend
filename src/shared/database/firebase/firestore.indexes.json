@@ -48,6 +48,44 @@
         { "fieldPath": "document.value", "order": "ASCENDING" },
         { "fieldPath": "deletedAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "Transaction",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentId", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Transaction",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasChildren", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" },
+        { "fieldPath": "paid", "order": "ASCENDING" },
+        { "fieldPath": "refYearDueDate", "order": "ASCENDING" },
+        { "fieldPath": "refMonthDueDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Transaction",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hasChildren", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" },
+        { "fieldPath": "paid", "order": "ASCENDING" },
+        { "fieldPath": "refYearPaymentDate", "order": "ASCENDING" },
+        { "fieldPath": "refMonthPaymentDate", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Transaction",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "deleted", "order": "ASCENDING" },
+        { "fieldPath": "rootId", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
