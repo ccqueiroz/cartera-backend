@@ -74,6 +74,25 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_DATE_RANGE]: () =>
     'A data inicial deve ser anterior ou igual à data final.',
 
+  [ErrorCode.TRANSACTION_NOT_FOUND]: () => 'Transação não encontrada.',
+  [ErrorCode.TRANSACTION_SETTLE_ON_INTERNAL]: () =>
+    'Não é possível quitar diretamente um nó com filhas; quite as folhas.',
+  [ErrorCode.TRANSACTION_ALREADY_PAID]: () => 'A transação já está quitada.',
+  [ErrorCode.TRANSACTION_REVERSE_ON_INTERNAL]: () =>
+    'Não é possível estornar um nó com filhas.',
+  [ErrorCode.TRANSACTION_REVERSE_ENTRY]: () =>
+    'A entrada do parcelamento não é estornável; corrija por edição ou exclusão.',
+  [ErrorCode.TRANSACTION_ALREADY_REVERSED]: () =>
+    'A transação já foi estornada.',
+  [ErrorCode.TRANSACTION_REVERSE_NOT_PAID]: () =>
+    'Não é possível estornar uma transação que não está quitada.',
+  [ErrorCode.TRANSACTION_REPARCEL_PAID_LEAF]: () =>
+    'Uma folha já paga é imutável e não pode ser reparcelada.',
+  [ErrorCode.TRANSACTION_INVALID_INSTALLMENT_COUNT]: () =>
+    'O número de parcelas deve ser maior ou igual a 1.',
+  [ErrorCode.TRANSACTION_ENTRY_EXCEEDS_TOTAL]: () =>
+    'O valor da entrada não pode ser maior ou igual ao valor total.',
+
   [ErrorCode.INVALID_TOKEN]: () => 'Token de autorização inválido.',
   [ErrorCode.TOKEN_EXPIRED]: () => 'Sessão expirada. Renove o token de acesso.',
   [ErrorCode.INVALID_CREDENTIALS]: () => 'Credenciais inválidas.',
