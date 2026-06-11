@@ -1,5 +1,6 @@
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { Period } from '@/shared/kernel/enums/period.enum';
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionTreeRepository } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { CategoryGateway } from '@/features/core-finance/transaction-engine/domain/ports/category.gateway.port';
@@ -8,10 +9,15 @@ import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export interface CreateSingleTransactionInput {
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: number;
   dueDate: string;
   categoryDescriptionEnum?: string;
+  isFixedCost?: boolean;
+  period?: Period | null;
+  frequency?: number | null;
   paymentDate?: string;
   paidAmount?: number;
   paymentMethodDescriptionEnum?: string;
@@ -67,10 +73,15 @@ export class CreateSingleTransactionUseCase {
       id,
       parentId: null,
       rootId: id,
+      userId: input.userId,
+      personId: input.personId,
       type: input.type,
       amount: Money.create(input.amount),
       dueDate: input.dueDate,
       createdAt: this.now(),
+      isFixedCost: input.isFixedCost,
+      period: input.period,
+      frequency: input.frequency,
       categoryDescriptionEnum: category?.descriptionEnum ?? null,
       categoryGroup: category?.group ?? null,
       paymentDate: wantsPaid ? input.paymentDate : null,

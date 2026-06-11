@@ -12,6 +12,7 @@ import {
 
 export interface EditTransactionInput {
   id: string;
+  userId: string;
   amount?: number;
   dueDate?: string;
   categoryDescriptionEnum?: string;
@@ -35,7 +36,7 @@ export class EditTransactionUseCase {
   }
 
   public async execute(input: EditTransactionInput): Promise<Transaction> {
-    const node = await this.repository.findActiveById(input.id);
+    const node = await this.repository.findActiveById(input.id, input.userId);
     if (!node) throw new TransactionNotFoundError();
 
     const category = await this.resolveCategory(input.categoryDescriptionEnum);

@@ -17,8 +17,8 @@ export class GetTransactionByIdUseCase {
     return new GetTransactionByIdUseCase(repository);
   }
 
-  public async execute(id: string): Promise<TransactionDetail> {
-    const node = await this.repository.findActiveById(id);
+  public async execute(id: string, userId: string): Promise<TransactionDetail> {
+    const node = await this.repository.findActiveById(id, userId);
     if (!node) throw new TransactionNotFoundError();
 
     const children = await this.repository.findChildren(id);

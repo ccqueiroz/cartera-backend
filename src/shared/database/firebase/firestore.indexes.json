@@ -86,6 +86,16 @@
         { "fieldPath": "deleted", "order": "ASCENDING" },
         { "fieldPath": "rootId", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "Transaction",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "hasChildren", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" },
+        { "fieldPath": "paid", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

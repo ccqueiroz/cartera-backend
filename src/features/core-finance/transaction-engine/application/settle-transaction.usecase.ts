@@ -8,6 +8,7 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export interface SettleTransactionInput {
   id: string;
+  userId: string;
   paymentDate: string;
   paidAmount: number;
   paymentMethodDescriptionEnum: string;
@@ -29,7 +30,7 @@ export class SettleTransactionUseCase {
   }
 
   public async execute(input: SettleTransactionInput): Promise<Transaction> {
-    const target = await this.repository.findActiveById(input.id);
+    const target = await this.repository.findActiveById(input.id, input.userId);
     if (!target) throw new TransactionNotFoundError();
 
     const active = await this.paymentMethodGateway.isActive(

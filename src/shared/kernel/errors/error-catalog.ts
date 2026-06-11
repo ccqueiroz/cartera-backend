@@ -92,6 +92,8 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     'O número de parcelas deve ser maior ou igual a 1.',
   [ErrorCode.TRANSACTION_ENTRY_EXCEEDS_TOTAL]: () =>
     'O valor da entrada não pode ser maior ou igual ao valor total.',
+  [ErrorCode.TRANSACTION_INVALID_FIXED_COST]: () =>
+    'Não foi possível salvar a recorrência. Confira o período e a frequência informados.',
 
   [ErrorCode.INVALID_TOKEN]: () => 'Token de autorização inválido.',
   [ErrorCode.TOKEN_EXPIRED]: () => 'Sessão expirada. Renove o token de acesso.',

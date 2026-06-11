@@ -2,7 +2,11 @@ import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { PaymentStatus } from '@/shared/kernel/value-objects/payment-status.vo';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
-import { BusinessRuleViolationError } from '@/shared/kernel/errors/domain.error';
+import { Period, PeriodEnum } from '@/shared/kernel/enums/period.enum';
+import {
+  BusinessRuleViolationError,
+  ValidationError,
+} from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export interface PaymentSnapshot {
@@ -17,6 +21,8 @@ interface TransactionProps {
   id: string;
   parentId: string | null;
   rootId: string;
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: Money;
   currentAmount: Money;
@@ -36,6 +42,11 @@ interface TransactionProps {
   firstInstallment: boolean;
   categoryDescriptionEnum: string | null;
   categoryGroup: string | null;
+  isFixedCost: boolean;
+  period: Period | null;
+  frequency: number | null;
+  rootIsFixedCost: boolean;
+  rootHasInstallments: boolean;
   hasChildren: boolean;
   reversed: boolean;
   paymentHistory: PaymentSnapshot[];
@@ -48,6 +59,8 @@ export interface TransactionPersistence {
   id: string;
   parentId: string | null;
   rootId: string;
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: number;
   currentAmount: number;
@@ -67,6 +80,11 @@ export interface TransactionPersistence {
   firstInstallment: boolean;
   categoryDescriptionEnum: string | null;
   categoryGroup: string | null;
+  isFixedCost: boolean;
+  period: Period | null;
+  frequency: number | null;
+  rootIsFixedCost: boolean;
+  rootHasInstallments: boolean;
   hasChildren: boolean;
   reversed: boolean;
   paymentHistory: PaymentSnapshot[];
@@ -79,6 +97,8 @@ export interface TransactionOutput {
   id: string;
   parentId: string | null;
   rootId: string;
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: number;
   currentAmount: number;
@@ -99,15 +119,23 @@ export interface TransactionOutput {
   firstInstallment: boolean;
   categoryDescriptionEnum: string | null;
   categoryGroup: string | null;
+  isFixedCost: boolean;
+  period: Period | null;
+  frequency: number | null;
+  rootIsFixedCost: boolean;
+  rootHasInstallments: boolean;
   hasChildren: boolean;
   reversed: boolean;
   deleted: boolean;
+  createdAt: string;
 }
 
 export interface CreateTransactionInput {
   id: string;
   parentId: string | null;
   rootId: string;
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: Money;
   dueDate: string;
@@ -116,6 +144,11 @@ export interface CreateTransactionInput {
   hasChildren?: boolean;
   categoryDescriptionEnum?: string | null;
   categoryGroup?: string | null;
+  isFixedCost?: boolean;
+  period?: Period | null;
+  frequency?: number | null;
+  rootIsFixedCost?: boolean;
+  rootHasInstallments?: boolean;
   paymentDate?: string | null;
   paidAmount?: Money | null;
   paymentMethodDescriptionEnum?: string | null;
@@ -138,6 +171,12 @@ export interface EditInput {
   today?: Date;
 }
 
+const FIXED_COST_PERIODS: ReadonlySet<string> = new Set([
+  PeriodEnum.WEEK,
+  PeriodEnum.MONTH,
+  PeriodEnum.YEAR,
+]);
+
 export class Transaction {
   private constructor(private props: TransactionProps) {}
 
@@ -146,6 +185,15 @@ export class Transaction {
       !!input.paymentDate &&
       !!input.paidAmount &&
       !!input.paymentMethodDescriptionEnum;
+
+    const isFixedCost = input.isFixedCost ?? false;
+    const period = input.period ?? null;
+    const frequency = input.frequency ?? null;
+    const hasChildren = input.hasChildren ?? false;
+    const isRoot = input.parentId === null;
+
+    Transaction.validateOwnership(input.userId, input.personId);
+    Transaction.validateFixedCost(isFixedCost, period, frequency);
 
     const dueRef = Transaction.refOf(input.dueDate);
     const paymentRef = bornPaid
@@ -156,6 +204,8 @@ export class Transaction {
       id: input.id,
       parentId: input.parentId,
       rootId: input.rootId,
+      userId: input.userId,
+      personId: input.personId,
       type: input.type,
       amount: input.amount,
       currentAmount: input.amount,
@@ -179,7 +229,13 @@ export class Transaction {
       firstInstallment: input.firstInstallment ?? false,
       categoryDescriptionEnum: input.categoryDescriptionEnum ?? null,
       categoryGroup: input.categoryGroup ?? null,
-      hasChildren: input.hasChildren ?? false,
+      isFixedCost,
+      period,
+      frequency,
+      rootIsFixedCost: input.rootIsFixedCost ?? (isRoot ? isFixedCost : false),
+      rootHasInstallments:
+        input.rootHasInstallments ?? (isRoot ? hasChildren : false),
+      hasChildren,
       reversed: false,
       paymentHistory: [],
       deleted: false,
@@ -220,6 +276,10 @@ export class Transaction {
     }
 
     this.props.hasChildren = true;
+    // Carona da denormalização de raiz (R11): só a raiz com filhas marca a árvore
+    // como parcelamento, gravado na montagem. Só liga (nunca reseta) — a árvore é
+    // imutável pós-criação.
+    if (this.props.parentId === null) this.props.rootHasInstallments = true;
     this.props.currentAmount = live.reduce(
       (sum, child) => sum.add(child.props.currentAmount),
       Money.zero(),
@@ -353,6 +413,36 @@ export class Transaction {
     }).status;
   }
 
+  private static validateOwnership(userId: string, personId: string): void {
+    if (!userId || !personId)
+      throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
+        details: 'userId e personId são obrigatórios.',
+      });
+  }
+
+  private static validateFixedCost(
+    isFixedCost: boolean,
+    period: Period | null,
+    frequency: number | null,
+  ): void {
+    if (!isFixedCost) {
+      if (period !== null || frequency !== null)
+        throw new BusinessRuleViolationError(
+          ErrorCode.TRANSACTION_INVALID_FIXED_COST,
+        );
+      return;
+    }
+
+    const validPeriod = period !== null && FIXED_COST_PERIODS.has(period);
+    const validFrequency =
+      frequency !== null &&
+      (frequency === -1 || (Number.isInteger(frequency) && frequency >= 2));
+    if (!validPeriod || !validFrequency)
+      throw new BusinessRuleViolationError(
+        ErrorCode.TRANSACTION_INVALID_FIXED_COST,
+      );
+  }
+
   private static signedVariance(paid: Money, amount: Money): number {
     return Transaction.round(paid.value - amount.value);
   }
@@ -376,6 +466,14 @@ export class Transaction {
 
   public get rootId(): string {
     return this.props.rootId;
+  }
+
+  public get userId(): string {
+    return this.props.userId;
+  }
+
+  public get personId(): string {
+    return this.props.personId;
   }
 
   public get amount(): Money {
@@ -402,6 +500,10 @@ export class Transaction {
     return this.props.firstInstallment;
   }
 
+  public get isFixedCost(): boolean {
+    return this.props.isFixedCost;
+  }
+
   public get reversed(): boolean {
     return this.props.reversed;
   }
@@ -418,6 +520,10 @@ export class Transaction {
     return this.props.paidInstallmentsCount;
   }
 
+  public get createdAt(): string {
+    return this.props.createdAt;
+  }
+
   private effectiveRate(): number {
     if (this.props.amount.isZero()) return 0;
     return Number(
@@ -430,6 +536,8 @@ export class Transaction {
       id: this.props.id,
       parentId: this.props.parentId,
       rootId: this.props.rootId,
+      userId: this.props.userId,
+      personId: this.props.personId,
       type: this.props.type,
       amount: this.props.amount.value,
       currentAmount: this.props.currentAmount.value,
@@ -449,6 +557,11 @@ export class Transaction {
       firstInstallment: this.props.firstInstallment,
       categoryDescriptionEnum: this.props.categoryDescriptionEnum,
       categoryGroup: this.props.categoryGroup,
+      isFixedCost: this.props.isFixedCost,
+      period: this.props.period,
+      frequency: this.props.frequency,
+      rootIsFixedCost: this.props.rootIsFixedCost,
+      rootHasInstallments: this.props.rootHasInstallments,
       hasChildren: this.props.hasChildren,
       reversed: this.props.reversed,
       paymentHistory: this.props.paymentHistory,
@@ -463,6 +576,8 @@ export class Transaction {
       id: this.props.id,
       parentId: this.props.parentId,
       rootId: this.props.rootId,
+      userId: this.props.userId,
+      personId: this.props.personId,
       type: this.props.type,
       amount: this.props.amount.value,
       currentAmount: this.props.currentAmount.value,
@@ -483,9 +598,15 @@ export class Transaction {
       firstInstallment: this.props.firstInstallment,
       categoryDescriptionEnum: this.props.categoryDescriptionEnum,
       categoryGroup: this.props.categoryGroup,
+      isFixedCost: this.props.isFixedCost,
+      period: this.props.period,
+      frequency: this.props.frequency,
+      rootIsFixedCost: this.props.rootIsFixedCost,
+      rootHasInstallments: this.props.rootHasInstallments,
       hasChildren: this.props.hasChildren,
       reversed: this.props.reversed,
       deleted: this.props.deleted,
+      createdAt: this.props.createdAt,
     };
   }
 }

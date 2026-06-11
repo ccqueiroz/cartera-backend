@@ -1,5 +1,6 @@
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { Period } from '@/shared/kernel/enums/period.enum';
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionTreeRepository } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { CategoryGateway } from '@/features/core-finance/transaction-engine/domain/ports/category.gateway.port';
@@ -19,10 +20,15 @@ export interface EntryInput {
 }
 
 export interface CreateInstallmentPlanInput {
+  userId: string;
+  personId: string;
   type: TransactionType;
   amount: number;
   dueDate: string;
   categoryDescriptionEnum?: string;
+  isFixedCost?: boolean;
+  period?: Period | null;
+  frequency?: number | null;
   installments: InstallmentInput[];
   entry?: EntryInput;
 }
@@ -80,19 +86,33 @@ export class CreateInstallmentPlanUseCase {
     const category = await this.resolveCategory(input.categoryDescriptionEnum);
     const createdAt = this.now();
     const motherId = this.generateId();
+    const motherIsFixedCost = input.isFixedCost ?? false;
 
     const mother = Transaction.create({
       id: motherId,
       parentId: null,
       rootId: motherId,
+      userId: input.userId,
+      personId: input.personId,
       type: input.type,
       amount: Money.create(input.amount),
       dueDate: input.dueDate,
       createdAt,
       hasChildren: true,
+      isFixedCost: input.isFixedCost,
+      period: input.period,
+      frequency: input.frequency,
       categoryDescriptionEnum: category?.descriptionEnum ?? null,
       categoryGroup: category?.group ?? null,
     });
+
+    // Folhas não herdam a política de custo-fixo da raiz (D12): nascem
+    // isFixedCost=false, period/frequency null. Carregam só os flags de raiz
+    // denormalizados, para que o filtro de listagem alcance a folha (R11).
+    const childRootFlags = {
+      rootHasInstallments: true,
+      rootIsFixedCost: motherIsFixedCost,
+    };
 
     const children: Transaction[] = [];
 
@@ -102,11 +122,14 @@ export class CreateInstallmentPlanUseCase {
           id: this.generateId(),
           parentId: motherId,
           rootId: motherId,
+          userId: input.userId,
+          personId: input.personId,
           type: input.type,
           amount: Money.create(input.entry.amount),
           dueDate: input.entry.paymentDate,
           createdAt,
           firstInstallment: true,
+          ...childRootFlags,
           categoryDescriptionEnum: category?.descriptionEnum ?? null,
           categoryGroup: category?.group ?? null,
           paymentDate: input.entry.paymentDate,
@@ -123,10 +146,13 @@ export class CreateInstallmentPlanUseCase {
           id: this.generateId(),
           parentId: motherId,
           rootId: motherId,
+          userId: input.userId,
+          personId: input.personId,
           type: input.type,
           amount: Money.create(installment.amount),
           dueDate: installment.dueDate,
           createdAt,
+          ...childRootFlags,
           categoryDescriptionEnum: category?.descriptionEnum ?? null,
           categoryGroup: category?.group ?? null,
         }),

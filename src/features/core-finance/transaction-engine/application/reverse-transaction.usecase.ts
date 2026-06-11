@@ -26,8 +26,8 @@ export class ReverseTransactionUseCase {
     return new ReverseTransactionUseCase(repository, now);
   }
 
-  public async execute(id: string): Promise<Transaction> {
-    const node = await this.repository.findActiveById(id);
+  public async execute(id: string, userId: string): Promise<Transaction> {
+    const node = await this.repository.findActiveById(id, userId);
     if (!node) throw new TransactionNotFoundError();
 
     const reversedAt = this.now();

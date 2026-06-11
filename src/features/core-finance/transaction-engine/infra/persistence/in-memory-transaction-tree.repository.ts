@@ -1,9 +1,10 @@
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import {
-  LeafFilter,
+  ListTransactionsQuery,
   LeafSettlement,
   TransactionTreeRepository,
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
+import { matchesLeafFilters } from '@/features/core-finance/transaction-engine/infra/persistence/apply-leaf-filters';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
 
 /**
@@ -26,9 +27,13 @@ export class InMemoryTransactionTreeRepository
     for (const node of nodes) this.store.set(node.id, node);
   }
 
-  public async findActiveById(id: string): Promise<Transaction | null> {
+  public async findActiveById(
+    id: string,
+    userId: string,
+  ): Promise<Transaction | null> {
     const node = this.store.get(id);
-    return !node || node.isDeleted ? null : node;
+    if (!node || node.isDeleted || node.userId !== userId) return null;
+    return node;
   }
 
   public async findChildren(parentId: string): Promise<Transaction[]> {
@@ -54,35 +59,13 @@ export class InMemoryTransactionTreeRepository
     return collected;
   }
 
-  public async listLeaves(filter: LeafFilter): Promise<Transaction[]> {
-    return [...this.store.values()].filter((node) => {
-      if (node.hasChildren || node.isDeleted) return false;
-      if (filter.rootId !== undefined && node.rootId !== filter.rootId)
-        return false;
-      if (filter.paid !== undefined && node.paid !== filter.paid) return false;
-      const view = node.toOutput();
-      if (
-        filter.refMonthDueDate !== undefined &&
-        view.refMonthDueDate !== filter.refMonthDueDate
-      )
-        return false;
-      if (
-        filter.refYearDueDate !== undefined &&
-        view.refYearDueDate !== filter.refYearDueDate
-      )
-        return false;
-      if (
-        filter.refMonthPaymentDate !== undefined &&
-        view.refMonthPaymentDate !== filter.refMonthPaymentDate
-      )
-        return false;
-      if (
-        filter.refYearPaymentDate !== undefined &&
-        view.refYearPaymentDate !== filter.refYearPaymentDate
-      )
-        return false;
-      return true;
-    });
+  public async listLeaves(
+    query: ListTransactionsQuery,
+  ): Promise<Transaction[]> {
+    return [...this.store.values()].filter(
+      (node) =>
+        !node.hasChildren && !node.isDeleted && matchesLeafFilters(node, query),
+    );
   }
 
   public async listDeleted(rootId?: string): Promise<Transaction[]> {

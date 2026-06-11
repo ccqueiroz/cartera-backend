@@ -15,6 +15,7 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export interface GlobalSettlementInput {
   nodeId: string;
+  userId: string;
   paymentDate: string;
   paymentMethodDescriptionEnum: string;
   /** Alvos da quitação (parcial). Ausente → todas as folhas abertas da subárvore. */
@@ -57,7 +58,10 @@ export class GlobalSettlementUseCase {
   public async execute(
     input: GlobalSettlementInput,
   ): Promise<GlobalSettlementResult> {
-    const handle = await this.repository.findActiveById(input.nodeId);
+    const handle = await this.repository.findActiveById(
+      input.nodeId,
+      input.userId,
+    );
     if (!handle) throw new TransactionNotFoundError();
 
     const active = await this.paymentMethodGateway.isActive(
