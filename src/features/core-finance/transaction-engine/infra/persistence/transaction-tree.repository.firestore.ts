@@ -9,10 +9,11 @@ import {
   TransactionPersistence,
 } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import {
-  LeafFilter,
+  ListTransactionsQuery,
   LeafSettlement,
   TransactionTreeRepository,
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
+import { matchesLeafFilters } from '@/features/core-finance/transaction-engine/infra/persistence/apply-leaf-filters';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
 
 /**
@@ -44,11 +45,15 @@ export class TransactionTreeRepositoryFirestore
     await batch.commit();
   }
 
-  public async findActiveById(id: string): Promise<Transaction | null> {
+  public async findActiveById(
+    id: string,
+    userId: string,
+  ): Promise<Transaction | null> {
     const doc = await this.collection().doc(id).get();
     if (!doc.exists) return null;
     const data = doc.data() as TransactionPersistence;
-    return data.deleted ? null : Transaction.with(data);
+    if (data.deleted || data.userId !== userId) return null;
+    return Transaction.with(data);
   }
 
   public async findChildren(parentId: string): Promise<Transaction[]> {
@@ -62,8 +67,11 @@ export class TransactionTreeRepositoryFirestore
   }
 
   public async loadSubtree(nodeId: string): Promise<Transaction[]> {
-    const root = await this.findActiveById(nodeId);
-    if (!root) return [];
+    const doc = await this.collection().doc(nodeId).get();
+    if (!doc.exists) return [];
+    const data = doc.data() as TransactionPersistence;
+    if (data.deleted) return [];
+    const root = Transaction.with(data);
     const collected = [root];
     const stack = [nodeId];
     while (stack.length > 0) {
@@ -77,36 +85,28 @@ export class TransactionTreeRepositoryFirestore
     return collected;
   }
 
-  public async listLeaves(filter: LeafFilter): Promise<Transaction[]> {
-    let query: Query = this.collection()
+  /**
+   * Split mínimo-Firestore (R6): só os `==` seguros que cabem num índice composto
+   * (`userId`, `hasChildren`, `deleted`, `paid`) sobem ao Firestore — contorna o
+   * limite de 1 range por query. Ranges, `type`, categoria, status, método,
+   * `rootHasInstallments`/`rootIsFixedCost` e a semântica independente de
+   * `refMonth`/`refYear` rodam in-memory via `matchesLeafFilters`.
+   */
+  public async listLeaves(
+    query: ListTransactionsQuery,
+  ): Promise<Transaction[]> {
+    let firestoreQuery: Query = this.collection()
+      .where('userId', '==', query.userId)
       .where('hasChildren', '==', false)
       .where('deleted', '==', false);
 
-    if (filter.rootId !== undefined)
-      query = query.where('rootId', '==', filter.rootId);
-    if (filter.paid !== undefined)
-      query = query.where('paid', '==', filter.paid);
-    if (filter.refMonthDueDate !== undefined)
-      query = query.where('refMonthDueDate', '==', filter.refMonthDueDate);
-    if (filter.refYearDueDate !== undefined)
-      query = query.where('refYearDueDate', '==', filter.refYearDueDate);
-    if (filter.refMonthPaymentDate !== undefined)
-      query = query.where(
-        'refMonthPaymentDate',
-        '==',
-        filter.refMonthPaymentDate,
-      );
-    if (filter.refYearPaymentDate !== undefined)
-      query = query.where(
-        'refYearPaymentDate',
-        '==',
-        filter.refYearPaymentDate,
-      );
+    if (query.paid !== undefined)
+      firestoreQuery = firestoreQuery.where('paid', '==', query.paid);
 
-    const snap = await query.get();
-    return snap.docs.map((doc) =>
-      Transaction.with(doc.data() as TransactionPersistence),
-    );
+    const snap = await firestoreQuery.get();
+    return snap.docs
+      .map((doc) => Transaction.with(doc.data() as TransactionPersistence))
+      .filter((node) => matchesLeafFilters(node, query));
   }
 
   public async listDeleted(rootId?: string): Promise<Transaction[]> {
