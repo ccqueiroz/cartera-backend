@@ -18,8 +18,8 @@ export class SoftDeleteTransactionUseCase {
     return new SoftDeleteTransactionUseCase(repository, now);
   }
 
-  public async execute(id: string): Promise<void> {
-    const node = await this.repository.findActiveById(id);
+  public async execute(id: string, userId: string): Promise<void> {
+    const node = await this.repository.findActiveById(id, userId);
     if (!node) throw new TransactionNotFoundError();
     await this.repository.softDeleteSubtreeAndRollup(id, this.now());
   }
