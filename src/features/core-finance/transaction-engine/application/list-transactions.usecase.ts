@@ -5,6 +5,7 @@ import {
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
 import { applySort, SortCriteria } from '@/shared/query/apply-sort';
 import { applyPagination } from '@/shared/query/apply-pagination';
 import { Page } from '@/shared/query/page';
@@ -23,6 +24,8 @@ export interface ListTransactionsInput {
   paymentMethodDescriptionEnum?: string;
   rootHasInstallments?: boolean;
   rootIsFixedCost?: boolean;
+  origin?: TransactionOrigin;
+  originNotIn?: TransactionOrigin[];
   dueDateFrom?: string;
   dueDateTo?: string;
   paymentDateFrom?: string;
@@ -72,6 +75,8 @@ export class ListTransactionsUseCase {
       paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
       rootHasInstallments: input.rootHasInstallments,
       rootIsFixedCost: input.rootIsFixedCost,
+      origin: input.origin,
+      originNotIn: input.originNotIn,
       ...periodRefs,
       dueDateFrom: input.dueDateFrom,
       dueDateTo: input.dueDateTo,

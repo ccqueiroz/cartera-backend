@@ -1,5 +1,6 @@
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
 import { Period } from '@/shared/kernel/enums/period.enum';
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionTreeRepository } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
@@ -31,6 +32,7 @@ export interface CreateInstallmentPlanInput {
   frequency?: number | null;
   installments: InstallmentInput[];
   entry?: EntryInput;
+  origin?: TransactionOrigin;
 }
 
 export interface InstallmentPlanResult {
@@ -104,14 +106,18 @@ export class CreateInstallmentPlanUseCase {
       frequency: input.frequency,
       categoryDescriptionEnum: category?.descriptionEnum ?? null,
       categoryGroup: category?.group ?? null,
+      origin: input.origin,
     });
 
     // Folhas não herdam a política de custo-fixo da raiz (D12): nascem
     // isFixedCost=false, period/frequency null. Carregam só os flags de raiz
     // denormalizados, para que o filtro de listagem alcance a folha (R11).
+    // origin, ao contrário, é idêntico em toda a árvore (O3): a folha é tão
+    // CARD_PURCHASE quanto a raiz.
     const childRootFlags = {
       rootHasInstallments: true,
       rootIsFixedCost: motherIsFixedCost,
+      origin: input.origin,
     };
 
     const children: Transaction[] = [];

@@ -51,6 +51,8 @@ export function matchesLeafFilters(
     return false;
   if (!matchesEquality(view.rootIsFixedCost, query.rootIsFixedCost))
     return false;
+  if (!matchesEquality(view.origin, query.origin)) return false;
+  if (query.originNotIn?.includes(view.origin)) return false;
   if (!matchesEquality(view.refMonthDueDate, query.refMonthDueDate))
     return false;
   if (!matchesEquality(view.refYearDueDate, query.refYearDueDate)) return false;

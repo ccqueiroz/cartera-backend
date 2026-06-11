@@ -8,6 +8,7 @@ import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { CategoryGateway } from '@/features/core-finance/transaction-engine/domain/ports/category.gateway.port';
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOriginEnum } from '@/shared/kernel/enums/transaction-origin.enum';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
 import { BusinessRuleViolationError } from '@/shared/kernel/errors/domain.error';
@@ -813,6 +814,88 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(underA.children.find((c) => c.id === 'a1')?.paidAmount).toBe(150);
       expect(underA.children.find((c) => c.id === 'a2')?.paidAmount).toBe(225);
       expect(underA.children.every((c) => c.paymentVariance === 0)).toBe(true);
+    });
+  });
+
+  describe('origin (UC-O1/UC-O2)', () => {
+    it('plano de parcelas: raiz e todas as folhas nascem com o mesmo origin', async () => {
+      const engine = makeEngine();
+      const { mother, children } = await engine.createInstallmentPlan.execute({
+        userId,
+        personId,
+        type: TransactionTypeEnum.BILLS,
+        amount: 600,
+        dueDate: '2026-03-10',
+        origin: TransactionOriginEnum.CARD_PURCHASE,
+        installments: [
+          { amount: 300, dueDate: '2026-04-10' },
+          { amount: 300, dueDate: '2026-05-10' },
+        ],
+      });
+      expect(mother.origin).toBe(TransactionOriginEnum.CARD_PURCHASE);
+      expect(
+        children.every(
+          (child) => child.origin === TransactionOriginEnum.CARD_PURCHASE,
+        ),
+      ).toBe(true);
+    });
+
+    it('criação sem origin nasce MANUAL', async () => {
+      const engine = makeEngine();
+      const node = await engine.createSingle.execute({
+        userId,
+        personId,
+        type: TransactionTypeEnum.BILLS,
+        amount: 100,
+        dueDate: '2026-03-10',
+      });
+      expect(node.origin).toBe(TransactionOriginEnum.MANUAL);
+    });
+
+    it('lista filtra por origin: inclusão devolve só o valor, exclusão remove CARD_INVOICE', async () => {
+      const repository = new InMemoryTransactionTreeRepository();
+      const engine = makeEngine(repository);
+      await engine.createSingle.execute({
+        userId,
+        personId,
+        type: TransactionTypeEnum.BILLS,
+        amount: 100,
+        dueDate: '2026-03-10',
+        origin: TransactionOriginEnum.CARD_PURCHASE,
+      });
+      await engine.createSingle.execute({
+        userId,
+        personId,
+        type: TransactionTypeEnum.BILLS,
+        amount: 200,
+        dueDate: '2026-03-11',
+        origin: TransactionOriginEnum.CARD_INVOICE,
+      });
+
+      const onlyPurchase = await engine.list.execute({
+        userId,
+        scope: 'to_pay',
+        origin: TransactionOriginEnum.CARD_PURCHASE,
+      });
+      expect(onlyPurchase.content).toHaveLength(1);
+      expect(onlyPurchase.content[0].origin).toBe(
+        TransactionOriginEnum.CARD_PURCHASE,
+      );
+
+      const exceptInvoice = await engine.list.execute({
+        userId,
+        scope: 'to_pay',
+        originNotIn: [TransactionOriginEnum.CARD_INVOICE],
+      });
+      expect(exceptInvoice.content).toHaveLength(1);
+      expect(
+        exceptInvoice.content.every(
+          (node) => node.origin !== TransactionOriginEnum.CARD_INVOICE,
+        ),
+      ).toBe(true);
+
+      const noFilter = await engine.list.execute({ userId, scope: 'to_pay' });
+      expect(noFilter.content).toHaveLength(2);
     });
   });
 });
