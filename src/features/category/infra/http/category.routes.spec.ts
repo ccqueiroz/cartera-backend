@@ -12,13 +12,13 @@ describe('categoryRoutes', () => {
     expect(
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
     ).toEqual([
-      'GET category',
-      'GET category/description/:descriptionEnum',
-      'GET category/group',
-      'GET category/group/:group',
-      'POST category',
-      'PUT category/:descriptionEnum',
-      'DELETE category/:descriptionEnum',
+      'GET category/list-all',
+      'GET category/list-by-enum/:descriptionEnum',
+      'GET category/list-groups',
+      'GET category/list-by-groups/:group',
+      'POST category/create',
+      'PUT category/edit/:descriptionEnum',
+      'DELETE category/delete/:descriptionEnum',
     ]);
   });
 

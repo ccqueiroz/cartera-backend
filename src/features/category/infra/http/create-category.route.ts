@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category:
+ * /api/category/create:
  *   post:
  *     summary: Cria uma categoria (ou reativa um slot soft-deleted).
  *     tags: [Category]
@@ -38,7 +38,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class CreateCategoryRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'category';
+  public readonly path: string = 'category/create';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,7 +4,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method:
+ * /api/payment-method/list-all:
  *   get:
  *     summary: Lista as formas de pagamento ativas.
  *     tags: [PaymentMethod]
@@ -18,7 +18,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  */
 export class ListPaymentMethodsRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'payment-method';
+  public readonly path: string = 'payment-method/list-all';
   public readonly handler: HttpHandler;
 
   private constructor(
