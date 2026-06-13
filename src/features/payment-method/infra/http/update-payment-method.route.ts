@@ -4,7 +4,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/{descriptionEnum}:
+ * /api/payment-method/edit/{descriptionEnum}:
  *   put:
  *     summary: Atualiza apenas a description de uma forma de pagamento ativa.
  *     tags: [PaymentMethod]
@@ -37,7 +37,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  */
 export class UpdatePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'payment-method/:descriptionEnum';
+  public readonly path: string = 'payment-method/edit/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/{descriptionEnum}:
+ * /api/category/edit/{descriptionEnum}:
  *   put:
  *     summary: Edita uma categoria ativa (descriptionEnum imutável).
  *     tags: [Category]
@@ -43,7 +43,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class UpdateCategoryRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'category/:descriptionEnum';
+  public readonly path: string = 'category/edit/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/{descriptionEnum}:
+ * /api/category/delete/{descriptionEnum}:
  *   delete:
  *     summary: Soft-deleta uma categoria ativa (documento permanece).
  *     tags: [Category]
@@ -28,7 +28,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class DeleteCategoryRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'category/:descriptionEnum';
+  public readonly path: string = 'category/delete/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

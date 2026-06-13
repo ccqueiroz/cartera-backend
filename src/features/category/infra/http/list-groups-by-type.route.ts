@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/group:
+ * /api/category/list-groups:
  *   get:
  *     summary: Lista os grupos distintos com ≥1 categoria ativa do tipo.
  *     tags: [Category]
@@ -27,7 +27,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class ListGroupsByTypeRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'category/group';
+  public readonly path: string = 'category/list-groups';
   public readonly handler: HttpHandler;
 
   private constructor(
