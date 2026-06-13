@@ -4,7 +4,7 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-status:
+ * /api/payment-status/list-all:
  *   get:
  *     summary: Lista o catálogo de status de pagamento.
  *     tags: [PaymentStatus]
@@ -18,7 +18,7 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  */
 export class ListPaymentStatusesRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'payment-status';
+  public readonly path: string = 'payment-status/list-all';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,7 +4,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/description/{descriptionEnum}:
+ * /api/payment-method/list-by-enum/{descriptionEnum}:
  *   get:
  *     summary: Busca a forma de pagamento por descriptionEnum (ativa, senão soft-deleted mais recente).
  *     tags: [PaymentMethod]
@@ -29,7 +29,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  */
 export class GetPaymentMethodByEnumRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'payment-method/description/:descriptionEnum';
+  public readonly path: string = 'payment-method/list-by-enum/:descriptionEnum';
   public readonly handler: HttpHandler;
 
   private constructor(

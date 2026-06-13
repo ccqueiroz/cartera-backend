@@ -12,11 +12,11 @@ describe('paymentMethodRoutes', () => {
     expect(
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
     ).toEqual([
-      'GET payment-method',
-      'GET payment-method/description/:descriptionEnum',
-      'POST payment-method',
-      'PUT payment-method/:descriptionEnum',
-      'DELETE payment-method/:descriptionEnum',
+      'GET payment-method/list-all',
+      'GET payment-method/list-by-enum/:descriptionEnum',
+      'POST payment-method/create',
+      'PUT payment-method/edit/:descriptionEnum',
+      'DELETE payment-method/delete/:descriptionEnum',
     ]);
   });
 

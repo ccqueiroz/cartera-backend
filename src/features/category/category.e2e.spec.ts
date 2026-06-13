@@ -114,13 +114,13 @@ function makeHarness() {
 
 describe('category e2e (guarda de autenticação via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
-    ['get', 'category'],
-    ['get', 'category/description/:descriptionEnum'],
-    ['get', 'category/group'],
-    ['get', 'category/group/:group'],
-    ['post', 'category'],
-    ['put', 'category/:descriptionEnum'],
-    ['delete', 'category/:descriptionEnum'],
+    ['get', 'category/list-all'],
+    ['get', 'category/list-by-enum/:descriptionEnum'],
+    ['get', 'category/list-groups'],
+    ['get', 'category/list-by-groups/:group'],
+    ['post', 'category/create'],
+    ['put', 'category/edit/:descriptionEnum'],
+    ['delete', 'category/delete/:descriptionEnum'],
   ];
 
   it.each(protectedRoutes)(
@@ -136,7 +136,7 @@ describe('category e2e (guarda de autenticação via factory)', () => {
 
   it('com sessão válida a leitura executa normalmente (200)', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category', {
+    const response = await dispatch('get', 'category/list-all', {
       query: { type: 'BILLS' },
       authorization: `Bearer ${VALID_TOKEN}`,
     });
@@ -147,7 +147,7 @@ describe('category e2e (guarda de autenticação via factory)', () => {
 
   it('token inválido: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category', {
+    const response = await dispatch('get', 'category/list-all', {
       query: { type: 'BILLS' },
       authorization: 'Bearer token-desconhecido',
     });
