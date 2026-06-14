@@ -1,6 +1,7 @@
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
 import { SortCriteria } from '@/shared/query/apply-sort';
 
 /**
@@ -19,6 +20,8 @@ export interface ListTransactionsQuery {
   paymentMethodDescriptionEnum?: string;
   rootHasInstallments?: boolean;
   rootIsFixedCost?: boolean;
+  origin?: TransactionOrigin;
+  originNotIn?: TransactionOrigin[];
   refMonthDueDate?: number;
   refYearDueDate?: number;
   refMonthPaymentDate?: number;

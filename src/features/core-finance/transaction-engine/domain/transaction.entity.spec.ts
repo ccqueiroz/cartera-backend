@@ -2,6 +2,7 @@ import { Transaction } from './transaction.entity';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOriginEnum } from '@/shared/kernel/enums/transaction-origin.enum';
 import { PeriodEnum } from '@/shared/kernel/enums/period.enum';
 import {
   BusinessRuleViolationError,
@@ -479,6 +480,44 @@ describe('Transaction entity', () => {
       expect(root.toOutput().rootHasInstallments).toBe(false);
       root.recomputeFromChildren([leaf('c1', 'root', 1000, '2026-04-10')]);
       expect(root.toOutput().rootHasInstallments).toBe(true);
+    });
+  });
+
+  describe('origin', () => {
+    function single(origin?: TransactionOriginEnum) {
+      return Transaction.create({
+        id: 'n1',
+        parentId: null,
+        rootId: 'n1',
+        userId,
+        personId,
+        type: TransactionTypeEnum.BILLS,
+        amount: Money.create(100),
+        dueDate: '2026-03-10',
+        createdAt,
+        origin,
+      });
+    }
+
+    it('default MANUAL quando ausente', () => {
+      expect(single().origin).toBe(TransactionOriginEnum.MANUAL);
+    });
+
+    it('preserva o origin explícito e o expõe em toPersistence/toOutput', () => {
+      const node = single(TransactionOriginEnum.IMPORT);
+      expect(node.origin).toBe(TransactionOriginEnum.IMPORT);
+      expect(node.toPersistence().origin).toBe(TransactionOriginEnum.IMPORT);
+      expect(node.toOutput().origin).toBe(TransactionOriginEnum.IMPORT);
+    });
+
+    it('documento persistido sem o campo hidrata como MANUAL', () => {
+      const persistence = single(
+        TransactionOriginEnum.CARD_PURCHASE,
+      ).toPersistence();
+      delete (persistence as { origin?: unknown }).origin;
+      expect(Transaction.with(persistence).origin).toBe(
+        TransactionOriginEnum.MANUAL,
+      );
     });
   });
 });

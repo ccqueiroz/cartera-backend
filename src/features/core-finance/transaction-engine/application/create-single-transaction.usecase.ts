@@ -1,5 +1,6 @@
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
 import { Period } from '@/shared/kernel/enums/period.enum';
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionTreeRepository } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
@@ -21,6 +22,7 @@ export interface CreateSingleTransactionInput {
   paymentDate?: string;
   paidAmount?: number;
   paymentMethodDescriptionEnum?: string;
+  origin?: TransactionOrigin;
 }
 
 export class CreateSingleTransactionUseCase {
@@ -84,6 +86,7 @@ export class CreateSingleTransactionUseCase {
       frequency: input.frequency,
       categoryDescriptionEnum: category?.descriptionEnum ?? null,
       categoryGroup: category?.group ?? null,
+      origin: input.origin,
       paymentDate: wantsPaid ? input.paymentDate : null,
       paidAmount: wantsPaid ? Money.create(input.paidAmount as number) : null,
       paymentMethodDescriptionEnum: wantsPaid

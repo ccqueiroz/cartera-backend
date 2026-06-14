@@ -2,6 +2,10 @@ import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { PaymentStatus } from '@/shared/kernel/value-objects/payment-status.vo';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
+import {
+  TransactionOrigin,
+  TransactionOriginEnum,
+} from '@/shared/kernel/enums/transaction-origin.enum';
 import { Period, PeriodEnum } from '@/shared/kernel/enums/period.enum';
 import {
   BusinessRuleViolationError,
@@ -48,6 +52,7 @@ interface TransactionProps {
   rootIsFixedCost: boolean;
   rootHasInstallments: boolean;
   hasChildren: boolean;
+  origin: TransactionOrigin;
   reversed: boolean;
   paymentHistory: PaymentSnapshot[];
   deleted: boolean;
@@ -86,6 +91,7 @@ export interface TransactionPersistence {
   rootIsFixedCost: boolean;
   rootHasInstallments: boolean;
   hasChildren: boolean;
+  origin: TransactionOrigin;
   reversed: boolean;
   paymentHistory: PaymentSnapshot[];
   deleted: boolean;
@@ -125,6 +131,7 @@ export interface TransactionOutput {
   rootIsFixedCost: boolean;
   rootHasInstallments: boolean;
   hasChildren: boolean;
+  origin: TransactionOrigin;
   reversed: boolean;
   deleted: boolean;
   createdAt: string;
@@ -149,6 +156,7 @@ export interface CreateTransactionInput {
   frequency?: number | null;
   rootIsFixedCost?: boolean;
   rootHasInstallments?: boolean;
+  origin?: TransactionOrigin;
   paymentDate?: string | null;
   paidAmount?: Money | null;
   paymentMethodDescriptionEnum?: string | null;
@@ -236,6 +244,7 @@ export class Transaction {
       rootHasInstallments:
         input.rootHasInstallments ?? (isRoot ? hasChildren : false),
       hasChildren,
+      origin: input.origin ?? TransactionOriginEnum.MANUAL,
       reversed: false,
       paymentHistory: [],
       deleted: false,
@@ -255,6 +264,7 @@ export class Transaction {
       currentAmount: Money.create(persistence.currentAmount),
       paidAmount: Money.create(persistence.paidAmount),
       paymentHistory: [...persistence.paymentHistory],
+      origin: persistence.origin ?? TransactionOriginEnum.MANUAL,
     });
   }
 
@@ -504,6 +514,10 @@ export class Transaction {
     return this.props.isFixedCost;
   }
 
+  public get origin(): TransactionOrigin {
+    return this.props.origin;
+  }
+
   public get reversed(): boolean {
     return this.props.reversed;
   }
@@ -563,6 +577,7 @@ export class Transaction {
       rootIsFixedCost: this.props.rootIsFixedCost,
       rootHasInstallments: this.props.rootHasInstallments,
       hasChildren: this.props.hasChildren,
+      origin: this.props.origin,
       reversed: this.props.reversed,
       paymentHistory: this.props.paymentHistory,
       deleted: this.props.deleted,
@@ -604,6 +619,7 @@ export class Transaction {
       rootIsFixedCost: this.props.rootIsFixedCost,
       rootHasInstallments: this.props.rootHasInstallments,
       hasChildren: this.props.hasChildren,
+      origin: this.props.origin,
       reversed: this.props.reversed,
       deleted: this.props.deleted,
       createdAt: this.props.createdAt,
