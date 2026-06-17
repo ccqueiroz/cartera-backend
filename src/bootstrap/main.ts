@@ -6,7 +6,11 @@ import { makePaymentMethodModule } from '@/features/payment-method/payment-metho
 import { makePaymentStatusModule } from '@/features/payment-status/payment-status.factory';
 import { makePersonModule } from '@/features/person/person.factory';
 import { makeAuthModule } from '@/features/auth/auth.factory';
+import { makeWalletModule } from '@/features/wallet/wallet.factory';
+import { makeFinancialIndicatorModule } from '@/features/financial-indicator/financial-indicator.factory';
 import { PersonGatewayAdapter } from '@/bootstrap/person.gateway.adapter';
+import { WalletProvisionGatewayAdapter } from '@/bootstrap/wallet-provision.gateway.adapter';
+import { FinancialIndicatorGatewayAdapter } from '@/bootstrap/financial-indicator.gateway.adapter';
 import { AuthGatewayFirebase } from '@/features/person/infra/gateways/auth.gateway.firebase';
 import { StorageGatewayFirebase } from '@/features/person/infra/gateways/storage.gateway.firebase';
 import { clientFireBaseAdmin } from '@/packages/clients/firebase';
@@ -58,11 +62,25 @@ function main(): void {
     storageGateway,
   });
 
-  // Ordem suporte → consumidor: auth consome person via porta (adapter do bootstrap).
+  // Suporte: indicadores globais (IOF) e wallet, ambos abaixo do core e do auth.
+  const financialIndicator = makeFinancialIndicatorModule({ db });
+  const wallet = makeWalletModule({
+    db,
+    authMiddleware,
+    financialIndicatorGateway: FinancialIndicatorGatewayAdapter.create(
+      financialIndicator.internal,
+    ),
+  });
+
+  // Ordem suporte → consumidor: auth consome person e wallet via portas (adapters do bootstrap).
   const auth = makeAuthModule({
     authMiddleware,
     authProviderGateway,
     personGateway: PersonGatewayAdapter.create(person.internal),
+    walletProvisionGateway: WalletProvisionGatewayAdapter.create(
+      wallet.internal,
+    ),
+    logger,
   });
 
   const api = ApiExpress.create({
@@ -72,6 +90,7 @@ function main(): void {
       ...paymentMethod,
       ...paymentStatus,
       ...person.routes,
+      ...wallet.routes,
       ...auth,
     ],
     globalMiddlewares: [cookies, cors, ipControll],
