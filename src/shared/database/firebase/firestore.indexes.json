@@ -96,6 +96,51 @@
         { "fieldPath": "deleted", "order": "ASCENDING" },
         { "fieldPath": "paid", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "Wallet",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "deletedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Wallet",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "name", "order": "ASCENDING" },
+        { "fieldPath": "deletedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "WalletMovement",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "walletId", "order": "ASCENDING" },
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "occurredAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Financial_Indicator",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "descriptionEnum", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" },
+        { "fieldPath": "deletedAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Financial_Indicator",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "descriptionEnum", "order": "ASCENDING" },
+        { "fieldPath": "active", "order": "ASCENDING" },
+        { "fieldPath": "refPeriodMonth", "order": "ASCENDING" },
+        { "fieldPath": "refPeriodYear", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
