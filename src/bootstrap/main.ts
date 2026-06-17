@@ -7,7 +7,11 @@ import { makePaymentStatusModule } from '@/features/payment-status/payment-statu
 import { makePersonModule } from '@/features/person/person.factory';
 import { makeAuthModule } from '@/features/auth/auth.factory';
 import { makeWalletModule } from '@/features/wallet/wallet.factory';
+import { makeTransferModule } from '@/features/transfer/transfer.factory';
 import { makeFinancialIndicatorModule } from '@/features/financial-indicator/financial-indicator.factory';
+import { PaymentMethodRepositoryFirestore } from '@/features/payment-method/infra/persistence/payment-method.repository.firestore';
+import { TransferWalletGatewayAdapter } from '@/bootstrap/transfer-wallet.gateway.adapter';
+import { TransferPaymentMethodGatewayAdapter } from '@/bootstrap/transfer-payment-method.gateway.adapter';
 import { PersonGatewayAdapter } from '@/bootstrap/person.gateway.adapter';
 import { WalletProvisionGatewayAdapter } from '@/bootstrap/wallet-provision.gateway.adapter';
 import { FinancialIndicatorGatewayAdapter } from '@/bootstrap/financial-indicator.gateway.adapter';
@@ -72,6 +76,16 @@ function main(): void {
     ),
   });
 
+  // Transferência: consome wallet e payment-method via portas (adapters do bootstrap), após o suporte.
+  const transfer = makeTransferModule({
+    db,
+    authMiddleware,
+    walletGateway: TransferWalletGatewayAdapter.create(db),
+    paymentMethodGateway: TransferPaymentMethodGatewayAdapter.create(
+      PaymentMethodRepositoryFirestore.create(db),
+    ),
+  });
+
   // Ordem suporte → consumidor: auth consome person e wallet via portas (adapters do bootstrap).
   const auth = makeAuthModule({
     authMiddleware,
@@ -91,6 +105,7 @@ function main(): void {
       ...paymentStatus,
       ...person.routes,
       ...wallet.routes,
+      ...transfer,
       ...auth,
     ],
     globalMiddlewares: [cookies, cors, ipControll],
