@@ -74,6 +74,17 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_DATE_RANGE]: () =>
     'A data inicial deve ser anterior ou igual à data final.',
 
+  [ErrorCode.WALLET_NOT_FOUND]: () => 'Carteira não encontrada.',
+  [ErrorCode.WALLET_DELETED]: () =>
+    'Esta carteira foi removida e não pode mais ser operada.',
+  [ErrorCode.WALLET_HAS_BALANCE]: () =>
+    'A carteira possui saldo diferente de zero. Confirme a exclusão para prosseguir.',
+  [ErrorCode.WALLET_NAME_REQUIRED]: () => 'O nome da carteira é obrigatório.',
+  [ErrorCode.INVALID_OVERDRAFT_CONFIG]: () =>
+    'A configuração do cheque-especial é inválida (limite, taxa, IOF e carência não podem ser negativos).',
+  [ErrorCode.INVALID_WALLET_ADJUST_AMOUNT]: () =>
+    'O valor do ajuste de saldo deve ser maior que zero.',
+
   [ErrorCode.TRANSACTION_NOT_FOUND]: () => 'Transação não encontrada.',
   [ErrorCode.TRANSACTION_SETTLE_ON_INTERNAL]: () =>
     'Não é possível quitar diretamente um nó com filhas; quite as folhas.',
