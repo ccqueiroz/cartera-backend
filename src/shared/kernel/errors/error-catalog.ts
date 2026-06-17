@@ -74,6 +74,16 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.INVALID_DATE_RANGE]: () =>
     'A data inicial deve ser anterior ou igual à data final.',
 
+  [ErrorCode.TRANSFER_NOT_FOUND]: () => 'Transferência não encontrada.',
+  [ErrorCode.TRANSFER_SAME_WALLET]: () =>
+    'A carteira de origem e a de destino devem ser diferentes.',
+  [ErrorCode.TRANSFER_AMOUNT_NOT_POSITIVE]: () =>
+    'O valor da transferência deve ser maior que zero.',
+  [ErrorCode.TRANSFER_DATE_IN_FUTURE]: () =>
+    'A data da transferência não pode ser futura.',
+  [ErrorCode.TRANSFER_PAYMENT_METHOD_INACTIVE]: () =>
+    'A forma de pagamento informada não está ativa no catálogo.',
+
   [ErrorCode.WALLET_NOT_FOUND]: () => 'Carteira não encontrada.',
   [ErrorCode.WALLET_DELETED]: () =>
     'Esta carteira foi removida e não pode mais ser operada.',
