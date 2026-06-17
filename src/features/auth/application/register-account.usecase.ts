@@ -1,5 +1,7 @@
 import { AuthProviderGateway } from '@/features/auth/domain/ports/auth-provider.gateway';
 import { PersonGateway } from '@/features/auth/domain/ports/person.gateway';
+import { WalletProvisionGateway } from '@/features/auth/domain/ports/wallet-provision.gateway';
+import { LoggerGateway } from '@/shared/logger/logger.gateway';
 
 interface RegisterAccountInput {
   email: string;
@@ -26,13 +28,22 @@ export class RegisterAccountUseCase {
   private constructor(
     private readonly authProvider: AuthProviderGateway,
     private readonly personGateway: PersonGateway,
+    private readonly walletProvisionGateway?: WalletProvisionGateway,
+    private readonly logger?: LoggerGateway,
   ) {}
 
   public static create(
     authProvider: AuthProviderGateway,
     personGateway: PersonGateway,
+    walletProvisionGateway?: WalletProvisionGateway,
+    logger?: LoggerGateway,
   ): RegisterAccountUseCase {
-    return new RegisterAccountUseCase(authProvider, personGateway);
+    return new RegisterAccountUseCase(
+      authProvider,
+      personGateway,
+      walletProvisionGateway,
+      logger,
+    );
   }
 
   public async execute(
@@ -55,6 +66,21 @@ export class RegisterAccountUseCase {
       // Compensação: sem person não pode sobrar conta órfã no provider.
       await this.authProvider.deleteAccount(account.userId);
       throw error;
+    }
+
+    // Seed da wallet "Cartera" (UC8/W5): aditivo e FORA da compensação — falha é tolerada.
+    if (this.walletProvisionGateway) {
+      try {
+        await this.walletProvisionGateway.provision({
+          userId: account.userId,
+        });
+      } catch (error) {
+        this.logger?.error(
+          `Falha ao semear a wallet do usuário ${account.userId}: ${String(
+            error,
+          )}`,
+        );
+      }
     }
 
     // Falha daqui em diante NÃO desfaz nada: conta+person íntegros, usuário loga via UC-02.

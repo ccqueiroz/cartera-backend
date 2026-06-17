@@ -95,4 +95,47 @@ describe('RegisterAccountUseCase', () => {
     await expect(useCase.execute(INPUT)).rejects.toThrow(boom);
     expect(authProvider.deleteAccount).not.toHaveBeenCalled();
   });
+
+  it('semeia a wallet após o person (UC8/W5)', async () => {
+    const authProvider = makeAuthProvider();
+    const personGateway = makePersonGateway();
+    const walletProvisionGateway = {
+      provision: jest.fn(async () => undefined),
+    };
+    const useCase = RegisterAccountUseCase.create(
+      authProvider,
+      personGateway,
+      walletProvisionGateway as never,
+    );
+
+    await useCase.execute(INPUT);
+
+    expect(walletProvisionGateway.provision).toHaveBeenCalledWith({
+      userId: 'uid-1',
+    });
+  });
+
+  it('falha no seed da wallet é tolerada (registro conclui, sem compensação)', async () => {
+    const authProvider = makeAuthProvider();
+    const personGateway = makePersonGateway();
+    const walletProvisionGateway = {
+      provision: jest.fn(async () => {
+        throw new Error('wallet seed falhou');
+      }),
+    };
+    const logger = { info: jest.fn(), error: jest.fn(), warn: jest.fn() };
+    const useCase = RegisterAccountUseCase.create(
+      authProvider,
+      personGateway,
+      walletProvisionGateway as never,
+      logger as never,
+    );
+
+    const output = await useCase.execute(INPUT);
+
+    expect(output.userId).toBe('uid-1');
+    expect(authProvider.deleteAccount).not.toHaveBeenCalled();
+    expect(authProvider.signInWithPassword).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalled();
+  });
 });
