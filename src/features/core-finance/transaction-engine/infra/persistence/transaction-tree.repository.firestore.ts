@@ -15,6 +15,7 @@ import {
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { matchesLeafFilters } from '@/features/core-finance/transaction-engine/infra/persistence/apply-leaf-filters';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
  * Árvore achatada na coleção `Transaction` (ADR-04). Escrita atômica
@@ -43,6 +44,18 @@ export class TransactionTreeRepositoryFirestore
     for (const node of nodes)
       batch.set(this.collection().doc(node.id), node.toPersistence());
     await batch.commit();
+  }
+
+  public async saveTx(ctx: AtomicContext, node: Transaction): Promise<void> {
+    ctx.txn.set(this.collection().doc(node.id), node.toPersistence());
+  }
+
+  public async saveManyTx(
+    ctx: AtomicContext,
+    nodes: Transaction[],
+  ): Promise<void> {
+    for (const node of nodes)
+      ctx.txn.set(this.collection().doc(node.id), node.toPersistence());
   }
 
   public async findActiveById(
@@ -123,66 +136,100 @@ export class TransactionTreeRepositoryFirestore
     mutate: (node: Transaction) => void,
     today?: Date,
   ): Promise<Transaction> {
-    return this.db.runTransaction(async (txn) => {
-      const target = await this.readActive(txn, targetId);
-      if (!target) throw new TransactionNotFoundError();
+    return this.db.runTransaction((txn) =>
+      this.mutateAndRollupCore(txn, targetId, mutate, today),
+    );
+  }
 
-      mutate(target);
-      const updated = new Map<string, Transaction>([[target.id, target]]);
-      const writeOrder: Transaction[] = [target];
+  public async mutateAndRollupTx(
+    ctx: AtomicContext,
+    targetId: string,
+    mutate: (node: Transaction) => void,
+    today?: Date,
+  ): Promise<Transaction> {
+    return this.mutateAndRollupCore(ctx.txn, targetId, mutate, today);
+  }
 
-      let cursor: Transaction | undefined = target;
-      let root = target;
-      while (cursor) {
-        if (cursor.hasChildren) {
-          const children = await this.readChildren(txn, cursor.id, updated);
-          cursor.recomputeFromChildren(children, today);
-        }
-        root = cursor;
-        if (!cursor.parentId) break;
-        const parent = await this.readActive(txn, cursor.parentId);
-        if (!parent) break;
-        updated.set(parent.id, parent);
-        writeOrder.push(parent);
-        cursor = parent;
+  private async mutateAndRollupCore(
+    txn: FirestoreTransaction,
+    targetId: string,
+    mutate: (node: Transaction) => void,
+    today?: Date,
+  ): Promise<Transaction> {
+    const target = await this.readActive(txn, targetId);
+    if (!target) throw new TransactionNotFoundError();
+
+    mutate(target);
+    const updated = new Map<string, Transaction>([[target.id, target]]);
+    const writeOrder: Transaction[] = [target];
+
+    let cursor: Transaction | undefined = target;
+    let root = target;
+    while (cursor) {
+      if (cursor.hasChildren) {
+        const children = await this.readChildren(txn, cursor.id, updated);
+        cursor.recomputeFromChildren(children, today);
       }
+      root = cursor;
+      if (!cursor.parentId) break;
+      const parent = await this.readActive(txn, cursor.parentId);
+      if (!parent) break;
+      updated.set(parent.id, parent);
+      writeOrder.push(parent);
+      cursor = parent;
+    }
 
-      for (const node of writeOrder)
-        txn.set(this.collection().doc(node.id), node.toPersistence());
-      return root;
-    });
+    for (const node of writeOrder)
+      txn.set(this.collection().doc(node.id), node.toPersistence());
+    return root;
   }
 
   public async settleLeavesAndRollup(
     settlements: LeafSettlement[],
     today?: Date,
   ): Promise<Transaction[]> {
-    return this.db.runTransaction(async (txn) => {
-      const updated = new Map<string, Transaction>();
-      const settled: Transaction[] = [];
-      for (const settlement of settlements) {
-        const leaf = await this.readActive(txn, settlement.leafId);
-        if (!leaf) continue;
-        settlement.mutate(leaf);
-        updated.set(leaf.id, leaf);
-        settled.push(leaf);
-      }
+    return this.db.runTransaction((txn) =>
+      this.settleLeavesAndRollupCore(txn, settlements, today),
+    );
+  }
 
-      const ancestors = await this.collectAncestors(
-        txn,
-        settled.map((leaf) => leaf.id),
-        updated,
-      );
-      const ordered = [...ancestors.values()].sort((a, b) => b.depth - a.depth);
-      for (const { node } of ordered) {
-        const children = await this.readChildren(txn, node.id, updated);
-        node.recomputeFromChildren(children, today);
-      }
+  public async settleLeavesAndRollupTx(
+    ctx: AtomicContext,
+    settlements: LeafSettlement[],
+    today?: Date,
+  ): Promise<Transaction[]> {
+    return this.settleLeavesAndRollupCore(ctx.txn, settlements, today);
+  }
 
-      for (const node of updated.values())
-        txn.set(this.collection().doc(node.id), node.toPersistence());
-      return settled;
-    });
+  private async settleLeavesAndRollupCore(
+    txn: FirestoreTransaction,
+    settlements: LeafSettlement[],
+    today?: Date,
+  ): Promise<Transaction[]> {
+    const updated = new Map<string, Transaction>();
+    const settled: Transaction[] = [];
+    for (const settlement of settlements) {
+      const leaf = await this.readActive(txn, settlement.leafId);
+      if (!leaf) continue;
+      settlement.mutate(leaf);
+      updated.set(leaf.id, leaf);
+      settled.push(leaf);
+    }
+
+    const ancestors = await this.collectAncestors(
+      txn,
+      settled.map((leaf) => leaf.id),
+      updated,
+    );
+    const ordered = [...ancestors.values()].sort((a, b) => b.depth - a.depth);
+    for (const { node } of ordered) {
+      const children = await this.readChildren(txn, node.id, updated);
+      node.recomputeFromChildren(children, today);
+    }
+
+    for (const node of updated.values())
+      txn.set(this.collection().doc(node.id), node.toPersistence());
+    return settled;
   }
 
   public async softDeleteSubtreeAndRollup(

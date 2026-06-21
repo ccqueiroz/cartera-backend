@@ -116,6 +116,9 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.TRANSACTION_INVALID_FIXED_COST]: () =>
     'Não foi possível salvar a recorrência. Confira o período e a frequência informados.',
 
+  [ErrorCode.SETTLEMENT_MOVEMENT_NOT_FOUND]: () =>
+    'Não foi possível estornar: o movimento de caixa desta liquidação não foi encontrado.',
+
   [ErrorCode.INVALID_TOKEN]: () => 'Token de autorização inválido.',
   [ErrorCode.TOKEN_EXPIRED]: () => 'Sessão expirada. Renove o token de acesso.',
   [ErrorCode.INVALID_CREDENTIALS]: () => 'Credenciais inválidas.',

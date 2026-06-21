@@ -1,6 +1,7 @@
 import { Wallet } from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /** Repositório em memória para testes de caso de uso (espelha o do transaction-engine). */
 export class InMemoryWalletRepository implements WalletRepository {
@@ -56,6 +57,14 @@ export class InMemoryWalletRepository implements WalletRepository {
   ): Promise<void> {
     this.wallets.set(wallet.id, wallet);
     this.movements.push(...movements);
+  }
+
+  public async saveWithMovementsTx(
+    _ctx: AtomicContext,
+    wallet: Wallet,
+    movements: WalletMovement[],
+  ): Promise<void> {
+    return this.saveWithMovements(wallet, movements);
   }
 
   public async update(wallet: Wallet): Promise<void> {

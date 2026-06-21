@@ -1,5 +1,6 @@
 import { Wallet } from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface WalletRepository {
   findActiveById(id: string, userId: string): Promise<Wallet | null>;
@@ -11,6 +12,12 @@ export interface WalletRepository {
   create(wallet: Wallet, movements: WalletMovement[]): Promise<void>;
   /** Atualiza saldo da wallet e anexa movimentos na mesma transação atômica (W4). */
   saveWithMovements(wallet: Wallet, movements: WalletMovement[]): Promise<void>;
+  /** Variante tx-aware: grava saldo + movimentos numa transação externa (AtomicRunner). */
+  saveWithMovementsTx(
+    ctx: AtomicContext,
+    wallet: Wallet,
+    movements: WalletMovement[],
+  ): Promise<void>;
   /** Atualiza só a wallet (edit/soft-delete) — sem movimento. */
   update(wallet: Wallet): Promise<void>;
   /** Todos os movimentos da wallet (replay do accrual + base do extrato). */

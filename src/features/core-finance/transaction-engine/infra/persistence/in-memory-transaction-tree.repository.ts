@@ -6,6 +6,7 @@ import {
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { matchesLeafFilters } from '@/features/core-finance/transaction-engine/infra/persistence/apply-leaf-filters';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
  * Adapter em memória do repositório de árvore. Implementação de referência da
@@ -25,6 +26,17 @@ export class InMemoryTransactionTreeRepository
 
   public async saveMany(nodes: Transaction[]): Promise<void> {
     for (const node of nodes) this.store.set(node.id, node);
+  }
+
+  public async saveTx(_ctx: AtomicContext, node: Transaction): Promise<void> {
+    return this.save(node);
+  }
+
+  public async saveManyTx(
+    _ctx: AtomicContext,
+    nodes: Transaction[],
+  ): Promise<void> {
+    return this.saveMany(nodes);
   }
 
   public async findActiveById(
@@ -96,6 +108,15 @@ export class InMemoryTransactionTreeRepository
     return root;
   }
 
+  public async mutateAndRollupTx(
+    _ctx: AtomicContext,
+    targetId: string,
+    mutate: (node: Transaction) => void,
+    today?: Date,
+  ): Promise<Transaction> {
+    return this.mutateAndRollup(targetId, mutate, today);
+  }
+
   public async settleLeavesAndRollup(
     settlements: LeafSettlement[],
     today?: Date,
@@ -112,6 +133,14 @@ export class InMemoryTransactionTreeRepository
       today,
     );
     return settled;
+  }
+
+  public async settleLeavesAndRollupTx(
+    _ctx: AtomicContext,
+    settlements: LeafSettlement[],
+    today?: Date,
+  ): Promise<Transaction[]> {
+    return this.settleLeavesAndRollup(settlements, today);
   }
 
   public async softDeleteSubtreeAndRollup(

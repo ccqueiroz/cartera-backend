@@ -8,6 +8,7 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface InstallmentInput {
   amount: number;
@@ -66,6 +67,24 @@ export class CreateInstallmentPlanUseCase {
   }
 
   public async execute(
+    input: CreateInstallmentPlanInput,
+  ): Promise<InstallmentPlanResult> {
+    const result = await this.build(input);
+    await this.repository.saveMany([result.mother, ...result.children]);
+    return result;
+  }
+
+  /** Variante tx-aware: materializa o plano numa transação externa (AtomicRunner). */
+  public async executeTx(
+    ctx: AtomicContext,
+    input: CreateInstallmentPlanInput,
+  ): Promise<InstallmentPlanResult> {
+    const result = await this.build(input);
+    await this.repository.saveManyTx(ctx, [result.mother, ...result.children]);
+    return result;
+  }
+
+  private async build(
     input: CreateInstallmentPlanInput,
   ): Promise<InstallmentPlanResult> {
     if (input.installments.length < 1)
@@ -166,7 +185,6 @@ export class CreateInstallmentPlanUseCase {
     }
 
     mother.recomputeFromChildren(children);
-    await this.repository.saveMany([mother, ...children]);
     return { mother, children };
   }
 

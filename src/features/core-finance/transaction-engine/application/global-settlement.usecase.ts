@@ -12,6 +12,7 @@ import {
 } from '@/features/core-finance/transaction-engine/domain/settlement-rateio';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface GlobalSettlementInput {
   nodeId: string;
@@ -24,8 +25,15 @@ export interface GlobalSettlementInput {
   valorPago?: number;
 }
 
+export interface SettledLeafAmount {
+  leafId: string;
+  paidAmount: number;
+}
+
 export interface GlobalSettlementResult {
   settledLeafIds: string[];
+  /** Valor efetivamente quitado por folha — base do rastreio fino de caixa (1 movimento por folha). */
+  settledAmounts: SettledLeafAmount[];
 }
 
 /**
@@ -58,6 +66,35 @@ export class GlobalSettlementUseCase {
   public async execute(
     input: GlobalSettlementInput,
   ): Promise<GlobalSettlementResult> {
+    const { settlements, amounts } = await this.prepare(input);
+    if (settlements.length === 0)
+      return { settledLeafIds: [], settledAmounts: [] };
+    await this.repository.settleLeavesAndRollup(settlements);
+    return {
+      settledLeafIds: amounts.map((a) => a.leafId),
+      settledAmounts: amounts,
+    };
+  }
+
+  /** Variante tx-aware: quita dentro de uma transação externa (AtomicRunner). */
+  public async executeTx(
+    ctx: AtomicContext,
+    input: GlobalSettlementInput,
+  ): Promise<GlobalSettlementResult> {
+    const { settlements, amounts } = await this.prepare(input);
+    if (settlements.length === 0)
+      return { settledLeafIds: [], settledAmounts: [] };
+    await this.repository.settleLeavesAndRollupTx(ctx, settlements);
+    return {
+      settledLeafIds: amounts.map((a) => a.leafId),
+      settledAmounts: amounts,
+    };
+  }
+
+  private async prepare(input: GlobalSettlementInput): Promise<{
+    settlements: LeafSettlement[];
+    amounts: SettledLeafAmount[];
+  }> {
     const handle = await this.repository.findActiveById(
       input.nodeId,
       input.userId,
@@ -82,7 +119,7 @@ export class GlobalSettlementUseCase {
         .map(toSettlementNode);
 
     const targets = this.resolveTargets(input, byId, openChildrenOf);
-    if (targets.length === 0) return { settledLeafIds: [] };
+    if (targets.length === 0) return { settlements: [], amounts: [] };
 
     const paidAmountByLeaf =
       input.valorPago === undefined
@@ -90,8 +127,10 @@ export class GlobalSettlementUseCase {
         : distributeSettlement(input.valorPago, targets, openChildrenOf);
 
     const updatedAt = this.now();
-    const settlements: LeafSettlement[] = [...paidAmountByLeaf].map(
-      ([leafId, paidAmount]) => ({
+    const settlements: LeafSettlement[] = [];
+    const amounts: SettledLeafAmount[] = [];
+    for (const [leafId, paidAmount] of paidAmountByLeaf) {
+      settlements.push({
         leafId,
         mutate: (node: Transaction) =>
           node.settle({
@@ -100,11 +139,10 @@ export class GlobalSettlementUseCase {
             paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
             updatedAt,
           }),
-      }),
-    );
-
-    await this.repository.settleLeavesAndRollup(settlements);
-    return { settledLeafIds: [...paidAmountByLeaf.keys()] };
+      });
+      amounts.push({ leafId, paidAmount: paidAmount.value });
+    }
+    return { settlements, amounts };
   }
 
   private resolveTargets(
