@@ -14,21 +14,21 @@ import {
   WalletMovementSpec,
   WalletGateway,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
-import { CreateBillResult } from '@/features/core-finance/bills/application/bill-response';
+import { CreateReceivableResult } from '@/features/core-finance/receivables/application/receivable-response';
 
-export interface InstallmentBillInput {
+export interface InstallmentReceivableInput {
   amount: number;
   dueDate: string;
 }
 
-export interface EntryBillInput {
+export interface EntryReceivableInput {
   amount: number;
   paymentDate: string;
   paymentMethodDescriptionEnum: string;
   walletId: string;
 }
 
-export interface CreateInstallmentBillInput {
+export interface CreateInstallmentReceivableInput {
   userId: string;
   personId?: string;
   amount: number;
@@ -37,17 +37,17 @@ export interface CreateInstallmentBillInput {
   isFixedCost?: boolean;
   period?: Period | null;
   frequency?: number | null;
-  installments: InstallmentBillInput[];
-  entry?: EntryBillInput;
+  installments: InstallmentReceivableInput[];
+  entry?: EntryReceivableInput;
 }
 
 /**
- * UC-B2: cria plano de parcelas (`type = BILLS`, `origin = MANUAL`). Com entrada
- * paga, exige `walletId` (B1) e materializa o plano + debita a entrada (com
- * `WalletMovement(SETTLEMENT)` no `refId` da folha de entrada) num **único bloco
- * atômico** (só escritas; não relê o plano recém-criado).
+ * UC-RV2: cria plano de parcelas (`type = RECEIVABLES`, `origin = MANUAL`). Com
+ * entrada recebida, exige `walletId` e materializa o plano + credita a entrada
+ * (com `WalletMovement(CREDIT, SETTLEMENT)` no `refId` da folha de entrada) num
+ * **único bloco atômico** (só escritas; não relê o plano recém-criado).
  */
-export class CreateInstallmentBillUseCase {
+export class CreateInstallmentReceivableUseCase {
   private constructor(
     private readonly engine: TransactionEngine,
     private readonly walletGateway: WalletGateway,
@@ -62,8 +62,8 @@ export class CreateInstallmentBillUseCase {
     atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
-  ): CreateInstallmentBillUseCase {
-    return new CreateInstallmentBillUseCase(
+  ): CreateInstallmentReceivableUseCase {
+    return new CreateInstallmentReceivableUseCase(
       engine,
       walletGateway,
       atomicRunner,
@@ -73,17 +73,17 @@ export class CreateInstallmentBillUseCase {
   }
 
   public async execute(
-    input: CreateInstallmentBillInput,
-  ): Promise<CreateBillResult> {
+    input: CreateInstallmentReceivableInput,
+  ): Promise<CreateReceivableResult> {
     if (input.entry && !input.entry.walletId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'A entrada paga exige walletId.',
+        details: 'A entrada recebida exige walletId.',
       });
 
     const base = {
       userId: input.userId,
       personId: input.personId ?? input.userId,
-      type: TransactionTypeEnum.BILLS,
+      type: TransactionTypeEnum.RECEIVABLES,
       origin: TransactionOriginEnum.MANUAL,
       amount: input.amount,
       dueDate: input.dueDate,
@@ -126,12 +126,12 @@ export class CreateInstallmentBillUseCase {
         (child) => child.firstInstallment,
       );
       if (entryLeaf) {
-        snapshot.debit(Money.create(entry.amount), entry.paymentDate);
+        snapshot.credit(Money.create(entry.amount));
         const movement: WalletMovementSpec = {
           id: this.generateId(),
           userId: input.userId,
           walletId: entry.walletId,
-          direction: 'DEBIT',
+          direction: 'CREDIT',
           amount: entry.amount,
           refType: 'SETTLEMENT',
           refId: entryLeaf.id,

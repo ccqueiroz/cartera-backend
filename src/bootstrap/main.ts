@@ -13,8 +13,9 @@ import { PaymentMethodRepositoryFirestore } from '@/features/payment-method/infr
 import { CategoryRepositoryFirestore } from '@/features/category/infra/persistence/category.repository.firestore';
 import { makeTransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import { makeBillsModule } from '@/features/core-finance/bills/bills.factory';
+import { makeReceivablesModule } from '@/features/core-finance/receivables/receivables.factory';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
-import { BillsWalletGatewayAdapter } from '@/bootstrap/bills-wallet.gateway.adapter';
+import { CoreFinanceWalletGatewayAdapter } from '@/bootstrap/core-finance-wallet.gateway.adapter';
 import { CoreFinanceCategoryGatewayAdapter } from '@/bootstrap/core-finance-category.gateway.adapter';
 import { CoreFinancePaymentMethodGatewayAdapter } from '@/bootstrap/core-finance-payment-method.gateway.adapter';
 import { TransferWalletGatewayAdapter } from '@/bootstrap/transfer-wallet.gateway.adapter';
@@ -104,11 +105,19 @@ function main(): void {
       PaymentMethodRepositoryFirestore.create(db),
     ),
   });
+  const atomicRunner = AtomicRunner.create(db);
+  const coreFinanceWalletGateway = CoreFinanceWalletGatewayAdapter.create(db);
   const bills = makeBillsModule({
     authMiddleware,
     engine: transactionEngine,
-    atomicRunner: AtomicRunner.create(db),
-    walletGateway: BillsWalletGatewayAdapter.create(db),
+    atomicRunner,
+    walletGateway: coreFinanceWalletGateway,
+  });
+  const receivables = makeReceivablesModule({
+    authMiddleware,
+    engine: transactionEngine,
+    atomicRunner,
+    walletGateway: coreFinanceWalletGateway,
   });
 
   // Ordem suporte → consumidor: auth consome person e wallet via portas (adapters do bootstrap).
@@ -132,6 +141,7 @@ function main(): void {
       ...wallet.routes,
       ...transfer,
       ...bills,
+      ...receivables,
       ...auth,
     ],
     globalMiddlewares: [cookies, cors, ipControll],

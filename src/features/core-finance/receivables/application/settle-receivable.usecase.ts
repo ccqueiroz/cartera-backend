@@ -1,9 +1,6 @@
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { collectBalanceWarnings } from '@/shared/kernel/value-objects/balance-warnings';
-import {
-  BusinessRuleViolationError,
-  EntityNotFoundError,
-} from '@/shared/kernel/errors/domain.error';
+import { EntityNotFoundError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
@@ -11,21 +8,25 @@ import {
   WalletMovementSpec,
   WalletGateway,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
-import { SettleBillResult } from '@/features/core-finance/bills/application/bill-response';
+import { SettleReceivableResult } from '@/features/core-finance/receivables/application/receivable-response';
 
-export interface ReverseBillInput {
+export interface SettleReceivableInput {
   id: string;
   userId: string;
+  walletId: string;
+  paidAmount: number;
+  paymentDate: string;
+  paymentMethodDescriptionEnum: string;
 }
 
 /**
- * UC-B9: estorna uma folha paga em bloco atômico — `engine.reverse` (snapshot em
- * `paymentHistory`) + crédito de volta na wallet do **movimento original** +
- * `WalletMovement(SETTLEMENT_REVERSAL, CREDIT)` (B3). A wallet de devolução é
- * localizada pelo movimento `SETTLEMENT` rastreável (`refId = folha`); sem ele →
- * `SETTLEMENT_MOVEMENT_NOT_FOUND` (422).
+ * UC-RV5: recebe uma folha em bloco atômico — folha recebida + rollup (motor) +
+ * **crédito** na wallet + `WalletMovement(CREDIT, SETTLEMENT)`, tudo num único
+ * `AtomicRunner.run`. A wallet é lida fora da transação (snapshot) e só escrita
+ * dentro dela, depois das leituras transacionais do motor (reads-before-writes).
+ * Receber credita → nunca negativa → sem warning de saldo.
  */
-export class ReverseBillUseCase {
+export class SettleReceivableUseCase {
   private constructor(
     private readonly engine: TransactionEngine,
     private readonly walletGateway: WalletGateway,
@@ -40,8 +41,8 @@ export class ReverseBillUseCase {
     atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
-  ): ReverseBillUseCase {
-    return new ReverseBillUseCase(
+  ): SettleReceivableUseCase {
+    return new SettleReceivableUseCase(
       engine,
       walletGateway,
       atomicRunner,
@@ -50,56 +51,49 @@ export class ReverseBillUseCase {
     );
   }
 
-  public async execute(input: ReverseBillInput): Promise<SettleBillResult> {
-    const movementRef = await this.walletGateway.findSettlementMovement(
-      input.id,
-      input.userId,
-    );
-    if (!movementRef)
-      throw new BusinessRuleViolationError(
-        ErrorCode.SETTLEMENT_MOVEMENT_NOT_FOUND,
-        { leafId: input.id },
-      );
-
+  public async execute(
+    input: SettleReceivableInput,
+  ): Promise<SettleReceivableResult> {
     const snapshot = await this.walletGateway.findActiveSnapshot(
-      movementRef.walletId,
+      input.walletId,
       input.userId,
     );
     if (!snapshot)
       throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: movementRef.walletId,
+        walletId: input.walletId,
       });
 
-    const amount = Money.create(movementRef.amount);
-    const occurredAt = this.now();
-    const occurredDate = occurredAt.slice(0, 10);
+    const amount = Money.create(input.paidAmount);
+    const createdAt = this.now();
 
     const root = await this.atomicRunner.run(async (ctx) => {
-      const reversedRoot = await this.engine.reverse.executeTx(
-        ctx,
-        input.id,
-        input.userId,
-      );
+      const settledRoot = await this.engine.settle.executeTx(ctx, {
+        id: input.id,
+        userId: input.userId,
+        paymentDate: input.paymentDate,
+        paidAmount: input.paidAmount,
+        paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
+      });
 
       snapshot.credit(amount);
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
-        walletId: movementRef.walletId,
+        walletId: input.walletId,
         direction: 'CREDIT',
-        amount: movementRef.amount,
-        refType: 'SETTLEMENT_REVERSAL',
+        amount: input.paidAmount,
+        refType: 'SETTLEMENT',
         refId: input.id,
-        occurredAt: occurredDate,
-        createdAt: occurredAt,
+        occurredAt: input.paymentDate,
+        createdAt,
       };
       await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return reversedRoot;
+      return settledRoot;
     });
 
     return {
       root: root.toOutput(),
-      wallet: { id: movementRef.walletId, balance: snapshot.balance.value },
+      wallet: { id: input.walletId, balance: snapshot.balance.value },
       warnings: collectBalanceWarnings({
         isNegative: snapshot.isNegative(),
         exceedsLimit: snapshot.exceedsOverdraftLimit(),

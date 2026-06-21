@@ -8,24 +8,25 @@ import {
   WalletMovementSpec,
   WalletGateway,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
-import { SettleBillResult } from '@/features/core-finance/bills/application/bill-response';
+import { SettleReceivableResult } from '@/features/core-finance/receivables/application/receivable-response';
 
-export interface SettleBillInput {
-  id: string;
+export interface GlobalSettleReceivableInput {
+  nodeId: string;
   userId: string;
   walletId: string;
-  paidAmount: number;
   paymentDate: string;
   paymentMethodDescriptionEnum: string;
+  selection?: string[];
+  valorPago?: number;
 }
 
 /**
- * UC-B5: liquida uma folha em bloco atômico (B1/B2) — folha paga + rollup (motor)
- * + débito na wallet + `WalletMovement(DEBIT, SETTLEMENT)`, tudo num único
- * `AtomicRunner.run`. A wallet é lida fora da transação (snapshot) e só escrita
- * dentro dela, depois das leituras transacionais do motor (reads-before-writes).
+ * UC-RV6: recebimento global em bloco atômico — `GlobalSettlement` (rateio
+ * Hamilton) dentro do `AtomicRunner`, um único **crédito** pelo total efetivo +
+ * um `WalletMovement(CREDIT, SETTLEMENT)` por folha settlada (rastreio fino por
+ * `refId`).
  */
-export class SettleBillUseCase {
+export class GlobalSettleReceivableUseCase {
   private constructor(
     private readonly engine: TransactionEngine,
     private readonly walletGateway: WalletGateway,
@@ -40,8 +41,8 @@ export class SettleBillUseCase {
     atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
-  ): SettleBillUseCase {
-    return new SettleBillUseCase(
+  ): GlobalSettleReceivableUseCase {
+    return new GlobalSettleReceivableUseCase(
       engine,
       walletGateway,
       atomicRunner,
@@ -50,7 +51,9 @@ export class SettleBillUseCase {
     );
   }
 
-  public async execute(input: SettleBillInput): Promise<SettleBillResult> {
+  public async execute(
+    input: GlobalSettleReceivableInput,
+  ): Promise<SettleReceivableResult> {
     const snapshot = await this.walletGateway.findActiveSnapshot(
       input.walletId,
       input.userId,
@@ -60,36 +63,47 @@ export class SettleBillUseCase {
         walletId: input.walletId,
       });
 
-    const amount = Money.create(input.paidAmount);
     const createdAt = this.now();
 
-    const root = await this.atomicRunner.run(async (ctx) => {
-      const settledRoot = await this.engine.settle.executeTx(ctx, {
-        id: input.id,
+    await this.atomicRunner.run(async (ctx) => {
+      const result = await this.engine.globalSettlement.executeTx(ctx, {
+        nodeId: input.nodeId,
         userId: input.userId,
         paymentDate: input.paymentDate,
-        paidAmount: input.paidAmount,
         paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
+        selection: input.selection,
+        valorPago: input.valorPago,
       });
+      if (result.settledAmounts.length === 0) return;
 
-      snapshot.debit(amount, input.paymentDate);
-      const movement: WalletMovementSpec = {
-        id: this.generateId(),
-        userId: input.userId,
-        walletId: input.walletId,
-        direction: 'DEBIT',
-        amount: input.paidAmount,
-        refType: 'SETTLEMENT',
-        refId: input.id,
-        occurredAt: input.paymentDate,
-        createdAt,
-      };
-      await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return settledRoot;
+      const total = result.settledAmounts.reduce(
+        (acc, a) => acc.add(Money.create(a.paidAmount)),
+        Money.create(0),
+      );
+      snapshot.credit(total);
+
+      const movements: WalletMovementSpec[] = result.settledAmounts.map(
+        (a) => ({
+          id: this.generateId(),
+          userId: input.userId,
+          walletId: input.walletId,
+          direction: 'CREDIT',
+          amount: a.paidAmount,
+          refType: 'SETTLEMENT',
+          refId: a.leafId,
+          occurredAt: input.paymentDate,
+          createdAt,
+        }),
+      );
+      await this.walletGateway.persistSettlement(ctx, snapshot, movements);
     });
 
+    const detail = await this.engine.getById.execute(
+      input.nodeId,
+      input.userId,
+    );
     return {
-      root: root.toOutput(),
+      root: detail.node,
       wallet: { id: input.walletId, balance: snapshot.balance.value },
       warnings: collectBalanceWarnings({
         isNegative: snapshot.isNegative(),

@@ -2,13 +2,13 @@ import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
 
 /**
- * Estado puro da carteira que a liquidação de Bill precisa para debitar/creditar
- * e emitir os warnings de saldo, sem importar a entidade `Wallet` (fronteira de
- * feature — wallet é outra feature, regra §4.1). Espelha o `TransferWalletSnapshot`:
- * o gateway carrega o registro cru completo (`raw`) para que a escrita atômica
- * devolva a carteira intacta, mutando só saldo/episódio/updatedAt.
+ * Estado puro da carteira que a liquidação de core-finance precisa para
+ * debitar/creditar e emitir os warnings de saldo, sem importar a entidade
+ * `Wallet` (fronteira de feature — wallet é outra feature, regra §4.1). Espelha o
+ * `TransferWalletSnapshot`: o gateway carrega o registro cru completo (`raw`) para
+ * que a escrita atômica devolva a carteira intacta, mutando só saldo/episódio/updatedAt.
  */
-export class BillWalletSnapshot {
+export class WalletSnapshot {
   private constructor(
     public readonly id: string,
     public readonly userId: string,
@@ -27,8 +27,8 @@ export class BillWalletSnapshot {
       overdraftSince: string | null;
       [key: string]: unknown;
     },
-  ): BillWalletSnapshot {
-    return new BillWalletSnapshot(
+  ): WalletSnapshot {
+    return new WalletSnapshot(
       id,
       raw.userId,
       SignedMoney.create(raw.balance),

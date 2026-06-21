@@ -14,9 +14,9 @@ import {
   WalletMovementSpec,
   WalletGateway,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
-import { CreateBillResult } from '@/features/core-finance/bills/application/bill-response';
+import { CreateReceivableResult } from '@/features/core-finance/receivables/application/receivable-response';
 
-export interface CreateSingleBillInput {
+export interface CreateSingleReceivableInput {
   userId: string;
   personId?: string;
   amount: number;
@@ -26,23 +26,20 @@ export interface CreateSingleBillInput {
   period?: Period | null;
   frequency?: number | null;
   paymentMethodDescriptionEnum?: string;
-  cardId?: string;
-  /** Nascida paga: data do pagamento. Exige `walletId`. */
+  /** Nascida recebida: data do recebimento. Exige `walletId`. */
   paidAt?: string;
   paidAmount?: number;
   walletId?: string;
 }
 
-const CREDIT_CARD = 'CREDIT_CARD';
-
 /**
- * UC-B1: cria despesa única (`type = BILLS`, `origin = MANUAL`). A vencer →
- * delega só ao motor. Nascida paga (`paidAt`) → exige `walletId` (B1) e cria +
- * liquida num **único bloco atômico** (B2): o motor grava o nó já pago e a wallet
- * é debitada + `WalletMovement(SETTLEMENT)` na mesma transação (só escritas — não
- * relê o nó recém-criado, respeitando o Firestore).
+ * UC-RV1: cria receita única (`type = RECEIVABLES`, `origin = MANUAL` fixo no
+ * servidor). A receber → delega só ao motor. Nascida recebida (`paidAt`) → exige
+ * `walletId` e cria + liquida num **único bloco atômico**: o motor grava o nó já
+ * recebido e a wallet é creditada + `WalletMovement(CREDIT, SETTLEMENT)` na mesma
+ * transação (só escritas — não relê o nó recém-criado, respeitando o Firestore).
  */
-export class CreateSingleBillUseCase {
+export class CreateSingleReceivableUseCase {
   private constructor(
     private readonly engine: TransactionEngine,
     private readonly walletGateway: WalletGateway,
@@ -57,8 +54,8 @@ export class CreateSingleBillUseCase {
     atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
-  ): CreateSingleBillUseCase {
-    return new CreateSingleBillUseCase(
+  ): CreateSingleReceivableUseCase {
+    return new CreateSingleReceivableUseCase(
       engine,
       walletGateway,
       atomicRunner,
@@ -68,14 +65,17 @@ export class CreateSingleBillUseCase {
   }
 
   public async execute(
-    input: CreateSingleBillInput,
-  ): Promise<CreateBillResult> {
-    this.assertEdges(input);
+    input: CreateSingleReceivableInput,
+  ): Promise<CreateReceivableResult> {
+    if (input.paidAt && !input.walletId)
+      throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
+        details: 'Receita nascida recebida exige walletId.',
+      });
 
     const base = {
       userId: input.userId,
       personId: input.personId ?? input.userId,
-      type: TransactionTypeEnum.BILLS,
+      type: TransactionTypeEnum.RECEIVABLES,
       origin: TransactionOriginEnum.MANUAL,
       amount: input.amount,
       dueDate: input.dueDate,
@@ -109,12 +109,12 @@ export class CreateSingleBillUseCase {
         paymentMethodDescriptionEnum:
           input.paymentMethodDescriptionEnum ?? 'CASH',
       });
-      snapshot.debit(Money.create(paidAmount), input.paidAt as string);
+      snapshot.credit(Money.create(paidAmount));
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
         walletId,
-        direction: 'DEBIT',
+        direction: 'CREDIT',
         amount: paidAmount,
         refType: 'SETTLEMENT',
         refId: created.id,
@@ -133,21 +133,5 @@ export class CreateSingleBillUseCase {
         exceedsLimit: snapshot.exceedsOverdraftLimit(),
       }),
     };
-  }
-
-  private assertEdges(input: CreateSingleBillInput): void {
-    if (input.paymentMethodDescriptionEnum === CREDIT_CARD && !input.cardId)
-      throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'Compra no cartão de crédito exige cardId.',
-      });
-    if (input.cardId)
-      throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details:
-          'Compra no cartão de crédito será tratada pela fatura (recurso ainda não disponível).',
-      });
-    if (input.paidAt && !input.walletId)
-      throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'Despesa nascida paga exige walletId.',
-      });
   }
 }

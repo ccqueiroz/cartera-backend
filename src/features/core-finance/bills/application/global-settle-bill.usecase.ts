@@ -5,9 +5,9 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
-  BillWalletMovementSpec,
+  WalletMovementSpec,
   WalletGateway,
-} from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
+} from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { SettleBillResult } from '@/features/core-finance/bills/application/bill-response';
 
 export interface GlobalSettleBillInput {
@@ -81,7 +81,7 @@ export class GlobalSettleBillUseCase {
       );
       snapshot.debit(total, input.paymentDate);
 
-      const movements: BillWalletMovementSpec[] = result.settledAmounts.map(
+      const movements: WalletMovementSpec[] = result.settledAmounts.map(
         (a) => ({
           id: this.generateId(),
           userId: input.userId,

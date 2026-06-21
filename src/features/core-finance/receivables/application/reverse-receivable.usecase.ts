@@ -11,21 +11,22 @@ import {
   WalletMovementSpec,
   WalletGateway,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
-import { SettleBillResult } from '@/features/core-finance/bills/application/bill-response';
+import { SettleReceivableResult } from '@/features/core-finance/receivables/application/receivable-response';
 
-export interface ReverseBillInput {
+export interface ReverseReceivableInput {
   id: string;
   userId: string;
 }
 
 /**
- * UC-B9: estorna uma folha paga em bloco atômico — `engine.reverse` (snapshot em
- * `paymentHistory`) + crédito de volta na wallet do **movimento original** +
- * `WalletMovement(SETTLEMENT_REVERSAL, CREDIT)` (B3). A wallet de devolução é
- * localizada pelo movimento `SETTLEMENT` rastreável (`refId = folha`); sem ele →
- * `SETTLEMENT_MOVEMENT_NOT_FOUND` (422).
+ * UC-RV9: estorna uma folha recebida em bloco atômico — `engine.reverse`
+ * (snapshot em `paymentHistory`) + **débito** de volta na wallet do **movimento
+ * original** + `WalletMovement(SETTLEMENT_REVERSAL, DEBIT)` (B3). A wallet de
+ * devolução é localizada pelo movimento `SETTLEMENT` rastreável (`refId = folha`);
+ * sem ele → `SETTLEMENT_MOVEMENT_NOT_FOUND` (422). Devolver pode negativar o saldo:
+ * conclui mesmo assim e devolve `warnings`, sem bloquear.
  */
-export class ReverseBillUseCase {
+export class ReverseReceivableUseCase {
   private constructor(
     private readonly engine: TransactionEngine,
     private readonly walletGateway: WalletGateway,
@@ -40,8 +41,8 @@ export class ReverseBillUseCase {
     atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
-  ): ReverseBillUseCase {
-    return new ReverseBillUseCase(
+  ): ReverseReceivableUseCase {
+    return new ReverseReceivableUseCase(
       engine,
       walletGateway,
       atomicRunner,
@@ -50,7 +51,9 @@ export class ReverseBillUseCase {
     );
   }
 
-  public async execute(input: ReverseBillInput): Promise<SettleBillResult> {
+  public async execute(
+    input: ReverseReceivableInput,
+  ): Promise<SettleReceivableResult> {
     const movementRef = await this.walletGateway.findSettlementMovement(
       input.id,
       input.userId,
@@ -81,12 +84,12 @@ export class ReverseBillUseCase {
         input.userId,
       );
 
-      snapshot.credit(amount);
+      snapshot.debit(amount, occurredDate);
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
         walletId: movementRef.walletId,
-        direction: 'CREDIT',
+        direction: 'DEBIT',
         amount: movementRef.amount,
         refType: 'SETTLEMENT_REVERSAL',
         refId: input.id,
