@@ -1,6 +1,7 @@
 import { Transaction } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionTreeRepository } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
  * UC-09 estorno: snapshot em `paymentHistory`, desfaz a quitação, `reversed=true`;
@@ -27,12 +28,27 @@ export class ReverseTransactionUseCase {
   }
 
   public async execute(id: string, userId: string): Promise<Transaction> {
-    const node = await this.repository.findActiveById(id, userId);
-    if (!node) throw new TransactionNotFoundError();
-
-    const reversedAt = this.now();
+    const reversedAt = await this.prepare(id, userId);
     return this.repository.mutateAndRollup(id, (target) =>
       target.reverse(reversedAt),
     );
+  }
+
+  /** Variante tx-aware: estorna dentro de uma transação externa (AtomicRunner). */
+  public async executeTx(
+    ctx: AtomicContext,
+    id: string,
+    userId: string,
+  ): Promise<Transaction> {
+    const reversedAt = await this.prepare(id, userId);
+    return this.repository.mutateAndRollupTx(ctx, id, (target) =>
+      target.reverse(reversedAt),
+    );
+  }
+
+  private async prepare(id: string, userId: string): Promise<string> {
+    const node = await this.repository.findActiveById(id, userId);
+    if (!node) throw new TransactionNotFoundError();
+    return this.now();
   }
 }

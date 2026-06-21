@@ -10,6 +10,13 @@ import { makeWalletModule } from '@/features/wallet/wallet.factory';
 import { makeTransferModule } from '@/features/transfer/transfer.factory';
 import { makeFinancialIndicatorModule } from '@/features/financial-indicator/financial-indicator.factory';
 import { PaymentMethodRepositoryFirestore } from '@/features/payment-method/infra/persistence/payment-method.repository.firestore';
+import { CategoryRepositoryFirestore } from '@/features/category/infra/persistence/category.repository.firestore';
+import { makeTransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
+import { makeBillsModule } from '@/features/core-finance/bills/bills.factory';
+import { AtomicRunner } from '@/shared/database/atomic-runner';
+import { BillsWalletGatewayAdapter } from '@/bootstrap/bills-wallet.gateway.adapter';
+import { CoreFinanceCategoryGatewayAdapter } from '@/bootstrap/core-finance-category.gateway.adapter';
+import { CoreFinancePaymentMethodGatewayAdapter } from '@/bootstrap/core-finance-payment-method.gateway.adapter';
 import { TransferWalletGatewayAdapter } from '@/bootstrap/transfer-wallet.gateway.adapter';
 import { TransferPaymentMethodGatewayAdapter } from '@/bootstrap/transfer-payment-method.gateway.adapter';
 import { PersonGatewayAdapter } from '@/bootstrap/person.gateway.adapter';
@@ -86,6 +93,24 @@ function main(): void {
     ),
   });
 
+  // Core-finance: o motor (in-context) é montado e injetado no condutor bills.
+  // bills coordena motor + wallet atomicamente via AtomicRunner (porta de escrita no bootstrap).
+  const transactionEngine = makeTransactionEngine({
+    db,
+    categoryGateway: CoreFinanceCategoryGatewayAdapter.create(
+      CategoryRepositoryFirestore.create(db),
+    ),
+    paymentMethodGateway: CoreFinancePaymentMethodGatewayAdapter.create(
+      PaymentMethodRepositoryFirestore.create(db),
+    ),
+  });
+  const bills = makeBillsModule({
+    authMiddleware,
+    engine: transactionEngine,
+    atomicRunner: AtomicRunner.create(db),
+    walletGateway: BillsWalletGatewayAdapter.create(db),
+  });
+
   // Ordem suporte → consumidor: auth consome person e wallet via portas (adapters do bootstrap).
   const auth = makeAuthModule({
     authMiddleware,
@@ -106,6 +131,7 @@ function main(): void {
       ...person.routes,
       ...wallet.routes,
       ...transfer,
+      ...bills,
       ...auth,
     ],
     globalMiddlewares: [cookies, cors, ipControll],

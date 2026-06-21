@@ -8,6 +8,7 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface CreateSingleTransactionInput {
   userId: string;
@@ -53,6 +54,24 @@ export class CreateSingleTransactionUseCase {
   public async execute(
     input: CreateSingleTransactionInput,
   ): Promise<Transaction> {
+    const node = await this.build(input);
+    await this.repository.save(node);
+    return node;
+  }
+
+  /** Variante tx-aware: grava o nó (eventualmente já pago) numa transação externa. */
+  public async executeTx(
+    ctx: AtomicContext,
+    input: CreateSingleTransactionInput,
+  ): Promise<Transaction> {
+    const node = await this.build(input);
+    await this.repository.saveTx(ctx, node);
+    return node;
+  }
+
+  private async build(
+    input: CreateSingleTransactionInput,
+  ): Promise<Transaction> {
     const wantsPaid =
       !!input.paymentDate &&
       input.paidAmount !== undefined &&
@@ -94,7 +113,6 @@ export class CreateSingleTransactionUseCase {
         : null,
     });
 
-    await this.repository.save(node);
     return node;
   }
 

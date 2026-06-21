@@ -1,4 +1,7 @@
-import { Firestore } from 'firebase-admin/firestore';
+import {
+  Firestore,
+  Transaction as FirestoreTransaction,
+} from 'firebase-admin/firestore';
 import {
   Wallet,
   WalletPersistence,
@@ -8,6 +11,7 @@ import {
   WalletMovementPersistence,
 } from '@/features/wallet/domain/wallet-movement.entity';
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
  * Wallet (`Wallet`) e ledger (`WalletMovement`) em coleções separadas. Toda
@@ -83,10 +87,26 @@ export class WalletRepositoryFirestore implements WalletRepository {
     movements: WalletMovement[],
   ): Promise<void> {
     await this.db.runTransaction(async (txn) => {
-      txn.set(this.wallets().doc(wallet.id), wallet.toPersistence());
-      for (const movement of movements)
-        txn.set(this.movements().doc(movement.id), movement.toPersistence());
+      this.saveWithMovementsCore(txn, wallet, movements);
     });
+  }
+
+  public async saveWithMovementsTx(
+    ctx: AtomicContext,
+    wallet: Wallet,
+    movements: WalletMovement[],
+  ): Promise<void> {
+    this.saveWithMovementsCore(ctx.txn, wallet, movements);
+  }
+
+  private saveWithMovementsCore(
+    txn: FirestoreTransaction,
+    wallet: Wallet,
+    movements: WalletMovement[],
+  ): void {
+    txn.set(this.wallets().doc(wallet.id), wallet.toPersistence());
+    for (const movement of movements)
+      txn.set(this.movements().doc(movement.id), movement.toPersistence());
   }
 
   public async update(wallet: Wallet): Promise<void> {

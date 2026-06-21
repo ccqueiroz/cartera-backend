@@ -5,6 +5,7 @@ import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine
 import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface SettleTransactionInput {
   id: string;
@@ -30,6 +31,22 @@ export class SettleTransactionUseCase {
   }
 
   public async execute(input: SettleTransactionInput): Promise<Transaction> {
+    const mutate = await this.prepare(input);
+    return this.repository.mutateAndRollup(input.id, mutate);
+  }
+
+  /** Variante tx-aware: settla dentro de uma transação externa (AtomicRunner). */
+  public async executeTx(
+    ctx: AtomicContext,
+    input: SettleTransactionInput,
+  ): Promise<Transaction> {
+    const mutate = await this.prepare(input);
+    return this.repository.mutateAndRollupTx(ctx, input.id, mutate);
+  }
+
+  private async prepare(
+    input: SettleTransactionInput,
+  ): Promise<(node: Transaction) => void> {
     const target = await this.repository.findActiveById(input.id, input.userId);
     if (!target) throw new TransactionNotFoundError();
 
@@ -42,13 +59,12 @@ export class SettleTransactionUseCase {
       });
 
     const updatedAt = this.now();
-    return this.repository.mutateAndRollup(input.id, (node) =>
+    return (node: Transaction) =>
       node.settle({
         paymentDate: input.paymentDate,
         paidAmount: Money.create(input.paidAmount),
         paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
         updatedAt,
-      }),
-    );
+      });
   }
 }

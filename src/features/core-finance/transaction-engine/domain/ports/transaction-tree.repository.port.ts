@@ -3,6 +3,7 @@ import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
 import { SortCriteria } from '@/shared/query/apply-sort';
+import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
  * Contrato único de listagem rica (R5). `userId` é obrigatório por tipo — nunca
@@ -47,6 +48,9 @@ export interface LeafSettlement {
 export interface TransactionTreeRepository {
   save(node: Transaction): Promise<void>;
   saveMany(nodes: Transaction[]): Promise<void>;
+  /** Variantes tx-aware: gravam dentro de uma transação externa (AtomicRunner). */
+  saveTx(ctx: AtomicContext, node: Transaction): Promise<void>;
+  saveManyTx(ctx: AtomicContext, nodes: Transaction[]): Promise<void>;
   findActiveById(id: string, userId: string): Promise<Transaction | null>;
   findChildren(parentId: string): Promise<Transaction[]>;
   loadSubtree(nodeId: string): Promise<Transaction[]>;
@@ -59,7 +63,22 @@ export interface TransactionTreeRepository {
     today?: Date,
   ): Promise<Transaction>;
 
+  /** Variante tx-aware: participa de uma transação externa (AtomicRunner) em vez de abrir a própria. */
+  mutateAndRollupTx(
+    ctx: AtomicContext,
+    targetId: string,
+    mutate: (node: Transaction) => void,
+    today?: Date,
+  ): Promise<Transaction>;
+
   settleLeavesAndRollup(
+    settlements: LeafSettlement[],
+    today?: Date,
+  ): Promise<Transaction[]>;
+
+  /** Variante tx-aware: participa de uma transação externa (AtomicRunner) em vez de abrir a própria. */
+  settleLeavesAndRollupTx(
+    ctx: AtomicContext,
     settlements: LeafSettlement[],
     today?: Date,
   ): Promise<Transaction[]>;
