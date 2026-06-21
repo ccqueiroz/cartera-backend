@@ -11,9 +11,9 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
-  BillWalletMovementSpec,
+  WalletMovementSpec,
   WalletGateway,
-} from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
+} from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { CreateBillResult } from '@/features/core-finance/bills/application/bill-response';
 
 export interface CreateSingleBillInput {
@@ -110,7 +110,7 @@ export class CreateSingleBillUseCase {
           input.paymentMethodDescriptionEnum ?? 'CASH',
       });
       snapshot.debit(Money.create(paidAmount), input.paidAt as string);
-      const movement: BillWalletMovementSpec = {
+      const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
         walletId,

@@ -1,8 +1,8 @@
 import { AtomicContext } from '@/shared/database/atomic-runner';
-import { BillWalletSnapshot } from '@/features/core-finance/bills/domain/bill-wallet-snapshot';
+import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 
 /** Dado cru de um movimento de caixa a gravar dentro da transação atômica. */
-export interface BillWalletMovementSpec {
+export interface WalletMovementSpec {
   id: string;
   userId: string;
   walletId: string;
@@ -21,20 +21,20 @@ export interface SettlementMovementRef {
 }
 
 /**
- * Porta de **escrita** de carteira que o condutor bills consome (regra §4.3):
- * wallet é outra feature, então bills define a porta e o bootstrap injeta o
- * adapter. Distinta da `WalletGateway` read-only do transfer. As leituras de
- * snapshot/movimento são não-transacionais (acontecem antes do bloco); a escrita
- * participa do `ctx` do AtomicRunner (só escreve — reads-before-writes do motor
- * já rodaram).
+ * Porta de **escrita** de carteira que os condutores de core-finance
+ * (bills/receivables) consomem (regra §4.3): wallet é outra feature, então
+ * core-finance define a porta e o bootstrap injeta o adapter. Distinta da
+ * `WalletGateway` read-only do transfer. As leituras de snapshot/movimento são
+ * não-transacionais (acontecem antes do bloco); a escrita participa do `ctx` do
+ * AtomicRunner (só escreve — reads-before-writes do motor já rodaram).
  */
 export interface WalletGateway {
   findActiveSnapshot(
     walletId: string,
     userId: string,
-  ): Promise<BillWalletSnapshot | null>;
+  ): Promise<WalletSnapshot | null>;
 
-  /** Movimento `SETTLEMENT` rastreável da folha (para o estorno creditar a wallet certa). */
+  /** Movimento `SETTLEMENT` rastreável da folha (para o estorno mover a wallet certa). */
   findSettlementMovement(
     leafId: string,
     userId: string,
@@ -43,7 +43,7 @@ export interface WalletGateway {
   /** Grava saldo + movimentos na transação externa (AtomicRunner). Só escrita. */
   persistSettlement(
     ctx: AtomicContext,
-    snapshot: BillWalletSnapshot,
-    movements: BillWalletMovementSpec[],
+    snapshot: WalletSnapshot,
+    movements: WalletMovementSpec[],
   ): Promise<void>;
 }

@@ -1,11 +1,11 @@
 import { Firestore } from 'firebase-admin/firestore';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 import {
-  BillWalletMovementSpec,
+  WalletMovementSpec,
   SettlementMovementRef,
   WalletGateway,
-} from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
-import { BillWalletSnapshot } from '@/features/core-finance/bills/domain/bill-wallet-snapshot';
+} from '@/features/core-finance/shared/ports/wallet.gateway.port';
+import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 
 interface WalletRecord {
   userId: string;
@@ -22,33 +22,34 @@ interface MovementRecord {
 }
 
 /**
- * Mora no bootstrap: bills e wallet não se importam — só o composition root
- * conhece os dois lados (regra §4.3). Lê snapshot/movimento fora da transação e
- * escreve (saldo + `WalletMovement`) dentro do `ctx` do AtomicRunner, depois das
- * leituras transacionais do motor (reads-before-writes).
+ * Mora no bootstrap: core-finance e wallet não se importam — só o composition
+ * root conhece os dois lados (regra §4.3). Lê snapshot/movimento fora da
+ * transação e escreve (saldo + `WalletMovement`) dentro do `ctx` do AtomicRunner,
+ * depois das leituras transacionais do motor (reads-before-writes). Serve as duas
+ * direções (despesa debita / receita credita) sem ramo por tipo.
  */
-export class BillsWalletGatewayAdapter implements WalletGateway {
+export class CoreFinanceWalletGatewayAdapter implements WalletGateway {
   private static readonly WALLETS = 'Wallet';
   private static readonly MOVEMENTS = 'WalletMovement';
 
   private constructor(private readonly db: Firestore) {}
 
-  public static create(db: Firestore): BillsWalletGatewayAdapter {
-    return new BillsWalletGatewayAdapter(db);
+  public static create(db: Firestore): CoreFinanceWalletGatewayAdapter {
+    return new CoreFinanceWalletGatewayAdapter(db);
   }
 
   public async findActiveSnapshot(
     walletId: string,
     userId: string,
-  ): Promise<BillWalletSnapshot | null> {
+  ): Promise<WalletSnapshot | null> {
     const doc = await this.db
-      .collection(BillsWalletGatewayAdapter.WALLETS)
+      .collection(CoreFinanceWalletGatewayAdapter.WALLETS)
       .doc(walletId)
       .get();
     if (!doc.exists) return null;
     const data = doc.data() as WalletRecord;
     if (data.userId !== userId || data.deletedAt !== null) return null;
-    return BillWalletSnapshot.fromRaw(walletId, data);
+    return WalletSnapshot.fromRaw(walletId, data);
   }
 
   public async findSettlementMovement(
@@ -56,11 +57,10 @@ export class BillsWalletGatewayAdapter implements WalletGateway {
     userId: string,
   ): Promise<SettlementMovementRef | null> {
     const snap = await this.db
-      .collection(BillsWalletGatewayAdapter.MOVEMENTS)
+      .collection(CoreFinanceWalletGatewayAdapter.MOVEMENTS)
       .where('userId', '==', userId)
       .where('refId', '==', leafId)
       .where('refType', '==', 'SETTLEMENT')
-      .where('direction', '==', 'DEBIT')
       .limit(1)
       .get();
     if (snap.empty) return null;
@@ -70,18 +70,20 @@ export class BillsWalletGatewayAdapter implements WalletGateway {
 
   public async persistSettlement(
     ctx: AtomicContext,
-    snapshot: BillWalletSnapshot,
-    movements: BillWalletMovementSpec[],
+    snapshot: WalletSnapshot,
+    movements: WalletMovementSpec[],
   ): Promise<void> {
     const updatedAt = movements[0]?.createdAt ?? '';
     ctx.txn.set(
-      this.db.collection(BillsWalletGatewayAdapter.WALLETS).doc(snapshot.id),
+      this.db
+        .collection(CoreFinanceWalletGatewayAdapter.WALLETS)
+        .doc(snapshot.id),
       snapshot.toPersistence(updatedAt),
     );
     for (const movement of movements)
       ctx.txn.set(
         this.db
-          .collection(BillsWalletGatewayAdapter.MOVEMENTS)
+          .collection(CoreFinanceWalletGatewayAdapter.MOVEMENTS)
           .doc(movement.id),
         { ...movement },
       );

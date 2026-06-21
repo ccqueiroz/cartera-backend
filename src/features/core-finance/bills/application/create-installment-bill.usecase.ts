@@ -11,9 +11,9 @@ import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
-  BillWalletMovementSpec,
+  WalletMovementSpec,
   WalletGateway,
-} from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
+} from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { CreateBillResult } from '@/features/core-finance/bills/application/bill-response';
 
 export interface InstallmentBillInput {
@@ -127,7 +127,7 @@ export class CreateInstallmentBillUseCase {
       );
       if (entryLeaf) {
         snapshot.debit(Money.create(entry.amount), entry.paymentDate);
-        const movement: BillWalletMovementSpec = {
+        const movement: WalletMovementSpec = {
           id: this.generateId(),
           userId: input.userId,
           walletId: entry.walletId,

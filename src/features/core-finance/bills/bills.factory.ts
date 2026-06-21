@@ -3,7 +3,7 @@ import { Middleware } from '@/shared/http/middleware';
 import { crypto } from '@/packages/clients/crypto';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
-import { WalletGateway } from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
+import { WalletGateway } from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { CardInvoiceGateway } from '@/features/core-finance/bills/domain/ports/card-invoice.gateway.port';
 import { SettleBillUseCase } from '@/features/core-finance/bills/application/settle-bill.usecase';
 import { GlobalSettleBillUseCase } from '@/features/core-finance/bills/application/global-settle-bill.usecase';
@@ -16,7 +16,7 @@ import { GetBillByIdUseCase } from '@/features/core-finance/bills/application/ge
 import { EditBillUseCase } from '@/features/core-finance/bills/application/edit-bill.usecase';
 import { SoftDeleteBillUseCase } from '@/features/core-finance/bills/application/soft-delete-bill.usecase';
 import { BillController } from '@/features/core-finance/bills/infra/http/bill.controller';
-import { coreFinanceRoutes } from '@/features/core-finance/infra/http/core-finance.routes';
+import { billRoutes } from '@/features/core-finance/infra/http/core-finance.routes';
 
 export interface BillsModuleDeps {
   authMiddleware: Middleware;
@@ -84,5 +84,5 @@ export function makeBillsModule(deps: BillsModuleDeps): Route[] {
     ),
   });
 
-  return coreFinanceRoutes(controller, deps.authMiddleware);
+  return billRoutes(controller, deps.authMiddleware);
 }

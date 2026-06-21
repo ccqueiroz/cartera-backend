@@ -7,12 +7,12 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
-import { BillWalletSnapshot } from '@/features/core-finance/bills/domain/bill-wallet-snapshot';
+import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 import {
-  BillWalletMovementSpec,
+  WalletMovementSpec,
   SettlementMovementRef,
   WalletGateway,
-} from '@/features/core-finance/bills/domain/ports/wallet.gateway.port';
+} from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { SettleBillUseCase } from '@/features/core-finance/bills/application/settle-bill.usecase';
 import { ReverseBillUseCase } from '@/features/core-finance/bills/application/reverse-bill.usecase';
 import { GlobalSettleBillUseCase } from '@/features/core-finance/bills/application/global-settle-bill.usecase';
@@ -49,7 +49,7 @@ const fakeRunner = {
 } as AtomicRunner;
 
 class FakeWalletGateway implements WalletGateway {
-  public readonly movements: BillWalletMovementSpec[] = [];
+  public readonly movements: WalletMovementSpec[] = [];
   private balance: number;
 
   constructor(
@@ -62,9 +62,9 @@ class FakeWalletGateway implements WalletGateway {
 
   public async findActiveSnapshot(
     walletId: string,
-  ): Promise<BillWalletSnapshot | null> {
+  ): Promise<WalletSnapshot | null> {
     if (walletId !== this.walletId) return null;
-    return BillWalletSnapshot.fromRaw(walletId, {
+    return WalletSnapshot.fromRaw(walletId, {
       userId,
       balance: this.balance,
       overdraftLimit: this.overdraftLimit,
@@ -83,8 +83,8 @@ class FakeWalletGateway implements WalletGateway {
 
   public async persistSettlement(
     _ctx: AtomicContext,
-    snapshot: BillWalletSnapshot,
-    movements: BillWalletMovementSpec[],
+    snapshot: WalletSnapshot,
+    movements: WalletMovementSpec[],
   ): Promise<void> {
     this.balance = snapshot.balance.value;
     this.movements.push(...movements);
