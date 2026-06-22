@@ -2,6 +2,11 @@ import config from './jest.config';
 
 config.testMatch = ['**/*.spec.ts'];
 
+config.testPathIgnorePatterns = [
+  ...(config.testPathIgnorePatterns ?? ['/node_modules/']),
+  '\\.e2e-live\\.spec\\.ts$',
+];
+
 config.collectCoverageFrom = config.collectCoverageFrom || [];
 
 config.collectCoverageFrom = [

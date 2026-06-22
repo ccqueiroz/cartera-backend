@@ -22,6 +22,7 @@
     "test:coverage:unit": "dotenv -e .env.test jest --config=jest-unit-config.ts --coverage",
     "test:unit": "npx jest --watch -c jest-unit-config.ts",
     "test:ci:unit": "npx jest -c jest-unit-config.ts --coverage",
+    "test:e2e": "dotenv -e .env.test jest --config=jest-e2e-config.ts --runInBand",
     "migrate": "ts-node scripts/run-migrations-firebase.ts",
     "start:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml --env-file .env.docker.env up --build -d",
     "stop:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml down",
