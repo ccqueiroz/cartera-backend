@@ -18,7 +18,9 @@ function assertNotProduction(baseUrl: string): void {
   const allowRemote = process.env.E2E_ALLOW_REMOTE === 'true';
 
   if (PROD_HOST_MARKERS.some((marker) => host.includes(marker))) {
-    throw new Error(`[e2e gate] host "${host}" looks like production — aborted.`);
+    throw new Error(
+      `[e2e gate] host "${host}" looks like production — aborted.`,
+    );
   }
   if (!isLocal && !allowRemote) {
     throw new Error(
