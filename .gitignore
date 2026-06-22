@@ -78,6 +78,9 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# e2e-live run artifacts (manifestos com dados de teste)
+test/e2e/.artifacts/
+
 # dotenv environment variable files
 .env
 .env.development.local
