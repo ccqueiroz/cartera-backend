@@ -57,13 +57,10 @@ export class WalletRepositoryFirestore implements WalletRepository {
     );
   }
 
-  public async findDefaultByUser(
-    userId: string,
-    name: string,
-  ): Promise<Wallet | null> {
+  public async findDefaultByUser(userId: string): Promise<Wallet | null> {
     const query = await this.wallets()
       .where('userId', '==', userId)
-      .where('name', '==', name)
+      .where('isDefault', '==', true)
       .where('deletedAt', '==', null)
       .limit(1)
       .get();
