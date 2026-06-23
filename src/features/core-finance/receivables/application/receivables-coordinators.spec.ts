@@ -67,8 +67,15 @@ class FakeWalletGateway implements WalletGateway {
     return WalletSnapshot.fromRaw(walletId, {
       userId,
       balance: this.balance,
-      overdraftLimit: this.overdraftLimit,
-      overdraftSince: null,
+      overdraft:
+        this.overdraftLimit > 0
+          ? {
+              limit: this.overdraftLimit,
+              monthlyRate: 0.08,
+              graceDays: 0,
+              since: null,
+            }
+          : null,
     });
   }
 
@@ -123,8 +130,7 @@ class SeededReversalWalletGateway implements WalletGateway {
     return WalletSnapshot.fromRaw(walletId, {
       userId,
       balance: this.balance,
-      overdraftLimit: 0,
-      overdraftSince: null,
+      overdraft: null,
     });
   }
 

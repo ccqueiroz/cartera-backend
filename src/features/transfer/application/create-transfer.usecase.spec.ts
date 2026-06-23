@@ -25,15 +25,17 @@ function snapshot(
     overdraftSince?: string | null;
   } = {},
 ): TransferWalletSnapshot {
+  const limit = overrides.overdraftLimit ?? 0;
+  const since =
+    overrides.overdraftSince === undefined ? null : overrides.overdraftSince;
   return TransferWalletSnapshot.fromRaw({
     userId: 'u1',
     name: 'W',
     balance: overrides.balance ?? 0,
-    overdraftLimit: overrides.overdraftLimit ?? 0,
-    overdraftMonthlyRate: 0.08,
-    overdraftGraceDays: 0,
-    overdraftSince:
-      overrides.overdraftSince === undefined ? null : overrides.overdraftSince,
+    overdraft:
+      limit > 0 || since !== null
+        ? { limit, monthlyRate: 0.08, graceDays: 0, since }
+        : null,
     createdAt: '2026-06-01T00:00:00.000Z',
     updatedAt: null,
     deletedAt: null,
@@ -220,6 +222,23 @@ describe('CreateTransferUseCase', () => {
 
     expect(result.fromWallet.balance).toBe(-30);
     expect(result.warnings).toContain(BalanceWarning.BALANCE_NEGATIVE);
+  });
+
+  it('origem caixa pura negativa: BALANCE_NEGATIVE sem OVERDRAFT_LIMIT_EXCEEDED', async () => {
+    const repository = new InMemoryTransferRepository();
+    const gateway = walletGatewayWith({
+      w1: snapshot({ balance: 0 }),
+      w2: snapshot({ balance: 0 }),
+    });
+    const useCase = makeUseCase(repository, gateway);
+
+    const result = await useCase.execute(validInput({ amount: 80 }));
+
+    expect(result.fromWallet.balance).toBe(-80);
+    expect(result.warnings).toContain(BalanceWarning.BALANCE_NEGATIVE);
+    expect(result.warnings).not.toContain(
+      BalanceWarning.OVERDRAFT_LIMIT_EXCEEDED,
+    );
   });
 
   it('estouro do limite emite OVERDRAFT_LIMIT_EXCEEDED', async () => {
