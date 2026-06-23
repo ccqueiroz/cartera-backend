@@ -136,7 +136,9 @@ describe('wallet (e2e-live)', () => {
   });
 
   it('edit enabling overdraft without a positive limit → OVERDRAFT_LIMIT_REQUIRED (400)', async () => {
-    const wallet = await createWallet(session.token, { name: 'E2E Enable Bad' });
+    const wallet = await createWallet(session.token, {
+      name: 'E2E Enable Bad',
+    });
     const id = String(wallet.id);
     const res = await request('put', `wallet/edit/${id}`, {
       token: session.token,
@@ -267,7 +269,9 @@ describe('wallet (e2e-live)', () => {
   });
 
   it('delete is idempotent: deleting a zero-balance wallet twice → 204 both times', async () => {
-    const wallet = await createWallet(session.token, { name: 'E2E Idempotent' });
+    const wallet = await createWallet(session.token, {
+      name: 'E2E Idempotent',
+    });
     const id = String(wallet.id);
 
     const first = await request('delete', `wallet/delete/${id}`, {
