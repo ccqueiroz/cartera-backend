@@ -29,16 +29,11 @@ export class InMemoryWalletRepository implements WalletRepository {
     );
   }
 
-  public async findDefaultByUser(
-    userId: string,
-    name: string,
-  ): Promise<Wallet | null> {
+  public async findDefaultByUser(userId: string): Promise<Wallet | null> {
     return (
       [...this.wallets.values()].find(
         (wallet) =>
-          wallet.userId === userId &&
-          wallet.isActive &&
-          wallet.toOutput().name === name,
+          wallet.userId === userId && wallet.isActive && wallet.isDefault,
       ) ?? null
     );
   }

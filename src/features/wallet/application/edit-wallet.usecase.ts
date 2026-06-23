@@ -10,6 +10,7 @@ interface EditWalletInput {
   userId: string;
   id: string;
   name?: string;
+  hasOverdraft?: boolean;
   overdraftLimit?: number;
   overdraftMonthlyRate?: number;
   overdraftGraceDays?: number;
@@ -32,6 +33,7 @@ export class EditWalletUseCase {
     const wallet = await this.loadOwned(input.id, input.userId);
     wallet.edit({
       name: input.name,
+      hasOverdraft: input.hasOverdraft,
       overdraftLimit: input.overdraftLimit,
       overdraftMonthlyRate: input.overdraftMonthlyRate,
       overdraftGraceDays: input.overdraftGraceDays,

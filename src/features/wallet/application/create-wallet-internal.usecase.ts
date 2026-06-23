@@ -23,10 +23,7 @@ export class CreateWalletInternalUseCase {
   }
 
   public async execute(input: { userId: string }): Promise<void> {
-    const existing = await this.repository.findDefaultByUser(
-      input.userId,
-      DEFAULT_WALLET_NAME,
-    );
+    const existing = await this.repository.findDefaultByUser(input.userId);
     if (existing) return;
 
     const wallet = Wallet.create({
@@ -35,6 +32,7 @@ export class CreateWalletInternalUseCase {
       name: DEFAULT_WALLET_NAME,
       balance: 0,
       createdAt: this.now(),
+      isDefault: true,
     });
     await this.repository.create(wallet, []);
   }

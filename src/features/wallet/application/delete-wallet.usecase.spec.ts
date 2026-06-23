@@ -1,5 +1,6 @@
 import { DeleteWalletUseCase } from './delete-wallet.usecase';
 import { CreateWalletUseCase } from './create-wallet.usecase';
+import { CreateWalletInternalUseCase } from './create-wallet-internal.usecase';
 import { InMemoryWalletRepository } from '@/features/wallet/infra/persistence/in-memory-wallet.repository';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -56,6 +57,26 @@ describe('DeleteWalletUseCase', () => {
     await useCase.execute({ userId: 'u1', id, force: true });
 
     expect(await repository.findActiveById(id, 'u1')).toBeNull();
+  });
+
+  it('blocks deleting the default wallet (WALLET_NOT_DELETABLE), even with force', async () => {
+    const repository = new InMemoryWalletRepository();
+    const ids = makeIds();
+    await CreateWalletInternalUseCase.create(repository, ids, now).execute({
+      userId: 'u1',
+    });
+    const [defaultWallet] = await repository.listActiveByUser('u1');
+    const useCase = DeleteWalletUseCase.create(repository, now);
+
+    await expect(
+      useCase.execute({ userId: 'u1', id: defaultWallet.id }),
+    ).rejects.toMatchObject({ code: ErrorCode.WALLET_NOT_DELETABLE });
+    await expect(
+      useCase.execute({ userId: 'u1', id: defaultWallet.id, force: true }),
+    ).rejects.toMatchObject({ code: ErrorCode.WALLET_NOT_DELETABLE });
+    expect(
+      await repository.findActiveById(defaultWallet.id, 'u1'),
+    ).not.toBeNull();
   });
 
   it('é idempotente (segunda chamada não falha)', async () => {

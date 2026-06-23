@@ -1,11 +1,15 @@
-import { ValidationError } from '@/shared/kernel/errors/domain.error';
+import {
+  BusinessRuleViolationError,
+  ValidationError,
+} from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
 import {
-  DEFAULT_OVERDRAFT_GRACE_DAYS,
-  DEFAULT_OVERDRAFT_MONTHLY_RATE,
-} from '@/features/wallet/domain/overdraft-defaults';
+  OverdraftPolicy,
+  OverdraftPolicyOutput,
+  OverdraftPolicyPersistence,
+} from '@/features/wallet/domain/overdraft-policy.vo';
 
 export interface OverdraftConfig {
   limit: Money;
@@ -18,10 +22,8 @@ interface WalletProps {
   userId: string;
   name: string;
   balance: SignedMoney;
-  overdraftLimit: Money;
-  overdraftMonthlyRate: number;
-  overdraftGraceDays: number;
-  overdraftSince: string | null;
+  isDefault: boolean;
+  overdraft: OverdraftPolicy | null;
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
@@ -32,10 +34,8 @@ export interface WalletPersistence {
   userId: string;
   name: string;
   balance: number;
-  overdraftLimit: number;
-  overdraftMonthlyRate: number;
-  overdraftGraceDays: number;
-  overdraftSince: string | null;
+  isDefault: boolean;
+  overdraft: OverdraftPolicyPersistence | null;
   createdAt: string;
   updatedAt: string | null;
   deletedAt: string | null;
@@ -45,25 +45,17 @@ export interface WalletOutput {
   id: string;
   name: string;
   balance: number;
+  isDefault: boolean;
   effectiveBalance: number;
   overdraftUsed: number;
   overdraftAvailable: number;
   availableBalance: number;
   accruedInterest: number;
   amountToPay: number;
-  overdraftLimit: number;
-  overdraftMonthlyRate: number;
-  overdraftGraceDays: number;
-  overdraftSince: string | null;
+  overdraft: OverdraftPolicyOutput | null;
   active: boolean;
   createdAt: string;
   updatedAt: string | null;
-}
-
-interface OverdraftInput {
-  overdraftLimit?: number;
-  overdraftMonthlyRate?: number;
-  overdraftGraceDays?: number;
 }
 
 export class Wallet {
@@ -75,26 +67,33 @@ export class Wallet {
     name: string;
     balance?: number;
     createdAt: string;
+    isDefault?: boolean;
+    hasOverdraft?: boolean;
     overdraftLimit?: number;
     overdraftMonthlyRate?: number;
     overdraftGraceDays?: number;
-    overdraftSince?: string | null;
   }): Wallet {
-    const overdraft = Wallet.resolveOverdraft(input);
+    const overdraft = input.hasOverdraft
+      ? OverdraftPolicy.create({
+          limit: input.overdraftLimit,
+          monthlyRate: input.overdraftMonthlyRate,
+          graceDays: input.overdraftGraceDays,
+        })
+      : null;
     const props: WalletProps = {
       id: input.id,
       userId: input.userId,
       name: input.name.trim(),
       balance: SignedMoney.create(input.balance ?? 0),
-      overdraftLimit: overdraft.limit,
-      overdraftMonthlyRate: overdraft.monthlyRate,
-      overdraftGraceDays: overdraft.graceDays,
-      overdraftSince: input.overdraftSince ?? null,
+      isDefault: input.isDefault ?? false,
+      overdraft,
       createdAt: input.createdAt,
       updatedAt: null,
       deletedAt: null,
     };
     Wallet.validateProps(props);
+    if (props.overdraft !== null && props.balance.isNegative())
+      props.overdraft.openEpisode(input.createdAt.slice(0, 10));
     return new Wallet(props);
   }
 
@@ -102,27 +101,10 @@ export class Wallet {
     return new Wallet({
       ...persistence,
       balance: SignedMoney.create(persistence.balance),
-      overdraftLimit: Money.create(persistence.overdraftLimit),
+      overdraft: persistence.overdraft
+        ? OverdraftPolicy.with(persistence.overdraft)
+        : null,
     });
-  }
-
-  private static resolveOverdraft(input: OverdraftInput): OverdraftConfig {
-    Wallet.assertNonNegativeConfig(input);
-    return {
-      limit: Money.create(input.overdraftLimit ?? 0),
-      monthlyRate: input.overdraftMonthlyRate ?? DEFAULT_OVERDRAFT_MONTHLY_RATE,
-      graceDays: input.overdraftGraceDays ?? DEFAULT_OVERDRAFT_GRACE_DAYS,
-    };
-  }
-
-  private static assertNonNegativeConfig(input: OverdraftInput): void {
-    const values = [
-      input.overdraftLimit,
-      input.overdraftMonthlyRate,
-      input.overdraftGraceDays,
-    ];
-    if (values.some((value) => value !== undefined && value < 0))
-      throw new ValidationError(ErrorCode.INVALID_OVERDRAFT_CONFIG);
   }
 
   private static validateProps(props: WalletProps): void {
@@ -130,38 +112,63 @@ export class Wallet {
       throw new ValidationError(ErrorCode.WALLET_NAME_REQUIRED);
   }
 
+  /**
+   * Edita nome e liga/desliga o cheque. Numa wallet comum, `hasOverdraft=false`
+   * vira caixa puro perdoando o episódio em aberto (a política some, e com ela o
+   * `since` e os juros acumulados — decisão do PO). Na default, qualquer mexida
+   * no cheque é barrada.
+   */
   public edit(input: {
     name?: string;
     updatedAt: string;
+    hasOverdraft?: boolean;
     overdraftLimit?: number;
     overdraftMonthlyRate?: number;
     overdraftGraceDays?: number;
   }): void {
-    Wallet.assertNonNegativeConfig(input);
+    const touchesOverdraft =
+      input.hasOverdraft !== undefined ||
+      input.overdraftLimit !== undefined ||
+      input.overdraftMonthlyRate !== undefined ||
+      input.overdraftGraceDays !== undefined;
+
+    if (this.props.isDefault && touchesOverdraft)
+      throw new BusinessRuleViolationError(
+        ErrorCode.WALLET_DEFAULT_NO_OVERDRAFT,
+      );
+
+    let overdraft = this.props.overdraft;
+    if (input.hasOverdraft === false) {
+      overdraft = null;
+    } else if (
+      input.hasOverdraft === true ||
+      (overdraft !== null && touchesOverdraft)
+    ) {
+      overdraft = OverdraftPolicy.create({
+        limit: input.overdraftLimit ?? overdraft?.limit.value,
+        monthlyRate: input.overdraftMonthlyRate ?? overdraft?.monthlyRate,
+        graceDays: input.overdraftGraceDays ?? overdraft?.graceDays,
+        since: overdraft?.since ?? null,
+      });
+    }
+
     const next: WalletProps = {
       ...this.props,
       name: input.name !== undefined ? input.name.trim() : this.props.name,
-      overdraftLimit:
-        input.overdraftLimit !== undefined
-          ? Money.create(input.overdraftLimit)
-          : this.props.overdraftLimit,
-      overdraftMonthlyRate:
-        input.overdraftMonthlyRate ?? this.props.overdraftMonthlyRate,
-      overdraftGraceDays:
-        input.overdraftGraceDays ?? this.props.overdraftGraceDays,
+      overdraft,
       updatedAt: input.updatedAt,
     };
     Wallet.validateProps(next);
     this.props = next;
   }
 
-  /** Debita o caixa; o saldo pode ficar negativo (W2). Abre o episódio de cheque no 1º cruzamento 0→negativo (W12). */
+  /** Debita o caixa; o saldo pode ficar negativo (W2). Abre o episódio só quando há cheque (W12); caixa puro nunca abre. */
   public debit(amount: Money, occurredAt: string, updatedAt: string): void {
     this.props.balance = this.props.balance.subtract(
       SignedMoney.create(amount.value),
     );
-    if (this.props.balance.isNegative() && this.props.overdraftSince === null)
-      this.props.overdraftSince = occurredAt;
+    if (this.props.overdraft !== null && this.props.balance.isNegative())
+      this.props.overdraft.openEpisode(occurredAt);
     this.props.updatedAt = updatedAt;
   }
 
@@ -175,7 +182,8 @@ export class Wallet {
 
   /** Fecha o episódio quando o saldo voltou a ≥ 0 e os juros foram quitados (W12). */
   public closeOverdraftEpisode(): void {
-    if (!this.props.balance.isNegative()) this.props.overdraftSince = null;
+    if (this.props.overdraft !== null && !this.props.balance.isNegative())
+      this.props.overdraft.closeEpisode();
   }
 
   /**
@@ -184,7 +192,8 @@ export class Wallet {
    * recontar os juros já capitalizados no replay).
    */
   public restartOverdraftEpisode(occurredAt: string): void {
-    if (this.props.balance.isNegative()) this.props.overdraftSince = occurredAt;
+    if (this.props.overdraft !== null && this.props.balance.isNegative())
+      this.props.overdraft.restartEpisode(occurredAt);
   }
 
   public softDelete(deletedAt: string): void {
@@ -204,15 +213,20 @@ export class Wallet {
     return this.props.balance;
   }
 
-  public get overdraftSince(): string | null {
-    return this.props.overdraftSince;
+  public get isDefault(): boolean {
+    return this.props.isDefault;
   }
 
-  public get overdraftConfig(): OverdraftConfig {
+  public get overdraftSince(): string | null {
+    return this.props.overdraft?.since ?? null;
+  }
+
+  public get overdraftConfig(): OverdraftConfig | null {
+    if (this.props.overdraft === null) return null;
     return {
-      limit: this.props.overdraftLimit,
-      monthlyRate: this.props.overdraftMonthlyRate,
-      graceDays: this.props.overdraftGraceDays,
+      limit: this.props.overdraft.limit,
+      monthlyRate: this.props.overdraft.monthlyRate,
+      graceDays: this.props.overdraft.graceDays,
     };
   }
 
@@ -220,10 +234,10 @@ export class Wallet {
     return this.props.deletedAt === null;
   }
 
-  /** Quanto do cheque o débito ultrapassaria: saldo final < −(limite) (W11, warn-only). */
+  /** Quanto do cheque o débito ultrapassaria: saldo final < −(limite) (W11, warn-only). Caixa puro nunca estoura. */
   public exceedsOverdraftLimit(): boolean {
-    const limit = this.props.overdraftLimit.value;
-    return this.props.balance.value < -limit;
+    if (this.props.overdraft === null) return false;
+    return this.props.balance.value < -this.props.overdraft.limit.value;
   }
 
   public toPersistence(): WalletPersistence {
@@ -232,10 +246,8 @@ export class Wallet {
       userId: this.props.userId,
       name: this.props.name,
       balance: this.props.balance.value,
-      overdraftLimit: this.props.overdraftLimit.value,
-      overdraftMonthlyRate: this.props.overdraftMonthlyRate,
-      overdraftGraceDays: this.props.overdraftGraceDays,
-      overdraftSince: this.props.overdraftSince,
+      isDefault: this.props.isDefault,
+      overdraft: this.props.overdraft?.toPersistence() ?? null,
       createdAt: this.props.createdAt,
       updatedAt: this.props.updatedAt,
       deletedAt: this.props.deletedAt,
@@ -244,7 +256,7 @@ export class Wallet {
 
   public toOutput(accruedInterest = 0): WalletOutput {
     const balance = this.props.balance.value;
-    const limit = this.props.overdraftLimit.value;
+    const limit = this.props.overdraft?.limit.value ?? 0;
     const effectiveBalance = Math.max(0, balance);
     const overdraftUsed = Math.max(0, -balance);
     const overdraftAvailable = Math.max(0, limit - overdraftUsed);
@@ -254,16 +266,21 @@ export class Wallet {
       id: this.props.id,
       name: this.props.name,
       balance,
+      isDefault: this.props.isDefault,
       effectiveBalance,
       overdraftUsed,
       overdraftAvailable,
       availableBalance,
       accruedInterest,
       amountToPay,
-      overdraftLimit: limit,
-      overdraftMonthlyRate: this.props.overdraftMonthlyRate,
-      overdraftGraceDays: this.props.overdraftGraceDays,
-      overdraftSince: this.props.overdraftSince,
+      overdraft: this.props.overdraft
+        ? {
+            limit,
+            monthlyRate: this.props.overdraft.monthlyRate,
+            graceDays: this.props.overdraft.graceDays,
+            since: this.props.overdraft.since,
+          }
+        : null,
       active: this.isActive,
       createdAt: this.props.createdAt,
       updatedAt: this.props.updatedAt,

@@ -89,7 +89,13 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     'Esta carteira foi removida e não pode mais ser operada.',
   [ErrorCode.WALLET_HAS_BALANCE]: () =>
     'A carteira possui saldo diferente de zero. Confirme a exclusão para prosseguir.',
+  [ErrorCode.WALLET_NOT_DELETABLE]: () =>
+    'A carteira Cartera é a representação do seu dinheiro e não pode ser excluída.',
+  [ErrorCode.WALLET_DEFAULT_NO_OVERDRAFT]: () =>
+    'A carteira Cartera é caixa puro e não pode ter cheque-especial.',
   [ErrorCode.WALLET_NAME_REQUIRED]: () => 'O nome da carteira é obrigatório.',
+  [ErrorCode.OVERDRAFT_LIMIT_REQUIRED]: () =>
+    'Para ativar o cheque-especial, informe um limite maior que zero.',
   [ErrorCode.INVALID_OVERDRAFT_CONFIG]: () =>
     'A configuração do cheque-especial é inválida (limite, taxa, IOF e carência não podem ser negativos).',
   [ErrorCode.INVALID_WALLET_ADJUST_AMOUNT]: () =>

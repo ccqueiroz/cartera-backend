@@ -18,7 +18,12 @@ describe('GetWalletByIdUseCase', () => {
       repository,
       ids,
       now,
-    ).execute({ userId: 'u1', name: 'Nubank', overdraftLimit: 100 });
+    ).execute({
+      userId: 'u1',
+      name: 'Nubank',
+      hasOverdraft: true,
+      overdraftLimit: 100,
+    });
 
     const useCase = GetWalletByIdUseCase.create(repository, gateway, now);
     const result = await useCase.execute({ userId: 'u1', id: wallet.id });

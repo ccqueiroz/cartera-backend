@@ -67,8 +67,15 @@ class FakeWalletGateway implements WalletGateway {
     return WalletSnapshot.fromRaw(walletId, {
       userId,
       balance: this.balance,
-      overdraftLimit: this.overdraftLimit,
-      overdraftSince: null,
+      overdraft:
+        this.overdraftLimit > 0
+          ? {
+              limit: this.overdraftLimit,
+              monthlyRate: 0.08,
+              graceDays: 0,
+              since: null,
+            }
+          : null,
     });
   }
 
@@ -162,6 +169,8 @@ describe('SettleBillUseCase', () => {
 
     expect(result.wallet.balance).toBe(-30);
     expect(result.warnings).toContain('BALANCE_NEGATIVE');
+    // Pure cash (overdraft null): never an overdraft-limit warning and no episode.
+    expect(result.warnings).not.toContain('OVERDRAFT_LIMIT_EXCEEDED');
   });
 
   it('wallet inexistente → WALLET_NOT_FOUND (sem gravar)', async () => {

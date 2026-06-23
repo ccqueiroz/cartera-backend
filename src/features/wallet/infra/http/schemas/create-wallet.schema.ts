@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -15,6 +16,10 @@ export class CreateWalletSchema {
   @IsOptional()
   @IsNumber({}, { message: 'O saldo inicial deve ser um número.' })
   balance?: number;
+
+  @IsOptional()
+  @IsBoolean({ message: 'hasOverdraft deve ser um booleano.' })
+  hasOverdraft?: boolean;
 
   @IsOptional()
   @IsNumber({}, { message: 'O limite do cheque deve ser um número.' })

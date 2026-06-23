@@ -27,10 +27,16 @@ async function seedWallet(
     ids,
     () => '2026-06-01T00:00:00.000Z',
   );
+  const hasOverdraft =
+    overrides.overdraftLimit !== undefined ||
+    overrides.overdraftMonthlyRate !== undefined;
   const { wallet } = await create.execute({
     userId: 'u1',
     name: 'Nubank',
-    overdraftLimit: overrides.overdraftLimit,
+    hasOverdraft,
+    overdraftLimit: hasOverdraft
+      ? overrides.overdraftLimit ?? 100000
+      : undefined,
     overdraftMonthlyRate: overrides.overdraftMonthlyRate,
   });
   return wallet.id;
@@ -58,6 +64,9 @@ describe('AdjustBalanceUseCase', () => {
 
     expect(result.wallet.balance).toBe(-1000);
     expect(result.warnings).toContain(WalletWarning.BALANCE_NEGATIVE);
+    expect(result.warnings).not.toContain(
+      WalletWarning.OVERDRAFT_LIMIT_EXCEEDED,
+    );
     expect(result.movements[0].direction).toBe('DEBIT');
     expect(result.movements[0].refType).toBe('ADJUST');
   });
@@ -146,6 +155,6 @@ describe('AdjustBalanceUseCase', () => {
     expect(interest?.direction).toBe('DEBIT');
     expect(interest?.amount).toBeCloseTo(112.5, 0);
     expect(result.wallet.balance).toBeCloseTo(87.5, 0);
-    expect(result.wallet.overdraftSince).toBeNull();
+    expect(result.wallet.overdraft?.since ?? null).toBeNull();
   });
 });

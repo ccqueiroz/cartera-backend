@@ -7,11 +7,17 @@ import {
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 
+interface OverdraftRecord {
+  limit: number;
+  monthlyRate: number;
+  graceDays: number;
+  since: string | null;
+}
+
 interface WalletRecord {
   userId: string;
   balance: number;
-  overdraftLimit: number;
-  overdraftSince: string | null;
+  overdraft: OverdraftRecord | null;
   deletedAt: string | null;
   [key: string]: unknown;
 }

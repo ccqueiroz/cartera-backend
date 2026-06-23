@@ -24,8 +24,11 @@ describe('CreateWalletInternalUseCase', () => {
 
     const wallets = await repository.listActiveByUser('u1');
     expect(wallets).toHaveLength(1);
-    expect(wallets[0].toOutput().name).toBe(DEFAULT_WALLET_NAME);
-    expect(wallets[0].balance.value).toBe(0);
+    const out = wallets[0].toOutput();
+    expect(out.name).toBe(DEFAULT_WALLET_NAME);
+    expect(out.balance).toBe(0);
+    expect(out.isDefault).toBe(true);
+    expect(out.overdraft).toBeNull();
   });
 
   it('é idempotente por usuário (não duplica)', async () => {

@@ -110,7 +110,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "name", "order": "ASCENDING" },
+        { "fieldPath": "isDefault", "order": "ASCENDING" },
         { "fieldPath": "deletedAt", "order": "ASCENDING" }
       ]
     },

@@ -27,9 +27,10 @@ export function computeAccruedInterest(input: {
 }): number {
   const { wallet, movements, today, iofDailyRate } = input;
   const since = wallet.overdraftSince;
-  if (since === null) return 0;
+  const config = wallet.overdraftConfig;
+  if (since === null || config === null) return 0;
 
-  const { monthlyRate, graceDays } = wallet.overdraftConfig;
+  const { monthlyRate, graceDays } = config;
   const firstInterestDay = addDays(since, graceDays + 1);
   if (today < firstInterestDay) return 0;
 
