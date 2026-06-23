@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -12,6 +13,10 @@ export class EditWalletSchema {
   @IsString({ message: 'O nome deve ser um texto.' })
   @IsNotEmpty({ message: 'O nome da carteira não pode ser vazio.' })
   name?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'hasOverdraft deve ser um booleano.' })
+  hasOverdraft?: boolean;
 
   @IsOptional()
   @IsNumber({}, { message: 'O limite do cheque deve ser um número.' })
