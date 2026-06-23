@@ -26,6 +26,10 @@ export class DeleteWalletUseCase {
     // Idempotente: inexistente ou já removida ⇒ no-op silencioso.
     if (!wallet || !wallet.isActive) return;
 
+    // A Cartera default é indeletável — barra antes do saldo e ignora `force` (C6).
+    if (wallet.isDefault)
+      throw new BusinessRuleViolationError(ErrorCode.WALLET_NOT_DELETABLE);
+
     if (!wallet.balance.isZero() && input.force !== true)
       throw new BusinessRuleViolationError(ErrorCode.WALLET_HAS_BALANCE);
 

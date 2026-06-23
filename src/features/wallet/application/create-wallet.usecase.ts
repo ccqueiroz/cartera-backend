@@ -15,6 +15,7 @@ interface CreateWalletInput {
   userId: string;
   name: string;
   balance?: number;
+  hasOverdraft?: boolean;
   overdraftLimit?: number;
   overdraftMonthlyRate?: number;
   overdraftGraceDays?: number;
@@ -49,13 +50,10 @@ export class CreateWalletUseCase {
       name: input.name,
       balance: input.balance ?? 0,
       createdAt,
+      hasOverdraft: input.hasOverdraft,
       overdraftLimit: input.overdraftLimit,
       overdraftMonthlyRate: input.overdraftMonthlyRate,
       overdraftGraceDays: input.overdraftGraceDays,
-      overdraftSince:
-        (input.balance ?? 0) < 0 && (input.overdraftLimit ?? 0) >= 0
-          ? occurredAt
-          : null,
     });
 
     const movements: WalletMovement[] = [];
