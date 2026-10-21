@@ -84,3 +84,12 @@ jobs:
         id: unit-tests
         run: yarn test:ci:unit
         continue-on-error: false
+
+      - name: Checando tipos
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: yarn build
+
+      - name: Checando arquitetura
+        run: yarn arch:check
