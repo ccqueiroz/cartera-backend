@@ -35,12 +35,12 @@
             "message": "shared/http não importa features (CLAUDE.md §4)."
           },
           {
-            "target": "./src/features/*/domain",
+            "target": "./src/features/**/domain/**",
             "from": "./src/shared/http",
             "message": "domain não conhece HTTP/shared-http (CLAUDE.md §4 regra 5)."
           },
           {
-            "target": "./src/features/*/application",
+            "target": "./src/features/**/application/**",
             "from": "./src/shared/http",
             "message": "application não conhece HTTP/shared-http (CLAUDE.md §4)."
           }
@@ -64,8 +64,8 @@
     },
     {
       "files": [
-        "src/features/*/domain/**/*.ts",
-        "src/features/*/application/**/*.ts"
+        "src/features/**/domain/**/*.ts",
+        "src/features/**/application/**/*.ts"
       ],
       "rules": {
         "no-restricted-imports": [
