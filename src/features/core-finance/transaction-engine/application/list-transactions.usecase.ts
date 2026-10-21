@@ -6,7 +6,10 @@ import {
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
-import { applySort, SortCriteria } from '@/shared/query/apply-sort';
+import {
+  applySort,
+  SortCriteria,
+} from '@/features/core-finance/transaction-engine/domain/apply-sort';
 import { applyPagination } from '@/shared/query/apply-pagination';
 import { Page } from '@/shared/query/page';
 

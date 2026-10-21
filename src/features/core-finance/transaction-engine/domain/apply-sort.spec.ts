@@ -1,4 +1,7 @@
-import { applySort, Sortable } from '@/shared/query/apply-sort';
+import {
+  applySort,
+  Sortable,
+} from '@/features/core-finance/transaction-engine/domain/apply-sort';
 
 function item(overrides: Partial<Sortable>): Sortable {
   return {
