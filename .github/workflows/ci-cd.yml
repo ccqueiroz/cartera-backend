@@ -93,3 +93,6 @@ jobs:
 
       - name: Checando arquitetura
         run: yarn arch:check
+
+      - name: Build do OpenAPI
+        run: node scripts/build-openapi.cjs
