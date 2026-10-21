@@ -5,7 +5,7 @@ export interface HealthStatus {
 
 /**
  * Use case puro: sem HTTP, sem infra. `uptime` é injetado para testabilidade
- * (CLAUDE.md §4 regra: application não conhece Express).
+ * (AGENTS.md, Dependencies: application não conhece Express).
  */
 export class CheckHealthUseCase {
   private constructor(private readonly uptime: () => number) {}

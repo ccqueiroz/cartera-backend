@@ -11,7 +11,7 @@ import { AtomicContext } from '@/shared/database/atomic-runner';
  * Gancho D24 (recortado): a perna cartão↔conta — devolver limite ao cartão e
  * debitar/creditar a conta de forma atômica — entra quando `credit-card`/`account`
  * existirem. Molde de referência: liquidação coordenada por use case com gateways
- * injetados (`CreditCardGateway`/`AccountGateway`), CLAUDE.md §6. Não implementado
+ * injetados (`CreditCardGateway`/`AccountGateway`), numa só transação. Não implementado
  * aqui: este UC entrega só o estorno intrínseco à árvore.
  */
 export class ReverseTransactionUseCase {
