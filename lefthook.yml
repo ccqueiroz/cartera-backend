@@ -12,17 +12,21 @@ pre-commit:
       # Roda só quando há .ts staged. Barra violação de fronteira (errors).
       # Warnings (órfãos do código antigo) NÃO bloqueiam — exit 0.
       glob: "src/**/*.ts"
-      run: >-
-        npx --yes dependency-cruiser "src/**/*.ts"
-        --config .claude/skills/arch-guard/depcruise.config.js
-        --output-type err
+      # ponytail: o cruiser e o tsc leem a árvore de trabalho, não o snapshot staged; a CI relê o commit.
+      run: npm run --silent arch:check
       fail_text: "Violação de fronteira arquitetural (arch-guard). Corrija antes de commitar — ver CLAUDE.md §4."
+    - name: typecheck
+      glob: "src/**/*.ts"
+      run: npx tsc --noEmit
+      fail_text: "Erro de tipo (tsc --noEmit). Ver AGENTS.md, Commands."
     - name: eslint-boundaries
       glob: "src/**/*.ts"
       run: npx eslint {staged_files}
       fail_text: "Violação de fronteira de import (ESLint). Ver CLAUDE.md §4/§9."
     - name: route-convention
-      glob: "src/features/**/infra/http/**/*.route.ts"
+      glob:
+        - "src/features/**/infra/http/*.route.ts"
+        - "src/features/**/infra/http/*.controller.ts"
       run: npx jest src/shared/http/route-convention.spec.ts --silent --runInBand
       fail_text: "Rota fora da convenção (@swagger / runValidate / registro em <feature>.routes.ts). Ver CLAUDE.md §9."
 
