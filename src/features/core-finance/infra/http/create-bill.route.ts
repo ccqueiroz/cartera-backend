@@ -11,7 +11,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       201: { description: Despesa criada. }
- *       400: { description: Payload inválido (ex.: nascida paga sem walletId). }
+ *       400: { description: "Payload inválido (ex.: nascida paga sem walletId)." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class CreateBillRoute implements Route {
