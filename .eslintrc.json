@@ -56,7 +56,11 @@
       }
     ],
     "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }],
-    "jest/expect-expect": "warn"
+    "jest/expect-expect": "warn",
+    "no-warning-comments": [
+      "error",
+      { "terms": ["CLAUDE.md \u00a7"], "location": "anywhere" }
+    ]
   },
   "overrides": [
     {
