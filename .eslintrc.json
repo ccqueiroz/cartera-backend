@@ -54,7 +54,9 @@
           }
         ]
       }
-    ]
+    ],
+    "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }],
+    "jest/expect-expect": "warn"
   },
   "overrides": [
     {
