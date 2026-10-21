@@ -43,6 +43,14 @@
             "target": "./src/features/**/application/**",
             "from": "./src/shared/http",
             "message": "application não conhece HTTP/shared-http (CLAUDE.md §4)."
+          },
+          {
+            "target": [
+              "./src/!(bootstrap|features)/**",
+              "./src/features/!(core-finance)/**"
+            ],
+            "from": "./src/features/core-finance/transaction-engine",
+            "message": "transaction-engine só é importado dentro de core-finance; o bootstrap o monta (AGENTS.md, Dependencies)."
           }
         ]
       }
