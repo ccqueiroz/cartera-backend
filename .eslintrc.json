@@ -32,17 +32,17 @@
           {
             "target": "./src/shared/http",
             "from": "./src/features",
-            "message": "shared/http não importa features (CLAUDE.md §4)."
+            "message": "shared/http não importa features (AGENTS.md, Dependencies)."
           },
           {
             "target": "./src/features/**/domain/**",
             "from": "./src/shared/http",
-            "message": "domain não conhece HTTP/shared-http (CLAUDE.md §4 regra 5)."
+            "message": "domain não conhece HTTP/shared-http (AGENTS.md, Dependencies)."
           },
           {
             "target": "./src/features/**/application/**",
             "from": "./src/shared/http",
-            "message": "application não conhece HTTP/shared-http (CLAUDE.md §4)."
+            "message": "application não conhece HTTP/shared-http (AGENTS.md, Dependencies)."
           },
           {
             "target": [
@@ -67,7 +67,7 @@
           "error",
           {
             "selector": "Program",
-            "message": "Arquivos *.route.ts só podem existir em features/*/infra/http (CLAUDE.md §9)."
+            "message": "Arquivos *.route.ts só podem existir em features/*/infra/http (AGENTS.md, Routes)."
           }
         ]
       }
@@ -84,7 +84,7 @@
             "paths": [
               {
                 "name": "express",
-                "message": "domain/application não conhece Express (CLAUDE.md §4 regra 5)."
+                "message": "domain/application não conhece Express (AGENTS.md, Dependencies)."
               }
             ],
             "patterns": [

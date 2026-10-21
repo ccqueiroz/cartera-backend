@@ -14,7 +14,7 @@ pre-commit:
       glob: "src/**/*.ts"
       # ponytail: o cruiser e o tsc leem a árvore de trabalho, não o snapshot staged; a CI relê o commit.
       run: npm run --silent arch:check
-      fail_text: "Violação de fronteira arquitetural (arch-guard). Corrija antes de commitar — ver CLAUDE.md §4."
+      fail_text: "Violação de fronteira arquitetural (arch-guard). Corrija antes de commitar — ver AGENTS.md, Dependencies."
     - name: typecheck
       glob: "src/**/*.ts"
       run: npx tsc --noEmit
@@ -22,13 +22,13 @@ pre-commit:
     - name: eslint-boundaries
       glob: "src/**/*.ts"
       run: npx eslint {staged_files}
-      fail_text: "Violação de fronteira de import (ESLint). Ver CLAUDE.md §4/§9."
+      fail_text: "Violação de fronteira de import (ESLint). Ver AGENTS.md, Dependencies e Routes."
     - name: route-convention
       glob:
         - "src/features/**/infra/http/*.route.ts"
         - "src/features/**/infra/http/*.controller.ts"
       run: npx jest src/shared/http/route-convention.spec.ts --silent --runInBand
-      fail_text: "Rota fora da convenção (@swagger / runValidate / registro em <feature>.routes.ts). Ver CLAUDE.md §9."
+      fail_text: "Rota fora da convenção (@swagger / validação no controller / registro em <feature>.routes.ts). Ver AGENTS.md, Routes."
 
 pre-push:
   jobs:
