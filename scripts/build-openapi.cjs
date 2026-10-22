@@ -33,6 +33,7 @@ if (!routeFiles.length) {
 }
 
 const routePairs = new Set();
+const routePaths = new Set();
 for (const file of routeFiles) {
   const content = fs.readFileSync(file, 'utf8');
   const method = content.match(
@@ -44,6 +45,7 @@ for (const file of routeFiles) {
     continue;
   }
   routePairs.add(`${method} ${routePath}`);
+  routePaths.add(routePath);
 }
 
 let spec;
@@ -61,13 +63,26 @@ try {
   finish();
 }
 
-const verbs = new Set(['get', 'post', 'put', 'patch', 'delete']);
+// All eight operation keys of an OpenAPI 3.0 path item, not only the five a route class can declare.
+const verbs = new Set([
+  'get',
+  'put',
+  'post',
+  'delete',
+  'options',
+  'head',
+  'patch',
+  'trace',
+]);
 const specPairs = new Set();
 for (const [specPath, operations] of Object.entries(spec.paths ?? {})) {
   const routePath = specPath.replace(/\{(\w+)\}/g, ':$1');
   if (!routePath.startsWith('/api/')) fail(`path without /api/: ${specPath}`);
+  const apiPath = routePath.replace(/^\/api\//, '');
+  // A path with no operation adds no pair, so the path itself is compared too.
+  if (!routePaths.has(apiPath)) fail(`not a route class: ${apiPath}`);
   for (const verb of Object.keys(operations).filter((key) => verbs.has(key))) {
-    specPairs.add(`${verb} ${routePath.replace(/^\/api\//, '')}`);
+    specPairs.add(`${verb} ${apiPath}`);
   }
 }
 for (const pair of specPairs)
