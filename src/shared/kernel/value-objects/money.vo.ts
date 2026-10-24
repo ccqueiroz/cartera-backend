@@ -3,7 +3,7 @@ import { ErrorCode } from '../errors/error-code';
 
 /**
  * Valor monetário imutável, normalizado a 2 casas. Toda aritmética financeira
- * passa por aqui (CLAUDE.md §7) — nunca em repositório.
+ * passa por aqui (AGENTS.md, Patterns) — nunca em repositório.
  */
 export class Money {
   private constructor(private readonly _value: number) {}

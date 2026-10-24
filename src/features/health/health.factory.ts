@@ -5,7 +5,7 @@ import { healthRoutes } from '@/features/health/infra/http/health.routes';
 
 /**
  * Factory da feature: monta use case → controller → rotas e devolve Route[].
- * Padrão de composição (CLAUDE.md §7). Health não tem deps externas.
+ * Padrão de composição (AGENTS.md, Patterns). Health não tem deps externas.
  */
 export function makeHealthModule(): Route[] {
   const useCase = CheckHealthUseCase.create();

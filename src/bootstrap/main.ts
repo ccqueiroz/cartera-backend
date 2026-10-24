@@ -41,7 +41,7 @@ import { SwaggerSetup } from '@/shared/http/swagger/swagger-setup';
 
 /**
  * Composition root da reescrita. Único lugar que conhece as factories e os
- * adapters concretos de `shared/`. Ordem: suporte → consumidores (CLAUDE.md §11).
+ * adapters concretos de `shared/`. Ordem: suporte → consumidores (a feature só é montada depois das que ela consome).
  */
 function main(): void {
   const logger = new WinstonLogger();

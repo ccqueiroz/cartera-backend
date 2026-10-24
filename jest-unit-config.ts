@@ -23,7 +23,7 @@ config.collectCoverageFrom = [
 ];
 
 // Gate de cobertura: global 0 (código antigo em harvest não trava), mas a
-// estrutura NOVA nasce com gate alto sobre domínio+application (CLAUDE.md §10).
+// estrutura NOVA nasce com gate alto sobre domínio+application (AGENTS.md, Tests).
 config.coverageThreshold = {
   global: { branches: 0, functions: 0, lines: 0, statements: 0 },
   './src/shared/kernel/': {

@@ -2,7 +2,7 @@ import { Transaction } from '@/features/core-finance/transaction-engine/domain/t
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
 import { TransactionOrigin } from '@/shared/kernel/enums/transaction-origin.enum';
-import { SortCriteria } from '@/shared/query/apply-sort';
+import { SortCriteria } from '@/features/core-finance/transaction-engine/domain/apply-sort';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**

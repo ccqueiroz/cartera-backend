@@ -3,7 +3,7 @@ import { ErrorCode } from '../errors/error-code';
 
 /**
  * Posição monetária imutável, normalizada a 2 casas. Irmão de `Money`, mas
- * representa um SALDO: aceita negativo e `subtract` não clampa (CLAUDE.md §7,
+ * representa um SALDO: aceita negativo e `subtract` não clampa (AGENTS.md, Patterns;
  * decisão W2). `Money` segue sendo o tipo de todo valor de operação (≥ 0).
  */
 export class SignedMoney {

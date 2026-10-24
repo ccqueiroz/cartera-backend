@@ -11,7 +11,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       201: { description: Receita criada. }
- *       400: { description: Payload inválido (ex.: nascida recebida sem walletId). }
+ *       400: { description: "Payload inválido (ex.: nascida recebida sem walletId)." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class CreateReceivableRoute implements Route {

@@ -16,7 +16,7 @@ const DUE_SOON_MIN_DAYS = 1;
 const DUE_SOON_MAX_DAYS = 5;
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
-/** Status de pagamento derivado de data + direção + pago (CLAUDE.md §5, §7). Imutável. */
+/** Status de pagamento derivado de data + direção + pago (AGENTS.md, Patterns). Imutável. */
 export class PaymentStatus {
   private constructor(private readonly _status: PaymentStatusEnum) {}
 

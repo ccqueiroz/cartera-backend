@@ -22,7 +22,7 @@ export interface SettlementMovementRef {
 
 /**
  * Porta de **escrita** de carteira que os condutores de core-finance
- * (bills/receivables) consomem (regra §4.3): wallet é outra feature, então
+ * (bills/receivables) consomem: wallet é outra feature, então
  * core-finance define a porta e o bootstrap injeta o adapter. Distinta da
  * `WalletGateway` read-only do transfer. As leituras de snapshot/movimento são
  * não-transacionais (acontecem antes do bloco); a escrita participa do `ctx` do

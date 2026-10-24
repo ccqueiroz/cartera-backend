@@ -6,7 +6,7 @@ export type ErrorParams = Record<string, string | number>;
  * Erros de domínio puros. NÃO conhecem HTTP/status nem texto de apresentação —
  * carregam um `ErrorCode` (eixo mensagem) e a classe (eixo status). O catálogo
  * resolve o PT-BR e o ErrorMiddleware mapeia a classe para status, na borda.
- * Ver CLAUDE.md §4 regra 5.
+ * Ver AGENTS.md, Dependencies.
  */
 export abstract class DomainError extends Error {
   public override readonly name: string;
