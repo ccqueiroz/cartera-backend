@@ -54,8 +54,8 @@ is the use case Output (or `Page<Output>` = `{ content, page, size, totalElement
    enums through `$ref: '#/components/schemas/<Enum>'`.
 4. Responses list every status the code can produce, each with the `ErrorCode` in parentheses;
    400 whenever there is a body or validated param; 401 whenever there is `security`; never 500.
-5. No `:` inside a flow map `{ description: ... }` (YAML error drops the whole operation);
-   use block form when the text has a colon. No `{ description: OK. }`.
+5. No `:` or `,` in an unquoted flow-map description: quote it (`{ description: "..." }`) or use block form.
+   A `:` breaks the YAML and drops the whole operation; a `,` cuts the description. No `{ description: OK. }`.
 
 ## How to check
 

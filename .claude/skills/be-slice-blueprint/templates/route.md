@@ -33,7 +33,7 @@ import { BudgetController } from '@/features/budget/infra/http/budget.controller
  *     responses:
  *       201: { description: Orçamento criado. }
  *       400: { description: Payload inválido (VALIDATION_FAILED). }
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
  *       404: { description: Categoria não encontrada (CATEGORY_NOT_FOUND). }
  *       409: { description: Já existe orçamento com esse nome (BUDGET_ALREADY_EXISTS). }
  */

@@ -24,7 +24,7 @@ route has `security`; every response names the `ErrorCode`.
  *     responses:
  *       200:
  *         description: Página de orçamentos ({ content, page, size, totalElements }).
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
  */
 ```
 
@@ -46,8 +46,8 @@ route has `security`; every response names the `ErrorCode`.
  *         schema: { type: string, format: uuid }
  *     responses:
  *       200: { description: Orçamento encontrado. }
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
- *       404: { description: Orçamento inexistente, removido ou de outro usuário (BUDGET_NOT_FOUND). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
+ *       404: { description: "Orçamento inexistente, removido ou de outro usuário (BUDGET_NOT_FOUND)." }
  */
 ```
 
@@ -77,7 +77,7 @@ route has `security`; every response names the `ErrorCode`.
  *     responses:
  *       201: { description: Orçamento criado. }
  *       400: { description: Payload inválido (VALIDATION_FAILED). }
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
  *       404: { description: Categoria não encontrada (CATEGORY_NOT_FOUND). }
  *       409: { description: Já existe orçamento com esse nome (BUDGET_ALREADY_EXISTS). }
  */
@@ -111,7 +111,7 @@ route has `security`; every response names the `ErrorCode`.
  *     responses:
  *       200: { description: Orçamento atualizado. }
  *       400: { description: Payload inválido (VALIDATION_FAILED). }
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
  *       404: { description: Orçamento não encontrado (BUDGET_NOT_FOUND). }
  *       409: { description: Orçamento removido (BUDGET_DELETED). }
  */
@@ -135,7 +135,7 @@ route has `security`; every response names the `ErrorCode`.
  *         schema: { type: string, format: uuid }
  *     responses:
  *       204: { description: Orçamento removido. }
- *       401: { description: Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED). }
+ *       401: { description: "Sessão ausente ou inválida (INVALID_TOKEN, TOKEN_EXPIRED)." }
  *       404: { description: Orçamento não encontrado (BUDGET_NOT_FOUND). }
  *       422: { description: Orçamento já removido (BUDGET_DELETED). }
  */
