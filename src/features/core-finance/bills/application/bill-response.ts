@@ -1,7 +1,7 @@
 import { TransactionOutput } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { BalanceWarning } from '@/shared/kernel/value-objects/balance-warnings';
 
-/** View mínima de carteira na resposta — não vaza a entidade Wallet; `balance` puro (§4.7). */
+/** View mínima de carteira na resposta — não vaza a entidade Wallet; `balance` puro. */
 export interface BillWalletView {
   id: string;
   balance: number;

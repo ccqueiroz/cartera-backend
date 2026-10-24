@@ -29,7 +29,7 @@ interface MovementRecord {
 
 /**
  * Mora no bootstrap: core-finance e wallet não se importam — só o composition
- * root conhece os dois lados (regra §4.3). Lê snapshot/movimento fora da
+ * root conhece os dois lados. Lê snapshot/movimento fora da
  * transação e escreve (saldo + `WalletMovement`) dentro do `ctx` do AtomicRunner,
  * depois das leituras transacionais do motor (reads-before-writes). Serve as duas
  * direções (despesa debita / receita credita) sem ramo por tipo.

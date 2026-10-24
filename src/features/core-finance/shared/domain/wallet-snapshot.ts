@@ -11,7 +11,7 @@ interface OverdraftRaw {
 /**
  * Estado puro da carteira que a liquidação de core-finance precisa para
  * debitar/creditar e emitir os warnings de saldo, sem importar a entidade
- * `Wallet` (fronteira de feature — wallet é outra feature, regra §4.1). Espelha o
+ * `Wallet` (fronteira de feature — wallet é outra feature). Espelha o
  * `TransferWalletSnapshot`: o gateway carrega o registro cru completo (`raw`) para
  * que a escrita atômica devolva a carteira intacta, mutando só saldo/episódio/updatedAt.
  * Quando `overdraft` é `null` a carteira é caixa puro: nunca abre episódio nem estoura limite.
