@@ -30,6 +30,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *               valorPago: { type: number }
  *     responses:
  *       200: { description: OK. }
+ *       400: { description: "Payload inválido." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class GlobalSettleBillRoute implements Route {

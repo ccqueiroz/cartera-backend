@@ -27,6 +27,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *       - sessionCookieAuth: []
  *     responses:
  *       200: { description: Carteira atualizada. }
+ *       400: { description: "Payload inválido." }
  *       401: { description: Sessão ausente ou inválida. }
  *       404: { description: Carteira não encontrada. }
  *       409: { description: Carteira removida. }
