@@ -392,6 +392,22 @@ describe('ListUnreceivedByPeriodUseCase', () => {
       uc.execute({ userId, startDate: '2026-06-30', endDate: '2026-06-01' }),
     ).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
   });
+
+  it('passes the list params to the engine', async () => {
+    const engine = buildEngine();
+    const calls: unknown[] = [];
+    (engine.list as unknown as { execute: unknown }).execute = async (
+      input: unknown,
+    ) => calls.push(input);
+    const params = { sort: { field: 'paymentStatus', value: 'OVERDUE' } };
+    await ListUnreceivedByPeriodUseCase.create(engine).execute({
+      userId,
+      startDate: '2026-06-01',
+      endDate: '2026-06-30',
+      params,
+    });
+    expect(calls[0]).toMatchObject({ params });
+  });
 });
 
 describe('CreateSingleReceivableUseCase', () => {
@@ -545,6 +561,21 @@ describe('thin read/mutation use-cases', () => {
       scope: 'to_pay',
       month: 6,
     });
+  });
+
+  it('ListReceivables passes the list params to the engine', async () => {
+    const engine = buildEngine();
+    const calls: unknown[] = [];
+    (engine.list as unknown as { execute: unknown }).execute = async (
+      input: unknown,
+    ) => calls.push(input);
+    const params = { sort: { field: 'paymentStatus', value: 'OVERDUE' } };
+    await ListReceivablesUseCase.create(engine).execute({
+      userId,
+      scope: 'to_pay',
+      params,
+    });
+    expect(calls[0]).toMatchObject({ params });
   });
 
   it('GetReceivableById delega ao motor', async () => {

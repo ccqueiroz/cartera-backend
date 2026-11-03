@@ -1,5 +1,5 @@
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 import { TransactionOutput } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
@@ -11,6 +11,7 @@ export interface ListUnreceivedByPeriodInput {
   endDate: string;
   page?: number;
   size?: number;
+  params?: PaginationParams;
 }
 
 /**
@@ -44,6 +45,7 @@ export class ListUnreceivedByPeriodUseCase {
       dueDateTo: input.endDate,
       page: input.page,
       size: input.size,
+      params: input.params,
     });
   }
 }
