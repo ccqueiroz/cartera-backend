@@ -28,6 +28,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *               entry: { type: object }
  *     responses:
  *       201: { description: OK. }
+ *       400: { description: "Payload inválido." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class CreateInstallmentBillRoute implements Route {

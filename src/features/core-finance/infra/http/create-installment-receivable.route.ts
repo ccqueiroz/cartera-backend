@@ -28,6 +28,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *               entry: { type: object }
  *     responses:
  *       201: { description: OK. }
+ *       400: { description: "Payload inválido." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class CreateInstallmentReceivableRoute implements Route {

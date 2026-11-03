@@ -165,6 +165,20 @@ const receivableRoutesWithBody = routesWithBody.filter((file) =>
   file.endsWith('-receivable.route.ts'),
 );
 
+const guardedRoutes = routeFiles.filter((file) => {
+  const routeClass = readFileSync(file, 'utf8').match(
+    /\bexport class (\w+)/,
+  )?.[1];
+  const routesFile = routesFileFor(file);
+  return (
+    routeClass !== undefined &&
+    existsSync(routesFile) &&
+    new RegExp(`\\b${routeClass}\\.create\\(\\s*\\w+\\s*,`).test(
+      readFileSync(routesFile, 'utf8'),
+    )
+  );
+});
+
 describe('[BK2-11] route classes against openapi.json', () => {
   it.each(routeFiles)(
     '%s has its OpenAPI path, verb and path params',
@@ -208,6 +222,20 @@ describe('[BK2-11] route classes against openapi.json', () => {
         'application/json',
         'schema',
       ]);
+    },
+  );
+
+  it.each(routesWithBody)('%s declares the 400 response', (file) => {
+    expect(operationOf(file)).toHaveProperty(['responses', '400']);
+  });
+
+  it.each(guardedRoutes)(
+    '%s declares security and the 401 response',
+    (file) => {
+      const operation = operationOf(file);
+
+      expect(operation).toHaveProperty('security', [{ sessionCookieAuth: [] }]);
+      expect(operation).toHaveProperty(['responses', '401']);
     },
   );
 });

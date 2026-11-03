@@ -29,6 +29,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *     responses:
  *       200: { description: OK. }
+ *       400: { description: "Payload inválido." }
  *       401: { description: Sessão ausente ou inválida. }
  */
 export class SettleBillRoute implements Route {
