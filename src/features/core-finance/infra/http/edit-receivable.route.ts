@@ -14,6 +14,17 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     summary: Edita a receita (com propagacao opcional).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount: { type: number }
+ *               dueDate: { type: string }
+ *               categoryDescriptionEnum: { type: string }
+ *               propagate: { type: boolean }
  *     responses:
  *       200: { description: OK. }
  *       401: { description: Sessão ausente ou inválida. }

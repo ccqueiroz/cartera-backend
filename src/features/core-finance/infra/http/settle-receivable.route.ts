@@ -14,6 +14,19 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     summary: Recebe uma parcela (liquidacao atomica creditando a wallet).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [walletId, paidAmount, paymentDate, paymentMethodDescriptionEnum]
+ *             properties:
+ *               walletId: { type: string }
+ *               paidAmount: { type: number }
+ *               paymentDate: { type: string }
+ *               paymentMethodDescriptionEnum:
+ *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *     responses:
  *       200: { description: OK. }
  *       401: { description: Sessão ausente ou inválida. }
