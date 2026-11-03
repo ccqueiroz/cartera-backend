@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, existsSync } from 'fs';
 import { resolve, join, basename, dirname } from 'path';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const srcDir = resolve(__dirname, '../..');
 const featuresDir = resolve(srcDir, 'features');
@@ -236,6 +237,92 @@ describe('[BK2-11] route classes against openapi.json', () => {
 
       expect(operation).toHaveProperty('security', [{ sessionCookieAuth: [] }]);
       expect(operation).toHaveProperty(['responses', '401']);
+    },
+  );
+});
+
+type OpenApiSchema = {
+  $ref?: string;
+  type?: string;
+  required?: string[];
+  properties?: Partial<Record<string, OpenApiSchema>>;
+  allOf?: OpenApiSchema[];
+  enum?: string[];
+};
+type OpenApiResponse = {
+  $ref?: string;
+  description?: string;
+  content?: Partial<Record<string, { schema?: OpenApiSchema }>>;
+};
+type OpenApiComponents = {
+  schemas?: Partial<Record<string, OpenApiSchema>>;
+  responses?: Partial<Record<string, OpenApiResponse>>;
+};
+
+const RESPONSES_REF = '#/components/responses/';
+const ERROR_RESPONSE_REF = '#/components/schemas/ErrorResponse';
+
+const componentsOf = (document: OpenApiDocument): OpenApiComponents =>
+  (document as OpenApiDocument & { components?: OpenApiComponents })
+    .components ?? {};
+
+const responseOf = (
+  response: OpenApiResponse | undefined,
+): OpenApiResponse | undefined =>
+  response?.$ref?.startsWith(RESPONSES_REF)
+    ? componentsOf(openapi).responses?.[
+        response.$ref.slice(RESPONSES_REF.length)
+      ]
+    : response;
+
+const errorCodesOf = (
+  response: OpenApiResponse | undefined,
+): string[] | undefined =>
+  responseOf(response)?.content?.['application/json']?.schema?.allOf?.find(
+    (part) => part.properties?.code?.enum,
+  )?.properties?.code?.enum;
+
+const SHARED_ERROR_RESPONSES: [string, ErrorCode[]][] = [
+  ['Unauthorized', [ErrorCode.INVALID_TOKEN, ErrorCode.TOKEN_EXPIRED]],
+  ['UserDisabled', [ErrorCode.USER_DISABLED]],
+  ['InternalServerError', [ErrorCode.INTERNAL_SERVER_ERROR]],
+  ['ValidationFailed', [ErrorCode.VALIDATION_FAILED]],
+  ['WalletNotFound', [ErrorCode.WALLET_NOT_FOUND]],
+];
+
+describe('[BK2-54] shared contract components', () => {
+  it('declares ErrorResponse with message and code required as strings', () => {
+    const errorResponse = componentsOf(openapi).schemas?.ErrorResponse;
+
+    expect(errorResponse).toEqual(
+      expect.objectContaining({
+        type: 'object',
+        properties: {
+          message: expect.objectContaining({ type: 'string' }),
+          code: expect.objectContaining({ type: 'string' }),
+        },
+      }),
+    );
+    expect([...(errorResponse?.required ?? [])].sort()).toEqual([
+      'code',
+      'message',
+    ]);
+  });
+
+  it.each(SHARED_ERROR_RESPONSES)(
+    '%s is the ErrorResponse with the code enum %j',
+    (name, codes) => {
+      const response = responseOf({ $ref: `${RESPONSES_REF}${name}` });
+      const enumCodes = errorCodesOf(response) ?? [];
+
+      expect(response?.description).toEqual(expect.any(String));
+      expect(response?.content?.['application/json']?.schema?.allOf).toEqual(
+        expect.arrayContaining([{ $ref: ERROR_RESPONSE_REF }]),
+      );
+      expect([...enumCodes].sort()).toEqual([...codes].sort());
+      expect(Object.values(ErrorCode)).toEqual(
+        expect.arrayContaining(enumCodes),
+      );
     },
   );
 });
