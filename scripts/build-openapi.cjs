@@ -1,6 +1,7 @@
-// ponytail: reads apis and the route classes as text; a non-literal apis array or another route declaration form exits 1; move to ts-node if the definition stops being a literal.
+// ponytail: reads apis, the security schemes and the route classes as text; a non-literal apis array, a security name without a literal scheme or another route declaration form exits 1; move to ts-node if the definition stops being a literal.
 const fs = require('node:fs');
 const path = require('node:path');
+const stringify = require('json-stable-stringify');
 const swaggerJSDoc = require('swagger-jsdoc');
 
 process.chdir(path.resolve(__dirname, '..'));
@@ -90,7 +91,39 @@ for (const pair of specPairs)
 for (const pair of routePairs)
   if (!specPairs.has(pair)) fail(`missing in spec: ${pair}`);
 
+const schemesBlock =
+  definitionText.match(/securitySchemes:\s*\{([\s\S]*?)\n\s{6}\},?\n/)?.[1] ?? '';
+const declaredSchemes = {};
+for (const match of schemesBlock.matchAll(/(\w+):\s*\{([^}]*)\}/g)) {
+  declaredSchemes[match[1]] = Object.fromEntries(
+    [...match[2].matchAll(/(\w+):\s*'([^']*)'/g)].map((field) => [
+      field[1],
+      field[2],
+    ]),
+  );
+}
+const usedSchemes = new Set();
+for (const operations of Object.values(spec.paths ?? {})) {
+  for (const verb of Object.keys(operations).filter((key) => verbs.has(key))) {
+    for (const requirement of operations[verb].security ?? []) {
+      Object.keys(requirement).forEach((name) => usedSchemes.add(name));
+    }
+  }
+}
+const securitySchemes = {};
+for (const name of [...usedSchemes].sort()) {
+  if (declaredSchemes[name]) securitySchemes[name] = declaredSchemes[name];
+  else fail(`security name without a scheme: ${name}`);
+}
+
 console.log(
   `paths=${Object.keys(spec.paths ?? {}).length} operations=${specPairs.size} routes=${routePairs.size}`,
 );
+if (!failures.length) {
+  spec.components = { ...spec.components, securitySchemes };
+  fs.writeFileSync(
+    'src/shared/http/swagger/openapi.json',
+    `${stringify(spec, { space: 2 })}\n`,
+  );
+}
 finish();
