@@ -1,11 +1,9 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-  ValidatorOptions,
-} from '@/packages/clients/class-validator';
-import { ValidationError } from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  DROP_UNKNOWN,
+  REJECT_UNKNOWN,
+} from '@/shared/http/request-input';
 import { CreatePaymentMethodUseCase } from '@/features/payment-method/application/create-payment-method.usecase';
 import { ListPaymentMethodsUseCase } from '@/features/payment-method/application/list-payment-methods.usecase';
 import { GetPaymentMethodByEnumUseCase } from '@/features/payment-method/application/get-payment-method-by-enum.usecase';
@@ -15,33 +13,6 @@ import { CreatePaymentMethodSchema } from '@/features/payment-method/infra/http/
 import { UpdatePaymentMethodSchema } from '@/features/payment-method/infra/http/schemas/update-payment-method.schema';
 import { DescriptionEnumParamSchema } from '@/features/payment-method/infra/http/schemas/description-enum-param.schema';
 import { PaymentMethodDescription } from '@/features/payment-method/domain/enums/payment-method-description.enum';
-
-const REJECT_UNKNOWN: ValidatorOptions = {
-  whitelist: true,
-  forbidNonWhitelisted: true,
-};
-const DROP_UNKNOWN: ValidatorOptions = {
-  whitelist: true,
-  forbidNonWhitelisted: false,
-};
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-  options: ValidatorOptions,
-): Promise<void> {
-  const errors = await runValidate(schema, input, options);
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
 
 export interface PaymentMethodUseCases {
   create: CreatePaymentMethodUseCase;

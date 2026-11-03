@@ -1,15 +1,10 @@
 import {
   ClassConstructor,
   runValidate,
-  ValidatorOptions,
 } from '@/packages/clients/class-validator';
+import { DROP_UNKNOWN } from '@/shared/http/request-input';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
-
-const DROP_UNKNOWN: ValidatorOptions = {
-  whitelist: true,
-  forbidNonWhitelisted: false,
-};
 
 /**
  * E-mail presente mas malformado discrimina INVALID_EMAIL; campo ausente (ou

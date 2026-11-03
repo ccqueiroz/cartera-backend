@@ -1,10 +1,5 @@
 import type { Request, Response } from 'express';
-import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import { ValidationError } from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { assertValid } from '@/shared/http/request-input';
 import { ListCategoriesByTypeUseCase } from '@/features/category/application/list-categories-by-type.usecase';
 import { GetCategoryByEnumUseCase } from '@/features/category/application/get-category-by-enum.usecase';
 import { ListGroupsByTypeUseCase } from '@/features/category/application/list-groups-by-type.usecase';
@@ -20,26 +15,6 @@ import { EditCategorySchema } from '@/features/category/infra/http/schemas/edit-
 import { CategoryDescription } from '@/features/category/domain/enums/category-description.enum';
 import { CategoryGroup } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
 
 export interface CategoryUseCases {
   listByType: ListCategoriesByTypeUseCase;
