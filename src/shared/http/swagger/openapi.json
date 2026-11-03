@@ -1913,6 +1913,55 @@
     },
     "/api/receivable/create": {
       "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paidAt": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
             "description": "Receita criada."
@@ -1938,6 +1987,53 @@
     },
     "/api/receivable/create-installment": {
       "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "entry": {
+                    "type": "object"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "installments": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate",
+                  "installments"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "201": {
             "description": "OK."
@@ -2002,6 +2098,30 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "propagate": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK."
@@ -2034,6 +2154,41 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "selection": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "valorPago": {
+                    "type": "number"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK."
@@ -2177,6 +2332,36 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paidAmount",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK."

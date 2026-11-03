@@ -14,6 +14,20 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     summary: Recebimento global (credito total + um movimento por folha).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [walletId, paymentDate, paymentMethodDescriptionEnum]
+ *             properties:
+ *               walletId: { type: string }
+ *               paymentDate: { type: string }
+ *               paymentMethodDescriptionEnum:
+ *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
+ *               selection: { type: array, items: { type: string } }
+ *               valorPago: { type: number }
  *     responses:
  *       200: { description: OK. }
  *       401: { description: Sessão ausente ou inválida. }
