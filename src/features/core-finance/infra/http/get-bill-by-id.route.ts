@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-by-id/:id:
+ * /api/bill/list-by-id/{id}:
  *   get:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Detalhe da despesa (no + filhas imediatas).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

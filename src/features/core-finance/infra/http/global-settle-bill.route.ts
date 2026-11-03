@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/global-settlement/:id:
+ * /api/bill/global-settlement/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Quitacao global (debito total + um movimento por folha).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

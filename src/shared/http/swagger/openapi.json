@@ -569,8 +569,18 @@
         ]
       }
     },
-    "/api/bill/delete/:id": {
+    "/api/bill/delete/{id}": {
       "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "OK."
@@ -591,8 +601,18 @@
         ]
       }
     },
-    "/api/bill/edit/:id": {
+    "/api/bill/edit/{id}": {
       "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -613,8 +633,18 @@
         ]
       }
     },
-    "/api/bill/global-settlement/:id": {
+    "/api/bill/global-settlement/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -657,8 +687,18 @@
         ]
       }
     },
-    "/api/bill/list-by-id/:id": {
+    "/api/bill/list-by-id/{id}": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -701,8 +741,18 @@
         ]
       }
     },
-    "/api/bill/reverse/:id": {
+    "/api/bill/reverse/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -723,8 +773,18 @@
         ]
       }
     },
-    "/api/bill/settle/:id": {
+    "/api/bill/settle/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -1710,8 +1770,18 @@
         ]
       }
     },
-    "/api/receivable/delete/:id": {
+    "/api/receivable/delete/{id}": {
       "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "OK."
@@ -1732,8 +1802,18 @@
         ]
       }
     },
-    "/api/receivable/edit/:id": {
+    "/api/receivable/edit/{id}": {
       "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -1754,8 +1834,18 @@
         ]
       }
     },
-    "/api/receivable/global-settlement/:id": {
+    "/api/receivable/global-settlement/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -1798,8 +1888,18 @@
         ]
       }
     },
-    "/api/receivable/list-by-id/:id": {
+    "/api/receivable/list-by-id/{id}": {
       "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -1845,8 +1945,18 @@
         ]
       }
     },
-    "/api/receivable/reverse/:id": {
+    "/api/receivable/reverse/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."
@@ -1867,8 +1977,18 @@
         ]
       }
     },
-    "/api/receivable/settle/:id": {
+    "/api/receivable/settle/{id}": {
       "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK."

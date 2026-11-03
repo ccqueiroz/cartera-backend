@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/settle/:id:
+ * /api/bill/settle/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Paga uma parcela (liquidacao atomica com a wallet).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

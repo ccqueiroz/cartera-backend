@@ -4,8 +4,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/delete/:id:
+ * /api/receivable/delete/{id}:
  *   delete:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Exclui (soft-delete) a receita; nao mexe em caixa.
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]

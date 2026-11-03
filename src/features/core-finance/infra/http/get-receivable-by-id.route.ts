@@ -4,8 +4,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-by-id/:id:
+ * /api/receivable/list-by-id/{id}:
  *   get:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Detalhe da receita (no + filhas imediatas).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
