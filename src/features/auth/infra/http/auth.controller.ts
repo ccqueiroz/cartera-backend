@@ -1,6 +1,5 @@
 import type { CookieOptions, Request, Response } from 'express';
-import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { userIdFrom } from '@/shared/http/request-input';
 import { RegisterAccountUseCase } from '@/features/auth/application/register-account.usecase';
 import { LoginUseCase } from '@/features/auth/application/login.usecase';
 import { RefreshSessionUseCase } from '@/features/auth/application/refresh-session.usecase';
@@ -24,12 +23,6 @@ const SESSION_COOKIE_OPTIONS: CookieOptions = {
 
 // Anti-enumeração (UC-06): mesma resposta exista a conta ou não.
 const RECOVERY_GENERIC_MESSAGE = 'Se o e-mail existir, enviaremos instruções.';
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
 
 export interface AuthUseCases {
   registerAccount: RegisterAccountUseCase;

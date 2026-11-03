@@ -1,13 +1,10 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  booleanOrUndefined,
+  numberOrUndefined,
+  userIdFrom,
+} from '@/shared/http/request-input';
 import { CreateSingleReceivableUseCase } from '@/features/core-finance/receivables/application/create-single-receivable.usecase';
 import { CreateInstallmentReceivableUseCase } from '@/features/core-finance/receivables/application/create-installment-receivable.usecase';
 import { ListReceivablesUseCase } from '@/features/core-finance/receivables/application/list-receivables.usecase';
@@ -24,44 +21,6 @@ import { SettleReceivableSchema } from '@/features/core-finance/receivables/infr
 import { GlobalSettleReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/global-settle-receivable.schema';
 import { EditReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/edit-receivable.schema';
 import { ListUnreceivedByPeriodSchema } from '@/features/core-finance/receivables/infra/http/schemas/list-unreceived-by-period.schema';
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
-
-function numberOrUndefined(value: unknown): number | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
-
-function boolOrUndefined(value: unknown): boolean | undefined {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  return undefined;
-}
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'received' || value === 'paid' ? 'paid' : 'to_pay';
@@ -138,8 +97,8 @@ export class ReceivableController {
       paymentMethodDescriptionEnum: req.query.paymentMethodDescriptionEnum
         ? String(req.query.paymentMethodDescriptionEnum)
         : undefined,
-      rootHasInstallments: boolOrUndefined(req.query.rootHasInstallments),
-      rootIsFixedCost: boolOrUndefined(req.query.rootIsFixedCost),
+      rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
+      rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });

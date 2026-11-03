@@ -1,13 +1,9 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  numberOrUndefined,
+  userIdFrom,
+} from '@/shared/http/request-input';
 import { CreateWalletUseCase } from '@/features/wallet/application/create-wallet.usecase';
 import { ListWalletsUseCase } from '@/features/wallet/application/list-wallets.usecase';
 import { GetWalletByIdUseCase } from '@/features/wallet/application/get-wallet-by-id.usecase';
@@ -18,38 +14,6 @@ import { GetWalletStatementUseCase } from '@/features/wallet/application/get-wal
 import { CreateWalletSchema } from '@/features/wallet/infra/http/schemas/create-wallet.schema';
 import { EditWalletSchema } from '@/features/wallet/infra/http/schemas/edit-wallet.schema';
 import { AdjustBalanceSchema } from '@/features/wallet/infra/http/schemas/adjust-balance.schema';
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
-
-function numberOrUndefined(value: unknown): number | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
 
 export interface WalletUseCases {
   create: CreateWalletUseCase;
