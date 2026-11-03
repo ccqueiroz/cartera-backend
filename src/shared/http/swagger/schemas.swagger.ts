@@ -2,92 +2,11 @@
  * @swagger
  * components:
  *   schemas:
- *     OrderByAmount:
- *       type: object
- *       properties:
- *         amount:
- *           type: string
- *           enum: [asc, desc]
- *           example: asc
- *
- *     OrderByReceivableDate:
- *       type: object
- *       properties:
- *         receivableDate:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByReceivalDate:
- *       type: object
- *       properties:
- *         receivalDate:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByBillDate:
- *       type: object
- *       properties:
- *         billDate:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByPayDate:
- *       type: object
- *       properties:
- *         payDate:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByCategory:
- *       type: object
- *       properties:
- *         categoryId:
- *           type: string
- *           enum: [asc, desc]
- *           example: asc
- *
- *     OrderByPaymentMethod:
- *       type: object
- *       properties:
- *         paymentMethodId:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByPaymentStatus:
- *       type: object
- *       properties:
- *         paymentStatusId:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByCreated:
- *       type: object
- *       properties:
- *         createdAt:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
- *     OrderByUpdated:
- *       type: object
- *       properties:
- *         updatedAt:
- *           type: string
- *           enum: [asc, desc]
- *           example: desc
- *
  *     CategoryDescriptionEnum:
  *       type: string
  *       description: Enumeração da descrição da categoria.
  *       enum:
  *         - UBER
- *         - NINY_NINE
  *         - BLABLACAR
  *         - LYFT
  *         - CABIFY
@@ -95,7 +14,6 @@
  *         - BUS
  *         - SUBWAY
  *         - TRAIN
- *         - AIRPLANE
  *         - FUEL
  *         - VEHICLE_MAINTENANCE
  *         - TOLLS_PARKING
@@ -120,7 +38,7 @@
  *         - GAS
  *         - INTERNET_TV
  *         - PHONE
- *         - CLEANING_LAUNDRY
+ *         - HOME_SERVICES
  *         - REPAIR_MAINTENANCE
  *         - VEHICLE_FINANCING
  *         - PROPERTY_FINANCING
@@ -131,29 +49,50 @@
  *         - LIFE_INSURANCE
  *         - HOME_INSURANCE
  *         - CLOTHING_ACCESSORIES
+ *         - SUPERMARKET
+ *         - ONLINE_SHOPPING
+ *         - HOME_DECOR
  *         - FLIGHT_TICKETS
+ *         - TRAVEL_PACKAGES
  *         - ACCOMMODATION
  *         - TOURS
  *         - CAR_RENTAL
+ *         - SCHOOL_TUITION
+ *         - COLLEGE_TUITION
+ *         - POSTGRADUATE_TUITION
+ *         - LANGUAGE_COURSES
+ *         - TECH_COURSES
+ *         - ONLINE_COURSES
+ *         - CERTIFICATIONS
+ *         - TUTORING
+ *         - SCHOOL_SUPPLIES
+ *         - UNIFORM
+ *         - EDUCATIONAL_SUBSCRIPTIONS
+ *         - SCHOOL_TRANSPORT
  *         - GIFTS_DONATIONS
  *         - TAXES
  *         - PET_FOOD
  *         - PET_VETERINARY
  *         - PET_SHOP
+ *         - PHARMACY_VET
  *         - DEPENDENTS_CARE
- *         - CLEANING_LAUNDRY_SERVICE
  *         - OFFICE_SUPPLIES
  *         - COWORKING
  *         - BUSINESS_SOFTWARE
+ *         - INVOICE_ISSUANCE
  *         - HARDWARE
  *         - SOFTWARE_APPS
- *         - SOFTWARE_SUBSCRIPTIONS
- *         - ACCOUNTANT
  *         - CONSULTING
  *         - TECHNICAL_MAINTENANCE
  *         - SPORTS_HOBBIES
+ *         - EVENTS_SHOWS_TICKETS
+ *         - ENTERTAINMENT_SUBSCRIPTIONS
  *         - CREDIT_CARD_PAYMENT
+ *         - BANK_TAXES
  *         - OTHER_EXPENSES
+ *         - INVESTMENT
+ *         - BUYING_ASSETS_AND_CRYPTOCURRENCIES
+ *         - LOAN_REPAYMENT
  *         - SALARY
  *         - PROFIT_WITHDRAWAL
  *         - RENT_INCOME
@@ -165,7 +104,150 @@
  *         - PARTNERSHIP_SPONSOR_INCOME
  *         - PENSIONS
  *         - CASHBACK_REWARDS
+ *         - RECEIVE_LOAN
  *         - OTHER_INCOME
+ *         - BAKERY
+ *         - BUTCHER
+ *         - FARMERS_MARKET
+ *         - BEVERAGES_LIQUOR
+ *         - BAR_PUB
+ *         - ICE_CREAM_DESSERTS
+ *         - SNACK_BAR
+ *         - INDRIVE
+ *         - TAXI
+ *         - CAR_WASH
+ *         - PARKING_MONTHLY
+ *         - INTERCITY_BUS
+ *         - FERRY_BOAT
+ *         - BIKE_SCOOTER_SHARING
+ *         - EV_CHARGING
+ *         - MEDICAL_CONSULTATION
+ *         - DENTIST
+ *         - LAB_EXAMS
+ *         - THERAPY
+ *         - HOSPITAL
+ *         - OPTICAL
+ *         - PHYSIOTHERAPY
+ *         - VACCINES
+ *         - HAIR_BARBER
+ *         - NAILS_MANICURE
+ *         - MASSAGE_SPA
+ *         - NUTRITIONIST
+ *         - ALTERNATIVE_THERAPY
+ *         - HOUSEHOLD_SUPPLIES
+ *         - FURNITURE_APPLIANCES
+ *         - DOMESTIC_WORKER
+ *         - GARDENING
+ *         - HOME_SECURITY
+ *         - STUDENT_LOAN
+ *         - PERSONAL_LOAN
+ *         - CONSORTIUM
+ *         - DEVICE_INSURANCE
+ *         - TRAVEL_INSURANCE
+ *         - PET_INSURANCE
+ *         - DENTAL_INSURANCE
+ *         - BUSINESS_INSURANCE
+ *         - SHOES
+ *         - ELECTRONICS
+ *         - BOOKS_STATIONERY
+ *         - COSMETICS_PERFUMERY
+ *         - TOYS
+ *         - JEWELRY_WATCHES
+ *         - GIFTS
+ *         - CURRENCY_EXCHANGE
+ *         - BAGGAGE
+ *         - CRUISE
+ *         - TRANSFER_SHUTTLE
+ *         - PET_GROOMING
+ *         - PET_BOARDING
+ *         - PET_TRAINING
+ *         - CHILD_SUPPORT
+ *         - NANNY
+ *         - DAYCARE
+ *         - ELDERLY_CARE
+ *         - ALLOWANCE_GIVEN
+ *         - CHILD_SUPPLIES
+ *         - TEXTBOOKS
+ *         - SCHOOL_TRIP
+ *         - GRADUATION_FEES
+ *         - EXAM_FEES
+ *         - LAUNDRY
+ *         - LOCKSMITH
+ *         - TAILOR_SEWING
+ *         - POSTAL_COURIER
+ *         - FUNERAL_SERVICES
+ *         - STORAGE_RENTAL
+ *         - CLUB_MEMBERSHIP
+ *         - ACCOUNTING
+ *         - LEGAL_SERVICES
+ *         - NOTARY
+ *         - CUSTOMS_BROKER
+ *         - TRANSLATION
+ *         - DESIGN_AGENCY
+ *         - RAW_MATERIALS
+ *         - INVENTORY_GOODS
+ *         - PACKAGING
+ *         - SHIPPING_LOGISTICS
+ *         - PAYMENT_PROCESSING_FEES
+ *         - SALES_COMMISSIONS_PAID
+ *         - MARKETING_ADVERTISING
+ *         - ONLINE_ADS
+ *         - PAYROLL
+ *         - PRO_LABORE
+ *         - EMPLOYEE_BENEFITS
+ *         - COMMERCIAL_RENT
+ *         - SUPPLIERS
+ *         - EQUIPMENT
+ *         - EQUIPMENT_MAINTENANCE
+ *         - TEAM_TRAINING
+ *         - PRIVATE_PENSION
+ *         - EMERGENCY_FUND
+ *         - STOCKS
+ *         - FIXED_INCOME
+ *         - FUNDS
+ *         - WEB_HOSTING_DOMAIN
+ *         - CLOUD_STORAGE
+ *         - GADGETS
+ *         - TECH_REPAIR
+ *         - CINEMA_THEATER
+ *         - GAMES
+ *         - BOOKS_MUSIC
+ *         - NIGHTLIFE
+ *         - PARK_ATTRACTIONS
+ *         - PROPERTY_TAX_IPTU
+ *         - VEHICLE_TAX_IPVA
+ *         - INCOME_TAX_IR
+ *         - VEHICLE_LICENSING
+ *         - TRAFFIC_FINES
+ *         - SIMPLES_DAS
+ *         - ISS
+ *         - ICMS
+ *         - INSS_CONTRIBUTION
+ *         - FGTS_EMPLOYER
+ *         - CARD_ANNUAL_FEE
+ *         - IOF
+ *         - TRANSFER_FEES
+ *         - OVERDRAFT_INTEREST
+ *         - ACCOUNT_MAINTENANCE
+ *         - INTEREST_CHARGES
+ *         - TITHE_OFFERING
+ *         - CHARITY_DONATION
+ *         - LOSSES_THEFT
+ *         - MISC_FINES
+ *         - UNEXPECTED
+ *         - PRODUCT_SALES
+ *         - SERVICE_REVENUE
+ *         - FREELANCE_INCOME
+ *         - THIRTEENTH_SALARY
+ *         - VACATION_PAY
+ *         - PROFIT_SHARING_PLR
+ *         - TAX_REFUND
+ *         - FGTS_WITHDRAWAL
+ *         - USED_GOODS_SALE
+ *         - PRIZES_LOTTERY
+ *         - ALLOWANCE_RECEIVED
+ *         - GOVERNMENT_BENEFIT
+ *         - ADVANCE_RECEIVED
  *       example: UBER
  *
  *     CategoryGroupEnum:
@@ -184,13 +266,16 @@
  *         - TRAVEL_AND_TOURISM
  *         - PET_CARE
  *         - CARE
+ *         - EDUCATION_AND_STUDIES
  *         - SERVICES
  *         - PROFESSIONAL_SERVICES
  *         - BUSINESS
+ *         - INVESTIMENTS
  *         - TECHNOLOGY
  *         - LEISURE
  *         - REVENUES
  *         - TAXES
+ *         - BANK
  *         - OTHERS
  *       example: MOBILITY_BY_APP
  *
@@ -213,7 +298,8 @@
  *         - FOOD_VOUCHER
  *         - PIX
  *         - CRYPTOCURRENCY
- *       example: CREDIT_CARD
+ *         - DIGITAL_WALLET
+ *       example: DEBIT_CARD
  *
  *     PaymentStatusDescriptionEnum:
  *       type: string
