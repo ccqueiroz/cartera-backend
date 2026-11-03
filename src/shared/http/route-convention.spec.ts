@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, existsSync } from 'fs';
 import { resolve, join, basename, dirname } from 'path';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { BalanceWarning } from '@/shared/kernel/value-objects/balance-warnings';
 
 const srcDir = resolve(__dirname, '../..');
 const featuresDir = resolve(srcDir, 'features');
@@ -257,6 +258,7 @@ type OpenApiResponse = {
 type OpenApiComponents = {
   schemas?: Partial<Record<string, OpenApiSchema>>;
   responses?: Partial<Record<string, OpenApiResponse>>;
+  parameters?: Partial<Record<string, OpenApiParameter>>;
 };
 
 const RESPONSES_REF = '#/components/responses/';
@@ -322,6 +324,50 @@ describe('[BK2-54] shared contract components', () => {
       expect([...enumCodes].sort()).toEqual([...codes].sort());
       expect(Object.values(ErrorCode)).toEqual(
         expect.arrayContaining(enumCodes),
+      );
+    },
+  );
+});
+
+const PAGINATION_PARAMETERS: [string, string][] = [
+  ['Page', 'page'],
+  ['Size', 'size'],
+  ['DirectionOrder', 'direction_order'],
+  ['SortValue', 'sort_value'],
+  ['SearchByDateValue', 'search_by_date_value'],
+];
+
+describe('[BK2-54] shared page and list components', () => {
+  it('declares PageMeta with the five page fields required', () => {
+    const required = componentsOf(openapi).schemas?.PageMeta?.required ?? [];
+
+    expect([...required].sort()).toEqual([
+      'ordering',
+      'page',
+      'size',
+      'totalElements',
+      'totalPages',
+    ]);
+  });
+
+  it('declares BalanceWarning with the kernel enum values', () => {
+    expect(componentsOf(openapi).schemas?.BalanceWarning?.enum).toEqual(
+      Object.values(BalanceWarning),
+    );
+  });
+
+  it('declares WalletBalanceView with id and balance required', () => {
+    const required =
+      componentsOf(openapi).schemas?.WalletBalanceView?.required ?? [];
+
+    expect([...required].sort()).toEqual(['balance', 'id']);
+  });
+
+  it.each(PAGINATION_PARAMETERS)(
+    '%s is the query parameter %s',
+    (component, name) => {
+      expect(componentsOf(openapi).parameters?.[component]).toEqual(
+        expect.objectContaining({ in: 'query', name }),
       );
     },
   );

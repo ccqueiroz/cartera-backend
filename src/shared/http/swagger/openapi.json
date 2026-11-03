@@ -1,5 +1,54 @@
 {
   "components": {
+    "parameters": {
+      "DirectionOrder": {
+        "in": "query",
+        "name": "direction_order",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "type": "string"
+        }
+      },
+      "Page": {
+        "in": "query",
+        "name": "page",
+        "required": false,
+        "schema": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "SearchByDateValue": {
+        "in": "query",
+        "name": "search_by_date_value",
+        "required": false,
+        "schema": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}(-\\d{4}-\\d{2}-\\d{2})?$",
+          "type": "string"
+        }
+      },
+      "Size": {
+        "in": "query",
+        "name": "size",
+        "required": false,
+        "schema": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "SortValue": {
+        "in": "query",
+        "name": "sort_value",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
     "responses": {
       "InternalServerError": {
         "content": {
@@ -119,6 +168,13 @@
       }
     },
     "schemas": {
+      "BalanceWarning": {
+        "enum": [
+          "BALANCE_NEGATIVE",
+          "OVERDRAFT_LIMIT_EXCEEDED"
+        ],
+        "type": "string"
+      },
       "CategoryDescriptionEnum": {
         "description": "Enumeração da descrição da categoria.",
         "enum": [
@@ -415,6 +471,41 @@
         ],
         "type": "object"
       },
+      "PageMeta": {
+        "properties": {
+          "ordering": {
+            "additionalProperties": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "object"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "ordering"
+        ],
+        "type": "object"
+      },
       "PaymentMethodDescriptionEnum": {
         "description": "Enumeração das descrições dos métodos de pagamento.",
         "enum": [
@@ -452,6 +543,21 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "WalletBalanceView": {
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "balance"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {
