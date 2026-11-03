@@ -1,0 +1,2346 @@
+{
+  "components": {
+    "schemas": {
+      "CategoryDescriptionEnum": {
+        "description": "Enumeração da descrição da categoria.",
+        "enum": [
+          "UBER",
+          "NINY_NINE",
+          "BLABLACAR",
+          "LYFT",
+          "CABIFY",
+          "99POP",
+          "BUS",
+          "SUBWAY",
+          "TRAIN",
+          "AIRPLANE",
+          "FUEL",
+          "VEHICLE_MAINTENANCE",
+          "TOLLS_PARKING",
+          "IFOOD",
+          "UBER_EATS",
+          "RAPPI",
+          "JAMES_DELIVERY",
+          "NINY_NINE_FOOD",
+          "ZE_DELIVERY",
+          "ONLINE_FOOD_ORDERS",
+          "RESTAURANT",
+          "FAST_FOOD",
+          "CAFE_BISTRO",
+          "PHARMACY",
+          "GYM",
+          "BEAUTY",
+          "SUPPLEMENTS",
+          "RENT",
+          "CONDOMINIUM_FEE",
+          "ENERGY",
+          "WATER",
+          "GAS",
+          "INTERNET_TV",
+          "PHONE",
+          "CLEANING_LAUNDRY",
+          "REPAIR_MAINTENANCE",
+          "VEHICLE_FINANCING",
+          "PROPERTY_FINANCING",
+          "VEHICLE_CREDIT_LINE",
+          "PROPERTY_CREDIT_LINE",
+          "AUTO_INSURANCE",
+          "HEALTH_INSURANCE",
+          "LIFE_INSURANCE",
+          "HOME_INSURANCE",
+          "CLOTHING_ACCESSORIES",
+          "FLIGHT_TICKETS",
+          "ACCOMMODATION",
+          "TOURS",
+          "CAR_RENTAL",
+          "GIFTS_DONATIONS",
+          "TAXES",
+          "PET_FOOD",
+          "PET_VETERINARY",
+          "PET_SHOP",
+          "DEPENDENTS_CARE",
+          "CLEANING_LAUNDRY_SERVICE",
+          "OFFICE_SUPPLIES",
+          "COWORKING",
+          "BUSINESS_SOFTWARE",
+          "HARDWARE",
+          "SOFTWARE_APPS",
+          "SOFTWARE_SUBSCRIPTIONS",
+          "ACCOUNTANT",
+          "CONSULTING",
+          "TECHNICAL_MAINTENANCE",
+          "SPORTS_HOBBIES",
+          "CREDIT_CARD_PAYMENT",
+          "OTHER_EXPENSES",
+          "SALARY",
+          "PROFIT_WITHDRAWAL",
+          "RENT_INCOME",
+          "INVESTMENT_INCOME",
+          "REIMBURSEMENTS",
+          "COMMISSIONS_BONUSES",
+          "DONATIONS_INHERITANCE",
+          "CAPITAL_CONTRIBUTIONS",
+          "PARTNERSHIP_SPONSOR_INCOME",
+          "PENSIONS",
+          "CASHBACK_REWARDS",
+          "OTHER_INCOME"
+        ],
+        "example": "UBER",
+        "type": "string"
+      },
+      "CategoryGroupEnum": {
+        "description": "Grupo da categoria.",
+        "enum": [
+          "MOBILITY_BY_APP",
+          "TRANSPORT",
+          "FOOD_DELIVERY",
+          "FOOD",
+          "HEALTH_AND_WELL_BEING",
+          "HOUSING",
+          "FINANCING",
+          "INSURANCE",
+          "SHOPPING",
+          "TRAVEL_AND_TOURISM",
+          "PET_CARE",
+          "CARE",
+          "SERVICES",
+          "PROFESSIONAL_SERVICES",
+          "BUSINESS",
+          "TECHNOLOGY",
+          "LEISURE",
+          "REVENUES",
+          "TAXES",
+          "OTHERS"
+        ],
+        "example": "MOBILITY_BY_APP",
+        "type": "string"
+      },
+      "OrderByAmount": {
+        "properties": {
+          "amount": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "asc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByBillDate": {
+        "properties": {
+          "billDate": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByCategory": {
+        "properties": {
+          "categoryId": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "asc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByCreated": {
+        "properties": {
+          "createdAt": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByPayDate": {
+        "properties": {
+          "payDate": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByPaymentMethod": {
+        "properties": {
+          "paymentMethodId": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByPaymentStatus": {
+        "properties": {
+          "paymentStatusId": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByReceivableDate": {
+        "properties": {
+          "receivableDate": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByReceivalDate": {
+        "properties": {
+          "receivalDate": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "OrderByUpdated": {
+        "properties": {
+          "updatedAt": {
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "example": "desc",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PaymentMethodDescriptionEnum": {
+        "description": "Enumeração das descrições dos métodos de pagamento.",
+        "enum": [
+          "DEBIT_CARD",
+          "CREDIT_CARD",
+          "BANK_SLIP",
+          "BANK_DEPOSIT",
+          "BANK_TRANSFER",
+          "AUTOMATIC_DEBIT",
+          "BOOKLET",
+          "CASH",
+          "CHECK",
+          "PROMISSORY",
+          "FINANCING",
+          "MEAL_VOUCHER",
+          "FOOD_VOUCHER",
+          "PIX",
+          "CRYPTOCURRENCY"
+        ],
+        "example": "CREDIT_CARD",
+        "type": "string"
+      },
+      "PaymentStatusDescriptionEnum": {
+        "description": "Enumeração das descrições dos status de pagamento.",
+        "enum": [
+          "PAID",
+          "RECEIVED",
+          "TO_PAY",
+          "TO_RECEIVE",
+          "DUE_SOON",
+          "DUE_DAY",
+          "OVERDUE",
+          "IN_PROGRESS"
+        ],
+        "example": "PAID",
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "sessionCookieAuth": {
+        "in": "cookie",
+        "name": "session",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "Cartera-Api",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/account": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 6,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password",
+                  "firstName",
+                  "lastName"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Conta e perfil criados; tokens no body e cookie `session` setado."
+          },
+          "400": {
+            "description": "E-mail inválido (INVALID_EMAIL) ou campo obrigatório ausente (VALIDATION_FAILED)."
+          },
+          "409": {
+            "description": "E-mail já em uso (EMAIL_ALREADY_IN_USE)."
+          }
+        },
+        "summary": "Registra conta (email/senha) com auto-login.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/password-recovery": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Resposta genérica idêntica exista a conta ou não — nunca vaza existência."
+          },
+          "400": {
+            "description": "E-mail malformado (INVALID_EMAIL)."
+          }
+        },
+        "summary": "Solicita recuperação de senha (resposta genérica anti-enumeração).",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/session": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Sessão encerrada; cookie `session` expirado."
+          },
+          "401": {
+            "description": "Sessão ausente, inválida (INVALID_TOKEN) ou expirada (TOKEN_EXPIRED)."
+          },
+          "403": {
+            "description": "Conta desativada (USER_DISABLED)."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Signout — revoga todos os refresh tokens do usuário (todos os devices).",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens no body (expirationTime ISO-8601) e cookie `session` setado."
+          },
+          "400": {
+            "description": "E-mail inválido (INVALID_EMAIL) ou campo ausente (VALIDATION_FAILED)."
+          },
+          "401": {
+            "description": "Credenciais inválidas (INVALID_CREDENTIALS) — e-mail e senha errados são indistinguíveis."
+          },
+          "403": {
+            "description": "Conta encerrada (ACCOUNT_DELETED) ou suspensa (USER_DISABLED)."
+          }
+        },
+        "summary": "Login (cria sessão) com email/senha.",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Novos tokens no body (expirationTime ISO-8601) e cookie `session` atualizado."
+          },
+          "400": {
+            "description": "Refresh token ausente (VALIDATION_FAILED)."
+          },
+          "401": {
+            "description": "Refresh token inválido, expirado ou revogado (INVALID_TOKEN) — exige relogin."
+          }
+        },
+        "summary": "Renova a sessão trocando o refresh token.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/bill/create": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "Despesa criada."
+          },
+          "400": {
+            "description": "Payload inválido (ex.: nascida paga sem walletId)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma despesa única (a vencer ou nascida paga, exigindo walletId).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/create-installment": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma despesa parcelada (entrada paga exige walletId).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/delete/:id": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Exclui (soft-delete) a despesa; nao mexe em caixa.",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/edit/:id": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita a despesa (com propagacao opcional).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/global-settlement/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Quitacao global (debito total + um movimento por folha).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-by-id/:id": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da despesa (no + filhas imediatas).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-unpaid-by-period": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas nao pagas no intervalo de vencimento.",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/reverse/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Estorna um pagamento (devolve o caixa na wallet original).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/settle/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Paga uma parcela (liquidacao atomica com a wallet).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/category/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "descriptionEnum": {
+                    "type": "string"
+                  },
+                  "group": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "BILLS",
+                      "RECEIVABLES"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "descriptionEnum",
+                  "group",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Slot soft-deleted reativado."
+          },
+          "201": {
+            "description": "Categoria criada."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "403": {
+            "description": "Sem autorização de escrita (gate TBD)."
+          },
+          "409": {
+            "description": "descriptionEnum já ativo."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma categoria (ou reativa um slot soft-deleted).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/delete/{descriptionEnum}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Categoria soft-deletada."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "403": {
+            "description": "Sem autorização de escrita (gate TBD)."
+          },
+          "404": {
+            "description": "Não existe ou já está soft-deleted."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft-deleta uma categoria ativa (documento permanece).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/edit/{descriptionEnum}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "group": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "BILLS",
+                      "RECEIVABLES"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "group",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Categoria atualizada."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "403": {
+            "description": "Sem autorização de escrita (gate TBD)."
+          },
+          "404": {
+            "description": "Não existe ou está soft-deleted."
+          },
+          "422": {
+            "description": "Tentativa de trocar o descriptionEnum imutável."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita uma categoria ativa (descriptionEnum imutável).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categorias ativas do tipo."
+          },
+          "400": {
+            "description": "Type ausente ou fora do enum."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoria ativa encontrada."
+          },
+          "400": {
+            "description": "descriptionEnum fora do enum."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Não existe ou está soft-deleted."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a categoria ativa por descriptionEnum.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-by-groups/{group}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categorias ativas do grupo/tipo."
+          },
+          "400": {
+            "description": "Group fora do enum ou type ausente/inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um grupo filtradas por tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-groups": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Grupos distintos do tipo."
+          },
+          "400": {
+            "description": "Type ausente ou fora do enum."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista os grupos distintos com ≥1 categoria ativa do tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Rota pública de liveness; retorna o status e o uptime do processo.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "example": "ok",
+                      "type": "string"
+                    },
+                    "uptimeSeconds": {
+                      "example": 1234,
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Serviço no ar."
+          }
+        },
+        "summary": "Verifica a saúde do serviço.",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/payment-method/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "maxLength": 60,
+                    "type": "string"
+                  },
+                  "descriptionEnum": {
+                    "enum": [
+                      "DEBIT_CARD",
+                      "CREDIT_CARD",
+                      "BANK_SLIP",
+                      "BANK_DEPOSIT",
+                      "BANK_TRANSFER",
+                      "AUTOMATIC_DEBIT",
+                      "BOOKLET",
+                      "CASH",
+                      "CHECK",
+                      "PROMISSORY",
+                      "FINANCING",
+                      "MEAL_VOUCHER",
+                      "FOOD_VOUCHER",
+                      "PIX",
+                      "CRYPTOCURRENCY",
+                      "DIGITAL_WALLET"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "descriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Forma de pagamento criada."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "409": {
+            "description": "Já existe forma de pagamento ativa para o descriptionEnum."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma forma de pagamento.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/delete/{descriptionEnum}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Forma de pagamento soft-deletada."
+          },
+          "400": {
+            "description": "descriptionEnum fora do conjunto fechado."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Não existe forma de pagamento ativa (inexistente ou já soft-deletada)."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft-delete da forma de pagamento ativa identificada por descriptionEnum.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/edit/{descriptionEnum}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "maxLength": 60,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Forma de pagamento atualizada."
+          },
+          "400": {
+            "description": "Payload inválido ou descriptionEnum fora do conjunto fechado."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Não existe forma de pagamento ativa para o descriptionEnum."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Atualiza apenas a description de uma forma de pagamento ativa.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Lista de formas de pagamento ativas (pode ser vazia)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as formas de pagamento ativas.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "enum": [
+                "DEBIT_CARD",
+                "CREDIT_CARD",
+                "BANK_SLIP",
+                "BANK_DEPOSIT",
+                "BANK_TRANSFER",
+                "AUTOMATIC_DEBIT",
+                "BOOKLET",
+                "CASH",
+                "CHECK",
+                "PROMISSORY",
+                "FINANCING",
+                "MEAL_VOUCHER",
+                "FOOD_VOUCHER",
+                "PIX",
+                "CRYPTOCURRENCY",
+                "DIGITAL_WALLET"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Forma de pagamento (ativa ou soft-deleted mais recente)."
+          },
+          "400": {
+            "description": "descriptionEnum fora do conjunto fechado."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Nenhuma forma de pagamento do tipo existe."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a forma de pagamento por descriptionEnum (ativa, senão soft-deleted mais recente).",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-status/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Lista de status de pagamento semeados (pode ser vazia)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista o catálogo de status de pagamento.",
+        "tags": [
+          "PaymentStatus"
+        ]
+      }
+    },
+    "/api/payment-status/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "enum": [
+                "PAID",
+                "RECEIVED",
+                "TO_PAY",
+                "TO_RECEIVE",
+                "DUE_SOON",
+                "DUE_DAY",
+                "OVERDUE",
+                "IN_PROGRESS"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status de pagamento do catálogo."
+          },
+          "400": {
+            "description": "descriptionEnum fora do conjunto fechado."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Nenhum status semeado para o code informado."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca um status de pagamento do catálogo pelo code.",
+        "tags": [
+          "PaymentStatus"
+        ]
+      }
+    },
+    "/api/person/me": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Conta desabilitada e perfil marcado como deletado (idempotente)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Perfil não encontrado."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft delete terminal disable-first (desabilita conta, revoga tokens, marca deletedAt).",
+        "tags": [
+          "Person"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Perfil com fullName/isActive computados e document mascarado."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Perfil não encontrado (sessão órfã tem refresh tokens revogados)."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Retorna o perfil do usuário autenticado.",
+        "tags": [
+          "Person"
+        ]
+      },
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "birthDate": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "defaultCurrency": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "document": {
+                    "nullable": true,
+                    "properties": {
+                      "type": {
+                        "enum": [
+                          "CPF",
+                          "CNPJ"
+                        ],
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Cru, sem máscara",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "monthlyIncome": {
+                    "properties": {
+                      "currency": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "value": {
+                        "nullable": true,
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "occupation": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "nullable": true,
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "isWhatsapp": {
+                        "type": "boolean"
+                      },
+                      "number": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com document re-mascarado."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Perfil não encontrado."
+          },
+          "409": {
+            "description": "Documento já em uso por outro perfil."
+          },
+          "422": {
+            "description": "Documento/telefone inválido para o tipo declarado."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita o perfil do usuário autenticado (email e avatar excluídos).",
+        "tags": [
+          "Person"
+        ]
+      }
+    },
+    "/api/person/me/avatar": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Avatar removido (no-op se não havia avatar)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Perfil não encontrado."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Remove o avatar (deleta do bucket e zera avatarUrl).",
+        "tags": [
+          "Person"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "image": {
+                    "description": "Imagem em base64 (com ou sem prefixo data URL)",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "image"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar substituído; avatarUrl atualizado."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Perfil não encontrado."
+          },
+          "413": {
+            "description": "Imagem decodificada acima de 5MB."
+          },
+          "422": {
+            "description": "Conteúdo não é JPEG nem PNG."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Substitui o avatar (base64 JPEG/PNG até 5MB, validado por magic bytes).",
+        "tags": [
+          "Person"
+        ]
+      }
+    },
+    "/api/receivable/create": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "Receita criada."
+          },
+          "400": {
+            "description": "Payload inválido (ex.: nascida recebida sem walletId)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma receita única (a receber ou nascida recebida, exigindo walletId).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/create-installment": {
+      "post": {
+        "responses": {
+          "201": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma receita parcelada (entrada recebida exige walletId).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/delete/:id": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Exclui (soft-delete) a receita; nao mexe em caixa.",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/edit/:id": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita a receita (com propagacao opcional).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/global-settlement/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Recebimento global (credito total + um movimento por folha).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-by-id/:id": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da receita (no + filhas imediatas).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-unreceived-by-period": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "400": {
+            "description": "Datas inválidas."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas nao recebidas no intervalo de vencimento.",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/reverse/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Estorna um recebimento (debita o caixa na wallet original).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/settle/:id": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "OK."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Recebe uma parcela (liquidacao atomica creditando a wallet).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/transfer/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "fromWalletId": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "toWalletId": {
+                    "type": "string"
+                  },
+                  "transferDate": {
+                    "example": "2026-06-17",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fromWalletId",
+                  "toWalletId",
+                  "amount",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Transferência criada (com warnings se a origem ficar negativa)."
+          },
+          "400": {
+            "description": "Payload inválido (mesma carteira",
+            "valor não positivo ou data futura).": null
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Carteira não encontrada."
+          },
+          "422": {
+            "description": "Forma de pagamento inativa ou inexistente."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Transfere um valor entre duas carteiras do usuário autenticado (movimento neutro).",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/transfer/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "month",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de transferências."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as transferências do usuário autenticado, por competência, ordenadas desc.",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/transfer/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transferência encontrada."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Transferência não encontrada."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe de uma transferência do usuário autenticado.",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/wallet/adjust-balance/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "occurredAt": {
+                    "type": "string"
+                  },
+                  "operation": {
+                    "enum": [
+                      "DEPOSIT",
+                      "WITHDRAW"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation",
+                  "amount"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Saldo ajustado (wallet + movimentos + warnings)."
+          },
+          "400": {
+            "description": "Valor inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Carteira não encontrada."
+          },
+          "409": {
+            "description": "Carteira removida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Ajuste manual de saldo (depósito/saque) com movimento ADJUST.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "balance": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Carteira criada (com warnings se saldo negativo)."
+          },
+          "400": {
+            "description": "Payload inválido."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma carteira do usuário autenticado.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/delete/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Carteira removida (idempotente)."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "422": {
+            "description": "Saldo ≠ 0 sem force."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Remove (soft-delete) uma carteira; saldo ≠ 0 exige force.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/edit/{id}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Carteira atualizada."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Carteira não encontrada."
+          },
+          "409": {
+            "description": "Carteira removida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita nome e config de cheque-especial da carteira (saldo fora da whitelist).",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Página de carteiras."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as carteiras ativas do usuário autenticado.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Carteira com campos derivados."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Carteira não encontrada."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Obtém uma carteira do usuário, com os campos derivados de cheque-especial.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/statement/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de movimentos."
+          },
+          "401": {
+            "description": "Sessão ausente ou inválida."
+          },
+          "404": {
+            "description": "Carteira não encontrada."
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Extrato (livro de caixa) de uma carteira, por competência.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    }
+  },
+  "tags": [
+  ]
+}
