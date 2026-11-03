@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/reverse/:id:
+ * /api/bill/reverse/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Estorna um pagamento (devolve o caixa na wallet original).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

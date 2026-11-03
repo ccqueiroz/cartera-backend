@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/delete/:id:
+ * /api/bill/delete/{id}:
  *   delete:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Exclui (soft-delete) a despesa; nao mexe em caixa.
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

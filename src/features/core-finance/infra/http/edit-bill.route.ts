@@ -4,8 +4,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/edit/:id:
+ * /api/bill/edit/{id}:
  *   put:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Edita a despesa (com propagacao opcional).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]

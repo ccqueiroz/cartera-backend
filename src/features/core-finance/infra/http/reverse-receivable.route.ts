@@ -4,8 +4,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/reverse/:id:
+ * /api/receivable/reverse/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Estorna um recebimento (debita o caixa na wallet original).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]

@@ -4,8 +4,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/settle/:id:
+ * /api/receivable/settle/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Recebe uma parcela (liquidacao atomica creditando a wallet).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]

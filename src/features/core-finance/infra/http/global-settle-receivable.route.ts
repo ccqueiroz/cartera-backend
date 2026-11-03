@@ -4,8 +4,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/global-settlement/:id:
+ * /api/receivable/global-settlement/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Recebimento global (credito total + um movimento por folha).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]

@@ -137,3 +137,45 @@ describe('route convention', () => {
     },
   );
 });
+
+type OpenApiParameter = { in?: string; name?: string; required?: boolean };
+type OpenApiOperation = { parameters?: OpenApiParameter[] };
+type OpenApiDocument = {
+  paths?: Partial<Record<string, Partial<Record<string, OpenApiOperation>>>>;
+};
+
+const openapi: OpenApiDocument = JSON.parse(
+  readFileSync(resolve(__dirname, 'swagger/openapi.json'), 'utf8'),
+);
+
+const EXPRESS_PATH_PARAM = /:(\w+)/g;
+
+const operationOf = (file: string): OpenApiOperation | undefined => {
+  const { method, path } = readRoute(file);
+  if (!method || !path) return undefined;
+  const openApiPath = `/api/${path.replace(EXPRESS_PATH_PARAM, '{$1}')}`;
+  return openapi.paths?.[openApiPath]?.[method];
+};
+
+describe('[BK2-11] route classes against openapi.json', () => {
+  it.each(routeFiles)(
+    '%s has its OpenAPI path, verb and path params',
+    (file) => {
+      const pathParams = Array.from(
+        (readRoute(file).path ?? '').matchAll(EXPRESS_PATH_PARAM),
+        (match) =>
+          expect.objectContaining({
+            in: 'path',
+            name: match[1],
+            required: true,
+          }),
+      );
+      const operation = operationOf(file);
+
+      expect(operation).toBeDefined();
+      expect(operation?.parameters ?? []).toEqual(
+        expect.arrayContaining(pathParams),
+      );
+    },
+  );
+});
