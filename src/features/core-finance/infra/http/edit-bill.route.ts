@@ -14,6 +14,17 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     summary: Edita a despesa (com propagacao opcional).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount: { type: number }
+ *               dueDate: { type: string }
+ *               categoryDescriptionEnum: { type: string }
+ *               propagate: { type: boolean }
  *     responses:
  *       200: { description: OK. }
  *       401: { description: Sessão ausente ou inválida. }
