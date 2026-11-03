@@ -94,5 +94,9 @@ jobs:
       - name: Checando arquitetura
         run: yarn arch:check
 
+      - name: Regras e índices do Firestore no repo
+        run: jq -er ".firestore.rules, .firestore.indexes" firebase.json | while read -r f; do test -f "$f" || exit 1; done
+        shell: bash
+
       - name: Build do OpenAPI
         run: node scripts/build-openapi.cjs
