@@ -1,4 +1,4 @@
-import { Page } from '@/shared/query/page';
+import { Ordering, Page } from '@/shared/query/page';
 
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_SIZE = 20;
@@ -7,6 +7,7 @@ export function applyPagination<T>(
   items: T[],
   page: number = DEFAULT_PAGE,
   size: number = DEFAULT_SIZE,
+  ordering: Ordering | null = null,
 ): Page<T> {
   const totalElements = items.length;
   const start = page * size;
@@ -15,5 +16,7 @@ export function applyPagination<T>(
     page,
     size,
     totalElements,
+    totalPages: Math.ceil(totalElements / size),
+    ordering,
   };
 }
