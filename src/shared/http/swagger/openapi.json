@@ -73,6 +73,29 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "TransactionNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação não encontrada."
+      },
       "Unauthorized": {
         "content": {
           "application/json": {
@@ -544,6 +567,189 @@
         "example": "PAID",
         "type": "string"
       },
+      "TransactionOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "categoryDescriptionEnum": {
+            "nullable": true,
+            "type": "string"
+          },
+          "categoryGroup": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "currentAmount": {
+            "type": "number"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "effectiveRate": {
+            "type": "number"
+          },
+          "firstInstallment": {
+            "type": "boolean"
+          },
+          "frequency": {
+            "nullable": true,
+            "type": "number"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isFixedCost": {
+            "type": "boolean"
+          },
+          "origin": {
+            "enum": [
+              "MANUAL",
+              "CARD_PURCHASE",
+              "CARD_INVOICE",
+              "SHOPPING_LIST",
+              "RECURRENCE",
+              "IMPORT"
+            ],
+            "type": "string"
+          },
+          "paid": {
+            "type": "boolean"
+          },
+          "paidAmount": {
+            "type": "number"
+          },
+          "paidInstallmentsCount": {
+            "type": "number"
+          },
+          "parentId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentMethodDescriptionEnum": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentStatus": {
+            "enum": [
+              "PAID",
+              "RECEIVED",
+              "TO_PAY",
+              "TO_RECEIVE",
+              "DUE_SOON",
+              "DUE_DAY",
+              "OVERDUE",
+              "IN_PROGRESS"
+            ],
+            "type": "string"
+          },
+          "paymentVariance": {
+            "type": "number"
+          },
+          "period": {
+            "enum": [
+              "WEEK",
+              "MONTH",
+              "YEAR"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "personId": {
+            "type": "string"
+          },
+          "refMonthDueDate": {
+            "type": "number"
+          },
+          "refMonthPaymentDate": {
+            "nullable": true,
+            "type": "number"
+          },
+          "refYearDueDate": {
+            "type": "number"
+          },
+          "refYearPaymentDate": {
+            "nullable": true,
+            "type": "number"
+          },
+          "reversed": {
+            "type": "boolean"
+          },
+          "rootHasInstallments": {
+            "type": "boolean"
+          },
+          "rootId": {
+            "type": "string"
+          },
+          "rootIsFixedCost": {
+            "type": "boolean"
+          },
+          "totalInterest": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "BILLS",
+              "RECEIVABLES"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "parentId",
+          "rootId",
+          "userId",
+          "personId",
+          "type",
+          "amount",
+          "currentAmount",
+          "paidAmount",
+          "dueDate",
+          "paymentDate",
+          "paid",
+          "paymentStatus",
+          "paymentMethodDescriptionEnum",
+          "refMonthDueDate",
+          "refYearDueDate",
+          "refMonthPaymentDate",
+          "refYearPaymentDate",
+          "totalInterest",
+          "paymentVariance",
+          "effectiveRate",
+          "paidInstallmentsCount",
+          "firstInstallment",
+          "categoryDescriptionEnum",
+          "categoryGroup",
+          "isFixedCost",
+          "period",
+          "frequency",
+          "rootIsFixedCost",
+          "rootHasInstallments",
+          "hasChildren",
+          "origin",
+          "reversed",
+          "deleted",
+          "createdAt"
+        ],
+        "type": "object"
+      },
       "WalletBalanceView": {
         "properties": {
           "balance": {
@@ -926,10 +1132,20 @@
         ],
         "responses": {
           "204": {
-            "description": "OK."
+            "description": "Despesa excluída",
+            "sem corpo.": null
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

@@ -372,3 +372,58 @@ describe('[BK2-54] shared page and list components', () => {
     },
   );
 });
+
+const expectRouteContract = (file: string): void => {
+  const operation = operationOf(file) as
+    | { responses?: Partial<Record<string, OpenApiResponse>> }
+    | undefined;
+
+  expect(operation).toBeDefined();
+  expect(operation?.responses).toHaveProperty('500');
+  Object.entries(operation?.responses ?? {}).forEach(([status, ref]) => {
+    const response = responseOf(ref);
+    const schema = response?.content?.['application/json']?.schema;
+    const codes = errorCodesOf(response) ?? [];
+
+    if (/^[45]/.test(status)) {
+      expect(schema?.allOf).toContainEqual({ $ref: ERROR_RESPONSE_REF });
+      expect(codes.length).toBeGreaterThan(0);
+      expect(Object.values(ErrorCode)).toEqual(expect.arrayContaining(codes));
+    }
+    if (/^20[012]$/.test(status)) {
+      expect(schema?.properties).toHaveProperty('data');
+      expect(schema?.required).toContain('data');
+    }
+    if (status === '204') {
+      expect(response).not.toHaveProperty('content');
+    }
+  });
+};
+
+const expectControllerEnvelope = (file: string): void => {
+  const content = readFileSync(file, 'utf8');
+
+  expect(content.match(/\.json\(\s*\{\s*data\s*:/g)?.length ?? 0).toBe(
+    content.match(/\.json\(/g)?.length ?? 0,
+  );
+};
+
+const CORE_FINANCE_CONTROLLERS = [
+  'core-finance/bills/infra/http/bill.controller.ts',
+  'core-finance/receivables/infra/http/receivable.controller.ts',
+];
+
+describe('[BK2-54] core-finance controllers and the bill delete route', () => {
+  it.each(CORE_FINANCE_CONTROLLERS)(
+    '%s wraps every json body in data',
+    (file) => {
+      expectControllerEnvelope(resolve(featuresDir, file));
+    },
+  );
+
+  it('delete-bill.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'core-finance/infra/http/delete-bill.route.ts'),
+    );
+  });
+});
