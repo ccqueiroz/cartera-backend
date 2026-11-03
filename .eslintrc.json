@@ -64,6 +64,23 @@
   },
   "overrides": [
     {
+      "files": ["src/**/*.ts"],
+      "excludedFiles": ["src/shared/http/**"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+            "message": "Importe o helper de @/shared/http/request-input; não declare uma cópia."
+          },
+          {
+            "selector": "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+            "message": "Importe o helper de @/shared/http/request-input; não declare uma cópia."
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/**/*.route.ts"],
       "excludedFiles": ["src/features/*/infra/http/**/*.route.ts"],
       "rules": {
