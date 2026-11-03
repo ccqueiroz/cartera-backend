@@ -1,5 +1,123 @@
 {
   "components": {
+    "responses": {
+      "InternalServerError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
+      },
+      "Unauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INVALID_TOKEN",
+                        "TOKEN_EXPIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Sessão ausente, inválida ou expirada."
+      },
+      "UserDisabled": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "USER_DISABLED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Usuário desabilitado."
+      },
+      "ValidationFailed": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados de entrada inválidos."
+      },
+      "WalletNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira não encontrada."
+      }
+    },
     "schemas": {
       "CategoryDescriptionEnum": {
         "description": "Enumeração da descrição da categoria.",
@@ -279,6 +397,23 @@
         ],
         "example": "MOBILITY_BY_APP",
         "type": "string"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "description": "Código do erro (ErrorCode).",
+            "type": "string"
+          },
+          "message": {
+            "description": "Mensagem em português do catálogo de erros.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "code"
+        ],
+        "type": "object"
       },
       "PaymentMethodDescriptionEnum": {
         "description": "Enumeração das descrições dos métodos de pagamento.",
