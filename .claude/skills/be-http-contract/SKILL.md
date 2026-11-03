@@ -43,8 +43,7 @@ query · `{key}` is `descriptionEnum` for catalogs, uuid elsewhere · exceptions
 | BusinessRuleViolationError | 422                         | ErrorMiddleware |
 | anything else              | 500 `INTERNAL_SERVER_ERROR` | ErrorMiddleware |
 
-Error body is always `{ message: <PT-BR from the catalog>, code: <ErrorCode> }`; success body
-is the use case Output (or `Page<Output>` = `{ content, page, size, totalElements }`).
+Success body is `{ data: <Output> }`; a paginated list is `{ data: { content, page, size, totalElements, totalPages, ordering } }`; a list without pagination is `{ data: [...] }`; 204 has no body; the error body is `{ message, code }`.
 
 ## Block rules (rule 5 and the operation count are checked by `node scripts/build-openapi.cjs`; the others in review)
 
@@ -52,15 +51,18 @@ is the use case Output (or `Page<Output>` = `{ content, page, size, totalElement
 2. `security: [sessionCookieAuth]` on every guarded route; none on auth/health.
 3. `requestBody` mirrors the schema field by field; `required` = fields without `@IsOptional()`;
    enums through `$ref: '#/components/schemas/<Enum>'`.
-4. Responses list every status the code can produce, each with the `ErrorCode` in parentheses;
-   400 whenever there is a body or validated param; 401 whenever there is `security`; never 500.
+4. Responses list every status the route flow produces, the 500 included, each as `$ref: '#/components/responses/<Name>'`;
+   each error response carries `ErrorResponse` and a `code` `enum` with only the codes of that route and that status;
+   400 whenever there is a body or validated param; 401 whenever there is `security`.
 5. No `:` or `,` in an unquoted flow-map description: quote it (`{ description: "..." }`) or use block form.
-   A `:` breaks the YAML and drops the whole operation; a `,` cuts the description. No `{ description: OK. }`.
+   A `:` breaks the YAML and drops the whole operation; a `,` cuts the description. No `{ description: OK. }`;
+   every 200, 201 and 202 declares the `data` schema.
 
 ## How to check
 
 - `npx jest src/shared/http/route-convention.spec.ts` — every route has `@swagger`, is in
   `<feature>.routes.ts`, and the controller validates body routes.
-- `node scripts/build-openapi.cjs` builds the spec exactly like boot does; it exits 1 on a YAML
-  error, an ignored block or an operation count different from the route classes.
+- `node scripts/build-openapi.cjs` builds the spec exactly like boot does and writes
+  `src/shared/http/swagger/openapi.json`; it exits 1 on a YAML error, an ignored block or an
+  operation count different from the route classes.
 - A new `ErrorCode` at the border appears in the `responses` of every route that can throw it.
