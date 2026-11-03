@@ -18,7 +18,7 @@
  *         dueDate: { type: string }
  *         paymentDate: { type: string, nullable: true }
  *         paid: { type: boolean }
- *         paymentStatus: { type: string, enum: [PAID, RECEIVED, TO_PAY, TO_RECEIVE, DUE_SOON, DUE_DAY, OVERDUE, IN_PROGRESS] }
+ *         paymentStatus: { $ref: '#/components/schemas/PaymentStatusDescriptionEnum' }
  *         paymentMethodDescriptionEnum: { type: string, nullable: true }
  *         refMonthDueDate: { type: number }
  *         refYearDueDate: { type: number }

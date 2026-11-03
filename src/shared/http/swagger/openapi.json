@@ -644,17 +644,7 @@
             "type": "string"
           },
           "paymentStatus": {
-            "enum": [
-              "PAID",
-              "RECEIVED",
-              "TO_PAY",
-              "TO_RECEIVE",
-              "DUE_SOON",
-              "DUE_DAY",
-              "OVERDUE",
-              "IN_PROGRESS"
-            ],
-            "type": "string"
+            "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
           },
           "paymentVariance": {
             "type": "number"
