@@ -157,6 +157,10 @@ const operationOf = (file: string): OpenApiOperation | undefined => {
   return openapi.paths?.[openApiPath]?.[method];
 };
 
+const nonReceivableRoutesWithBody = routesWithBody.filter(
+  (file) => !file.endsWith('-receivable.route.ts'),
+);
+
 describe('[BK2-11] route classes against openapi.json', () => {
   it.each(routeFiles)(
     '%s has its OpenAPI path, verb and path params',
@@ -176,6 +180,18 @@ describe('[BK2-11] route classes against openapi.json', () => {
       expect(operation?.parameters ?? []).toEqual(
         expect.arrayContaining(pathParams),
       );
+    },
+  );
+
+  it.each(nonReceivableRoutesWithBody)(
+    '%s declares the request body',
+    (file) => {
+      expect(operationOf(file)).toHaveProperty([
+        'requestBody',
+        'content',
+        'application/json',
+        'schema',
+      ]);
     },
   );
 });

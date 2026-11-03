@@ -14,6 +14,19 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     summary: Paga uma parcela (liquidacao atomica com a wallet).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [walletId, paidAmount, paymentDate, paymentMethodDescriptionEnum]
+ *             properties:
+ *               walletId: { type: string }
+ *               paidAmount: { type: number }
+ *               paymentDate: { type: string }
+ *               paymentMethodDescriptionEnum:
+ *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *     responses:
  *       200: { description: OK. }
  *       401: { description: Sessão ausente ou inválida. }

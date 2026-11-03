@@ -9,6 +9,27 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     summary: Cria uma despesa única (a vencer ou nascida paga, exigindo walletId).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amount, dueDate]
+ *             properties:
+ *               personId: { type: string }
+ *               amount: { type: number }
+ *               dueDate: { type: string }
+ *               categoryDescriptionEnum: { type: string }
+ *               isFixedCost: { type: boolean }
+ *               period: { type: string }
+ *               frequency: { type: number }
+ *               paymentMethodDescriptionEnum:
+ *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
+ *               cardId: { type: string }
+ *               paidAt: { type: string }
+ *               paidAmount: { type: number }
+ *               walletId: { type: string }
  *     responses:
  *       201: { description: Despesa criada. }
  *       400: { description: "Payload inválido (ex.: nascida paga sem walletId)." }
