@@ -46,6 +46,24 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
   [ErrorCode.AT_LEAST_ONE_INSTALLMENT_REQUIRED]: () =>
     'Informe ao menos uma parcela.',
   [ErrorCode.INVALID_PAYMENT_METHOD]: () => 'Forma de pagamento inválida.',
+  [ErrorCode.ATTRIBUTE_MUST_BE_A_BOOLEAN]: (params) =>
+    `${params?.attribute} deve ser um booleano.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_WHOLE_DAYS]: (params) =>
+    `${params?.attribute} deve ser um número inteiro de dias.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE]: (params) =>
+    `${params?.attribute} não pode ser negativa.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_MASCULINE]: (params) =>
+    `${params?.attribute} não pode ser negativo.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE]: (params) =>
+    `${params?.attribute} não pode ser vazio.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO]: (params) =>
+    `${params?.attribute} deve ser maior que zero.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_DEPOSIT_OR_WITHDRAW]: (params) =>
+    `${params?.attribute} deve ser DEPOSIT ou WITHDRAW.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]: (params) =>
+    `${params?.attribute} é obrigatória.`,
+  [ErrorCode.ATTRIBUTE_IS_INVALID_FEMININE]: (params) =>
+    `${params?.attribute} é inválida.`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum

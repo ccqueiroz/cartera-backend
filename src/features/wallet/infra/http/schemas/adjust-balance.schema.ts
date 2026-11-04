@@ -6,20 +6,37 @@ import {
   Matches,
 } from 'class-validator';
 import { WalletAdjustOperation } from '@/features/wallet/application/adjust-balance.usecase';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export class AdjustBalanceSchema {
   @IsEnum(WalletAdjustOperation, {
-    message: 'A operação deve ser DEPOSIT ou WITHDRAW.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DEPOSIT_OR_WITHDRAW]({
+      attribute: 'A operação',
+    }),
   })
   operation!: WalletAdjustOperation;
 
-  @IsNumber({}, { message: 'O valor deve ser um número.' })
-  @IsPositive({ message: 'O valor do ajuste deve ser maior que zero.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'O valor',
+      }),
+    },
+  )
+  @IsPositive({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO]({
+      attribute: 'O valor do ajuste',
+    }),
+  })
   amount!: number;
 
   @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'A data deve estar no formato YYYY-MM-DD.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DATE]({
+      attribute: 'A data',
+    }),
   })
   occurredAt?: string;
 }
