@@ -30,9 +30,13 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *               paidAmount: { type: number }
  *               walletId: { type: string }
  *     responses:
- *       201: { description: Receita criada. }
- *       400: { description: "Payload inválido (ex.: nascida recebida sem walletId)." }
- *       401: { description: Sessão ausente ou inválida. }
+ *       201: { $ref: '#/components/responses/CreateTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionCreateBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionInvalidFixedCost' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateReceivableRoute implements Route {
   public readonly method: HttpMethod = 'post';

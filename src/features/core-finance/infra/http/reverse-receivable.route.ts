@@ -15,8 +15,12 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/SettleTransactionResultResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionOrWalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionReverseRefused' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ReverseReceivableRoute implements Route {
   public readonly method: HttpMethod = 'patch';

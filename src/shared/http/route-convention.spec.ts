@@ -464,3 +464,18 @@ describe('[BK2-54] bill list routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] receivable item routes', () => {
+  it.each([
+    'core-finance/infra/http/create-receivable.route.ts',
+    'core-finance/infra/http/create-installment-receivable.route.ts',
+    'core-finance/infra/http/edit-receivable.route.ts',
+    'core-finance/infra/http/delete-receivable.route.ts',
+    'core-finance/infra/http/get-receivable-by-id.route.ts',
+    'core-finance/infra/http/settle-receivable.route.ts',
+    'core-finance/infra/http/global-settle-receivable.route.ts',
+    'core-finance/infra/http/reverse-receivable.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
