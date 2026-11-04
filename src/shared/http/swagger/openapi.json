@@ -3000,13 +3000,25 @@
         },
         "responses": {
           "201": {
-            "description": "Receita criada."
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido (ex.: nascida recebida sem walletId)."
+            "$ref": "#/components/responses/TransactionCreateBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3072,13 +3084,25 @@
         },
         "responses": {
           "201": {
-            "description": "OK."
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionInstallmentBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3107,10 +3131,19 @@
         ],
         "responses": {
           "204": {
-            "description": "OK."
+            "description": "Receita excluída, sem corpo."
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3163,13 +3196,22 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionEditBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3233,13 +3275,25 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionAlreadyPaid"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3290,10 +3344,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionDetailResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3347,10 +3410,22 @@
         ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionReverseRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3409,13 +3484,25 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionSettleRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
