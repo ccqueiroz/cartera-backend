@@ -89,4 +89,20 @@ describe('errorCatalog', () => {
       );
     },
   );
+
+  it.each([
+    ErrorCode.ATTRIBUTE_MUST_BE_A_BOOLEAN,
+    ErrorCode.ATTRIBUTE_MUST_BE_WHOLE_DAYS,
+    ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE,
+    ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_MASCULINE,
+    ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE,
+    ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO,
+    ErrorCode.ATTRIBUTE_MUST_BE_DEPOSIT_OR_WITHDRAW,
+    ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE,
+    ErrorCode.ATTRIBUTE_IS_INVALID_FEMININE,
+  ])('[BK2-58] %s puts the schema field label into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+      'any_label',
+    );
+  });
 });
