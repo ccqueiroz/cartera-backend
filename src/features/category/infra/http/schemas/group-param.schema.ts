@@ -1,4 +1,6 @@
 import { IsIn } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import {
   CategoryGroup,
   CategoryGroupEnum,
@@ -7,6 +9,8 @@ import {
 const GROUPS = Object.values(CategoryGroupEnum);
 
 export class GroupParamSchema {
-  @IsIn(GROUPS, { message: 'Grupo de categoria inválido.' })
+  @IsIn(GROUPS, {
+    message: errorCatalog[ErrorCode.INVALID_CATEGORY_GROUP](),
+  })
   group!: CategoryGroup;
 }

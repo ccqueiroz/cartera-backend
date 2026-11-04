@@ -1,4 +1,6 @@
 import { IsIn } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import {
   PaymentMethodDescription,
   PaymentMethodDescriptionEnum,
@@ -8,8 +10,9 @@ const DESCRIPTION_ENUMS = Object.values(PaymentMethodDescriptionEnum);
 
 export class DescriptionEnumParamSchema {
   @IsIn(DESCRIPTION_ENUMS, {
-    message:
-      'O identificador da forma de pagamento (descriptionEnum) é inválido.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE]({
+      attribute: 'O identificador da forma de pagamento (descriptionEnum)',
+    }),
   })
   descriptionEnum!: PaymentMethodDescription;
 }

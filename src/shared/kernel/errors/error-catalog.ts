@@ -64,6 +64,10 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} é obrigatória.`,
   [ErrorCode.ATTRIBUTE_IS_INVALID_FEMININE]: (params) =>
     `${params?.attribute} é inválida.`,
+  [ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE]: (params) =>
+    `${params?.attribute} é inválido.`,
+  [ErrorCode.ATTRIBUTE_EXCEEDS_MAX_LENGTH]: (params) =>
+    `${params?.attribute} excede o tamanho máximo (${params?.max}).`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
