@@ -11,24 +11,57 @@ import {
   Matches,
   Min,
 } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const CIVIL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 export class CreateBudgetSchema {
-  @IsString({ message: 'O nome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O nome do orçamento é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O nome',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O nome do orçamento',
+    }),
+  })
   name!: string;
 
-  @IsNumber({}, { message: 'O limite deve ser um número.' })
-  @Min(0.01, { message: 'O limite deve ser maior que zero.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'O limite',
+      }),
+    },
+  )
+  @Min(0.01, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO]({
+      attribute: 'O limite',
+    }),
+  })
   limit!: number;
 
-  @IsString({ message: 'A categoria deve ser um texto.' })
-  @IsNotEmpty({ message: 'A categoria é obrigatória.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A categoria',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]({
+      attribute: 'A categoria',
+    }),
+  })
   categoryDescriptionEnum!: string;
 
   @IsOptional()
-  @Matches(CIVIL_DATE, { message: 'A data deve estar no formato YYYY-MM-DD.' })
+  @Matches(CIVIL_DATE, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DATE]({
+      attribute: 'A data',
+    }),
+  })
   startsAt?: string;
 }
 ```
