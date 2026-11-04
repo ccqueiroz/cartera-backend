@@ -8,6 +8,7 @@ import {
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
@@ -138,16 +139,21 @@ export class CreateSingleBillUseCase {
   private assertEdges(input: CreateSingleBillInput): void {
     if (input.paymentMethodDescriptionEnum === CREDIT_CARD && !input.cardId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'Compra no cartão de crédito exige cardId.',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_REQUIRES_CARD_ID]({
+          attribute: 'Compra no cartão de crédito',
+        }),
       });
     if (input.cardId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details:
-          'Compra no cartão de crédito será tratada pela fatura (recurso ainda não disponível).',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_WILL_BE_HANDLED_BY_INVOICE]({
+          attribute: 'Compra no cartão de crédito',
+        }),
       });
     if (input.paidAt && !input.walletId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'Despesa nascida paga exige walletId.',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID]({
+          attribute: 'Despesa nascida paga',
+        }),
       });
   }
 }

@@ -31,10 +31,13 @@ describe('errorCatalog', () => {
   });
 
   it('VALIDATION_FAILED interpola details', () => {
-    const message = errorCatalog[ErrorCode.VALIDATION_FAILED]({
-      details: 'description não pode ser vazio',
+    const details = errorCatalog[
+      ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE
+    ]({
+      attribute: 'description',
     });
-    expect(message).toContain('description não pode ser vazio');
+    const message = errorCatalog[ErrorCode.VALIDATION_FAILED]({ details });
+    expect(message).toContain(details);
   });
 
   it.each([
@@ -142,4 +145,19 @@ describe('errorCatalog', () => {
     });
     expect(message).toContain('6');
   });
+
+  it.each([
+    ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID,
+    ErrorCode.ATTRIBUTE_REQUIRES_CARD_ID,
+    ErrorCode.ATTRIBUTE_WILL_BE_HANDLED_BY_INVOICE,
+    ErrorCode.ATTRIBUTE_MUST_NOT_BE_BEFORE_START_DATE,
+    ErrorCode.ATTRIBUTES_ARE_REQUIRED,
+  ])(
+    '[BK2-58] %s puts the use case or entity subject into the message',
+    (code) => {
+      expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+        'any_label',
+      );
+    },
+  );
 });

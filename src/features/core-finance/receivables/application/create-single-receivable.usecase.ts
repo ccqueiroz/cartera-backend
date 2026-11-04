@@ -8,6 +8,7 @@ import {
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
@@ -69,7 +70,9 @@ export class CreateSingleReceivableUseCase {
   ): Promise<CreateReceivableResult> {
     if (input.paidAt && !input.walletId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'Receita nascida recebida exige walletId.',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID]({
+          attribute: 'Receita nascida recebida',
+        }),
       });
 
     const base = {
