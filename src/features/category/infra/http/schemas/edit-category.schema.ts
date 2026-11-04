@@ -5,6 +5,8 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import {
   CategoryDescription,
   CategoryDescriptionEnum,
@@ -22,20 +24,34 @@ const DESCRIPTION_ENUMS = Object.values(CategoryDescriptionEnum);
 const GROUPS = Object.values(CategoryGroupEnum);
 
 export class EditCategorySchema {
-  @IsString({ message: 'A descrição deve ser um texto.' })
-  @IsNotEmpty({ message: 'A descrição é obrigatória.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A descrição',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]({
+      attribute: 'A descrição',
+    }),
+  })
   description!: string;
 
-  @IsIn(GROUPS, { message: 'Grupo de categoria inválido.' })
+  @IsIn(GROUPS, {
+    message: errorCatalog[ErrorCode.INVALID_CATEGORY_GROUP](),
+  })
   group!: CategoryGroup;
 
-  @IsEnum(TransactionTypeEnum, { message: 'Tipo de categoria inválido.' })
+  @IsEnum(TransactionTypeEnum, {
+    message: errorCatalog[ErrorCode.INVALID_CATEGORY_TYPE](),
+  })
   type!: TransactionType;
 
   // Aceito mas imutável: trocá-lo é rejeitado no use case com 422, não aqui.
   @IsOptional()
   @IsIn(DESCRIPTION_ENUMS, {
-    message: 'O identificador da categoria (descriptionEnum) é inválido.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE]({
+      attribute: 'O identificador da categoria (descriptionEnum)',
+    }),
   })
   descriptionEnum?: CategoryDescription;
 }

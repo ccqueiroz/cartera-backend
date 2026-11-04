@@ -1,4 +1,6 @@
 import { IsIn } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import {
   PaymentStatusCode,
   PaymentStatusEnum,
@@ -8,7 +10,7 @@ const STATUS_CODES = Object.values(PaymentStatusEnum);
 
 export class DescriptionEnumParamSchema {
   @IsIn(STATUS_CODES, {
-    message: 'O código do status de pagamento é inválido.',
+    message: errorCatalog[ErrorCode.INVALID_PAYMENT_STATUS_CODE](),
   })
   descriptionEnum!: PaymentStatusCode;
 }

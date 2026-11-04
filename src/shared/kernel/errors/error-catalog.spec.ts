@@ -105,4 +105,21 @@ describe('errorCatalog', () => {
       'any_label',
     );
   });
+
+  it.each([
+    ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE,
+    ErrorCode.ATTRIBUTE_EXCEEDS_MAX_LENGTH,
+  ])('[BK2-58] %s puts the registry field label into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+      'any_label',
+    );
+  });
+
+  it('[BK2-58] ATTRIBUTE_EXCEEDS_MAX_LENGTH puts the max length into the message', () => {
+    const message = errorCatalog[ErrorCode.ATTRIBUTE_EXCEEDS_MAX_LENGTH]({
+      attribute: 'any_label',
+      max: 60,
+    });
+    expect(message).toContain('60');
+  });
 });
