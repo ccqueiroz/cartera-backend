@@ -1,7 +1,17 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export class ReplaceAvatarSchema {
-  @IsString({ message: 'A imagem deve ser enviada como base64.' })
-  @IsNotEmpty({ message: 'A imagem é obrigatória.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_BASE64]({
+      attribute: 'A imagem',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]({
+      attribute: 'A imagem',
+    }),
+  })
   image!: string;
 }

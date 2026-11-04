@@ -122,4 +122,24 @@ describe('errorCatalog', () => {
     });
     expect(message).toContain('60');
   });
+
+  it.each([
+    ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE,
+    ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_FEMININE,
+    ErrorCode.ATTRIBUTE_BELOW_MIN_LENGTH,
+    ErrorCode.ATTRIBUTE_MUST_BE_BASE64,
+    ErrorCode.ATTRIBUTE_MUST_BE_CPF_OR_CNPJ,
+  ])('[BK2-58] %s puts the account field label into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+      'any_label',
+    );
+  });
+
+  it('[BK2-58] ATTRIBUTE_BELOW_MIN_LENGTH puts the min length into the message', () => {
+    const message = errorCatalog[ErrorCode.ATTRIBUTE_BELOW_MIN_LENGTH]({
+      attribute: 'any_label',
+      min: 6,
+    });
+    expect(message).toContain('6');
+  });
 });
