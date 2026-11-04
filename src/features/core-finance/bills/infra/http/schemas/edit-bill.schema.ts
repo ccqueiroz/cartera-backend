@@ -5,23 +5,42 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export class EditBillSchema {
   @IsOptional()
-  @IsNumber({}, { message: 'O valor deve ser um número.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'O valor',
+      }),
+    },
+  )
   amount?: number;
 
   @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'O vencimento deve estar no formato YYYY-MM-DD.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DATE]({
+      attribute: 'O vencimento',
+    }),
   })
   dueDate?: string;
 
   @IsOptional()
-  @IsString({ message: 'A categoria deve ser um texto.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A categoria',
+    }),
+  })
   categoryDescriptionEnum?: string;
 
   @IsOptional()
-  @IsBoolean({ message: 'A propagação deve ser booleana.' })
+  @IsBoolean({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_FEMININE]({
+      attribute: 'A propagação',
+    }),
+  })
   propagate?: boolean;
 }
