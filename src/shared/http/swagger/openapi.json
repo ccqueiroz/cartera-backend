@@ -1122,8 +1122,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Despesa excluída",
-            "sem corpo.": null
+            "description": "Despesa excluída, sem corpo."
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"

@@ -15,7 +15,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       204: { description: Despesa excluída, sem corpo. }
+ *       204: { description: "Despesa excluída, sem corpo." }
  *       401: { $ref: '#/components/responses/Unauthorized' }
  *       403: { $ref: '#/components/responses/UserDisabled' }
  *       404: { $ref: '#/components/responses/TransactionNotFound' }
