@@ -56,7 +56,10 @@ describe('[BK2-15] request-input helpers', () => {
       code: ErrorCode.VALIDATION_FAILED,
       params: {
         details:
-          'property extra should not exist; ' +
+          errorCatalog[ErrorCode.PROPERTY_SHOULD_NOT_EXIST]({
+            attribute: 'extra',
+          }) +
+          '; ' +
           errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
             attribute: 'O nome',
           }),
