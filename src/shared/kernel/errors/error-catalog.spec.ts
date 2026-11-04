@@ -46,4 +46,23 @@ describe('errorCatalog', () => {
       'start_date',
     );
   });
+
+  it.each([
+    ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD,
+    ErrorCode.PARAMETER_MUST_BE_ASC_OR_DESC,
+    ErrorCode.PARAMETER_MUST_BE_DATE_OR_DATE_RANGE,
+    ErrorCode.PARAMETER_START_DATE_AFTER_END_DATE,
+  ])('[BK2-58] %s puts the parameter name into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'any_parameter' })).toContain(
+      'any_parameter',
+    );
+  });
+
+  it('[BK2-58] PARAMETER_DOES_NOT_ACCEPT_FIELD puts the sent field into the message', () => {
+    const message = errorCatalog[ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]({
+      attribute: 'any_parameter',
+      value: 'any_field',
+    });
+    expect(message).toContain('any_field');
+  });
 });

@@ -11,10 +11,15 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 class SampleSchema {
-  @IsString({ message: 'O nome deve ser um texto.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O nome',
+    }),
+  })
   name!: string;
 }
 
@@ -50,7 +55,11 @@ describe('[BK2-15] request-input helpers', () => {
     ).rejects.toMatchObject({
       code: ErrorCode.VALIDATION_FAILED,
       params: {
-        details: 'property extra should not exist; O nome deve ser um texto.',
+        details:
+          'property extra should not exist; ' +
+          errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+            attribute: 'O nome',
+          }),
       },
     });
   });

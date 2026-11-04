@@ -1,5 +1,6 @@
 import { readPaginationParams } from './pagination-params';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { SortOrder } from '@/shared/query/page';
 
@@ -120,6 +121,64 @@ describe('[BK2-48] readPaginationParams', () => {
         expect.objectContaining({
           code: ErrorCode.VALIDATION_FAILED,
           params: { details: expect.stringContaining(parameter) },
+        }),
+      );
+    },
+  );
+
+  it.each([
+    {
+      query: { ordering: 'name', direction_order: 'asc' },
+      details: errorCatalog[ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]({
+        attribute: 'ordering',
+        value: 'name',
+      }),
+    },
+    {
+      query: { ordering: 'dueDate', direction_order: 'up' },
+      details: errorCatalog[ErrorCode.PARAMETER_MUST_BE_ASC_OR_DESC]({
+        attribute: 'direction_order',
+      }),
+    },
+    {
+      query: { sort: 'amount', sort_value: '10' },
+      details: errorCatalog[ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]({
+        attribute: 'sort',
+        value: 'amount',
+      }),
+    },
+    {
+      query: {
+        search_by_date: 'createdAt',
+        search_by_date_value: '2026-01-15',
+      },
+      details: errorCatalog[ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]({
+        attribute: 'search_by_date',
+        value: 'createdAt',
+      }),
+    },
+    {
+      query: {
+        search_by_date: 'dueDate',
+        search_by_date_value: '2026-02-01-2026-01-31',
+      },
+      details: errorCatalog[ErrorCode.PARAMETER_START_DATE_AFTER_END_DATE]({
+        attribute: 'search_by_date_value',
+      }),
+    },
+    {
+      query: { search_by_date: 'dueDate', search_by_date_value: '15/01/2026' },
+      details: errorCatalog[ErrorCode.PARAMETER_MUST_BE_DATE_OR_DATE_RANGE]({
+        attribute: 'search_by_date_value',
+      }),
+    },
+  ])(
+    '[BK2-58] rejects $query with the details from the catalog',
+    ({ query, details }) => {
+      expect(() => readPaginationParams(query, billListFields)).toThrow(
+        expect.objectContaining({
+          code: ErrorCode.VALIDATION_FAILED,
+          params: { details },
         }),
       );
     },
