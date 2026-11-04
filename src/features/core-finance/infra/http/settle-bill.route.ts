@@ -28,9 +28,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *               paymentMethodDescriptionEnum:
  *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
  *     responses:
- *       200: { description: OK. }
- *       400: { description: "Payload inválido." }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/SettleTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionSettleBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionOrWalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionSettleRefused' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class SettleBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';
