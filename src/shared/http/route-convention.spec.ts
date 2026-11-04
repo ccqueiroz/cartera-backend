@@ -455,3 +455,12 @@ describe('[BK2-54] bill global settle and create routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] bill list routes', () => {
+  it.each([
+    'core-finance/infra/http/list-bills.route.ts',
+    'core-finance/infra/http/list-unpaid-bills-by-period.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

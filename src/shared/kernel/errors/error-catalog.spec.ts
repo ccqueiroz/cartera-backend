@@ -36,4 +36,14 @@ describe('errorCatalog', () => {
     });
     expect(message).toContain('description não pode ser vazio');
   });
+
+  it.each([
+    ErrorCode.ATTRIBUTE_MUST_BE_TEXT,
+    ErrorCode.ATTRIBUTE_MUST_BE_NUMERIC_TEXT,
+    ErrorCode.ATTRIBUTE_MUST_BE_DATE,
+  ])('[BK2-58] %s puts the attribute into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'start_date' })).toContain(
+      'start_date',
+    );
+  });
 });

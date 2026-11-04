@@ -11,6 +11,13 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
       : 'Parâmetros de entrada inválidos.',
   [ErrorCode.INTERNAL_SERVER_ERROR]: () => 'Erro interno no servidor.',
 
+  [ErrorCode.ATTRIBUTE_MUST_BE_TEXT]: (params) =>
+    `${params?.attribute} deve ser um texto.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_NUMERIC_TEXT]: (params) =>
+    `${params?.attribute} deve ser um texto numérico.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_DATE]: (params) =>
+    `${params?.attribute} deve estar no formato YYYY-MM-DD.`,
+
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
       ? `Categoria "${params.descriptionEnum}" não encontrada.`

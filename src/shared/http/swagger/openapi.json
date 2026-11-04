@@ -47,6 +47,45 @@
         "schema": {
           "type": "string"
         }
+      },
+      "TransactionOrdering": {
+        "in": "query",
+        "name": "ordering",
+        "required": false,
+        "schema": {
+          "enum": [
+            "dueDate",
+            "paymentDate",
+            "amount",
+            "paidAmount"
+          ],
+          "type": "string"
+        }
+      },
+      "TransactionSearchByDate": {
+        "in": "query",
+        "name": "search_by_date",
+        "required": false,
+        "schema": {
+          "enum": [
+            "dueDate",
+            "paymentDate"
+          ],
+          "type": "string"
+        }
+      },
+      "TransactionSort": {
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "schema": {
+          "enum": [
+            "categoryDescriptionEnum",
+            "paymentMethodDescriptionEnum",
+            "paymentStatus"
+          ],
+          "type": "string"
+        }
       }
     },
     "responses": {
@@ -316,6 +355,42 @@
           }
         },
         "description": "Transação."
+      },
+      "TransactionPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/TransactionOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de transações."
       },
       "TransactionReverseRefused": {
         "content": {
@@ -1680,12 +1755,47 @@
     },
     "/api/bill/list-all": {
       "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -1743,12 +1853,47 @@
     },
     "/api/bill/list-unpaid-by-period": {
       "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
