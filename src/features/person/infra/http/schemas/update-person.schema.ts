@@ -10,52 +10,119 @@ import {
   Type,
   ValidateNested,
 } from '@/packages/clients/class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 class UpdatePersonPhoneSchema {
-  @IsString({ message: 'O número do telefone deve ser um texto.' })
-  @IsNotEmpty({ message: 'O número do telefone é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O número do telefone',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O número do telefone',
+    }),
+  })
   number!: string;
 
-  @IsString({ message: 'O código do país deve ser um texto.' })
-  @IsNotEmpty({ message: 'O código do país é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O código do país',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O código do país',
+    }),
+  })
   countryCode!: string;
 
-  @IsBoolean({ message: 'isWhatsapp deve ser um booleano.' })
+  @IsBoolean({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_A_BOOLEAN]({
+      attribute: 'isWhatsapp',
+    }),
+  })
   isWhatsapp!: boolean;
 }
 
 class UpdatePersonDocumentSchema {
   @IsIn(['CPF', 'CNPJ'], {
-    message: 'O tipo do documento deve ser CPF ou CNPJ.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_CPF_OR_CNPJ]({
+      attribute: 'O tipo do documento',
+    }),
   })
   type!: string;
 
-  @IsString({ message: 'O valor do documento deve ser um texto.' })
-  @IsNotEmpty({ message: 'O valor do documento é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O valor do documento',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O valor do documento',
+    }),
+  })
   value!: string;
 }
 
 class UpdatePersonMonthlyIncomeSchema {
   @IsOptional()
-  @IsNumber({}, { message: 'A renda mensal deve ser um número.' })
-  @Min(0, { message: 'A renda mensal não pode ser negativa.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'A renda mensal',
+      }),
+    },
+  )
+  @Min(0, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE]({
+      attribute: 'A renda mensal',
+    }),
+  })
   value?: number | null;
 
   @IsOptional()
-  @IsString({ message: 'A moeda da renda mensal deve ser um texto.' })
-  @IsNotEmpty({ message: 'A moeda da renda mensal não pode ser vazia.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A moeda da renda mensal',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_FEMININE]({
+      attribute: 'A moeda da renda mensal',
+    }),
+  })
   currency?: string | null;
 }
 
 export class UpdatePersonSchema {
   @IsOptional()
-  @IsString({ message: 'O primeiro nome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O primeiro nome não pode ser vazio.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O primeiro nome',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE]({
+      attribute: 'O primeiro nome',
+    }),
+  })
   firstName?: string;
 
   @IsOptional()
-  @IsString({ message: 'O sobrenome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O sobrenome não pode ser vazio.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O sobrenome',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE]({
+      attribute: 'O sobrenome',
+    }),
+  })
   lastName?: string;
 
   @IsOptional()
@@ -70,12 +137,18 @@ export class UpdatePersonSchema {
 
   @IsOptional()
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: 'A data de nascimento deve estar no formato YYYY-MM-DD.',
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DATE]({
+      attribute: 'A data de nascimento',
+    }),
   })
   birthDate?: string | null;
 
   @IsOptional()
-  @IsString({ message: 'A ocupação deve ser um texto.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A ocupação',
+    }),
+  })
   occupation?: string | null;
 
   @IsOptional()
@@ -84,7 +157,15 @@ export class UpdatePersonSchema {
   monthlyIncome?: UpdatePersonMonthlyIncomeSchema;
 
   @IsOptional()
-  @IsString({ message: 'A moeda padrão deve ser um texto.' })
-  @IsNotEmpty({ message: 'A moeda padrão não pode ser vazia.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A moeda padrão',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_FEMININE]({
+      attribute: 'A moeda padrão',
+    }),
+  })
   defaultCurrency?: string | null;
 }

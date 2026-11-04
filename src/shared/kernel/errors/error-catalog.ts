@@ -68,6 +68,16 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} é inválido.`,
   [ErrorCode.ATTRIBUTE_EXCEEDS_MAX_LENGTH]: (params) =>
     `${params?.attribute} excede o tamanho máximo (${params?.max}).`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]: (params) =>
+    `${params?.attribute} é obrigatório.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_FEMININE]: (params) =>
+    `${params?.attribute} não pode ser vazia.`,
+  [ErrorCode.ATTRIBUTE_BELOW_MIN_LENGTH]: (params) =>
+    `${params?.attribute} deve ter no mínimo ${params?.min} caracteres.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BASE64]: (params) =>
+    `${params?.attribute} deve ser enviada como base64.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_CPF_OR_CNPJ]: (params) =>
+    `${params?.attribute} deve ser CPF ou CNPJ.`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
