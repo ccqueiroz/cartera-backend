@@ -50,6 +50,24 @@
       }
     },
     "responses": {
+      "CreateTransactionResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateTransactionResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação criada."
+      },
       "InternalServerError": {
         "content": {
           "application/json": {
@@ -90,6 +108,55 @@
           }
         },
         "description": "Resultado da liquidação da parcela."
+      },
+      "TransactionAlreadyPaid": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_ALREADY_PAID"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação já paga."
+      },
+      "TransactionCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para criar a transação."
       },
       "TransactionDetailResponse": {
         "content": {
@@ -133,6 +200,57 @@
           }
         },
         "description": "Dados inválidos para editar a transação."
+      },
+      "TransactionInstallmentBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_INVALID_NUMBER",
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "TRANSACTION_ENTRY_EXCEEDS_TOTAL",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para criar a despesa parcelada."
+      },
+      "TransactionInvalidFixedCost": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_INVALID_FIXED_COST"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Custo fixo inválido para a transação."
       },
       "TransactionNotFound": {
         "content": {
@@ -653,6 +771,26 @@
         ],
         "example": "MOBILITY_BY_APP",
         "type": "string"
+      },
+      "CreateTransactionResult": {
+        "properties": {
+          "root": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "root"
+        ],
+        "type": "object"
       },
       "ErrorResponse": {
         "properties": {
@@ -1232,13 +1370,25 @@
         },
         "responses": {
           "201": {
-            "description": "Despesa criada."
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido (ex.: nascida paga sem walletId)."
+            "$ref": "#/components/responses/TransactionCreateBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -1304,13 +1454,25 @@
         },
         "responses": {
           "201": {
-            "description": "OK."
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionInstallmentBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -1483,13 +1645,25 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionAlreadyPaid"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

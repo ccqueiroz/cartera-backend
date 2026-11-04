@@ -27,9 +27,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *               installments: { type: array, items: { type: object } }
  *               entry: { type: object }
  *     responses:
- *       201: { description: OK. }
- *       400: { description: "Payload inválido." }
- *       401: { description: Sessão ausente ou inválida. }
+ *       201: { $ref: '#/components/responses/CreateTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionInstallmentBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionInvalidFixedCost' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateInstallmentBillRoute implements Route {
   public readonly method: HttpMethod = 'post';

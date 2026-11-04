@@ -31,9 +31,13 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *               paidAmount: { type: number }
  *               walletId: { type: string }
  *     responses:
- *       201: { description: Despesa criada. }
- *       400: { description: "Payload inválido (ex.: nascida paga sem walletId)." }
- *       401: { description: Sessão ausente ou inválida. }
+ *       201: { $ref: '#/components/responses/CreateTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionCreateBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionInvalidFixedCost' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateBillRoute implements Route {
   public readonly method: HttpMethod = 'post';

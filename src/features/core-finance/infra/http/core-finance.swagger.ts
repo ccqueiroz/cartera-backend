@@ -58,6 +58,15 @@
  *         warnings:
  *           type: array
  *           items: { $ref: '#/components/schemas/BalanceWarning' }
+ *     CreateTransactionResult:
+ *       type: object
+ *       required: [root]
+ *       properties:
+ *         root: { $ref: '#/components/schemas/TransactionOutput' }
+ *         wallet: { $ref: '#/components/schemas/WalletBalanceView' }
+ *         warnings:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/BalanceWarning' }
  *   responses:
  *     TransactionOutputResponse:
  *       description: Transação.
@@ -155,5 +164,66 @@
  *                     enum:
  *                       - TRANSACTION_ALREADY_PAID
  *                       - TRANSACTION_SETTLE_ON_INTERNAL
+ *     CreateTransactionResultResponse:
+ *       description: Transação criada.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/CreateTransactionResult' }
+ *     TransactionAlreadyPaid:
+ *       description: Transação já paga.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - TRANSACTION_ALREADY_PAID
+ *     TransactionCreateBadRequest:
+ *       description: Dados inválidos para criar a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_NOT_FOUND
+ *                       - MONEY_NEGATIVE
+ *                       - PAYMENT_METHOD_NOT_FOUND
+ *                       - VALIDATION_FAILED
+ *     TransactionInstallmentBadRequest:
+ *       description: Dados inválidos para criar a despesa parcelada.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_NOT_FOUND
+ *                       - MONEY_INVALID_NUMBER
+ *                       - MONEY_NEGATIVE
+ *                       - PAYMENT_METHOD_NOT_FOUND
+ *                       - TRANSACTION_ENTRY_EXCEEDS_TOTAL
+ *                       - VALIDATION_FAILED
+ *     TransactionInvalidFixedCost:
+ *       description: Custo fixo inválido para a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - TRANSACTION_INVALID_FIXED_COST
  */
 export {};
