@@ -15,8 +15,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/TransactionDetailResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetBillByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';

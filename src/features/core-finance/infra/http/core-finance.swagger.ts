@@ -41,12 +41,51 @@
  *         reversed: { type: boolean }
  *         deleted: { type: boolean }
  *         createdAt: { type: string }
+ *     TransactionDetail:
+ *       type: object
+ *       required: [node, children]
+ *       properties:
+ *         node: { $ref: '#/components/schemas/TransactionOutput' }
+ *         children:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/TransactionOutput' }
  *   responses:
+ *     TransactionOutputResponse:
+ *       description: Transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/TransactionOutput' }
+ *     TransactionDetailResponse:
+ *       description: Transação com as filhas imediatas.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/TransactionDetail' }
  *     TransactionNotFound:
  *       description: Transação não encontrada.
  *       content:
  *         application/json:
  *           schema:
  *             allOf: [{ $ref: '#/components/schemas/ErrorResponse' }, { properties: { code: { enum: [TRANSACTION_NOT_FOUND] } } }]
+ *     TransactionEditBadRequest:
+ *       description: Dados inválidos para editar a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_NOT_FOUND
+ *                       - MONEY_NEGATIVE
+ *                       - VALIDATION_FAILED
  */
 export {};
