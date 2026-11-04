@@ -2,12 +2,14 @@ import type { Request } from 'express';
 import {
   ClassConstructor,
   runValidate,
+  ValidationTypes,
   ValidatorOptions,
 } from '@/packages/clients/class-validator';
 import {
   UnauthorizedError,
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export const REJECT_UNKNOWN: ValidatorOptions = {
@@ -28,7 +30,17 @@ export async function assertValid<T extends object>(
   const errors = await runValidate(schema, input, options);
   if (errors.length === 0) return;
   const details = errors
-    .map((error) => Object.values(error.constraints ?? {}).join(', '))
+    .map((error) =>
+      Object.entries(error.constraints ?? {})
+        .map(([constraint, message]) =>
+          constraint === ValidationTypes.WHITELIST
+            ? errorCatalog[ErrorCode.PROPERTY_SHOULD_NOT_EXIST]({
+                attribute: error.property,
+              })
+            : message,
+        )
+        .join(', '),
+    )
     .filter(Boolean)
     .join('; ');
   throw new ValidationError(

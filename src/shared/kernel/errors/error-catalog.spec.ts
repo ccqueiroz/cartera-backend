@@ -160,4 +160,13 @@ describe('errorCatalog', () => {
       );
     },
   );
+
+  it.each([ErrorCode.PROPERTY_SHOULD_NOT_EXIST])(
+    '[BK2-58] %s puts the unknown field name into the message',
+    (code) => {
+      expect(errorCatalog[code]({ attribute: 'any_field' })).toContain(
+        'any_field',
+      );
+    },
+  );
 });

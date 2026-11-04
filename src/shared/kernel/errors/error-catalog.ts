@@ -88,6 +88,8 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} não pode ser anterior a start_date.`,
   [ErrorCode.ATTRIBUTES_ARE_REQUIRED]: (params) =>
     `${params?.attribute} são obrigatórios.`,
+  [ErrorCode.PROPERTY_SHOULD_NOT_EXIST]: (params) =>
+    `property ${params?.attribute} should not exist`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
