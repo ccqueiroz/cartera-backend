@@ -17,6 +17,14 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} deve ser um texto numérico.`,
   [ErrorCode.ATTRIBUTE_MUST_BE_DATE]: (params) =>
     `${params?.attribute} deve estar no formato YYYY-MM-DD.`,
+  [ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]: (params) =>
+    `O parâmetro ${params?.attribute} não aceita o campo ${params?.value}.`,
+  [ErrorCode.PARAMETER_MUST_BE_ASC_OR_DESC]: (params) =>
+    `O parâmetro ${params?.attribute} deve ser asc ou desc.`,
+  [ErrorCode.PARAMETER_MUST_BE_DATE_OR_DATE_RANGE]: (params) =>
+    `O parâmetro ${params?.attribute} deve ser YYYY-MM-DD ou YYYY-MM-DD-YYYY-MM-DD.`,
+  [ErrorCode.PARAMETER_START_DATE_AFTER_END_DATE]: (params) =>
+    `O parâmetro ${params?.attribute} tem a data inicial depois da final.`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
