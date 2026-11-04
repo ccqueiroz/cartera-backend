@@ -49,6 +49,15 @@
  *         children:
  *           type: array
  *           items: { $ref: '#/components/schemas/TransactionOutput' }
+ *     SettleTransactionResult:
+ *       type: object
+ *       required: [root, wallet, warnings]
+ *       properties:
+ *         root: { $ref: '#/components/schemas/TransactionOutput' }
+ *         wallet: { $ref: '#/components/schemas/WalletBalanceView' }
+ *         warnings:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/BalanceWarning' }
  *   responses:
  *     TransactionOutputResponse:
  *       description: Transação.
@@ -87,5 +96,64 @@
  *                       - CATEGORY_NOT_FOUND
  *                       - MONEY_NEGATIVE
  *                       - VALIDATION_FAILED
+ *     SettleTransactionResultResponse:
+ *       description: Resultado da liquidação da parcela.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/SettleTransactionResult' }
+ *     TransactionOrWalletNotFound:
+ *       description: Transação ou carteira não encontrada.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - TRANSACTION_NOT_FOUND
+ *                       - WALLET_NOT_FOUND
+ *     TransactionReverseRefused:
+ *       description: Estorno recusado para a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - SETTLEMENT_MOVEMENT_NOT_FOUND
+ *                       - TRANSACTION_ALREADY_REVERSED
+ *                       - TRANSACTION_REVERSE_ENTRY
+ *     TransactionSettleBadRequest:
+ *       description: Dados inválidos para liquidar a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - MONEY_NEGATIVE
+ *                       - PAYMENT_METHOD_NOT_FOUND
+ *                       - VALIDATION_FAILED
+ *     TransactionSettleRefused:
+ *       description: Liquidação recusada para a transação.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - TRANSACTION_ALREADY_PAID
+ *                       - TRANSACTION_SETTLE_ON_INTERNAL
  */
 export {};

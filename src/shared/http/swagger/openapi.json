@@ -73,6 +73,24 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "SettleTransactionResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/SettleTransactionResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Resultado da liquidação da parcela."
+      },
       "TransactionDetailResponse": {
         "content": {
           "application/json": {
@@ -139,6 +157,30 @@
         },
         "description": "Transação não encontrada."
       },
+      "TransactionOrWalletNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_NOT_FOUND",
+                        "WALLET_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação ou carteira não encontrada."
+      },
       "TransactionOutputResponse": {
         "content": {
           "application/json": {
@@ -156,6 +198,80 @@
           }
         },
         "description": "Transação."
+      },
+      "TransactionReverseRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "SETTLEMENT_MOVEMENT_NOT_FOUND",
+                        "TRANSACTION_ALREADY_REVERSED",
+                        "TRANSACTION_REVERSE_ENTRY"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Estorno recusado para a transação."
+      },
+      "TransactionSettleBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para liquidar a transação."
+      },
+      "TransactionSettleRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_ALREADY_PAID",
+                        "TRANSACTION_SETTLE_ON_INTERNAL"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Liquidação recusada para a transação."
       },
       "Unauthorized": {
         "content": {
@@ -627,6 +743,28 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "SettleTransactionResult": {
+        "properties": {
+          "root": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "root",
+          "wallet",
+          "warnings"
+        ],
+        "type": "object"
       },
       "TransactionDetail": {
         "properties": {
@@ -1465,10 +1603,22 @@
         ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionReverseRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -1527,13 +1677,25 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionSettleRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
