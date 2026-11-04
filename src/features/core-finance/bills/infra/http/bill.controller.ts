@@ -5,6 +5,7 @@ import {
   numberOrUndefined,
   userIdFrom,
 } from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateSingleBillUseCase } from '@/features/core-finance/bills/application/create-single-bill.usecase';
 import { CreateInstallmentBillUseCase } from '@/features/core-finance/bills/application/create-installment-bill.usecase';
 import { ListBillsUseCase } from '@/features/core-finance/bills/application/list-bills.usecase';
@@ -21,6 +22,16 @@ import { SettleBillSchema } from '@/features/core-finance/bills/infra/http/schem
 import { GlobalSettleBillSchema } from '@/features/core-finance/bills/infra/http/schemas/global-settle-bill.schema';
 import { EditBillSchema } from '@/features/core-finance/bills/infra/http/schemas/edit-bill.schema';
 import { ListUnpaidByPeriodSchema } from '@/features/core-finance/bills/infra/http/schemas/list-unpaid-by-period.schema';
+
+const LIST_FIELDS = {
+  ordering: ['dueDate', 'paymentDate', 'amount', 'paidAmount'],
+  sort: [
+    'categoryDescriptionEnum',
+    'paymentMethodDescriptionEnum',
+    'paymentStatus',
+  ],
+  searchByDate: ['dueDate', 'paymentDate'],
+} as const;
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'paid' ? 'paid' : 'to_pay';
@@ -100,8 +111,7 @@ export class BillController {
         : undefined,
       rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
       rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
@@ -115,8 +125,7 @@ export class BillController {
       userId: userIdFrom(req),
       startDate: String(req.query.start_date),
       endDate: String(req.query.end_date),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };

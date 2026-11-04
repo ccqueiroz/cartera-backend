@@ -225,5 +225,38 @@
  *                   code:
  *                     enum:
  *                       - TRANSACTION_INVALID_FIXED_COST
+ *     TransactionPageResponse:
+ *       description: Página de transações.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/PageMeta'
+ *                   - type: object
+ *                     required: [content]
+ *                     properties:
+ *                       content:
+ *                         type: array
+ *                         items: { $ref: '#/components/schemas/TransactionOutput' }
+ *   parameters:
+ *     TransactionOrdering:
+ *       name: ordering
+ *       in: query
+ *       required: false
+ *       schema: { type: string, enum: [dueDate, paymentDate, amount, paidAmount] }
+ *     TransactionSort:
+ *       name: sort
+ *       in: query
+ *       required: false
+ *       schema: { type: string, enum: [categoryDescriptionEnum, paymentMethodDescriptionEnum, paymentStatus] }
+ *     TransactionSearchByDate:
+ *       name: search_by_date
+ *       in: query
+ *       required: false
+ *       schema: { type: string, enum: [dueDate, paymentDate] }
  */
 export {};
