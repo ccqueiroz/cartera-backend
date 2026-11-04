@@ -41,6 +41,8 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} é obrigatória na liquidação.`,
   [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_PAYOFF]: (params) =>
     `${params?.attribute} é obrigatória na quitação.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_RECEIPT]: (params) =>
+    `${params?.attribute} é obrigatória no recebimento.`,
   [ErrorCode.AT_LEAST_ONE_INSTALLMENT_REQUIRED]: () =>
     'Informe ao menos uma parcela.',
   [ErrorCode.INVALID_PAYMENT_METHOD]: () => 'Forma de pagamento inválida.',

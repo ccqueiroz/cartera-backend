@@ -80,4 +80,13 @@ describe('errorCatalog', () => {
       'any_label',
     );
   });
+
+  it.each([ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_RECEIPT])(
+    '[BK2-58] %s puts the receivable field label into the message',
+    (code) => {
+      expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+        'any_label',
+      );
+    },
+  );
 });
