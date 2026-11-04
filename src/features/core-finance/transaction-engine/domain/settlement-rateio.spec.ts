@@ -23,7 +23,7 @@ describe('distributeSettlement (rateio top-down T1.2.2)', () => {
   const openChildrenOf = (id: string): SettlementNode[] =>
     id === 'A' ? [leaf('a1', 150), leaf('a2', 225)] : [];
 
-  it('alvo interno recursa por nó: X=600 → a1=160, a2=240, B=200', () => {
+  it('internal target recurses per node: X=600 gives a1=160, a2=240, B=200', () => {
     const result = distributeSettlement(
       600,
       [internal('A', 400), leaf('B', 200)],
@@ -35,7 +35,7 @@ describe('distributeSettlement (rateio top-down T1.2.2)', () => {
     expect(sum(result)).toBe(600);
   });
 
-  it('seleção em folhas é flat sobre elas (granularidade importa): X=600', () => {
+  it('leaf selection is flat over them (granularity matters): X=600', () => {
     const result = distributeSettlement(
       600,
       [leaf('a1', 150), leaf('a2', 225), leaf('B', 200)],
@@ -47,14 +47,14 @@ describe('distributeSettlement (rateio top-down T1.2.2)', () => {
     expect(sum(result)).toBe(600);
   });
 
-  it('nível único 11×200, X=1300: conserva o total (cenário do spec)', () => {
+  it('single level 11x200, X=1300: keeps the total (spec scenario)', () => {
     const targets = Array.from({ length: 11 }, (_, i) => leaf(`p${i}`, 200));
     const result = distributeSettlement(1300, targets, () => []);
     expect(result.size).toBe(11);
     expect(sum(result)).toBe(1300);
   });
 
-  it('folha paga fica fora de openChildrenOf → intocada, fatia inteira p/ a aberta', () => {
+  it('paid leaf stays out of openChildrenOf: untouched, whole slice goes to the open one', () => {
     const onlyOneOpen = (id: string): SettlementNode[] =>
       id === 'A' ? [leaf('a1', 150)] : [];
     const result = distributeSettlement(300, [internal('A', 400)], onlyOneOpen);
@@ -63,7 +63,7 @@ describe('distributeSettlement (rateio top-down T1.2.2)', () => {
     expect(sum(result)).toBe(300);
   });
 
-  it('alvos vazios → mapa vazio', () => {
+  it('empty targets give an empty map', () => {
     expect(distributeSettlement(100, [], () => []).size).toBe(0);
   });
 });

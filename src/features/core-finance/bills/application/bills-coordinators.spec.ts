@@ -146,7 +146,7 @@ describe('SettleBillUseCase', () => {
     });
   });
 
-  it('saldo negativo pós-débito → warning BALANCE_NEGATIVE, sem bloquear', async () => {
+  it('negative balance after debit gives a BALANCE_NEGATIVE warning, without blocking', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 10);
     const settle = SettleBillUseCase.create(
@@ -173,7 +173,7 @@ describe('SettleBillUseCase', () => {
     expect(result.warnings).not.toContain('OVERDRAFT_LIMIT_EXCEEDED');
   });
 
-  it('wallet inexistente → WALLET_NOT_FOUND (sem gravar)', async () => {
+  it('missing wallet gives WALLET_NOT_FOUND (writes nothing)', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     const settle = SettleBillUseCase.create(
@@ -241,7 +241,7 @@ describe('ReverseBillUseCase', () => {
     });
   });
 
-  it('sem movimento de liquidação → SETTLEMENT_MOVEMENT_NOT_FOUND', async () => {
+  it('no settlement movement gives SETTLEMENT_MOVEMENT_NOT_FOUND', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     const reverse = ReverseBillUseCase.create(
@@ -262,7 +262,7 @@ describe('ReverseBillUseCase', () => {
 });
 
 describe('GlobalSettleBillUseCase', () => {
-  it('um único débito pelo total + um movimento por folha settlada', async () => {
+  it('one debit for the total plus one movement per settled leaf', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     let seq = 0;
@@ -329,7 +329,7 @@ describe('ListUnpaidBillsByPeriodUseCase', () => {
     });
   });
 
-  it('end_date < start_date → ValidationError', async () => {
+  it('end_date < start_date gives ValidationError', async () => {
     const engine = buildEngine();
     const uc = ListUnpaidBillsByPeriodUseCase.create(engine);
 
@@ -370,7 +370,7 @@ describe('CreateSingleBillUseCase', () => {
     return { uc, wallet };
   }
 
-  it('a vencer → só root (BILLS, sem wallet)', async () => {
+  it('not yet due creates only the root (BILLS, no wallet)', async () => {
     const { uc } = build();
     const result = await uc.execute({
       userId,
@@ -382,7 +382,7 @@ describe('CreateSingleBillUseCase', () => {
     expect(result.wallet).toBeUndefined();
   });
 
-  it('nascida paga → cria e liquida atomicamente (wallet + warnings)', async () => {
+  it('born paid creates and settles atomically (wallet + warnings)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -397,7 +397,7 @@ describe('CreateSingleBillUseCase', () => {
     expect(wallet.movements).toHaveLength(1);
   });
 
-  it('nascida paga sem walletId → ValidationError', async () => {
+  it('born paid without walletId gives ValidationError', async () => {
     const { uc } = build();
     await expect(
       uc.execute({
@@ -409,7 +409,7 @@ describe('CreateSingleBillUseCase', () => {
     ).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
   });
 
-  it('CREDIT_CARD sem cardId → ValidationError (borda B6)', async () => {
+  it('CREDIT_CARD without cardId gives ValidationError (edge B6)', async () => {
     const { uc } = build();
     await expect(
       uc.execute({
@@ -439,7 +439,7 @@ describe('CreateInstallmentBillUseCase', () => {
     };
   }
 
-  it('sem entrada → só root (mãe = Σ parcelas)', async () => {
+  it('without down payment creates only the root (parent equals the sum of installments)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -454,7 +454,7 @@ describe('CreateInstallmentBillUseCase', () => {
     expect(wallet.movements).toHaveLength(0);
   });
 
-  it('entrada sem walletId → ValidationError', async () => {
+  it('down payment without walletId gives ValidationError', async () => {
     const { uc } = build();
     await expect(
       uc.execute({
@@ -472,7 +472,7 @@ describe('CreateInstallmentBillUseCase', () => {
     ).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
   });
 
-  it('entrada paga → registra caixa da entrada (débito + movimento)', async () => {
+  it('paid down payment records its cash (debit + movement)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -497,7 +497,7 @@ describe('CreateInstallmentBillUseCase', () => {
 });
 
 describe('thin read/mutation use-cases', () => {
-  it('ListBills fixa o type BILLS e repassa scope/competência', async () => {
+  it('ListBills fixes the BILLS type and passes scope and period through', async () => {
     const engine = buildEngine();
     const calls: unknown[] = [];
     (engine.list as unknown as { execute: unknown }).execute = async (
@@ -555,7 +555,7 @@ describe('thin read/mutation use-cases', () => {
     expect(out.amount).toBe(25);
   });
 
-  it('SoftDeleteBill delega ao motor (não lança)', async () => {
+  it('SoftDeleteBill delegates to the engine (resolves to undefined)', async () => {
     const engine = buildEngine();
     const leafId = await createBillLeaf(engine, 10);
     await expect(

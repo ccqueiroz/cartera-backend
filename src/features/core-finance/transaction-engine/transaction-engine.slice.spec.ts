@@ -39,9 +39,9 @@ function makeEngine(
   });
 }
 
-describe('transaction-engine e2e (via factory + repo em memória)', () => {
-  describe('UC-01 criar único', () => {
-    it('nasce pago com paymentDate+paidAmount+paymentMethod', async () => {
+describe('transaction-engine e2e (via factory + in-memory repo)', () => {
+  describe('UC-01 create single', () => {
+    it('born paid with paymentDate+paidAmount+paymentMethod', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId,
@@ -57,7 +57,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(node.toOutput().refMonthPaymentDate).toBe(3);
     });
 
-    it('nasce não-pago sem os campos de pagamento', async () => {
+    it('born unpaid without the payment fields', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId,
@@ -69,7 +69,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(node.paid).toBe(false);
     });
 
-    it('forma de pagamento inativa é rejeitada', async () => {
+    it('inactive payment method is rejected', async () => {
       const engine = makeEngine();
       await expect(
         engine.createSingle.execute({
@@ -87,7 +87,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-02 criar parcelada', () => {
-    it('mãe IN_PROGRESS, entrada paga, paidInstallmentsCount=1, totalInterest correto', async () => {
+    it('parent IN_PROGRESS, paid down payment, paidInstallmentsCount=1, correct totalInterest', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -113,7 +113,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(view.currentAmount).toBe(1300);
     });
 
-    it('árvore de parcelamento nasce com rootHasInstallments na raiz e nas folhas', async () => {
+    it('installment tree starts with rootHasInstallments on the root and the leaves', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -136,7 +136,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       ).toBe(true);
     });
 
-    it('desconto contratado (Σ filhas < mãe) → totalInterest negativo (D29)', async () => {
+    it('contracted discount (sum of children < parent) gives negative totalInterest (D29)', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -157,7 +157,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(mother.toOutput().totalInterest).toBe(-100);
     });
 
-    it('parcelas < 1 e entrada >= total são erros', async () => {
+    it('installments < 1 and down payment >= total give errors', async () => {
       const engine = makeEngine();
       await expect(
         engine.createInstallmentPlan.execute({
@@ -189,7 +189,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-03 listar', () => {
-    it('filtro de pagamento vê só folhas reais — mãe nunca entra (D6)', async () => {
+    it('payment filter sees only real leaves: parent never enters (D6)', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -217,7 +217,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(aPagar.totalElements).toBe(3);
     });
 
-    it('filtra por mês/ano usando o par de vencimento', async () => {
+    it('filters by month/year using the due date pair', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -241,7 +241,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(abril.content[0].refMonthDueDate).toBe(4);
     });
 
-    it('listagem de auditoria devolve só deletados e a padrão os exclui', async () => {
+    it('audit listing returns only deleted items and the default excludes them', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId,
@@ -260,8 +260,8 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
     });
   });
 
-  describe('UC-03 isolamento, sort e paginação', () => {
-    it('usuário A nunca vê nó de B na listagem (R4/R10)', async () => {
+  describe('UC-03 isolation, sort and pagination', () => {
+    it('user A never sees a node of user B in the listing (R4/R10)', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeEngine(repository);
       await engine.createSingle.execute({
@@ -284,7 +284,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(listA.content.every((node) => node.userId === 'A')).toBe(true);
     });
 
-    it('id de outro usuário é indistinguível de inexistente (mesmo erro)', async () => {
+    it('id of another user is indistinguishable from a missing one (same error)', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId: 'A',
@@ -316,7 +316,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       ).rejects.toBeInstanceOf(TransactionNotFoundError);
     });
 
-    it('ordena por amount DESC com desempate por createdAt e pagina o conjunto filtrado', async () => {
+    it('sorts by amount DESC with createdAt as tie-break and paginates the filtered set', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeEngine(repository);
       for (const amount of [300, 100, 200]) {
@@ -350,7 +350,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(firstPage.size).toBe(2);
     });
 
-    it('combina range + type sem multi-range no Firestore; mês-only abrange anos', async () => {
+    it('combines range + type without multi-range in Firestore; month-only covers years', async () => {
       const engine = makeEngine();
       for (const dueDate of ['2025-04-10', '2026-04-10', '2026-08-10']) {
         await engine.createSingle.execute({
@@ -385,7 +385,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-04 ver por id', () => {
-    it('devolve nó + filhas imediatas', async () => {
+    it('returns node + immediate children', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -403,7 +403,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(detail.children).toHaveLength(2);
     });
 
-    it('nó deletado responde como inexistente (404)', async () => {
+    it('deleted node responds as missing (404)', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId,
@@ -420,7 +420,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-05 editar', () => {
-    it('propagação de dueDate pula filhas pagas e mantém cadência mensal', async () => {
+    it('dueDate propagation skips paid children and keeps monthly cadence', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -458,7 +458,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(entryView?.dueDate).toBe('2026-03-10');
     });
 
-    it('editar amount da mãe recalcula totalInterest', async () => {
+    it('editing the parent amount recalculates totalInterest', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -481,7 +481,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(root.toOutput().totalInterest).toBe(200);
     });
 
-    it('edição direta de nó pago é permitida (correção de cadastro)', async () => {
+    it('direct edit of a paid node is allowed (registry correction)', async () => {
       const engine = makeEngine();
       const { children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -510,7 +510,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-06 settle', () => {
-    it('folha com variância: registra paymentVariance e recalcula a mãe', async () => {
+    it('leaf with variance: records paymentVariance and recalculates the parent', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -537,7 +537,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(root.paidInstallmentsCount).toBe(1);
     });
 
-    it('settle direto em nó interno é erro de domínio', async () => {
+    it('direct settle on an internal node is a domain error', async () => {
       const engine = makeEngine();
       const { mother } = await engine.createInstallmentPlan.execute({
         userId,
@@ -559,7 +559,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
     });
   });
 
-  describe('quitação global', () => {
+  describe('global payoff', () => {
     it('parcial: rateio Hamilton conserva o total e reporta as selecionadas pagas', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
@@ -629,7 +629,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-07 soft delete em cascata', () => {
-    it('deleta a subárvore e recalcula os ancestrais', async () => {
+    it('deletes the subtree and recalculates the ancestors', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -651,7 +651,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('UC-09 estorno', () => {
-    it('estorna a folha e reabre a mãe (IN_PROGRESS)', async () => {
+    it('reverses the leaf and reopens the parent (IN_PROGRESS)', async () => {
       const engine = makeEngine();
       const { children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -680,7 +680,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
     });
   });
 
-  describe('quitação global — árvore profundidade 3 (rateio recursivo T1.2.2)', () => {
+  describe('global payoff, depth-3 tree (recursive allocation T1.2.2)', () => {
     const createdAt = '2026-01-01T00:00:00.000Z';
 
     function node(
@@ -703,7 +703,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       });
     }
 
-    it('valorPago reportado desce por nó: folha B=200 (não 208.70), total conservado', async () => {
+    it('reported paid value descends per node: leaf B=200 (not 208.70), total kept', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeTransactionEngine({
         db: {} as any,
@@ -750,7 +750,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       ).toBe(600);
     });
 
-    it('seleção pai+filho não duplica rateio: descendente do interno é descartado, Σ=X', async () => {
+    it('parent+child selection does not duplicate allocation: internal descendant is dropped, sum=X', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeTransactionEngine({
         db: {} as any,
@@ -786,7 +786,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(Number(total.toFixed(2))).toBe(600);
     });
 
-    it('quitação em cheio (sem valorPago): cada folha pelo próprio amount, variância 0', async () => {
+    it('full payoff (no paid value): each leaf by its own amount, variance 0', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeTransactionEngine({
         db: {} as any,
@@ -818,7 +818,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
   });
 
   describe('origin (UC-O1/UC-O2)', () => {
-    it('plano de parcelas: raiz e todas as folhas nascem com o mesmo origin', async () => {
+    it('installment plan: root and all leaves start with the same origin', async () => {
       const engine = makeEngine();
       const { mother, children } = await engine.createInstallmentPlan.execute({
         userId,
@@ -840,7 +840,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       ).toBe(true);
     });
 
-    it('criação sem origin nasce MANUAL', async () => {
+    it('creation without origin starts as MANUAL', async () => {
       const engine = makeEngine();
       const node = await engine.createSingle.execute({
         userId,
@@ -852,7 +852,7 @@ describe('transaction-engine e2e (via factory + repo em memória)', () => {
       expect(node.origin).toBe(TransactionOriginEnum.MANUAL);
     });
 
-    it('lista filtra por origin: inclusão devolve só o valor, exclusão remove CARD_INVOICE', async () => {
+    it('list filters by origin: inclusion returns only the value, exclusion removes CARD_INVOICE', async () => {
       const repository = new InMemoryTransactionTreeRepository();
       const engine = makeEngine(repository);
       await engine.createSingle.execute({
