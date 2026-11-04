@@ -65,4 +65,19 @@ describe('errorCatalog', () => {
     });
     expect(message).toContain('any_field');
   });
+
+  it.each([
+    ErrorCode.ATTRIBUTE_MUST_BE_NUMBER,
+    ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_MASCULINE,
+    ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_FEMININE,
+    ErrorCode.ATTRIBUTE_MUST_BE_OBJECT,
+    ErrorCode.ATTRIBUTE_MUST_BE_LIST,
+    ErrorCode.ATTRIBUTE_MUST_BE_ID_LIST,
+    ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_SETTLEMENT,
+    ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_PAYOFF,
+  ])('[BK2-58] %s puts the bill field label into the message', (code) => {
+    expect(errorCatalog[code]({ attribute: 'any_label' })).toContain(
+      'any_label',
+    );
+  });
 });

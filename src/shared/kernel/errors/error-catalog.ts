@@ -25,6 +25,25 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `O parâmetro ${params?.attribute} deve ser YYYY-MM-DD ou YYYY-MM-DD-YYYY-MM-DD.`,
   [ErrorCode.PARAMETER_START_DATE_AFTER_END_DATE]: (params) =>
     `O parâmetro ${params?.attribute} tem a data inicial depois da final.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]: (params) =>
+    `${params?.attribute} deve ser um número.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_MASCULINE]: (params) =>
+    `${params?.attribute} deve ser booleano.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_FEMININE]: (params) =>
+    `${params?.attribute} deve ser booleana.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_OBJECT]: (params) =>
+    `${params?.attribute} deve ser um objeto.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_LIST]: (params) =>
+    `${params?.attribute} devem ser uma lista.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_ID_LIST]: (params) =>
+    `${params?.attribute} deve ser uma lista de ids.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_SETTLEMENT]: (params) =>
+    `${params?.attribute} é obrigatória na liquidação.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_PAYOFF]: (params) =>
+    `${params?.attribute} é obrigatória na quitação.`,
+  [ErrorCode.AT_LEAST_ONE_INSTALLMENT_REQUIRED]: () =>
+    'Informe ao menos uma parcela.',
+  [ErrorCode.INVALID_PAYMENT_METHOD]: () => 'Forma de pagamento inválida.',
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
