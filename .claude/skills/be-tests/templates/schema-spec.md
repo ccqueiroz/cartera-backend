@@ -4,6 +4,8 @@
 
 ```ts
 import { runValidate } from '@/packages/clients/class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { CreateBudgetSchema } from './create-budget.schema';
 
 const REJECT_UNKNOWN = { whitelist: true, forbidNonWhitelisted: true };
@@ -19,7 +21,9 @@ describe('CreateBudgetSchema', () => {
   it('rejects a non-positive limit with the PT-BR message', async () => {
     const errors = await validate({ ...valid, limit: 0 });
     expect(Object.values(errors[0].constraints ?? {})).toContain(
-      'O limite deve ser maior que zero.',
+      errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO]({
+        attribute: 'O limite',
+      }),
     );
   });
 
