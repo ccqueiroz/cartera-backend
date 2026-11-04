@@ -7,17 +7,21 @@ import {
   PayloadTooLargeError,
 } from './domain.error';
 import { ErrorCode } from './error-code';
+import { errorCatalog } from './error-catalog';
 
 describe('domain errors', () => {
   it('ValidationError é DomainError e carrega code/params/name', () => {
+    const details = errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'name',
+    });
     const error = new ValidationError(ErrorCode.VALIDATION_FAILED, {
-      details: 'x',
+      details,
     });
     expect(error).toBeInstanceOf(DomainError);
     expect(error).toBeInstanceOf(Error);
     expect(error.name).toBe('ValidationError');
     expect(error.code).toBe(ErrorCode.VALIDATION_FAILED);
-    expect(error.params).toEqual({ details: 'x' });
+    expect(error.params).toEqual({ details });
   });
 
   it('message técnico é igual ao code (útil em log/stack)', () => {

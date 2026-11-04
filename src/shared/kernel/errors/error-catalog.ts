@@ -78,6 +78,16 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
     `${params?.attribute} deve ser enviada como base64.`,
   [ErrorCode.ATTRIBUTE_MUST_BE_CPF_OR_CNPJ]: (params) =>
     `${params?.attribute} deve ser CPF ou CNPJ.`,
+  [ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID]: (params) =>
+    `${params?.attribute} exige walletId.`,
+  [ErrorCode.ATTRIBUTE_REQUIRES_CARD_ID]: (params) =>
+    `${params?.attribute} exige cardId.`,
+  [ErrorCode.ATTRIBUTE_WILL_BE_HANDLED_BY_INVOICE]: (params) =>
+    `${params?.attribute} será tratada pela fatura (recurso ainda não disponível).`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_BEFORE_START_DATE]: (params) =>
+    `${params?.attribute} não pode ser anterior a start_date.`,
+  [ErrorCode.ATTRIBUTES_ARE_REQUIRED]: (params) =>
+    `${params?.attribute} são obrigatórios.`,
 
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum

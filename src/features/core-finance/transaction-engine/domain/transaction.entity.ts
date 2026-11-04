@@ -12,6 +12,7 @@ import {
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 
 export interface PaymentSnapshot {
   paymentDate: string;
@@ -426,7 +427,9 @@ export class Transaction {
   private static validateOwnership(userId: string, personId: string): void {
     if (!userId || !personId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'userId e personId são obrigatórios.',
+        details: errorCatalog[ErrorCode.ATTRIBUTES_ARE_REQUIRED]({
+          attribute: 'userId e personId',
+        }),
       });
   }
 

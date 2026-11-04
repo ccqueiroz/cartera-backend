@@ -5,6 +5,7 @@ import { TransactionOutput } from '@/features/core-finance/transaction-engine/do
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 
 export interface ListUnpaidBillsByPeriodInput {
   userId: string;
@@ -35,7 +36,11 @@ export class ListUnpaidBillsByPeriodUseCase {
   ): Promise<Page<TransactionOutput>> {
     if (input.endDate < input.startDate)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'end_date não pode ser anterior a start_date.',
+        details: errorCatalog[
+          ErrorCode.ATTRIBUTE_MUST_NOT_BE_BEFORE_START_DATE
+        ]({
+          attribute: 'end_date',
+        }),
       });
 
     return this.engine.list.execute({

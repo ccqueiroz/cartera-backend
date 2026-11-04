@@ -1,5 +1,6 @@
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import {
   Document,
   DocumentType,
@@ -131,15 +132,21 @@ export class Person {
   private static validateProps(props: PersonProps): void {
     if (!props.firstName.trim())
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'firstName é obrigatório',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+          attribute: 'firstName',
+        }),
       });
     if (!props.lastName.trim())
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'lastName é obrigatório',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+          attribute: 'lastName',
+        }),
       });
     if (props.birthDate !== null && !BIRTH_DATE_PATTERN.test(props.birthDate))
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'birthDate deve estar no formato YYYY-MM-DD',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_DATE]({
+          attribute: 'birthDate',
+        }),
       });
   }
 
