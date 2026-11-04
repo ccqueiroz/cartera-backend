@@ -427,3 +427,12 @@ describe('[BK2-54] core-finance controllers and the bill delete route', () => {
     );
   });
 });
+
+describe('[BK2-54] bill edit and read routes', () => {
+  it.each([
+    'core-finance/infra/http/edit-bill.route.ts',
+    'core-finance/infra/http/get-bill-by-id.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

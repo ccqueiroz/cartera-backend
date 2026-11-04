@@ -73,6 +73,49 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "TransactionDetailResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransactionDetail"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação com as filhas imediatas."
+      },
+      "TransactionEditBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_NEGATIVE",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para editar a transação."
+      },
       "TransactionNotFound": {
         "content": {
           "application/json": {
@@ -95,6 +138,24 @@
           }
         },
         "description": "Transação não encontrada."
+      },
+      "TransactionOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransactionOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação."
       },
       "Unauthorized": {
         "content": {
@@ -566,6 +627,24 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "TransactionDetail": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionOutput"
+            },
+            "type": "array"
+          },
+          "node": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          }
+        },
+        "required": [
+          "node",
+          "children"
+        ],
+        "type": "object"
       },
       "TransactionOutput": {
         "properties": {
@@ -1187,13 +1266,22 @@
         },
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/TransactionEditBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -1314,10 +1402,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionDetailResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
