@@ -201,7 +201,7 @@ describe('SettleReceivableUseCase', () => {
     });
   });
 
-  it('wallet inexistente → WALLET_NOT_FOUND (sem gravar)', async () => {
+  it('missing wallet gives WALLET_NOT_FOUND (writes nothing)', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     const settle = SettleReceivableUseCase.create(
@@ -269,7 +269,7 @@ describe('ReverseReceivableUseCase', () => {
     });
   });
 
-  it('estorno que negativa o saldo → warning BALANCE_NEGATIVE, sem bloquear', async () => {
+  it('reversal that makes the balance negative gives a BALANCE_NEGATIVE warning, without blocking', async () => {
     const engine = buildEngine();
     const leafId = await createReceivableLeaf(engine, 40);
     const wallet = new SeededReversalWalletGateway('w1', 10, leafId, 40);
@@ -294,7 +294,7 @@ describe('ReverseReceivableUseCase', () => {
     expect(result.warnings).toContain('BALANCE_NEGATIVE');
   });
 
-  it('sem movimento de liquidação → SETTLEMENT_MOVEMENT_NOT_FOUND', async () => {
+  it('no settlement movement gives SETTLEMENT_MOVEMENT_NOT_FOUND', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     const reverse = ReverseReceivableUseCase.create(
@@ -315,7 +315,7 @@ describe('ReverseReceivableUseCase', () => {
 });
 
 describe('GlobalSettleReceivableUseCase', () => {
-  it('um único crédito pelo total + um movimento por folha settlada', async () => {
+  it('one credit for the total plus one movement per settled leaf', async () => {
     const engine = buildEngine();
     const wallet = new FakeWalletGateway('w1', 100);
     let seq = 0;
@@ -384,7 +384,7 @@ describe('ListUnreceivedByPeriodUseCase', () => {
     expect(calls[0].originNotIn).toBeUndefined();
   });
 
-  it('end_date < start_date → ValidationError', async () => {
+  it('end_date < start_date gives ValidationError', async () => {
     const engine = buildEngine();
     const uc = ListUnreceivedByPeriodUseCase.create(engine);
 
@@ -425,7 +425,7 @@ describe('CreateSingleReceivableUseCase', () => {
     return { uc, wallet };
   }
 
-  it('a receber → só root (RECEIVABLES, sem wallet)', async () => {
+  it('to receive creates only the root (RECEIVABLES, no wallet)', async () => {
     const { uc } = build();
     const result = await uc.execute({
       userId,
@@ -437,7 +437,7 @@ describe('CreateSingleReceivableUseCase', () => {
     expect(result.wallet).toBeUndefined();
   });
 
-  it('nascida recebida → cria e credita atomicamente (wallet + warnings)', async () => {
+  it('born received creates and credits atomically (wallet + warnings)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -453,7 +453,7 @@ describe('CreateSingleReceivableUseCase', () => {
     expect(wallet.movements[0]).toMatchObject({ direction: 'CREDIT' });
   });
 
-  it('nascida recebida sem walletId → ValidationError', async () => {
+  it('born received without walletId gives ValidationError', async () => {
     const { uc } = build();
     await expect(
       uc.execute({
@@ -483,7 +483,7 @@ describe('CreateInstallmentReceivableUseCase', () => {
     };
   }
 
-  it('sem entrada → só root (mãe = Σ parcelas)', async () => {
+  it('without down payment creates only the root (parent equals the sum of installments)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -498,7 +498,7 @@ describe('CreateInstallmentReceivableUseCase', () => {
     expect(wallet.movements).toHaveLength(0);
   });
 
-  it('entrada sem walletId → ValidationError', async () => {
+  it('down payment without walletId gives ValidationError', async () => {
     const { uc } = build();
     await expect(
       uc.execute({
@@ -516,7 +516,7 @@ describe('CreateInstallmentReceivableUseCase', () => {
     ).rejects.toMatchObject({ code: 'VALIDATION_FAILED' });
   });
 
-  it('entrada recebida → registra caixa da entrada (crédito + movimento)', async () => {
+  it('received down payment records its cash (credit + movement)', async () => {
     const { uc, wallet } = build();
     const result = await uc.execute({
       userId,
@@ -541,7 +541,7 @@ describe('CreateInstallmentReceivableUseCase', () => {
 });
 
 describe('thin read/mutation use-cases', () => {
-  it('ListReceivables fixa o type RECEIVABLES e repassa scope/competência', async () => {
+  it('ListReceivables fixes the RECEIVABLES type and passes scope and period through', async () => {
     const engine = buildEngine();
     const calls: unknown[] = [];
     (engine.list as unknown as { execute: unknown }).execute = async (
@@ -599,7 +599,7 @@ describe('thin read/mutation use-cases', () => {
     expect(out.amount).toBe(25);
   });
 
-  it('SoftDeleteReceivable delega ao motor (não lança)', async () => {
+  it('SoftDeleteReceivable delegates to the engine (resolves to undefined)', async () => {
     const engine = buildEngine();
     const leafId = await createReceivableLeaf(engine, 10);
     await expect(

@@ -15,7 +15,7 @@ function item(overrides: Partial<Sortable>): Sortable {
 }
 
 describe('applySort', () => {
-  it('ordena pelo campo e direção informados', () => {
+  it('sorts by the given field and direction', () => {
     const items = [
       item({ amount: 200 }),
       item({ amount: 100 }),
@@ -28,7 +28,7 @@ describe('applySort', () => {
     ).toEqual([300, 200, 100]);
   });
 
-  it('default é dueDate ASC quando nenhum sort é informado', () => {
+  it('defaults to dueDate ASC when no sort is given', () => {
     const items = [
       item({ dueDate: '2026-05-10' }),
       item({ dueDate: '2026-02-10' }),
@@ -58,7 +58,7 @@ describe('applySort', () => {
     ]);
   });
 
-  it('é puro: não muta o array de entrada', () => {
+  it('is pure: does not mutate the input array', () => {
     const items = [item({ amount: 2 }), item({ amount: 1 })];
     applySort(items, { field: 'amount', direction: 'ASC' });
     expect(items.map((i) => i.amount)).toEqual([2, 1]);

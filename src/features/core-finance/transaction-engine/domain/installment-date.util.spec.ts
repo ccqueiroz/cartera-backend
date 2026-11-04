@@ -10,7 +10,7 @@ describe('installment-date util', () => {
     expect(addMonths('2026-11-15', 3)).toBe('2027-02-15');
   });
 
-  it('monthDelta conta a diferença em meses com sinal', () => {
+  it('monthDelta counts the signed difference in months', () => {
     expect(monthDelta('2026-03-10', '2026-06-10')).toBe(3);
     expect(monthDelta('2026-09-10', '2026-04-10')).toBe(-5);
     expect(monthDelta('2026-12-01', '2027-02-01')).toBe(2);

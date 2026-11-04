@@ -53,8 +53,8 @@ function mother(id: string, amount: number) {
 }
 
 describe('Transaction entity', () => {
-  describe('derivação temporal e refs', () => {
-    it('deriva refMonth/refYear de dueDate; payment fica null até pago', () => {
+  describe('temporal derivation and refs', () => {
+    it('derives refMonth/refYear from dueDate; payment stays null until paid', () => {
       const node = leaf('l1', 'm', 100, '2026-09-10');
       const view = node.toOutput();
       expect(view.refMonthDueDate).toBe(9);
@@ -63,7 +63,7 @@ describe('Transaction entity', () => {
       expect(view.refYearPaymentDate).toBeNull();
     });
 
-    it('pagamento antecipado registra o mês do pagamento, não do vencimento', () => {
+    it('early payment records the payment month, not the due month', () => {
       const node = leaf('l1', 'm', 100, '2026-09-10');
       node.settle({
         paymentDate: '2026-04-05',
@@ -78,7 +78,7 @@ describe('Transaction entity', () => {
   });
 
   describe('rollup, pago-derivado e paidInstallmentsCount', () => {
-    it('mãe condensa as filhas: currentAmount, totalInterest, paidInstallmentsCount', () => {
+    it('parent condenses its children: currentAmount, totalInterest, paidInstallmentsCount', () => {
       const m = mother('m', 1000);
       const c1 = leaf('c1', 'm', 550, '2026-03-10');
       const c2 = leaf('c2', 'm', 550, '2026-04-10');
@@ -92,7 +92,7 @@ describe('Transaction entity', () => {
       expect(view.paymentStatus).toBe(PaymentStatusEnum.IN_PROGRESS);
     });
 
-    it('mãe vira pago-derivada quando todas as filhas pagam; conta cascateia', () => {
+    it('parent becomes paid-derived when all children are paid; the account cascades', () => {
       const m = mother('m', 1000);
       const c1 = leaf('c1', 'm', 500, '2026-03-10');
       const c2 = leaf('c2', 'm', 500, '2026-04-10');
@@ -121,8 +121,8 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('totalInterest × paymentVariance (D18)', () => {
-    it('variação de quitação flui só para paymentVariance, nunca para totalInterest', () => {
+  describe('totalInterest x paymentVariance (D18)', () => {
+    it('payoff variance flows only to paymentVariance, never to totalInterest', () => {
       const m = mother('m', 1000);
       const c1 = leaf('c1', 'm', 550, '2026-03-10');
       const c2 = leaf('c2', 'm', 550, '2026-04-10');
@@ -149,7 +149,7 @@ describe('Transaction entity', () => {
       expect(m.toOutput().totalInterest).toBe(-200);
     });
 
-    it('rollup recursivo soma totalInterest com sinal das filhas internas', () => {
+    it('recursive rollup sums totalInterest with the sign of the internal children', () => {
       const grandchild1 = leaf('g1', 'sub', 100, '2026-03-10');
       const grandchild2 = leaf('g2', 'sub', 100, '2026-04-10');
       const sub = Transaction.create({
@@ -174,7 +174,7 @@ describe('Transaction entity', () => {
       expect(m.toOutput().totalInterest).toBe(150);
     });
 
-    it('desconto gera variância negativa', () => {
+    it('discount generates negative variance', () => {
       const node = leaf('l', 'm', 150, '2026-03-10');
       node.settle({
         paymentDate: '2026-03-10',
@@ -186,8 +186,8 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('effectiveRate (derivado, não persistido)', () => {
-    it('folha com desconto deriva taxa negativa', () => {
+  describe('effectiveRate (derived, not persisted)', () => {
+    it('leaf with discount derives a negative rate', () => {
       const node = leaf('l', 'm', 150, '2026-03-10');
       node.settle({
         paymentDate: '2026-03-10',
@@ -199,7 +199,7 @@ describe('Transaction entity', () => {
       expect(node.toPersistence()).not.toHaveProperty('effectiveRate');
     });
 
-    it('mãe: taxa efetiva total sobre o preço original', () => {
+    it('parent: total effective rate over the original price', () => {
       const m = mother('m', 1000);
       const c1 = leaf('c1', 'm', 550, '2026-03-10');
       const c2 = leaf('c2', 'm', 550, '2026-04-10');
@@ -219,14 +219,14 @@ describe('Transaction entity', () => {
       expect(m.toOutput().effectiveRate).toBe(0.1);
     });
 
-    it('guard amount = 0 não quebra', () => {
+    it('guard amount = 0 does not break', () => {
       const node = leaf('l', 'm', 0, '2026-03-10');
       expect(node.toOutput().effectiveRate).toBe(0);
     });
   });
 
-  describe('guardas de domínio', () => {
-    it('settle em nó interno é erro', () => {
+  describe('domain guards', () => {
+    it('settle on an internal node is an error', () => {
       const m = mother('m', 100);
       m.recomputeFromChildren([leaf('c', 'm', 100, '2026-03-10')]);
       expect(() =>
@@ -239,7 +239,7 @@ describe('Transaction entity', () => {
       ).toThrow(BusinessRuleViolationError);
     });
 
-    it('settle duplo é erro', () => {
+    it('double settle is an error', () => {
       const node = leaf('l', 'm', 100, '2026-03-10');
       const settle = () =>
         node.settle({
@@ -252,7 +252,7 @@ describe('Transaction entity', () => {
       expect(settle).toThrow(BusinessRuleViolationError);
     });
 
-    it('estornar não-pago, entrada, duplo e interno são erros', () => {
+    it('reversing unpaid, down payment, double or internal nodes gives errors', () => {
       const open = leaf('l', 'm', 100, '2026-03-10');
       expect(() => open.reverse(createdAt)).toThrow(BusinessRuleViolationError);
 
@@ -287,7 +287,7 @@ describe('Transaction entity', () => {
       expect(() => paid.reverse(createdAt)).toThrow(BusinessRuleViolationError);
     });
 
-    it('reparcel: folha paga é imutável (não vira interna)', () => {
+    it('reinstallment: paid leaf is immutable (does not become internal)', () => {
       const paid = leaf('p', 'm', 100, '2026-03-10');
       paid.settle({
         paymentDate: '2026-03-10',
@@ -303,8 +303,8 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('estorno reabre a mãe', () => {
-    it('estornar a única folha paga devolve a mãe a IN_PROGRESS', () => {
+  describe('reversal reopens the parent', () => {
+    it('reversing the only paid leaf sets the parent back to IN_PROGRESS', () => {
       const m = mother('m', 100);
       const c = leaf('c', 'm', 100, '2026-03-10');
       c.settle({
@@ -324,7 +324,7 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('atributos novos (R1): serialização e propagação', () => {
+  describe('new attributes (R1): serialization and propagation', () => {
     function fixedCost(id: string) {
       return Transaction.create({
         id,
@@ -363,7 +363,7 @@ describe('Transaction entity', () => {
       expect(out.rootHasInstallments).toBe(false);
     });
 
-    it('nó simples não custo-fixo nasce com period/frequency null e rootIsFixedCost false', () => {
+    it('simple non-fixed-cost node starts with period/frequency null and rootIsFixedCost false', () => {
       const node = leaf('l1', 'l1', 100, '2026-09-10');
       const out = node.toOutput();
       expect(out.isFixedCost).toBe(false);
@@ -373,8 +373,8 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('ownership (R2): userId/personId obrigatórios e userId imutável', () => {
-    it('criar sem userId ou personId é erro de domínio', () => {
+  describe('ownership (R2): userId/personId required and userId immutable', () => {
+    it('creating without userId or personId is a domain error', () => {
       const base = {
         id: 'x',
         parentId: null,
@@ -392,7 +392,7 @@ describe('Transaction entity', () => {
       ).toThrow(ValidationError);
     });
 
-    it('userId é só getter — edit nunca o muda', () => {
+    it('userId is only a getter: edit never changes it', () => {
       const node = leaf('l1', 'm', 100, '2026-03-10');
       node.edit({ dueDate: '2026-05-10', updatedAt: createdAt });
       expect(node.userId).toBe(userId);
@@ -420,7 +420,7 @@ describe('Transaction entity', () => {
         });
     }
 
-    it('isFixedCost=false com period ou frequency preenchidos é rejeitado', () => {
+    it('isFixedCost=false with period or frequency filled is rejected', () => {
       expect(build({ isFixedCost: false, period: PeriodEnum.MONTH })).toThrow(
         BusinessRuleViolationError,
       );
@@ -429,7 +429,7 @@ describe('Transaction entity', () => {
       );
     });
 
-    it('isFixedCost=true exige period válido e frequency -1 ou inteiro >= 2', () => {
+    it('isFixedCost=true requires a valid period and frequency -1 or an integer >= 2', () => {
       expect(
         build({ isFixedCost: true, period: PeriodEnum.WEEK, frequency: -1 }),
       ).not.toThrow();
@@ -438,7 +438,7 @@ describe('Transaction entity', () => {
       ).not.toThrow();
     });
 
-    it('frequency 0, 1, fracionário e negativo != -1 são rejeitados', () => {
+    it('frequency 0, 1, fractional and negative other than -1 are rejected', () => {
       for (const frequency of [0, 1, 1.5, -2]) {
         expect(
           build({ isFixedCost: true, period: PeriodEnum.MONTH, frequency }),
@@ -446,7 +446,7 @@ describe('Transaction entity', () => {
       }
     });
 
-    it('o erro usa o ErrorCode dedicado de custo-fixo', () => {
+    it('the error uses the dedicated fixed-cost ErrorCode', () => {
       const run = build({
         isFixedCost: true,
         period: PeriodEnum.MONTH,
@@ -460,12 +460,12 @@ describe('Transaction entity', () => {
     });
   });
 
-  describe('denormalização de raiz (R11)', () => {
-    it('mãe criada com hasChildren nasce com rootHasInstallments true', () => {
+  describe('root denormalization (R11)', () => {
+    it('parent created with hasChildren starts with rootHasInstallments true', () => {
       expect(mother('m', 1000).toOutput().rootHasInstallments).toBe(true);
     });
 
-    it('raiz sem filhas tem rootHasInstallments false; a carona do recompute liga', () => {
+    it('root without children has rootHasInstallments false; the recompute piggyback turns it on', () => {
       const root = Transaction.create({
         id: 'root',
         parentId: null,
@@ -499,18 +499,18 @@ describe('Transaction entity', () => {
       });
     }
 
-    it('default MANUAL quando ausente', () => {
+    it('defaults to MANUAL when absent', () => {
       expect(single().origin).toBe(TransactionOriginEnum.MANUAL);
     });
 
-    it('preserva o origin explícito e o expõe em toPersistence/toOutput', () => {
+    it('keeps the explicit origin and exposes it in toPersistence/toOutput', () => {
       const node = single(TransactionOriginEnum.IMPORT);
       expect(node.origin).toBe(TransactionOriginEnum.IMPORT);
       expect(node.toPersistence().origin).toBe(TransactionOriginEnum.IMPORT);
       expect(node.toOutput().origin).toBe(TransactionOriginEnum.IMPORT);
     });
 
-    it('documento persistido sem o campo hidrata como MANUAL', () => {
+    it('persisted document without the field hydrates as MANUAL', () => {
       const persistence = single(
         TransactionOriginEnum.CARD_PURCHASE,
       ).toPersistence();
