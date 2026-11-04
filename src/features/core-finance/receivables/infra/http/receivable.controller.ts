@@ -62,7 +62,7 @@ export class ReceivableController {
       paidAmount: req.body.paidAmount,
       walletId: req.body.walletId,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public createInstallment = async (
@@ -82,7 +82,7 @@ export class ReceivableController {
       installments: req.body.installments,
       entry: req.body.entry,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -102,7 +102,7 @@ export class ReceivableController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listUnreceivedByPeriod = async (
@@ -117,7 +117,7 @@ export class ReceivableController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -125,7 +125,7 @@ export class ReceivableController {
       String(req.params.id),
       userIdFrom(req),
     );
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public settle = async (req: Request, res: Response): Promise<void> => {
@@ -138,7 +138,7 @@ export class ReceivableController {
       paymentDate: req.body.paymentDate,
       paymentMethodDescriptionEnum: req.body.paymentMethodDescriptionEnum,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public globalSettlement = async (
@@ -155,7 +155,7 @@ export class ReceivableController {
       selection: req.body.selection,
       valorPago: req.body.valorPago,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public edit = async (req: Request, res: Response): Promise<void> => {
@@ -168,7 +168,7 @@ export class ReceivableController {
       categoryDescriptionEnum: req.body.categoryDescriptionEnum,
       propagate: req.body.propagate,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public delete = async (req: Request, res: Response): Promise<void> => {
@@ -184,6 +184,6 @@ export class ReceivableController {
       id: String(req.params.id),
       userId: userIdFrom(req),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }

@@ -1,6 +1,6 @@
 # Controller
 
-`infra/http/<feature>.controller.ts`. One per feature, private constructor + `static create(useCases)`; one arrow method per route (arrow keeps `this` when the route takes the reference); each method: `assertValid(schema, req.body)` → build the use case input from `req` (`userIdFrom(req)` for the tenant, `numberOrUndefined` for numeric query) → `res.status(N).json(result)`. Never `try/catch`: the `ErrorMiddleware` maps domain errors. The three helpers (`assertValid`, `userIdFrom`, `numberOrUndefined`) come from `@/shared/http/request-input`; never declare them in the controller (ESLint `no-restricted-syntax` blocks a copy).
+`infra/http/<feature>.controller.ts`. One per feature, private constructor + `static create(useCases)`; one arrow method per route (arrow keeps `this` when the route takes the reference); each method: `assertValid(schema, req.body)` → build the use case input from `req` (`userIdFrom(req)` for the tenant, `numberOrUndefined` for numeric query) → `res.status(N).json({ data: result })`. Never `try/catch`: the `ErrorMiddleware` maps domain errors. The three helpers (`assertValid`, `userIdFrom`, `numberOrUndefined`) come from `@/shared/http/request-input`; never declare them in the controller (ESLint `no-restricted-syntax` blocks a copy).
 
 ```ts
 import type { Request, Response } from 'express';
@@ -32,7 +32,7 @@ export class BudgetController {
       limit: req.body.limit,
       categoryDescriptionEnum: req.body.categoryDescriptionEnum,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -41,7 +41,7 @@ export class BudgetController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public remove = async (req: Request, res: Response): Promise<void> => {

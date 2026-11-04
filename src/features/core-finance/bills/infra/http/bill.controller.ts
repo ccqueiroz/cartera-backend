@@ -63,7 +63,7 @@ export class BillController {
       paidAmount: req.body.paidAmount,
       walletId: req.body.walletId,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public createInstallment = async (
@@ -83,7 +83,7 @@ export class BillController {
       installments: req.body.installments,
       entry: req.body.entry,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -103,7 +103,7 @@ export class BillController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listUnpaidByPeriod = async (
@@ -118,7 +118,7 @@ export class BillController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -126,7 +126,7 @@ export class BillController {
       String(req.params.id),
       userIdFrom(req),
     );
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public settle = async (req: Request, res: Response): Promise<void> => {
@@ -139,7 +139,7 @@ export class BillController {
       paymentDate: req.body.paymentDate,
       paymentMethodDescriptionEnum: req.body.paymentMethodDescriptionEnum,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public globalSettlement = async (
@@ -156,7 +156,7 @@ export class BillController {
       selection: req.body.selection,
       valorPago: req.body.valorPago,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public edit = async (req: Request, res: Response): Promise<void> => {
@@ -169,7 +169,7 @@ export class BillController {
       categoryDescriptionEnum: req.body.categoryDescriptionEnum,
       propagate: req.body.propagate,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public delete = async (req: Request, res: Response): Promise<void> => {
@@ -185,6 +185,6 @@ export class BillController {
       id: String(req.params.id),
       userId: userIdFrom(req),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }
