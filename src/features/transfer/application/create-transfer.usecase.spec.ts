@@ -106,7 +106,7 @@ describe('CreateTransferUseCase', () => {
     expect(result.transfer.amount).toBe(120);
   });
 
-  it('grava 2 carteiras + 2 movimentos (DEBIT/CREDIT, refType TRANSFER) + 1 transferência', async () => {
+  it('writes 2 wallets + 2 movements (DEBIT/CREDIT, refType TRANSFER) + 1 transfer', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 300 }),
@@ -130,7 +130,7 @@ describe('CreateTransferUseCase', () => {
     expect(debit?.refId).toBe(credit?.refId);
   });
 
-  it('rejeita origem igual ao destino com 400 (ValidationError)', async () => {
+  it('rejects a source equal to the destination with 400 (ValidationError)', async () => {
     const repository = new InMemoryTransferRepository();
     const useCase = makeUseCase(repository, walletGatewayWith({}));
 
@@ -139,7 +139,7 @@ describe('CreateTransferUseCase', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('rejeita valor não positivo com 400 (ValidationError)', async () => {
+  it('rejects a non-positive amount with 400 (ValidationError)', async () => {
     const repository = new InMemoryTransferRepository();
     const useCase = makeUseCase(repository, walletGatewayWith({}));
 
@@ -151,7 +151,7 @@ describe('CreateTransferUseCase', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('rejeita data futura com 400 (ValidationError)', async () => {
+  it('rejects a future date with 400 (ValidationError)', async () => {
     const repository = new InMemoryTransferRepository();
     const useCase = makeUseCase(repository, walletGatewayWith({}));
 
@@ -160,7 +160,7 @@ describe('CreateTransferUseCase', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('404 quando uma carteira não pertence ao usuário / está deletada / não existe', async () => {
+  it('404 when a wallet does not belong to the user / is deleted / does not exist', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 100 }),
@@ -176,7 +176,7 @@ describe('CreateTransferUseCase', () => {
     );
   });
 
-  it('422 quando a forma de pagamento está inativa / inexistente', async () => {
+  it('422 when the payment method is inactive / missing', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 100 }),
@@ -192,7 +192,7 @@ describe('CreateTransferUseCase', () => {
     );
   });
 
-  it('origem que fica negativa: sucesso com warning BALANCE_NEGATIVE', async () => {
+  it('source that goes negative: success with BALANCE_NEGATIVE warning', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 50, overdraftLimit: 1000 }),
@@ -206,7 +206,7 @@ describe('CreateTransferUseCase', () => {
     expect(result.warnings).toContain(BalanceWarning.BALANCE_NEGATIVE);
   });
 
-  it('origem já negativa: sucesso com warning (post-state)', async () => {
+  it('source already negative: success with warning (post-state)', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({
@@ -224,7 +224,7 @@ describe('CreateTransferUseCase', () => {
     expect(result.warnings).toContain(BalanceWarning.BALANCE_NEGATIVE);
   });
 
-  it('origem caixa pura negativa: BALANCE_NEGATIVE sem OVERDRAFT_LIMIT_EXCEEDED', async () => {
+  it('pure cash source negative: BALANCE_NEGATIVE without OVERDRAFT_LIMIT_EXCEEDED', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 0 }),
@@ -256,7 +256,7 @@ describe('CreateTransferUseCase', () => {
     expect(result.warnings).toContain(BalanceWarning.OVERDRAFT_LIMIT_EXCEEDED);
   });
 
-  it('transferDate default = hoje quando ausente', async () => {
+  it('transferDate defaults to today when missing', async () => {
     const repository = new InMemoryTransferRepository();
     const gateway = walletGatewayWith({
       w1: snapshot({ balance: 100 }),

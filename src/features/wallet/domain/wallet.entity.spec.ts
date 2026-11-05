@@ -90,7 +90,7 @@ describe('Wallet entity', () => {
     expect(wallet.exceedsOverdraftLimit()).toBe(false);
   });
 
-  it('overdraft wallet debit opens the episode on the first 0→negative crossing', () => {
+  it('overdraft wallet debit opens the episode on the first 0->negative crossing', () => {
     const wallet = build({ hasOverdraft: true, overdraftLimit: 100 });
     wallet.debit(Money.create(150), '2026-06-14', '2026-06-14T01:00:00.000Z');
     expect(wallet.balance.value).toBe(-150);
@@ -106,7 +106,7 @@ describe('Wallet entity', () => {
     expect(wallet.balance.value).toBe(-100);
   });
 
-  it('credits and closes the episode when balance returns to ≥ 0', () => {
+  it('credits and closes the episode when balance returns to >= 0', () => {
     const wallet = build({ hasOverdraft: true, overdraftLimit: 100 });
     wallet.debit(Money.create(100), '2026-06-14', '2026-06-14T01:00:00.000Z');
     wallet.credit(Money.create(120), '2026-06-16T01:00:00.000Z');

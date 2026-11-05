@@ -28,7 +28,7 @@ const run = async (
 const USER = { userId: 'uid-1', email: 'a@b.com' };
 
 describe('VerifyTokenMiddleware', () => {
-  it('Bearer header vence quando header e cookie estão presentes', async () => {
+  it('Bearer header wins when header and cookie are both present', async () => {
     const verifyToken = jest.fn(async () => USER);
     const request = makeRequest({
       authorization: 'Bearer token-do-header',
@@ -42,7 +42,7 @@ describe('VerifyTokenMiddleware', () => {
     });
   });
 
-  it('cai pro cookie session quando não há Bearer', async () => {
+  it('falls back to the session cookie when there is no Bearer', async () => {
     const verifyToken = jest.fn(async () => USER);
     const request = makeRequest({ sessionCookie: 'token-do-cookie' });
 
@@ -53,7 +53,7 @@ describe('VerifyTokenMiddleware', () => {
     });
   });
 
-  it('sem credencial nenhuma rejeita com INVALID_TOKEN sem chamar o verifier', async () => {
+  it('with no credential at all rejects with INVALID_TOKEN without calling the verifier', async () => {
     const verifyToken = jest.fn();
     const { next } = await run(makeRequest({}), verifyToken);
 
@@ -63,7 +63,7 @@ describe('VerifyTokenMiddleware', () => {
     expect(error.code).toBe(ErrorCode.INVALID_TOKEN);
   });
 
-  it('header Authorization que não é Bearer cai pro cookie', async () => {
+  it('Authorization header that is not Bearer falls back to the cookie', async () => {
     const verifyToken = jest.fn(async () => USER);
     const request = makeRequest({
       authorization: 'Basic abc123',
@@ -92,7 +92,7 @@ describe('VerifyTokenMiddleware', () => {
     ['TOKEN_EXPIRED', new UnauthorizedError(ErrorCode.TOKEN_EXPIRED)],
     ['INVALID_TOKEN', new UnauthorizedError(ErrorCode.INVALID_TOKEN)],
   ])(
-    'falha de verificação %s propaga pro ErrorMiddleware',
+    'verification failure %s propagates to ErrorMiddleware',
     async (_, thrown) => {
       const verifyToken = jest.fn(async () => {
         throw thrown;
@@ -106,7 +106,7 @@ describe('VerifyTokenMiddleware', () => {
     },
   );
 
-  it('conta desativada propaga ForbiddenError (403, não 401)', async () => {
+  it('disabled account propagates ForbiddenError (403, not 401)', async () => {
     const thrown = new ForbiddenError(ErrorCode.USER_DISABLED);
     const verifyToken = jest.fn(async () => {
       throw thrown;

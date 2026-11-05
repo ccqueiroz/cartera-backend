@@ -27,7 +27,7 @@ function base(overrides: Partial<Parameters<typeof Transfer.create>[0]> = {}) {
 }
 
 describe('Transfer entity', () => {
-  it('cria uma transferência válida e serializa puro', () => {
+  it('creates a valid transfer and serializes it as pure data', () => {
     const transfer = base();
     const persistence = transfer.toPersistence();
     const output = transfer.toOutput();
@@ -42,21 +42,21 @@ describe('Transfer entity', () => {
     expect(persistence).not.toHaveProperty('deletedAt');
   });
 
-  it('rejeita origem igual ao destino', () => {
+  it('rejects a source equal to the destination', () => {
     expect(() => base({ toWalletId: 'w1' })).toThrow(ValidationError);
     expect(codeOf(() => base({ toWalletId: 'w1' }))).toBe(
       ErrorCode.TRANSFER_SAME_WALLET,
     );
   });
 
-  it('rejeita valor zero', () => {
+  it('rejects a zero amount', () => {
     expect(() => base({ amount: Money.create(0) })).toThrow(ValidationError);
     expect(codeOf(() => base({ amount: Money.create(0) }))).toBe(
       ErrorCode.TRANSFER_AMOUNT_NOT_POSITIVE,
     );
   });
 
-  it('rejeita data futura (depois de hoje)', () => {
+  it('rejects a future date (after today)', () => {
     const futura = () =>
       base({
         transferDate: '2026-06-18',
@@ -66,7 +66,7 @@ describe('Transfer entity', () => {
     expect(codeOf(futura)).toBe(ErrorCode.TRANSFER_DATE_IN_FUTURE);
   });
 
-  it('aceita data igual a hoje', () => {
+  it('accepts a date equal to today', () => {
     expect(() =>
       base({
         transferDate: '2026-06-17',
@@ -75,7 +75,7 @@ describe('Transfer entity', () => {
     ).not.toThrow();
   });
 
-  it('reconstitui de persistência com with()', () => {
+  it('rebuilds from persistence with with()', () => {
     const transfer = Transfer.with({
       id: 't9',
       userId: 'u1',

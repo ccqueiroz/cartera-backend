@@ -43,7 +43,7 @@ async function seedWallet(
 }
 
 describe('AdjustBalanceUseCase', () => {
-  it('saque abaixo do saldo executa e retorna BALANCE_NEGATIVE (nunca bloqueia)', async () => {
+  it('withdrawal below the balance executes and returns BALANCE_NEGATIVE (never blocks)', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seedWallet(repository, ids);
@@ -71,7 +71,7 @@ describe('AdjustBalanceUseCase', () => {
     expect(result.movements[0].refType).toBe('ADJUST');
   });
 
-  it('saque além do limite retorna OVERDRAFT_LIMIT_EXCEEDED', async () => {
+  it('withdrawal beyond the limit returns OVERDRAFT_LIMIT_EXCEEDED', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seedWallet(repository, ids, { overdraftLimit: 100 });
@@ -93,7 +93,7 @@ describe('AdjustBalanceUseCase', () => {
     expect(result.warnings).toContain(WalletWarning.OVERDRAFT_LIMIT_EXCEEDED);
   });
 
-  it('amount ≤ 0 é rejeitado', async () => {
+  it('amount <= 0 is rejected', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seedWallet(repository, ids);
@@ -115,7 +115,7 @@ describe('AdjustBalanceUseCase', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
-  it('depósito capitaliza juros antes do principal e fecha o episódio', async () => {
+  it('deposit capitalizes interest before the principal and closes the episode', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seedWallet(repository, ids, { overdraftMonthlyRate: 0.1 });

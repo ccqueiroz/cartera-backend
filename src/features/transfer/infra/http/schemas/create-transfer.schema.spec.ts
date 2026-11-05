@@ -14,7 +14,7 @@ function valid(overrides: Record<string, unknown> = {}) {
 }
 
 describe('CreateTransferSchema', () => {
-  it('aceita payload válido com transferDate', async () => {
+  it('accepts a valid payload with transferDate', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ transferDate: '2026-06-10' }),
@@ -23,12 +23,12 @@ describe('CreateTransferSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('aceita payload válido sem transferDate (opcional)', async () => {
+  it('accepts a valid payload without transferDate (optional)', async () => {
     const errors = await runValidate(CreateTransferSchema, valid(), options);
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita fromWalletId vazio', async () => {
+  it('rejects an empty fromWalletId', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ fromWalletId: '' }),
@@ -37,7 +37,7 @@ describe('CreateTransferSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita amount não numérico', async () => {
+  it('rejects a non-numeric amount', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ amount: 'dez' }),
@@ -46,7 +46,7 @@ describe('CreateTransferSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita paymentMethodDescriptionEnum fora do conjunto fechado', async () => {
+  it('rejects a paymentMethodDescriptionEnum outside the closed set', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ paymentMethodDescriptionEnum: 'BITCOIN' }),
@@ -55,7 +55,7 @@ describe('CreateTransferSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita transferDate em formato inválido', async () => {
+  it('rejects a transferDate in an invalid format', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ transferDate: '10/06/2026' }),
@@ -64,7 +64,7 @@ describe('CreateTransferSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita props desconhecidas', async () => {
+  it('rejects unknown props', async () => {
     const errors = await runValidate(
       CreateTransferSchema,
       valid({ userId: 'hacker' }),

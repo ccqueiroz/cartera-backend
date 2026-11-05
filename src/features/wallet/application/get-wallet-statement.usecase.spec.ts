@@ -21,7 +21,7 @@ function makeIds() {
 }
 
 describe('GetWalletStatementUseCase', () => {
-  it('lista movimentos por competência, ordenados desc', async () => {
+  it('lists movements by competence, sorted desc', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const { wallet } = await CreateWalletUseCase.create(
@@ -63,7 +63,7 @@ describe('GetWalletStatementUseCase', () => {
     expect(page.content[0].occurredAt).toBe('2026-06-12');
   });
 
-  it('período sem movimento retorna vazio', async () => {
+  it('period without movement returns empty', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const { wallet } = await CreateWalletUseCase.create(
@@ -83,7 +83,7 @@ describe('GetWalletStatementUseCase', () => {
     expect(page.content).toEqual([]);
   });
 
-  it('wallet de outro usuário ⇒ 404', async () => {
+  it('wallet of another user => 404', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const { wallet } = await CreateWalletUseCase.create(
