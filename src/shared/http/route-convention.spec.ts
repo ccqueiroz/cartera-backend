@@ -503,3 +503,12 @@ describe('[BK2-54] wallet controller and the wallet read and delete routes', () 
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] wallet create and edit routes', () => {
+  it.each([
+    'wallet/infra/http/create-wallet.route.ts',
+    'wallet/infra/http/edit-wallet.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

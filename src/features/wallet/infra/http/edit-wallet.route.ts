@@ -26,11 +26,14 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Carteira atualizada. }
- *       400: { description: "Payload inválido." }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Carteira não encontrada. }
- *       409: { description: Carteira removida. }
+ *       200: { $ref: '#/components/responses/WalletOutputResponse' }
+ *       400: { $ref: '#/components/responses/WalletEditBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       409: { $ref: '#/components/responses/WalletDeleted' }
+ *       422: { $ref: '#/components/responses/WalletDefaultNoOverdraft' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class EditWalletRoute implements Route {
   public readonly method: HttpMethod = 'put';
