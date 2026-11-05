@@ -4,7 +4,7 @@ description: >
   How each layer of the cartera-backend is tested: red-first by assertion, what to test
   where (domain and application without IO, repositories by contract against the
   in-memory adapter and the Firestore fake, controllers with jest.fn use cases, routes
-  registry, factory, bootstrap adapters, slice e2e via factory + fake db + real guard),
+  registry, factory, bootstrap adapters, slice spec via factory + fake db + real guard),
   the mocks in src/test/, describe/it naming in English, the unit coverage gate (85%
   features, 90% kernel) and what is outside it. Use when writing, reviewing or fixing a
   *.spec.ts, choosing a mock or fake, making a test fail first, or reading the coverage

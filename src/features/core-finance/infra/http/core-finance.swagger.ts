@@ -32,7 +32,7 @@
  *         categoryDescriptionEnum: { type: string, nullable: true }
  *         categoryGroup: { type: string, nullable: true }
  *         isFixedCost: { type: boolean }
- *         period: { type: string, nullable: true, enum: [WEEK, MONTH, YEAR] }
+ *         period: { type: string, nullable: true, enum: [WEEK, MONTH, YEAR, null] }
  *         frequency: { type: number, nullable: true }
  *         rootIsFixedCost: { type: boolean }
  *         rootHasInstallments: { type: boolean }

@@ -46,3 +46,13 @@ describe('[BK2-10] openapi.json component enums', () => {
     expect(openapi.components?.schemas?.[schemaName]?.enum).toEqual(expected);
   });
 });
+
+describe('[BK2-50] openapi.json nullable enum', () => {
+  it('lists null in the enum of the nullable TransactionOutput period', () => {
+    expect(openapi.components?.schemas?.TransactionOutput).toMatchObject({
+      properties: {
+        period: { nullable: true, enum: expect.arrayContaining([null]) },
+      },
+    });
+  });
+});

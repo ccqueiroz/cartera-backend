@@ -16,7 +16,7 @@ export function applyPagination<T>(
     page,
     size,
     totalElements,
-    totalPages: Math.ceil(totalElements / size),
+    totalPages: size === 0 ? 0 : Math.ceil(totalElements / size),
     ordering,
   };
 }

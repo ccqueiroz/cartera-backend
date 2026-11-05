@@ -22,16 +22,7 @@ import { SettleBillSchema } from '@/features/core-finance/bills/infra/http/schem
 import { GlobalSettleBillSchema } from '@/features/core-finance/bills/infra/http/schemas/global-settle-bill.schema';
 import { EditBillSchema } from '@/features/core-finance/bills/infra/http/schemas/edit-bill.schema';
 import { ListUnpaidByPeriodSchema } from '@/features/core-finance/bills/infra/http/schemas/list-unpaid-by-period.schema';
-
-const LIST_FIELDS = {
-  ordering: ['dueDate', 'paymentDate', 'amount', 'paidAmount'],
-  sort: [
-    'categoryDescriptionEnum',
-    'paymentMethodDescriptionEnum',
-    'paymentStatus',
-  ],
-  searchByDate: ['dueDate', 'paymentDate'],
-} as const;
+import { TRANSACTION_LIST_FIELDS } from '@/features/core-finance/infra/http/transaction-list-fields';
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'paid' ? 'paid' : 'to_pay';
@@ -111,7 +102,7 @@ export class BillController {
         : undefined,
       rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
       rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
-      params: readPaginationParams(req.query, LIST_FIELDS),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
@@ -125,7 +116,7 @@ export class BillController {
       userId: userIdFrom(req),
       startDate: String(req.query.start_date),
       endDate: String(req.query.end_date),
-      params: readPaginationParams(req.query, LIST_FIELDS),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };

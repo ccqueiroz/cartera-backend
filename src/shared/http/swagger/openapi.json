@@ -2665,7 +2665,8 @@
             "enum": [
               "WEEK",
               "MONTH",
-              "YEAR"
+              "YEAR",
+              null
             ],
             "nullable": true,
             "type": "string"
