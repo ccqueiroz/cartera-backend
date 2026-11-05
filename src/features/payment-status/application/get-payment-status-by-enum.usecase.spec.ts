@@ -1,5 +1,5 @@
 import { GetPaymentStatusByEnumUseCase } from './get-payment-status-by-enum.usecase';
-import { PaymentStatusCatalog } from '../domain/payment-status-catalog.entity';
+import { PaymentStatusCatalog } from '@/features/payment-status/domain/payment-status-catalog.entity';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 

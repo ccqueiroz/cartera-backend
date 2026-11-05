@@ -1,5 +1,5 @@
 import { DateRange } from './date-range.vo';
-import { ValidationError } from '../errors/domain.error';
+import { ValidationError } from '@/shared/kernel/errors/domain.error';
 
 describe('DateRange', () => {
   const start = new Date('2026-01-01');

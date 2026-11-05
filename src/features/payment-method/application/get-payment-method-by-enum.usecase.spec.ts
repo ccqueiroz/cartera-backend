@@ -1,6 +1,6 @@
 import { GetPaymentMethodByEnumUseCase } from './get-payment-method-by-enum.usecase';
-import { PaymentMethod } from '../domain/payment-method.entity';
-import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
+import { PaymentMethod } from '@/features/payment-method/domain/payment-method.entity';
+import { PaymentMethodDescriptionEnum } from '@/features/payment-method/domain/enums/payment-method-description.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const makeMethod = (deletedAt: string | null) =>

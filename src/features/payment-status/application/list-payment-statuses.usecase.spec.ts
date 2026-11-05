@@ -1,5 +1,5 @@
 import { ListPaymentStatusesUseCase } from './list-payment-statuses.usecase';
-import { PaymentStatusCatalog } from '../domain/payment-status-catalog.entity';
+import { PaymentStatusCatalog } from '@/features/payment-status/domain/payment-status-catalog.entity';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 
 const makeEntry = (id: string, code: PaymentStatusEnum, label: string) =>

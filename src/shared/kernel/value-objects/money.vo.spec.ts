@@ -1,5 +1,5 @@
 import { Money } from './money.vo';
-import { ValidationError } from '../errors/domain.error';
+import { ValidationError } from '@/shared/kernel/errors/domain.error';
 
 describe('Money', () => {
   it('creates and normalizes to 2 decimal places', () => {

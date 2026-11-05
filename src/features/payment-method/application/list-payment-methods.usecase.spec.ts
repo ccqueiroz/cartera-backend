@@ -1,6 +1,6 @@
 import { ListPaymentMethodsUseCase } from './list-payment-methods.usecase';
-import { PaymentMethod } from '../domain/payment-method.entity';
-import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
+import { PaymentMethod } from '@/features/payment-method/domain/payment-method.entity';
+import { PaymentMethodDescriptionEnum } from '@/features/payment-method/domain/enums/payment-method-description.enum';
 
 const makeActive = (id: string, enumValue: string) =>
   PaymentMethod.create({
