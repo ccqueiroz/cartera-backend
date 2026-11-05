@@ -2,16 +2,16 @@ import { WalletMovementOutput } from '@/features/wallet/domain/wallet-movement.e
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { EntityNotFoundError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { applyListParams } from '@/shared/query/apply-list-params';
 import { applyPagination } from '@/shared/query/apply-pagination';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 
 interface GetWalletStatementInput {
   userId: string;
   id: string;
   month?: number;
   year?: number;
-  page?: number;
-  size?: number;
+  params?: PaginationParams;
 }
 
 export class GetWalletStatementUseCase {
@@ -34,12 +34,18 @@ export class GetWalletStatementUseCase {
       input.userId,
     );
 
+    const { params = {} } = input;
     const filtered = movements
       .filter((movement) => this.matchesCompetence(movement.occurredAt, input))
       .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
       .map((movement) => movement.toOutput());
 
-    return applyPagination(filtered, input.page, input.size);
+    return applyPagination(
+      applyListParams(filtered, params),
+      params.page,
+      params.size,
+      params.ordering ?? null,
+    );
   }
 
   private matchesCompetence(

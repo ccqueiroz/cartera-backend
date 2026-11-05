@@ -19,12 +19,29 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *       - in: query
  *         name: year
  *         schema: { type: integer }
+ *       - $ref: '#/components/parameters/Page'
+ *       - $ref: '#/components/parameters/Size'
+ *       - in: query
+ *         name: ordering
+ *         schema: { type: string, enum: [occurredAt, amount, createdAt] }
+ *       - $ref: '#/components/parameters/DirectionOrder'
+ *       - in: query
+ *         name: sort
+ *         schema: { type: string, enum: [direction, refType] }
+ *       - $ref: '#/components/parameters/SortValue'
+ *       - in: query
+ *         name: search_by_date
+ *         schema: { type: string, enum: [occurredAt, createdAt] }
+ *       - $ref: '#/components/parameters/SearchByDateValue'
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Página de movimentos. }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Carteira não encontrada. }
+ *       200: { $ref: '#/components/responses/WalletMovementPageResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class WalletStatementRoute implements Route {
   public readonly method: HttpMethod = 'get';

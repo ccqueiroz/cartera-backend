@@ -4,6 +4,7 @@ import {
   numberOrUndefined,
   userIdFrom,
 } from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateWalletUseCase } from '@/features/wallet/application/create-wallet.usecase';
 import { ListWalletsUseCase } from '@/features/wallet/application/list-wallets.usecase';
 import { GetWalletByIdUseCase } from '@/features/wallet/application/get-wallet-by-id.usecase';
@@ -14,6 +15,12 @@ import { GetWalletStatementUseCase } from '@/features/wallet/application/get-wal
 import { CreateWalletSchema } from '@/features/wallet/infra/http/schemas/create-wallet.schema';
 import { EditWalletSchema } from '@/features/wallet/infra/http/schemas/edit-wallet.schema';
 import { AdjustBalanceSchema } from '@/features/wallet/infra/http/schemas/adjust-balance.schema';
+
+const STATEMENT_FIELDS = {
+  ordering: ['occurredAt', 'amount', 'createdAt'],
+  sort: ['direction', 'refType'],
+  searchByDate: ['occurredAt', 'createdAt'],
+} as const;
 
 export interface WalletUseCases {
   create: CreateWalletUseCase;
@@ -69,8 +76,7 @@ export class WalletController {
       id: String(req.params.id),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, STATEMENT_FIELDS),
     });
     res.status(200).json({ data: result });
   };

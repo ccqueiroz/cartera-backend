@@ -78,6 +78,23 @@
  *             required: [data]
  *             properties:
  *               data: { $ref: '#/components/schemas/WalletOutput' }
+ *     WalletMovementPageResponse:
+ *       description: Página de movimentos do extrato.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/PageMeta'
+ *                   - type: object
+ *                     required: [content]
+ *                     properties:
+ *                       content:
+ *                         type: array
+ *                         items: { $ref: '#/components/schemas/WalletMovementOutput' }
  *     WalletDeleteRefused:
  *       description: Remoção recusada para a carteira.
  *       content:
