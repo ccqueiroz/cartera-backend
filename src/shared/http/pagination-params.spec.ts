@@ -183,4 +183,22 @@ describe('[BK2-48] readPaginationParams', () => {
       );
     },
   );
+
+  it('reads the one-day range with the initial date equal to the final', () => {
+    expect(
+      readPaginationParams(
+        {
+          search_by_date: 'dueDate',
+          search_by_date_value: '2026-01-15-2026-01-15',
+        },
+        billListFields,
+      ),
+    ).toEqual({
+      searchByDate: {
+        field: 'dueDate',
+        initialDate: '2026-01-15',
+        finalDate: '2026-01-15',
+      },
+    });
+  });
 });
