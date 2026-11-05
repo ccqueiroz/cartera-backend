@@ -107,6 +107,76 @@
         },
         "description": "Saldo ajustado com os movimentos e os avisos."
       },
+      "CategoryAlreadyExists": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Categoria já ativa para este descriptionEnum."
+      },
+      "CategoryBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_DESCRIPTION_REQUIRED",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou descrição obrigatória ausente."
+      },
+      "CategoryDescriptionEnumImmutable": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_DESCRIPTION_ENUM_IMMUTABLE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Tentativa de trocar o descriptionEnum imutável."
+      },
       "CategoryGroupListResponse": {
         "content": {
           "application/json": {
@@ -2848,22 +2918,25 @@
         },
         "responses": {
           "200": {
-            "description": "Slot soft-deleted reativado."
+            "$ref": "#/components/responses/CategoryOutputResponse"
           },
           "201": {
-            "description": "Categoria criada."
+            "$ref": "#/components/responses/CategoryOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/CategoryBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Sem autorização de escrita (gate TBD)."
+            "$ref": "#/components/responses/UserDisabled"
           },
           "409": {
-            "description": "descriptionEnum já ativo."
+            "$ref": "#/components/responses/CategoryAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -2894,14 +2967,20 @@
           "204": {
             "description": "Categoria soft-deletada."
           },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Sem autorização de escrita (gate TBD)."
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Não existe ou já está soft-deleted."
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -2960,22 +3039,25 @@
         },
         "responses": {
           "200": {
-            "description": "Categoria atualizada."
+            "$ref": "#/components/responses/CategoryOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/CategoryBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
-            "description": "Sem autorização de escrita (gate TBD)."
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Não existe ou está soft-deleted."
+            "$ref": "#/components/responses/CategoryNotFound"
           },
           "422": {
-            "description": "Tentativa de trocar o descriptionEnum imutável."
+            "$ref": "#/components/responses/CategoryDescriptionEnumImmutable"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

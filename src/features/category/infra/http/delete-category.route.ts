@@ -17,14 +17,12 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       204:
- *         description: Categoria soft-deletada.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       403:
- *         description: Sem autorização de escrita (gate TBD).
- *       404:
- *         description: Não existe ou já está soft-deleted.
+ *       204: { description: "Categoria soft-deletada." }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/CategoryNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class DeleteCategoryRoute implements Route {
   public readonly method: HttpMethod = 'delete';

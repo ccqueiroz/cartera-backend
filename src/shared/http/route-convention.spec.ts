@@ -576,3 +576,13 @@ describe('[BK2-54] category controller and the category read routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] category write routes', () => {
+  it.each([
+    'category/infra/http/create-category.route.ts',
+    'category/infra/http/update-category.route.ts',
+    'category/infra/http/delete-category.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
