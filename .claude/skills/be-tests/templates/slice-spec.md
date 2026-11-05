@@ -1,6 +1,6 @@
-# Slice e2e spec (in process)
+# Slice spec (in process)
 
-`src/features/<feature>/<feature>.e2e.spec.ts`. The whole slice through the factory with a fake Firestore db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.e2e.spec.ts`, with a local `makeFakeDb()` until the shared fake exists.
+`src/features/<feature>/<feature>.slice.spec.ts`. The whole slice through the factory with a fake Firestore db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.slice.spec.ts`, with a local `makeFakeDb()` until the shared fake exists.
 
 ```ts
 const VALID_TOKEN = 'valid-token';
