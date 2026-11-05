@@ -648,3 +648,19 @@ describe('[BK2-54] login and session refresh routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] signout, password recovery and health routes', () => {
+  it('health.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'health/infra/http/health.controller.ts'),
+    );
+  });
+
+  it.each([
+    'auth/infra/http/signout.route.ts',
+    'auth/infra/http/recover-password.route.ts',
+    'health/infra/http/health.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

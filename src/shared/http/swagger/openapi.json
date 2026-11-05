@@ -356,6 +356,24 @@
         },
         "description": "Carteira criada com os avisos de saldo."
       },
+      "HealthStatusResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Serviço no ar."
+      },
       "InternalServerError": {
         "content": {
           "application/json": {
@@ -599,6 +617,48 @@
         },
         "description": "Status de pagamento do catálogo."
       },
+      "RecoverPasswordOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RecoverPasswordOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Pedido de recuperação aceito, com resposta genérica."
+      },
+      "RecoverPasswordUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Falha do provedor de autenticação ou limite de pedidos excedido."
+      },
       "RefreshUnauthorized": {
         "content": {
           "application/json": {
@@ -727,6 +787,32 @@
           }
         },
         "description": "Resultado da liquidação da parcela."
+      },
+      "SignoutUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_NOT_FOUND",
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_TOKEN",
+                        "TOKEN_EXPIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Sessão ausente, inválida ou expirada."
       },
       "TransactionAlreadyPaid": {
         "content": {
@@ -1961,6 +2047,24 @@
         ],
         "type": "object"
       },
+      "HealthStatus": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ok"
+            ],
+            "type": "string"
+          },
+          "uptimeSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "uptimeSeconds"
+        ],
+        "type": "object"
+      },
       "PageMeta": {
         "properties": {
           "ordering": {
@@ -2084,6 +2188,17 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "RecoverPasswordOutput": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
       },
       "RefreshedAuthSession": {
         "properties": {
@@ -2660,10 +2775,16 @@
         },
         "responses": {
           "202": {
-            "description": "Resposta genérica idêntica exista a conta ou não — nunca vaza existência."
+            "$ref": "#/components/responses/RecoverPasswordOutputResponse"
           },
           "400": {
-            "description": "E-mail malformado (INVALID_EMAIL)."
+            "$ref": "#/components/responses/AuthBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/RecoverPasswordUnauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "summary": "Solicita recuperação de senha (resposta genérica anti-enumeração).",
@@ -2679,10 +2800,13 @@
             "description": "Sessão encerrada; cookie `session` expirado."
           },
           "401": {
-            "description": "Sessão ausente, inválida (INVALID_TOKEN) ou expirada (TOKEN_EXPIRED)."
+            "$ref": "#/components/responses/SignoutUnauthorized"
           },
           "403": {
-            "description": "Conta desativada (USER_DISABLED)."
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3805,24 +3929,10 @@
         "description": "Rota pública de liveness; retorna o status e o uptime do processo.",
         "responses": {
           "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "status": {
-                      "example": "ok",
-                      "type": "string"
-                    },
-                    "uptimeSeconds": {
-                      "example": 1234,
-                      "type": "number"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Serviço no ar."
+            "$ref": "#/components/responses/HealthStatusResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "summary": "Verifica a saúde do serviço.",
