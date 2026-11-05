@@ -43,7 +43,7 @@ export class WalletController {
       overdraftMonthlyRate: req.body.overdraftMonthlyRate,
       overdraftGraceDays: req.body.overdraftGraceDays,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -52,7 +52,7 @@ export class WalletController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -60,7 +60,7 @@ export class WalletController {
       userId: userIdFrom(req),
       id: String(req.params.id),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public statement = async (req: Request, res: Response): Promise<void> => {
@@ -72,7 +72,7 @@ export class WalletController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public edit = async (req: Request, res: Response): Promise<void> => {
@@ -86,7 +86,7 @@ export class WalletController {
       overdraftMonthlyRate: req.body.overdraftMonthlyRate,
       overdraftGraceDays: req.body.overdraftGraceDays,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public adjustBalance = async (req: Request, res: Response): Promise<void> => {
@@ -98,7 +98,7 @@ export class WalletController {
       amount: req.body.amount,
       occurredAt: req.body.occurredAt,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public remove = async (req: Request, res: Response): Promise<void> => {

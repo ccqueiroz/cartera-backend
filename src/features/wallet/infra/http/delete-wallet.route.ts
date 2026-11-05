@@ -19,9 +19,11 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       204: { description: Carteira removida (idempotente). }
- *       401: { description: Sessão ausente ou inválida. }
- *       422: { description: Saldo ≠ 0 sem force. }
+ *       204: { description: "Carteira removida, sem corpo." }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       422: { $ref: '#/components/responses/WalletDeleteRefused' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class DeleteWalletRoute implements Route {
   public readonly method: HttpMethod = 'delete';

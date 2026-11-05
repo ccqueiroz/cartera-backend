@@ -536,6 +536,30 @@
         },
         "description": "Dados de entrada inválidos."
       },
+      "WalletDeleteRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_HAS_BALANCE",
+                        "WALLET_NOT_DELETABLE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Remoção recusada para a carteira."
+      },
       "WalletNotFound": {
         "content": {
           "application/json": {
@@ -558,6 +582,24 @@
           }
         },
         "description": "Carteira não encontrada."
+      },
+      "WalletOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/WalletOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Carteira."
       }
     },
     "schemas": {
@@ -1182,6 +1224,92 @@
         "required": [
           "id",
           "balance"
+        ],
+        "type": "object"
+      },
+      "WalletOutput": {
+        "properties": {
+          "accruedInterest": {
+            "type": "number"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "amountToPay": {
+            "type": "number"
+          },
+          "availableBalance": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "effectiveBalance": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overdraft": {
+            "nullable": true,
+            "properties": {
+              "graceDays": {
+                "type": "number"
+              },
+              "limit": {
+                "type": "number"
+              },
+              "monthlyRate": {
+                "type": "number"
+              },
+              "since": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "limit",
+              "monthlyRate",
+              "graceDays",
+              "since"
+            ],
+            "type": "object"
+          },
+          "overdraftAvailable": {
+            "type": "number"
+          },
+          "overdraftUsed": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "balance",
+          "isDefault",
+          "effectiveBalance",
+          "overdraftUsed",
+          "overdraftAvailable",
+          "availableBalance",
+          "accruedInterest",
+          "amountToPay",
+          "overdraft",
+          "active",
+          "createdAt",
+          "updatedAt"
         ],
         "type": "object"
       }
@@ -3883,13 +4011,19 @@
         ],
         "responses": {
           "204": {
-            "description": "Carteira removida (idempotente)."
+            "description": "Carteira removida, sem corpo."
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "422": {
-            "description": "Saldo ≠ 0 sem force."
+            "$ref": "#/components/responses/WalletDeleteRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4004,13 +4138,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Carteira com campos derivados."
+            "$ref": "#/components/responses/WalletOutputResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Carteira não encontrada."
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
