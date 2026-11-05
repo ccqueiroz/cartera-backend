@@ -512,3 +512,11 @@ describe('[BK2-54] wallet create and edit routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] wallet adjust balance route', () => {
+  it('adjust-balance.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'wallet/infra/http/adjust-balance.route.ts'),
+    );
+  });
+});

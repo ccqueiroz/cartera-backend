@@ -89,6 +89,24 @@
       }
     },
     "responses": {
+      "AdjustBalanceResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/AdjustBalanceResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Saldo ajustado com os movimentos e os avisos."
+      },
       "CreateTransactionResultResponse": {
         "content": {
           "application/json": {
@@ -554,6 +572,30 @@
         },
         "description": "Dados de entrada inválidos."
       },
+      "WalletAdjustBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Valor inválido ou saldo negativo sem limite."
+      },
       "WalletCreateBadRequest": {
         "content": {
           "application/json": {
@@ -718,6 +760,31 @@
       }
     },
     "schemas": {
+      "AdjustBalanceResult": {
+        "properties": {
+          "movements": {
+            "items": {
+              "$ref": "#/components/schemas/WalletMovementOutput"
+            },
+            "type": "array"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "wallet",
+          "movements",
+          "warnings"
+        ],
+        "type": "object"
+      },
       "BalanceWarning": {
         "enum": [
           "BALANCE_NEGATIVE",
@@ -1357,6 +1424,59 @@
         "required": [
           "id",
           "balance"
+        ],
+        "type": "object"
+      },
+      "WalletMovementOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "refId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "refType": {
+            "enum": [
+              "SETTLEMENT",
+              "SETTLEMENT_REVERSAL",
+              "TRANSFER",
+              "INVOICE",
+              "YIELD",
+              "ADJUST",
+              "OVERDRAFT_INTEREST"
+            ],
+            "type": "string"
+          },
+          "walletId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "walletId",
+          "direction",
+          "amount",
+          "refType",
+          "refId",
+          "occurredAt",
+          "createdAt"
         ],
         "type": "object"
       },
@@ -4041,19 +4161,25 @@
         },
         "responses": {
           "200": {
-            "description": "Saldo ajustado (wallet + movimentos + warnings)."
+            "$ref": "#/components/responses/AdjustBalanceResultResponse"
           },
           "400": {
-            "description": "Valor inválido."
+            "$ref": "#/components/responses/WalletAdjustBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Carteira não encontrada."
+            "$ref": "#/components/responses/WalletNotFound"
           },
           "409": {
-            "description": "Carteira removida."
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
