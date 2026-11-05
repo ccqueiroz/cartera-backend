@@ -8,10 +8,22 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *   get:
  *     summary: Lista receitas por competencia (folhas, filtros do motor).
  *     tags: [Receivable]
+ *     parameters:
+ *       - $ref: '#/components/parameters/Page'
+ *       - $ref: '#/components/parameters/Size'
+ *       - $ref: '#/components/parameters/TransactionOrdering'
+ *       - $ref: '#/components/parameters/DirectionOrder'
+ *       - $ref: '#/components/parameters/TransactionSort'
+ *       - $ref: '#/components/parameters/SortValue'
+ *       - $ref: '#/components/parameters/TransactionSearchByDate'
+ *       - $ref: '#/components/parameters/SearchByDateValue'
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/TransactionPageResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListReceivablesRoute implements Route {
   public readonly method: HttpMethod = 'get';

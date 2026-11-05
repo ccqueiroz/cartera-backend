@@ -5,6 +5,7 @@ import {
   numberOrUndefined,
   userIdFrom,
 } from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateSingleReceivableUseCase } from '@/features/core-finance/receivables/application/create-single-receivable.usecase';
 import { CreateInstallmentReceivableUseCase } from '@/features/core-finance/receivables/application/create-installment-receivable.usecase';
 import { ListReceivablesUseCase } from '@/features/core-finance/receivables/application/list-receivables.usecase';
@@ -21,6 +22,16 @@ import { SettleReceivableSchema } from '@/features/core-finance/receivables/infr
 import { GlobalSettleReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/global-settle-receivable.schema';
 import { EditReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/edit-receivable.schema';
 import { ListUnreceivedByPeriodSchema } from '@/features/core-finance/receivables/infra/http/schemas/list-unreceived-by-period.schema';
+
+const LIST_FIELDS = {
+  ordering: ['dueDate', 'paymentDate', 'amount', 'paidAmount'],
+  sort: [
+    'categoryDescriptionEnum',
+    'paymentMethodDescriptionEnum',
+    'paymentStatus',
+  ],
+  searchByDate: ['dueDate', 'paymentDate'],
+} as const;
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'received' || value === 'paid' ? 'paid' : 'to_pay';
@@ -99,8 +110,7 @@ export class ReceivableController {
         : undefined,
       rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
       rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
@@ -114,8 +124,7 @@ export class ReceivableController {
       userId: userIdFrom(req),
       startDate: String(req.query.start_date),
       endDate: String(req.query.end_date),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
