@@ -281,7 +281,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.body).toMatchObject({
+      expect((response.body as any).data).toMatchObject({
         email: 'ana@example.com',
         userId: 'uid-1',
         firstName: 'Ana',
@@ -290,7 +290,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
         id: 'person-1',
         updatedAt: null,
       });
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data ?? {};
       expect(body.accessToken).toBeTruthy();
       expect(body.refreshToken).toBeTruthy();
       expect(body.expirationTime).toMatch(ISO_8601);
@@ -336,7 +336,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data ?? {};
       expect(body.userId).toBe('uid-1');
       expect(body.expirationTime).toMatch(ISO_8601);
       expect(response.cookies['session']).toEqual({
@@ -399,14 +399,14 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
 
       const response = await dispatch('put', 'auth/session', {
         body: { refreshToken: registerBody.refreshToken },
       });
 
       expect(response.statusCode).toBe(200);
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data ?? {};
       expect(body.accessToken).not.toBe(registerBody.accessToken);
       expect(body.expirationTime).toMatch(ISO_8601);
       expect(registerBody.expirationTime).toMatch(ISO_8601);
@@ -431,7 +431,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
       await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
       });
@@ -451,7 +451,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
 
       const signout = await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
@@ -475,7 +475,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
 
       const response = await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
@@ -490,7 +490,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
 
       const response = await dispatch('delete', 'auth/session', {
         sessionCookie: registerBody.accessToken,
@@ -527,7 +527,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data ?? {};
       provider.accounts.get('uid-1')!.disabled = true;
 
       const response = await dispatch('delete', 'auth/session', {

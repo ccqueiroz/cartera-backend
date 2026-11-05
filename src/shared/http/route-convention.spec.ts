@@ -625,3 +625,17 @@ describe('[BK2-54] payment method write routes and payment status', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] auth controller and the register route', () => {
+  it('auth.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'auth/infra/http/auth.controller.ts'),
+    );
+  });
+
+  it('register-account.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'auth/infra/http/register-account.route.ts'),
+    );
+  });
+});
