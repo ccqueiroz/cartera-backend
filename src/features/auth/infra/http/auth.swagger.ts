@@ -34,6 +34,11 @@
  *         accessToken: { type: string }
  *         refreshToken: { type: string }
  *         expirationTime: { type: string }
+ *     RecoverPasswordOutput:
+ *       type: object
+ *       required: [message]
+ *       properties:
+ *         message: { type: string }
  *   responses:
  *     RegisterAccountOutputResponse:
  *       description: Conta e perfil criados, com os tokens no corpo e o cookie session definido.
@@ -138,5 +143,40 @@
  *                     enum:
  *                       - INTERNAL_SERVER_ERROR
  *                       - INVALID_TOKEN
+ *     RecoverPasswordOutputResponse:
+ *       description: Pedido de recuperação aceito, com resposta genérica.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/RecoverPasswordOutput' }
+ *     SignoutUnauthorized:
+ *       description: Sessão ausente, inválida ou expirada.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - ACCOUNT_NOT_FOUND
+ *                       - INTERNAL_SERVER_ERROR
+ *                       - INVALID_TOKEN
+ *                       - TOKEN_EXPIRED
+ *     RecoverPasswordUnauthorized:
+ *       description: Falha do provedor de autenticação ou limite de pedidos excedido.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - INTERNAL_SERVER_ERROR
+ *                       - TOO_MANY_REQUESTS
  */
 export {};
