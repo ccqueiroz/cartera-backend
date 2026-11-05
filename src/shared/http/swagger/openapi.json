@@ -125,6 +125,24 @@
         },
         "description": "Transação criada."
       },
+      "CreateTransferResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateTransferResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transferência criada com os saldos das carteiras e os avisos."
+      },
       "CreateWalletResultResponse": {
         "content": {
           "application/json": {
@@ -501,6 +519,96 @@
           }
         },
         "description": "Liquidação recusada para a transação."
+      },
+      "TransferCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_AMOUNT_NOT_POSITIVE",
+                        "TRANSFER_DATE_IN_FUTURE",
+                        "TRANSFER_SAME_WALLET",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido, mesma carteira, valor não positivo ou data futura."
+      },
+      "TransferNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transferência não encontrada."
+      },
+      "TransferOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransferOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transferência."
+      },
+      "TransferPaymentMethodInactive": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_PAYMENT_METHOD_INACTIVE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Forma de pagamento inativa ou inexistente."
       },
       "Unauthorized": {
         "content": {
@@ -1163,6 +1271,32 @@
         ],
         "type": "object"
       },
+      "CreateTransferResult": {
+        "properties": {
+          "fromWallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "toWallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "transfer": {
+            "$ref": "#/components/schemas/TransferOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "transfer",
+          "fromWallet",
+          "toWallet",
+          "warnings"
+        ],
+        "type": "object"
+      },
       "CreateWalletResult": {
         "properties": {
           "wallet": {
@@ -1480,6 +1614,41 @@
           "origin",
           "reversed",
           "deleted",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "TransferOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "fromWalletId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "paymentMethodDescriptionEnum": {
+            "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+          },
+          "toWalletId": {
+            "type": "string"
+          },
+          "transferDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fromWalletId",
+          "toWalletId",
+          "amount",
+          "paymentMethodDescriptionEnum",
+          "transferDate",
           "createdAt"
         ],
         "type": "object"
@@ -4075,20 +4244,25 @@
         },
         "responses": {
           "201": {
-            "description": "Transferência criada (com warnings se a origem ficar negativa)."
+            "$ref": "#/components/responses/CreateTransferResultResponse"
           },
           "400": {
-            "description": "Payload inválido (mesma carteira",
-            "valor não positivo ou data futura).": null
+            "$ref": "#/components/responses/TransferCreateBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Carteira não encontrada."
+            "$ref": "#/components/responses/WalletNotFound"
           },
           "422": {
-            "description": "Forma de pagamento inativa ou inexistente."
+            "$ref": "#/components/responses/TransferPaymentMethodInactive"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4169,13 +4343,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Transferência encontrada."
+            "$ref": "#/components/responses/TransferOutputResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Transferência não encontrada."
+            "$ref": "#/components/responses/TransferNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

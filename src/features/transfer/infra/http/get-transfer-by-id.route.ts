@@ -16,9 +16,11 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Transferência encontrada. }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Transferência não encontrada. }
+ *       200: { $ref: '#/components/responses/TransferOutputResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransferNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetTransferByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';
