@@ -107,6 +107,24 @@
         },
         "description": "Transação criada."
       },
+      "CreateWalletResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateWalletResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Carteira criada com os avisos de saldo."
+      },
       "InternalServerError": {
         "content": {
           "application/json": {
@@ -536,6 +554,55 @@
         },
         "description": "Dados de entrada inválidos."
       },
+      "WalletCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "OVERDRAFT_LIMIT_REQUIRED",
+                        "VALIDATION_FAILED",
+                        "WALLET_NAME_REQUIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou saldo negativo sem limite."
+      },
+      "WalletDefaultNoOverdraft": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_DEFAULT_NO_OVERDRAFT"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira padrão não aceita cheque especial."
+      },
       "WalletDeleteRefused": {
         "content": {
           "application/json": {
@@ -559,6 +626,54 @@
           }
         },
         "description": "Remoção recusada para a carteira."
+      },
+      "WalletDeleted": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_DELETED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira removida."
+      },
+      "WalletEditBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "OVERDRAFT_LIMIT_REQUIRED",
+                        "VALIDATION_FAILED",
+                        "WALLET_NAME_REQUIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido na edição da carteira."
       },
       "WalletNotFound": {
         "content": {
@@ -906,6 +1021,24 @@
         },
         "required": [
           "root"
+        ],
+        "type": "object"
+      },
+      "CreateWalletResult": {
+        "properties": {
+          "wallet": {
+            "$ref": "#/components/schemas/WalletOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "wallet",
+          "warnings"
         ],
         "type": "object"
       },
@@ -3969,13 +4102,19 @@
         },
         "responses": {
           "201": {
-            "description": "Carteira criada (com warnings se saldo negativo)."
+            "$ref": "#/components/responses/CreateWalletResultResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/WalletCreateBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4075,19 +4214,28 @@
         },
         "responses": {
           "200": {
-            "description": "Carteira atualizada."
+            "$ref": "#/components/responses/WalletOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/WalletEditBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Carteira não encontrada."
+            "$ref": "#/components/responses/WalletNotFound"
           },
           "409": {
-            "description": "Carteira removida."
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "422": {
+            "$ref": "#/components/responses/WalletDefaultNoOverdraft"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

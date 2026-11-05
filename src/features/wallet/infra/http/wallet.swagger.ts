@@ -28,6 +28,14 @@
  *         active: { type: boolean }
  *         createdAt: { type: string }
  *         updatedAt: { type: string, nullable: true }
+ *     CreateWalletResult:
+ *       type: object
+ *       required: [wallet, warnings]
+ *       properties:
+ *         wallet: { $ref: '#/components/schemas/WalletOutput' }
+ *         warnings:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/BalanceWarning' }
  *   responses:
  *     WalletOutputResponse:
  *       description: Carteira.
@@ -50,5 +58,63 @@
  *                     enum:
  *                       - WALLET_HAS_BALANCE
  *                       - WALLET_NOT_DELETABLE
+ *     CreateWalletResultResponse:
+ *       description: Carteira criada com os avisos de saldo.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/CreateWalletResult' }
+ *     WalletCreateBadRequest:
+ *       description: Payload inválido ou saldo negativo sem limite.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - MONEY_NEGATIVE
+ *                       - OVERDRAFT_LIMIT_REQUIRED
+ *                       - VALIDATION_FAILED
+ *                       - WALLET_NAME_REQUIRED
+ *     WalletEditBadRequest:
+ *       description: Payload inválido na edição da carteira.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - OVERDRAFT_LIMIT_REQUIRED
+ *                       - VALIDATION_FAILED
+ *                       - WALLET_NAME_REQUIRED
+ *     WalletDeleted:
+ *       description: Carteira removida.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - WALLET_DELETED
+ *     WalletDefaultNoOverdraft:
+ *       description: Carteira padrão não aceita cheque especial.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - WALLET_DEFAULT_NO_OVERDRAFT
  */
 export {};
