@@ -43,7 +43,7 @@ const makeDeps = (person: Person | null) => {
 };
 
 describe('DeleteOwnPersonUseCase', () => {
-  it('executa disable → revoke → deletedAt nessa ordem', async () => {
+  it('runs disable, revoke and deletedAt in that order', async () => {
     const person = makePerson();
     const { useCase, calls } = makeDeps(person);
 
@@ -53,7 +53,7 @@ describe('DeleteOwnPersonUseCase', () => {
     expect(person.toPersistence().deletedAt).toBe(NOW);
   });
 
-  it('falha no disable (passo 1) não muta nada', async () => {
+  it('fails at disable (step 1) and mutates nothing', async () => {
     const person = makePerson();
     const { useCase, authGateway, repository } = makeDeps(person);
     authGateway.disableAccount.mockRejectedValue(new Error('auth off'));
@@ -66,7 +66,7 @@ describe('DeleteOwnPersonUseCase', () => {
     expect(person.toPersistence().deletedAt).toBeNull();
   });
 
-  it('falha no revoke deixa estado seguro: conta trancada, perfil vivo', async () => {
+  it('fails at revoke and leaves a safe state: account locked, profile alive', async () => {
     const person = makePerson();
     const { useCase, authGateway, repository } = makeDeps(person);
     authGateway.revokeRefreshTokens.mockRejectedValue(new Error('auth off'));
@@ -77,7 +77,7 @@ describe('DeleteOwnPersonUseCase', () => {
     expect(person.toPersistence().deletedAt).toBeNull();
   });
 
-  it('re-delete é idempotente: deletedAt original preservado', async () => {
+  it('re-delete is idempotent: original deletedAt is preserved', async () => {
     const person = makePerson();
     person.softDelete('2026-06-01T00:00:00.000Z');
     const { useCase, calls } = makeDeps(person);
@@ -88,7 +88,7 @@ describe('DeleteOwnPersonUseCase', () => {
     expect(person.toPersistence().deletedAt).toBe('2026-06-01T00:00:00.000Z');
   });
 
-  it('404 quando não existe person nem deletado', async () => {
+  it('404 when no person exists, deleted or not', async () => {
     const { useCase, authGateway } = makeDeps(null);
     await expect(useCase.execute({ userId: 'user-1' })).rejects.toBeInstanceOf(
       EntityNotFoundError,

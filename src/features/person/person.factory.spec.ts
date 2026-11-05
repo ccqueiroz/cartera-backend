@@ -22,7 +22,7 @@ describe('makePersonModule', () => {
     ).toBe(true);
   });
 
-  it('expõe os contratos internos (UC1/UC7) sem rota HTTP', () => {
+  it('exposes the internal contracts (UC1/UC7) with no HTTP route', () => {
     const module = makePersonModule(makeDeps());
 
     expect(module.internal.createPerson).toBeDefined();
@@ -32,7 +32,7 @@ describe('makePersonModule', () => {
     expect(module.internal.syncPersonEmail).toBeDefined();
   });
 
-  it('aceita generateId/now injetados para teste determinístico', async () => {
+  it('accepts injected generateId/now for a deterministic test', async () => {
     const deps = makeDeps();
     const queryEmpty = {
       where: jest.fn().mockReturnThis(),

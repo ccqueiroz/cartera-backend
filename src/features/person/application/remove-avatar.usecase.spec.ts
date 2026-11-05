@@ -53,7 +53,7 @@ describe('RemoveAvatarUseCase', () => {
     expect(repository.update).toHaveBeenCalledWith(person);
   });
 
-  it('sem avatar é no-op: nenhuma interação com bucket ou update', async () => {
+  it('no avatar is a no-op: no interaction with the bucket or update', async () => {
     const { useCase, storageGateway, repository } = makeDeps(makePerson());
 
     await useCase.execute({ userId: 'user-1' });
@@ -62,7 +62,7 @@ describe('RemoveAvatarUseCase', () => {
     expect(repository.update).not.toHaveBeenCalled();
   });
 
-  it('falha do bucket loga e avatarUrl ainda vira null', async () => {
+  it('bucket failure is logged and avatarUrl still becomes null', async () => {
     const person = makePerson('https://bucket/avatars/user-1.png');
     const { useCase, storageGateway, logger, repository } = makeDeps(person);
     storageGateway.delete.mockRejectedValue(new Error('bucket off'));
@@ -74,7 +74,7 @@ describe('RemoveAvatarUseCase', () => {
     expect(repository.update).toHaveBeenCalledWith(person);
   });
 
-  it('404 quando não há person ativo', async () => {
+  it('404 when there is no active person', async () => {
     const { useCase } = makeDeps(null);
     await expect(useCase.execute({ userId: 'user-1' })).rejects.toBeInstanceOf(
       EntityNotFoundError,

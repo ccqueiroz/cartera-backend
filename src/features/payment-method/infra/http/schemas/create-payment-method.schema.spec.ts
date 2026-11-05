@@ -4,7 +4,7 @@ import { CreatePaymentMethodSchema } from './create-payment-method.schema';
 const options = { whitelist: true, forbidNonWhitelisted: true };
 
 describe('CreatePaymentMethodSchema', () => {
-  it('aceita payload válido', async () => {
+  it('accepts a valid payload', async () => {
     const errors = await runValidate(
       CreatePaymentMethodSchema,
       { description: 'Pix', descriptionEnum: 'PIX' },
@@ -13,7 +13,7 @@ describe('CreatePaymentMethodSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita descriptionEnum fora do conjunto fechado', async () => {
+  it('rejects a descriptionEnum outside the closed set', async () => {
     const errors = await runValidate(
       CreatePaymentMethodSchema,
       { description: 'Bitcoin', descriptionEnum: 'BITCOIN' },
@@ -22,7 +22,7 @@ describe('CreatePaymentMethodSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita description vazio', async () => {
+  it('rejects an empty description', async () => {
     const errors = await runValidate(
       CreatePaymentMethodSchema,
       { description: '', descriptionEnum: 'PIX' },
@@ -31,7 +31,7 @@ describe('CreatePaymentMethodSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita description acima de 60 caracteres', async () => {
+  it('rejects a description longer than 60 characters', async () => {
     const errors = await runValidate(
       CreatePaymentMethodSchema,
       { description: 'x'.repeat(61), descriptionEnum: 'PIX' },
@@ -40,7 +40,7 @@ describe('CreatePaymentMethodSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita props desconhecidas', async () => {
+  it('rejects unknown props', async () => {
     const errors = await runValidate(
       CreatePaymentMethodSchema,
       { description: 'Pix', descriptionEnum: 'PIX', userId: 'hacker' },

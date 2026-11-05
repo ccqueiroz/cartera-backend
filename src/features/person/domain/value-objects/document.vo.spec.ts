@@ -15,13 +15,13 @@ const captureError = (fn: () => unknown): any => {
 };
 
 describe('Document', () => {
-  it('cria CPF válido guardando só dígitos', () => {
+  it('creates a valid CPF keeping only digits', () => {
     const document = Document.create({ type: 'CPF', value: '390.533.447-05' });
     expect(document.type).toBe('CPF');
     expect(document.value).toBe(VALID_CPF);
   });
 
-  it('cria CNPJ válido guardando só dígitos', () => {
+  it('creates a valid CNPJ keeping only digits', () => {
     const document = Document.create({
       type: 'CNPJ',
       value: '11.222.333/0001-81',
@@ -30,7 +30,7 @@ describe('Document', () => {
     expect(document.value).toBe(VALID_CNPJ);
   });
 
-  it('rejeita dígito verificador inválido com INVALID_DOCUMENT', () => {
+  it('rejects an invalid check digit with INVALID_DOCUMENT', () => {
     expect(() =>
       Document.create({ type: 'CPF', value: '39053344700' }),
     ).toThrow(BusinessRuleViolationError);
@@ -41,7 +41,7 @@ describe('Document', () => {
     expect(error.code).toBe(ErrorCode.INVALID_DOCUMENT);
   });
 
-  it('rejeita contagem de dígitos incompatível com o type declarado', () => {
+  it('rejects a digit count that does not match the declared type', () => {
     const cpfWithCnpjDigits = captureError(() =>
       Document.create({ type: 'CPF', value: VALID_CNPJ }),
     );
@@ -54,12 +54,12 @@ describe('Document', () => {
     expect(cnpjWithCpfDigits.code).toBe(ErrorCode.DOCUMENT_TYPE_MISMATCH);
   });
 
-  it('mascara CPF como 999.xxx.xxx-99 (3 primeiros e 2 últimos visíveis)', () => {
+  it('masks a CPF as 999.xxx.xxx-99 (first 3 and last 2 digits visible)', () => {
     const document = Document.create({ type: 'CPF', value: VALID_CPF });
     expect(document.toMasked()).toBe('390.xxx.xxx-05');
   });
 
-  it('mascara CNPJ como 99.xxx.xxx/xxxx-99 (2 primeiros e 2 últimos visíveis)', () => {
+  it('masks a CNPJ as 99.xxx.xxx/xxxx-99 (first 2 and last 2 digits visible)', () => {
     const document = Document.create({ type: 'CNPJ', value: VALID_CNPJ });
     expect(document.toMasked()).toBe('11.xxx.xxx/xxxx-81');
   });

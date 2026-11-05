@@ -11,7 +11,7 @@ const makeRepository = (result: Person | null) => ({
 });
 
 describe('FindPersonByUserIdUseCase', () => {
-  it('retorna o person ativo do userId', async () => {
+  it('returns the active person for the userId', async () => {
     const person = {} as Person;
     const repository = makeRepository(person);
     const result = await FindPersonByUserIdUseCase.create(
@@ -20,7 +20,7 @@ describe('FindPersonByUserIdUseCase', () => {
     expect(result).toBe(person);
   });
 
-  it('miss retorna null sem revogar credenciais', async () => {
+  it('miss returns null without revoking credentials', async () => {
     const repository = makeRepository(null);
     const result = await FindPersonByUserIdUseCase.create(
       repository as any,

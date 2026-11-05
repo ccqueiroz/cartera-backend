@@ -13,13 +13,13 @@ import { PaymentMethodNotFoundError } from './payment-method-not-found.error';
  * Duplicate→409.
  */
 describe('PaymentMethod domain errors mapping contract', () => {
-  it('PaymentMethodNotFoundError → EntityNotFoundError (404) com code próprio', () => {
+  it('PaymentMethodNotFoundError maps to EntityNotFoundError (404) with its own code', () => {
     const error = new PaymentMethodNotFoundError('PIX');
     expect(error).toBeInstanceOf(EntityNotFoundError);
     expect(error.code).toBe(ErrorCode.PAYMENT_METHOD_NOT_FOUND);
   });
 
-  it('DuplicatePaymentMethodError → DuplicateEntityError (409) com code próprio', () => {
+  it('DuplicatePaymentMethodError maps to DuplicateEntityError (409) with its own code', () => {
     const error = new DuplicatePaymentMethodError('PIX');
     expect(error).toBeInstanceOf(DuplicateEntityError);
     expect(error.code).toBe(ErrorCode.PAYMENT_METHOD_ALREADY_EXISTS);

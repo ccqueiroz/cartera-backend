@@ -28,7 +28,7 @@ const makePerson = () =>
   });
 
 describe('GetOwnPersonUseCase', () => {
-  it('retorna o person ativo do userId', async () => {
+  it('returns the active person for the userId', async () => {
     const repository = makeRepository();
     const authGateway = makeAuthGateway();
     const person = makePerson();
@@ -43,7 +43,7 @@ describe('GetOwnPersonUseCase', () => {
     expect(authGateway.revokeRefreshTokens).not.toHaveBeenCalled();
   });
 
-  it('sessão órfã: revoga refresh tokens antes do PERSON_NOT_FOUND', async () => {
+  it('orphan session: revokes refresh tokens before PERSON_NOT_FOUND', async () => {
     const repository = makeRepository();
     const authGateway = makeAuthGateway();
 
@@ -57,7 +57,7 @@ describe('GetOwnPersonUseCase', () => {
     expect(authGateway.revokeRefreshTokens).toHaveBeenCalledWith('user-1');
   });
 
-  it('person deletado é tratado como inexistente (finder padrão filtra)', async () => {
+  it('deleted person is treated as missing (the default finder filters it)', async () => {
     const repository = makeRepository();
     const authGateway = makeAuthGateway();
     repository.findByUserId.mockResolvedValue(null);

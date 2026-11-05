@@ -11,7 +11,7 @@ const makeActive = (id: string, enumValue: string) =>
   });
 
 describe('ListPaymentMethodsUseCase', () => {
-  it('retorna os métodos ativos como output', async () => {
+  it('returns the active methods as output', async () => {
     const repository = {
       listActive: async () => [
         makeActive('pm-1', PaymentMethodDescriptionEnum.PIX),
@@ -26,7 +26,7 @@ describe('ListPaymentMethodsUseCase', () => {
     expect(result[0]).toHaveProperty('active', true);
   });
 
-  it('retorna [] quando não há métodos ativos', async () => {
+  it('returns [] when there are no active methods', async () => {
     const repository = { listActive: async () => [] } as any;
     const useCase = ListPaymentMethodsUseCase.create(repository);
 

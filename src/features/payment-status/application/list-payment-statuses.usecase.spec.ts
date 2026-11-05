@@ -11,7 +11,7 @@ const makeEntry = (id: string, code: PaymentStatusEnum, label: string) =>
   });
 
 describe('ListPaymentStatusesUseCase', () => {
-  it('retorna os status semeados como output', async () => {
+  it('returns the seeded statuses as output', async () => {
     const repository = {
       listAll: async () => [
         makeEntry('ps-1', PaymentStatusEnum.PAID, 'Pago'),
@@ -28,7 +28,7 @@ describe('ListPaymentStatusesUseCase', () => {
     ]);
   });
 
-  it('retorna [] quando o catálogo não foi semeado', async () => {
+  it('returns [] when the catalog was not seeded', async () => {
     const repository = { listAll: async () => [] } as any;
     const useCase = ListPaymentStatusesUseCase.create(repository);
 

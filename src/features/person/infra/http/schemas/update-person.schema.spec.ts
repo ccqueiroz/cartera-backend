@@ -10,7 +10,7 @@ const DROP_UNKNOWN: ValidatorOptions = {
 };
 
 describe('UpdatePersonSchema', () => {
-  it('aceita body parcial válido', async () => {
+  it('accepts a valid partial body', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       {
@@ -26,12 +26,12 @@ describe('UpdatePersonSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('aceita body vazio (PATCH sem campos)', async () => {
+  it('accepts an empty body (PATCH with no fields)', async () => {
     const errors = await runValidate(UpdatePersonSchema, {}, DROP_UNKNOWN);
     expect(errors).toHaveLength(0);
   });
 
-  it('descarta props desconhecidas (email, avatarUrl) sem erro', async () => {
+  it('drops unknown props (email, avatarUrl) without error', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       { email: 'hack@example.com', avatarUrl: 'http://x', firstName: 'Caio' },
@@ -40,7 +40,7 @@ describe('UpdatePersonSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita birthDate fora de YYYY-MM-DD', async () => {
+  it('rejects a birthDate outside YYYY-MM-DD', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       { birthDate: '15/01/1990' },
@@ -49,7 +49,7 @@ describe('UpdatePersonSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita document.type fora de CPF|CNPJ', async () => {
+  it('rejects a document.type outside CPF|CNPJ', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       { document: { type: 'RG', value: '123' } },
@@ -58,7 +58,7 @@ describe('UpdatePersonSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita phone sem isWhatsapp booleano', async () => {
+  it('rejects a phone without a boolean isWhatsapp', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       {
@@ -69,7 +69,7 @@ describe('UpdatePersonSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita monthlyIncome.value negativo', async () => {
+  it('rejects a negative monthlyIncome.value', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       { monthlyIncome: { value: -1, currency: 'BRL' } },
@@ -78,7 +78,7 @@ describe('UpdatePersonSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita firstName vazio', async () => {
+  it('rejects an empty firstName', async () => {
     const errors = await runValidate(
       UpdatePersonSchema,
       { firstName: '' },

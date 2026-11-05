@@ -20,7 +20,7 @@ function activeIof() {
 }
 
 describe('FindActiveFinancialIndicatorUseCase', () => {
-  it('retorna o indicador ativo do enum', async () => {
+  it('returns the active indicator for the enum', async () => {
     const repository = {
       findActiveByEnum: async () => activeIof(),
     } as never;
@@ -35,7 +35,7 @@ describe('FindActiveFinancialIndicatorUseCase', () => {
     expect(result?.aliquotaTotal).toBe(0.003882);
   });
 
-  it('retorna null quando não há ativo', async () => {
+  it('returns null when there is no active one', async () => {
     const repository = { findActiveByEnum: async () => null } as never;
     const useCase = FindActiveFinancialIndicatorUseCase.create(repository);
 

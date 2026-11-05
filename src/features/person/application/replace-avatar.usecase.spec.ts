@@ -49,7 +49,7 @@ const input = {
 };
 
 describe('ReplaceAvatarUseCase', () => {
-  it('faz upload no path determinístico e grava avatarUrl', async () => {
+  it('uploads to the deterministic path and saves avatarUrl', async () => {
     const { useCase, storageGateway, repository } = makeDeps(makePerson());
 
     const person = await useCase.execute(input);
@@ -63,14 +63,14 @@ describe('ReplaceAvatarUseCase', () => {
     expect(repository.update).toHaveBeenCalledWith(person);
   });
 
-  it('404 quando não há person ativo', async () => {
+  it('404 when there is no active person', async () => {
     const { useCase } = makeDeps(null);
     await expect(useCase.execute(input)).rejects.toBeInstanceOf(
       EntityNotFoundError,
     );
   });
 
-  it('falha de upload vira erro não-domínio AVATAR_UPLOAD_FAILED sem mutar estado', async () => {
+  it('upload failure becomes a non-domain AVATAR_UPLOAD_FAILED error without mutating state', async () => {
     const { useCase, storageGateway, repository, logger } = makeDeps(
       makePerson(),
     );
@@ -83,7 +83,7 @@ describe('ReplaceAvatarUseCase', () => {
     expect(logger.error).toHaveBeenCalled();
   });
 
-  it('deleta extensão antiga best-effort quando havia avatar', async () => {
+  it('deletes the old extension on a best-effort basis when there was an avatar', async () => {
     const { useCase, storageGateway } = makeDeps(
       makePerson('https://bucket/avatars/user-1.jpg'),
     );
@@ -96,13 +96,13 @@ describe('ReplaceAvatarUseCase', () => {
     );
   });
 
-  it('não chama delete quando não havia avatar anterior', async () => {
+  it('does not call delete when there was no previous avatar', async () => {
     const { useCase, storageGateway } = makeDeps(makePerson());
     await useCase.execute(input);
     expect(storageGateway.delete).not.toHaveBeenCalled();
   });
 
-  it('falha no delete da imagem antiga loga e a request sucede', async () => {
+  it('failure deleting the old image is logged and the request succeeds', async () => {
     const { useCase, storageGateway, logger } = makeDeps(
       makePerson('https://bucket/avatars/user-1.jpg'),
     );

@@ -69,7 +69,7 @@ describe('PersonRepositoryFirestore', () => {
     ['findByEmail', 'email', 'caio@example.com'],
     ['findByDocument', 'document.value', '39053344705'],
   ] as const)(
-    '%s filtra deletedAt == null por padrão',
+    '%s filters deletedAt == null by default',
     async (method, field, value) => {
       const { db, whereCalls } = makeDb([persistence()]);
       const repository = PersonRepositoryFirestore.create(db);
@@ -84,7 +84,7 @@ describe('PersonRepositoryFirestore', () => {
     },
   );
 
-  it('findByUserIdIncludingDeleted não filtra deletedAt', async () => {
+  it('findByUserIdIncludingDeleted does not filter deletedAt', async () => {
     const deleted = persistence({ deletedAt: '2026-06-04T13:00:00.000Z' });
     const { db, whereCalls } = makeDb([deleted]);
     const repository = PersonRepositoryFirestore.create(db);
@@ -95,7 +95,7 @@ describe('PersonRepositoryFirestore', () => {
     expect(result?.toPersistence().deletedAt).toBe('2026-06-04T13:00:00.000Z');
   });
 
-  it('finders retornam null quando a query vem vazia', async () => {
+  it('finders return null when the query comes back empty', async () => {
     const { db } = makeDb([]);
     const repository = PersonRepositoryFirestore.create(db);
 
