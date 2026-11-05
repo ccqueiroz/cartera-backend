@@ -149,6 +149,52 @@
         },
         "description": "Sessão criada, com os tokens no corpo e o cookie session definido."
       },
+      "AvatarTooLarge": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "AVATAR_TOO_LARGE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Imagem decodificada acima de 5MB."
+      },
+      "AvatarUnsupportedType": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "AVATAR_UNSUPPORTED_TYPE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Conteúdo não é JPEG nem PNG."
+      },
       "CategoryAlreadyExists": {
         "content": {
           "application/json": {
@@ -617,6 +663,29 @@
         },
         "description": "Status de pagamento do catálogo."
       },
+      "PersonDocumentInUse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "DOCUMENT_ALREADY_IN_USE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Documento já em uso por outro perfil."
+      },
       "PersonNotFound": {
         "content": {
           "application/json": {
@@ -657,6 +726,31 @@
           }
         },
         "description": "Perfil com fullName e isActive computados e o document mascarado."
+      },
+      "PersonUpdateRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "DOCUMENT_TYPE_MISMATCH",
+                        "INVALID_DOCUMENT",
+                        "INVALID_PHONE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Documento ou telefone inválido para o tipo declarado."
       },
       "RecoverPasswordOutputResponse": {
         "content": {
@@ -4557,22 +4651,28 @@
         },
         "responses": {
           "200": {
-            "description": "Perfil atualizado com document re-mascarado."
+            "$ref": "#/components/responses/PersonOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Perfil não encontrado."
+            "$ref": "#/components/responses/PersonNotFound"
           },
           "409": {
-            "description": "Documento já em uso por outro perfil."
+            "$ref": "#/components/responses/PersonDocumentInUse"
           },
           "422": {
-            "description": "Documento/telefone inválido para o tipo declarado."
+            "$ref": "#/components/responses/PersonUpdateRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4639,22 +4739,28 @@
         },
         "responses": {
           "200": {
-            "description": "Avatar substituído; avatarUrl atualizado."
+            "$ref": "#/components/responses/PersonOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Perfil não encontrado."
+            "$ref": "#/components/responses/PersonNotFound"
           },
           "413": {
-            "description": "Imagem decodificada acima de 5MB."
+            "$ref": "#/components/responses/AvatarTooLarge"
           },
           "422": {
-            "description": "Conteúdo não é JPEG nem PNG."
+            "$ref": "#/components/responses/AvatarUnsupportedType"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

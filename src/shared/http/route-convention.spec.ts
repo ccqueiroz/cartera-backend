@@ -680,3 +680,86 @@ describe('[BK2-54] person controller and the read and delete routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] person update and avatar routes', () => {
+  it.each([
+    'person/infra/http/update-own-person.route.ts',
+    'person/infra/http/replace-avatar.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
+
+const THROWN_ERROR_CODE =
+  /(?:new\s+\w+Error\(\s*|super\(\s*)ErrorCode\.([A-Z_]+)/g;
+
+// Thrown in src/ but answered by no route (A25 of the backend-2 spec).
+const CODES_WITHOUT_ROUTE: string[] = [
+  // the Min(0) of the create and edit wallet schemas answers VALIDATION_FAILED first
+  ErrorCode.INVALID_OVERDRAFT_CONFIG,
+  // the IsPositive of the adjust balance schema answers VALIDATION_FAILED first
+  ErrorCode.INVALID_WALLET_ADJUST_AMOUNT,
+  // the installment receivable schema answers VALIDATION_FAILED first
+  ErrorCode.TRANSACTION_INVALID_INSTALLMENT_COUNT,
+  // reverse receivable answers SETTLEMENT_MOVEMENT_NOT_FOUND before the engine
+  ErrorCode.TRANSACTION_REVERSE_NOT_PAID,
+  // reverse receivable answers SETTLEMENT_MOVEMENT_NOT_FOUND before the engine
+  ErrorCode.TRANSACTION_REVERSE_ON_INTERNAL,
+  // the description enum param and create category schemas answer VALIDATION_FAILED first
+  ErrorCode.INVALID_CATEGORY_DESCRIPTION_ENUM,
+  // the group param, create and edit category schemas answer VALIDATION_FAILED first
+  ErrorCode.INVALID_CATEGORY_GROUP,
+  // the type query, create and edit category schemas answer VALIDATION_FAILED first
+  ErrorCode.INVALID_CATEGORY_TYPE,
+  // no route calls DateRange.create
+  ErrorCode.INVALID_DATE_RANGE,
+  // the description enum param and create payment method schemas answer VALIDATION_FAILED first
+  ErrorCode.INVALID_PAYMENT_METHOD_DESCRIPTION_ENUM,
+  // no route calls PaymentStatusCatalog.create; the repository reads by with()
+  ErrorCode.INVALID_PAYMENT_STATUS_CODE,
+  // the create and update payment method schemas answer VALIDATION_FAILED first
+  ErrorCode.PAYMENT_METHOD_DESCRIPTION_TOO_LONG,
+  // no route calls PaymentStatusCatalog.create; the repository reads by with()
+  ErrorCode.PAYMENT_STATUS_LABEL_REQUIRED,
+  // no route calls markAsInternal
+  ErrorCode.TRANSACTION_REPARCEL_PAID_LEAF,
+];
+
+describe('[BK2-54] every route, every controller and every thrown error code', () => {
+  it.each(routeFiles)(
+    '%s declares every status with its contract',
+    expectRouteContract,
+  );
+
+  it.each(walk(featuresDir).filter((file) => file.endsWith('.controller.ts')))(
+    '%s wraps every json body in data',
+    expectControllerEnvelope,
+  );
+
+  it('finds every thrown error code in the enum of some route response', () => {
+    const thrownCodes = walk(srcDir)
+      .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
+      .flatMap((file) =>
+        Array.from(
+          readFileSync(file, 'utf8').matchAll(THROWN_ERROR_CODE),
+          (match) => match[1],
+        ),
+      );
+    const routeCodes = routeFiles.flatMap((file) =>
+      Object.values(
+        (
+          operationOf(file) as
+            | { responses?: Partial<Record<string, OpenApiResponse>> }
+            | undefined
+        )?.responses ?? {},
+      ).flatMap((response) => errorCodesOf(response) ?? []),
+    );
+
+    expect(
+      [...new Set(thrownCodes)].filter(
+        (code) =>
+          !CODES_WITHOUT_ROUTE.includes(code) && !routeCodes.includes(code),
+      ),
+    ).toEqual([]);
+  });
+});

@@ -20,18 +20,14 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Avatar substituído; avatarUrl atualizado.
- *       400:
- *         description: Payload inválido.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Perfil não encontrado.
- *       413:
- *         description: Imagem decodificada acima de 5MB.
- *       422:
- *         description: Conteúdo não é JPEG nem PNG.
+ *       200: { $ref: '#/components/responses/PersonOutputResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PersonNotFound' }
+ *       413: { $ref: '#/components/responses/AvatarTooLarge' }
+ *       422: { $ref: '#/components/responses/AvatarUnsupportedType' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ReplaceAvatarRoute implements Route {
   public readonly method: HttpMethod = 'put';

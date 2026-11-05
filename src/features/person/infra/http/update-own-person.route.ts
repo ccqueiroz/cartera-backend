@@ -41,18 +41,14 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Perfil atualizado com document re-mascarado.
- *       400:
- *         description: Payload inválido.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Perfil não encontrado.
- *       409:
- *         description: Documento já em uso por outro perfil.
- *       422:
- *         description: Documento/telefone inválido para o tipo declarado.
+ *       200: { $ref: '#/components/responses/PersonOutputResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PersonNotFound' }
+ *       409: { $ref: '#/components/responses/PersonDocumentInUse' }
+ *       422: { $ref: '#/components/responses/PersonUpdateRefused' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class UpdateOwnPersonRoute implements Route {
   public readonly method: HttpMethod = 'patch';
