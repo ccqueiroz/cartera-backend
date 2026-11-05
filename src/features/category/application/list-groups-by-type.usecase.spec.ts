@@ -1,5 +1,5 @@
 import { ListGroupsByTypeUseCase } from './list-groups-by-type.usecase';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 describe('ListGroupsByTypeUseCase', () => {

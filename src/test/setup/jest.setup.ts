@@ -1,4 +1,4 @@
-import mockFirebaseAdmin from '../mocks/firebase-admin.mock';
+import mockFirebaseAdmin from '@/test/mocks/firebase-admin.mock';
 
 jest.mock('firebase-admin', () => ({
   __esModule: true,

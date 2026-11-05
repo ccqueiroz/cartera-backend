@@ -94,6 +94,12 @@
       }
     },
     {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": ["error", { "patterns": ["../*"] }]
+      }
+    },
+    {
       "files": [
         "src/features/**/domain/**/*.ts",
         "src/features/**/application/**/*.ts"
@@ -112,7 +118,8 @@
               "**/shared/http",
               "**/shared/http/**",
               "@/shared/http",
-              "@/shared/http/**"
+              "@/shared/http/**",
+              "../*"
             ]
           }
         ]

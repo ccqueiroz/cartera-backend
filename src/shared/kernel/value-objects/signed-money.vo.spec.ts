@@ -1,7 +1,7 @@
 import { SignedMoney } from './signed-money.vo';
 import { Money } from './money.vo';
-import { ValidationError } from '../errors/domain.error';
-import { ErrorCode } from '../errors/error-code';
+import { ValidationError } from '@/shared/kernel/errors/domain.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 function captureError(fn: () => unknown): unknown {
   try {

@@ -1,6 +1,6 @@
 import { PaymentStatus } from './payment-status.vo';
-import { PaymentStatusEnum } from '../enums/payment-status.enum';
-import { TransactionTypeEnum } from '../enums/transaction-type.enum';
+import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
+import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 
 describe('PaymentStatus', () => {
   const today = new Date('2026-06-03T00:00:00.000Z');
