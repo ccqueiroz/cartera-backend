@@ -55,7 +55,7 @@
         ]
       }
     ],
-    "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }],
+    "jest/valid-title": ["error", { "mustMatch": "^[\\x20-\\x7E]*$" }],
     "jest/expect-expect": "warn",
     "no-warning-comments": [
       "error",
@@ -137,6 +137,22 @@
         "@typescript-eslint/no-explicit-any": "off",
         "no-console": "off",
         "@typescript-eslint/no-empty-function": "off"
+      }
+    },
+    {
+      "files": ["test/e2e/**/*.e2e-live.spec.ts"],
+      "rules": {
+        "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }]
+      }
+    },
+    {
+      "files": [
+        "migrations-firebase/001-create-payment-methods.spec.ts",
+        "migrations-firebase/002-create-category.spec.ts",
+        "migrations-firebase/005-seed-financial-indicators.spec.ts"
+      ],
+      "rules": {
+        "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }]
       }
     }
   ],
