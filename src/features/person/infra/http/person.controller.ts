@@ -32,7 +32,7 @@ export class PersonController {
     const person = await this.useCases.getOwn.execute({
       userId: userIdFrom(req),
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public updateOwn = async (req: Request, res: Response): Promise<void> => {
@@ -48,7 +48,7 @@ export class PersonController {
       monthlyIncome: req.body.monthlyIncome,
       defaultCurrency: req.body.defaultCurrency,
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public deleteOwn = async (req: Request, res: Response): Promise<void> => {
@@ -64,7 +64,7 @@ export class PersonController {
       buffer,
       contentType,
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public removeAvatar = async (req: Request, res: Response): Promise<void> => {

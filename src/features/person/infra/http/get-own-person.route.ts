@@ -11,12 +11,11 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Perfil com fullName/isActive computados e document mascarado.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Perfil não encontrado (sessão órfã tem refresh tokens revogados).
+ *       200: { $ref: '#/components/responses/PersonOutputResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PersonNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetOwnPersonRoute implements Route {
   public readonly method: HttpMethod = 'get';

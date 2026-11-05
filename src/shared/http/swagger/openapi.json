@@ -617,6 +617,47 @@
         },
         "description": "Status de pagamento do catálogo."
       },
+      "PersonNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PERSON_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Perfil não encontrado."
+      },
+      "PersonOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PersonOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Perfil com fullName e isActive computados e o document mascarado."
+      },
       "RecoverPasswordOutputResponse": {
         "content": {
           "application/json": {
@@ -2188,6 +2229,135 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "PersonOutput": {
+        "properties": {
+          "avatarUrl": {
+            "nullable": true,
+            "type": "string"
+          },
+          "birthDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "defaultCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deletedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "document": {
+            "nullable": true,
+            "properties": {
+              "type": {
+                "enum": [
+                  "CPF",
+                  "CNPJ"
+                ],
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ],
+            "type": "object"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "monthlyIncome": {
+            "properties": {
+              "currency": {
+                "nullable": true,
+                "type": "string"
+              },
+              "value": {
+                "nullable": true,
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "currency"
+            ],
+            "type": "object"
+          },
+          "occupation": {
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "properties": {
+              "countryCode": {
+                "type": "string"
+              },
+              "isWhatsapp": {
+                "type": "boolean"
+              },
+              "number": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "number",
+              "countryCode",
+              "isWhatsapp"
+            ],
+            "type": "object"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "email",
+          "firstName",
+          "lastName",
+          "fullName",
+          "phone",
+          "document",
+          "avatarUrl",
+          "birthDate",
+          "occupation",
+          "monthlyIncome",
+          "defaultCurrency",
+          "isActive",
+          "createdAt",
+          "updatedAt",
+          "deletedAt"
+        ],
+        "type": "object"
       },
       "RecoverPasswordOutput": {
         "properties": {
@@ -4256,10 +4426,16 @@
             "description": "Conta desabilitada e perfil marcado como deletado (idempotente)."
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Perfil não encontrado."
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4276,13 +4452,19 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Perfil com fullName/isActive computados e document mascarado."
+            "$ref": "#/components/responses/PersonOutputResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Perfil não encontrado (sessão órfã tem refresh tokens revogados)."
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -4412,10 +4594,16 @@
             "description": "Avatar removido (no-op se não havia avatar)."
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Perfil não encontrado."
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

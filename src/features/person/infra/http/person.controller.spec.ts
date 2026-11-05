@@ -54,7 +54,7 @@ describe('PersonController', () => {
       userId: 'user-1',
     });
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('rejeita request sem user_auth com UnauthorizedError (401)', async () => {
@@ -135,7 +135,7 @@ describe('PersonController', () => {
     expect(input.contentType).toBe('image/jpeg');
     expect(Buffer.isBuffer(input.buffer)).toBe(true);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('replaceAvatar rejeita conteúdo não-imagem com 422 (AVATAR_UNSUPPORTED_TYPE)', async () => {

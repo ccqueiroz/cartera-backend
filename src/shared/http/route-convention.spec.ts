@@ -664,3 +664,19 @@ describe('[BK2-54] signout, password recovery and health routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] person controller and the read and delete routes', () => {
+  it('person.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'person/infra/http/person.controller.ts'),
+    );
+  });
+
+  it.each([
+    'person/infra/http/get-own-person.route.ts',
+    'person/infra/http/delete-own-person.route.ts',
+    'person/infra/http/remove-avatar.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
