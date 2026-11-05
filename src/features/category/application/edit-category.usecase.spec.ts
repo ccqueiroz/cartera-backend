@@ -41,7 +41,7 @@ describe('EditCategoryUseCase', () => {
     expect(updated).toHaveLength(1);
   });
 
-  it('lança not found quando não existe ativo (404)', async () => {
+  it('throws not found when no active one exists (404)', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       update: async () => {},
@@ -56,7 +56,7 @@ describe('EditCategoryUseCase', () => {
     });
   });
 
-  it('rejeita troca de descriptionEnum (422)', async () => {
+  it('rejects descriptionEnum change (422)', async () => {
     const repository = {
       findActiveByEnum: async () => makeActive(),
       update: async () => {},

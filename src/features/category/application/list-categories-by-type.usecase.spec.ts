@@ -16,7 +16,7 @@ const makeCategory = () =>
   });
 
 describe('ListCategoriesByTypeUseCase', () => {
-  it('retorna os ativos do tipo como output', async () => {
+  it('returns the active items of the type as output', async () => {
     const repository = {
       findActiveByType: async () => [makeCategory()],
     } as any;
@@ -28,14 +28,14 @@ describe('ListCategoriesByTypeUseCase', () => {
     expect(result[0].descriptionEnum).toBe(CategoryDescriptionEnum.UBER);
   });
 
-  it('retorna [] quando não há ativos', async () => {
+  it('returns [] when there are no active items', async () => {
     const repository = { findActiveByType: async () => [] } as any;
     const useCase = ListCategoriesByTypeUseCase.create(repository);
 
     expect(await useCase.execute({ type: 'RECEIVABLES' })).toEqual([]);
   });
 
-  it('rejeita type fora do enum', async () => {
+  it('rejects type outside the enum', async () => {
     const repository = { findActiveByType: async () => [] } as any;
     const useCase = ListCategoriesByTypeUseCase.create(repository);
 

@@ -27,7 +27,7 @@ const makeSoftDeleted = () => {
 };
 
 describe('CreateCategoryUseCase', () => {
-  it('cria nova categoria quando o enum não existe', async () => {
+  it('creates new category when the enum does not exist', async () => {
     const created: Category[] = [];
     const repository = {
       findByEnum: async () => null,
@@ -50,7 +50,7 @@ describe('CreateCategoryUseCase', () => {
     expect(result.category.toPersistence().id).toBe('uuid-1');
   });
 
-  it('conflita (409) quando o enum já está ativo', async () => {
+  it('conflicts (409) when the enum is already active', async () => {
     const repository = {
       findByEnum: async () =>
         Category.create({
@@ -72,7 +72,7 @@ describe('CreateCategoryUseCase', () => {
     });
   });
 
-  it('reativa (200) quando o enum existe soft-deleted', async () => {
+  it('reactivates (200) when the enum exists soft-deleted', async () => {
     const updated: Category[] = [];
     const repository = {
       findByEnum: async () => makeSoftDeleted(),

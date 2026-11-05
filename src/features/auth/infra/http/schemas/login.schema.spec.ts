@@ -16,7 +16,7 @@ const catchCode = async (input: unknown): Promise<ErrorCode> => {
 };
 
 describe('LoginSchema', () => {
-  it('aceita payload válido', async () => {
+  it('accepts valid payload', async () => {
     await expect(
       assertAuthInputValid(LoginSchema, VALID),
     ).resolves.toBeUndefined();
@@ -28,7 +28,7 @@ describe('LoginSchema', () => {
     );
   });
 
-  it('e-mail ausente vira VALIDATION_FAILED (não INVALID_EMAIL)', async () => {
+  it('missing email becomes VALIDATION_FAILED (not INVALID_EMAIL)', async () => {
     expect(await catchCode({ password: 'secret' })).toBe(
       ErrorCode.VALIDATION_FAILED,
     );

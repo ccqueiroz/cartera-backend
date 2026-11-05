@@ -6,7 +6,7 @@ const controller = CategoryController.create({} as any);
 const authMiddleware = { getHandler: jest.fn() } as unknown as Middleware;
 
 describe('categoryRoutes', () => {
-  it('registra as sete rotas CRUD com método e path corretos', () => {
+  it('registers the seven CRUD routes with correct method and path', () => {
     const routes = categoryRoutes(controller, authMiddleware);
 
     expect(
@@ -22,7 +22,7 @@ describe('categoryRoutes', () => {
     ]);
   });
 
-  it('todas as rotas passam pelo middleware de autenticação, leituras incluídas', () => {
+  it('all routes go through the authentication middleware, reads included', () => {
     const routes = categoryRoutes(controller, authMiddleware);
 
     expect(

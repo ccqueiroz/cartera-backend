@@ -112,7 +112,7 @@ function makeHarness() {
   return { dispatch };
 }
 
-describe('category e2e (guarda de autenticação via factory)', () => {
+describe('category e2e (authentication guard via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
     ['get', 'category/list-all'],
     ['get', 'category/list-by-enum/:descriptionEnum'],
@@ -124,7 +124,7 @@ describe('category e2e (guarda de autenticação via factory)', () => {
   ];
 
   it.each(protectedRoutes)(
-    'sem credencial: %s %s responde 401 INVALID_TOKEN',
+    'no credential: %s %s responds 401 INVALID_TOKEN',
     async (method, path) => {
       const { dispatch } = makeHarness();
       const response = await dispatch(method, path);
@@ -134,7 +134,7 @@ describe('category e2e (guarda de autenticação via factory)', () => {
     },
   );
 
-  it('com sessão válida a leitura executa normalmente (200)', async () => {
+  it('with a valid session the read runs normally (200)', async () => {
     const { dispatch } = makeHarness();
     const response = await dispatch('get', 'category/list-all', {
       query: { type: 'BILLS' },
@@ -145,7 +145,7 @@ describe('category e2e (guarda de autenticação via factory)', () => {
     expect(response.body).toEqual({ data: [] });
   });
 
-  it('token inválido: 401 INVALID_TOKEN', async () => {
+  it('invalid token: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
     const response = await dispatch('get', 'category/list-all', {
       query: { type: 'BILLS' },

@@ -22,7 +22,7 @@ describe('makeAuthModule', () => {
     ]);
   });
 
-  it('injeta o guard só na rota protegida via deps (nunca global)', () => {
+  it('injects the guard only on the protected route via deps (never global)', () => {
     const routes = makeAuthModule({
       authMiddleware,
       authProviderGateway: {} as any,
