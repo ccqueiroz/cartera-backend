@@ -551,3 +551,11 @@ describe('[BK2-54] transfer controller and the transfer read and create routes',
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] transfer list route', () => {
+  it('list-transfers.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'transfer/infra/http/list-transfers.route.ts'),
+    );
+  });
+});

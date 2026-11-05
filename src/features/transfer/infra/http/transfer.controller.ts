@@ -4,10 +4,17 @@ import {
   numberOrUndefined,
   userIdFrom,
 } from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateTransferUseCase } from '@/features/transfer/application/create-transfer.usecase';
 import { ListTransfersUseCase } from '@/features/transfer/application/list-transfers.usecase';
 import { GetTransferByIdUseCase } from '@/features/transfer/application/get-transfer-by-id.usecase';
 import { CreateTransferSchema } from '@/features/transfer/infra/http/schemas/create-transfer.schema';
+
+const TRANSFER_LIST_FIELDS = {
+  ordering: ['transferDate', 'amount', 'createdAt'],
+  sort: ['paymentMethodDescriptionEnum'],
+  searchByDate: ['transferDate', 'createdAt'],
+} as const;
 
 export interface TransferUseCases {
   create: CreateTransferUseCase;
@@ -40,8 +47,7 @@ export class TransferController {
       userId: userIdFrom(req),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, TRANSFER_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };

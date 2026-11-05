@@ -587,6 +587,42 @@
         },
         "description": "Transferência."
       },
+      "TransferPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/TransferOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de transferências."
+      },
       "TransferPaymentMethodInactive": {
         "content": {
           "application/json": {
@@ -4295,26 +4331,69 @@
             }
           },
           {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer"
-            }
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
           },
           {
             "in": "query",
-            "name": "size",
+            "name": "ordering",
             "schema": {
-              "type": "integer"
+              "enum": [
+                "transferDate",
+                "amount",
+                "createdAt"
+              ],
+              "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "enum": [
+                "paymentMethodDescriptionEnum"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "in": "query",
+            "name": "search_by_date",
+            "schema": {
+              "enum": [
+                "transferDate",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
           }
         ],
         "responses": {
           "200": {
-            "description": "Página de transferências."
+            "$ref": "#/components/responses/TransferPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
