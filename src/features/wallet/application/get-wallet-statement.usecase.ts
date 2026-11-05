@@ -11,8 +11,6 @@ interface GetWalletStatementInput {
   id: string;
   month?: number;
   year?: number;
-  page?: number;
-  size?: number;
   params?: PaginationParams;
 }
 
@@ -36,18 +34,17 @@ export class GetWalletStatementUseCase {
       input.userId,
     );
 
-    const { params } = input;
-    const competence = movements
+    const { params = {} } = input;
+    const filtered = movements
       .filter((movement) => this.matchesCompetence(movement.occurredAt, input))
       .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
       .map((movement) => movement.toOutput());
-    const filtered = params ? applyListParams(competence, params) : competence;
 
     return applyPagination(
-      filtered,
-      input.page ?? params?.page,
-      input.size ?? params?.size,
-      params?.ordering ?? null,
+      applyListParams(filtered, params),
+      params.page,
+      params.size,
+      params.ordering ?? null,
     );
   }
 
