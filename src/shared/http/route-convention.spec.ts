@@ -528,3 +528,11 @@ describe('[BK2-54] wallet statement route', () => {
     );
   });
 });
+
+describe('[BK2-54] wallet list route', () => {
+  it('list-wallets.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'wallet/infra/http/list-wallets.route.ts'),
+    );
+  });
+});

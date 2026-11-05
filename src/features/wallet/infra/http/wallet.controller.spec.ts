@@ -109,3 +109,61 @@ describe('[BK2-48] WalletController statement', () => {
     },
   );
 });
+
+describe('[BK2-48] WalletController listAll', () => {
+  it('passes the read params and answers the page in data', async () => {
+    const execute = jest.fn().mockResolvedValue(page);
+    const controller = WalletController.create({ list: { execute } } as any);
+    const res = makeResponse();
+
+    await controller.listAll(
+      requestWith({
+        page: '2',
+        size: '10',
+        ordering: 'balance',
+        direction_order: 'desc',
+        sort: 'isDefault',
+        sort_value: 'false',
+        search_by_date: 'createdAt',
+        search_by_date_value: '2026-06-01',
+      }),
+      res,
+    );
+
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 'user-1',
+        params: {
+          page: 2,
+          size: 10,
+          ordering: { balance: SortOrder.DESC },
+          sort: { field: 'isDefault', value: 'false' },
+          searchByDate: { field: 'createdAt', exactlyDate: '2026-06-01' },
+        },
+      }),
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ data: page });
+  });
+
+  it('rejects an ordering outside the wallet fields with VALIDATION_FAILED', async () => {
+    const execute = jest.fn();
+    const controller = WalletController.create({ list: { execute } } as any);
+    const result = controller.listAll(
+      requestWith({ ordering: 'amount', direction_order: 'asc' }),
+      makeResponse(),
+    );
+
+    await expect(result).rejects.toThrow(ValidationError);
+    await expect(result).rejects.toMatchObject({
+      code: ErrorCode.VALIDATION_FAILED,
+      params: {
+        details: errorCatalog[ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]({
+          attribute: 'ordering',
+          value: 'amount',
+        }),
+      },
+    });
+    expect(execute).not.toHaveBeenCalled();
+  });
+});

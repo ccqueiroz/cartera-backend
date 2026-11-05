@@ -22,6 +22,12 @@ const STATEMENT_FIELDS = {
   searchByDate: ['occurredAt', 'createdAt'],
 } as const;
 
+const WALLET_LIST_FIELDS = {
+  ordering: ['name', 'balance', 'createdAt'],
+  sort: ['isDefault'],
+  searchByDate: ['createdAt'],
+} as const;
+
 export interface WalletUseCases {
   create: CreateWalletUseCase;
   list: ListWalletsUseCase;
@@ -56,8 +62,7 @@ export class WalletController {
   public listAll = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.list.execute({
       userId: userIdFrom(req),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, WALLET_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
