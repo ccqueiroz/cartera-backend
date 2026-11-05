@@ -520,3 +520,11 @@ describe('[BK2-54] wallet adjust balance route', () => {
     );
   });
 });
+
+describe('[BK2-54] wallet statement route', () => {
+  it('wallet-statement.route.ts declares every status with its contract', () => {
+    expectRouteContract(
+      resolve(featuresDir, 'wallet/infra/http/wallet-statement.route.ts'),
+    );
+  });
+});

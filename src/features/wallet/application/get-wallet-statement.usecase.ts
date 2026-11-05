@@ -2,8 +2,9 @@ import { WalletMovementOutput } from '@/features/wallet/domain/wallet-movement.e
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { EntityNotFoundError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { applyListParams } from '@/shared/query/apply-list-params';
 import { applyPagination } from '@/shared/query/apply-pagination';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 
 interface GetWalletStatementInput {
   userId: string;
@@ -12,6 +13,7 @@ interface GetWalletStatementInput {
   year?: number;
   page?: number;
   size?: number;
+  params?: PaginationParams;
 }
 
 export class GetWalletStatementUseCase {
@@ -34,12 +36,19 @@ export class GetWalletStatementUseCase {
       input.userId,
     );
 
-    const filtered = movements
+    const { params } = input;
+    const competence = movements
       .filter((movement) => this.matchesCompetence(movement.occurredAt, input))
       .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
       .map((movement) => movement.toOutput());
+    const filtered = params ? applyListParams(competence, params) : competence;
 
-    return applyPagination(filtered, input.page, input.size);
+    return applyPagination(
+      filtered,
+      input.page ?? params?.page,
+      input.size ?? params?.size,
+      params?.ordering ?? null,
+    );
   }
 
   private matchesCompetence(

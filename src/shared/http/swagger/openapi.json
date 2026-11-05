@@ -717,6 +717,42 @@
         },
         "description": "Payload inválido na edição da carteira."
       },
+      "WalletMovementPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/WalletMovementOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de movimentos do extrato."
+      },
       "WalletNotFound": {
         "content": {
           "application/json": {
@@ -4463,17 +4499,75 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "in": "query",
+            "name": "ordering",
+            "schema": {
+              "enum": [
+                "occurredAt",
+                "amount",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "enum": [
+                "direction",
+                "refType"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "in": "query",
+            "name": "search_by_date",
+            "schema": {
+              "enum": [
+                "occurredAt",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
           }
         ],
         "responses": {
           "200": {
-            "description": "Página de movimentos."
+            "$ref": "#/components/responses/WalletMovementPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Carteira não encontrada."
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
