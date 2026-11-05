@@ -33,6 +33,23 @@
  *             required: [data]
  *             properties:
  *               data: { $ref: '#/components/schemas/TransferOutput' }
+ *     TransferPageResponse:
+ *       description: Página de transferências.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/PageMeta'
+ *                   - type: object
+ *                     required: [content]
+ *                     properties:
+ *                       content:
+ *                         type: array
+ *                         items: { $ref: '#/components/schemas/TransferOutput' }
  *     CreateTransferResultResponse:
  *       description: Transferência criada com os saldos das carteiras e os avisos.
  *       content:

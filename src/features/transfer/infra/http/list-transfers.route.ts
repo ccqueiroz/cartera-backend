@@ -15,17 +15,28 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  *       - in: query
  *         name: year
  *         schema: { type: integer }
+ *       - $ref: '#/components/parameters/Page'
+ *       - $ref: '#/components/parameters/Size'
  *       - in: query
- *         name: page
- *         schema: { type: integer }
+ *         name: ordering
+ *         schema: { type: string, enum: [transferDate, amount, createdAt] }
+ *       - $ref: '#/components/parameters/DirectionOrder'
  *       - in: query
- *         name: size
- *         schema: { type: integer }
+ *         name: sort
+ *         schema: { type: string, enum: [paymentMethodDescriptionEnum] }
+ *       - $ref: '#/components/parameters/SortValue'
+ *       - in: query
+ *         name: search_by_date
+ *         schema: { type: string, enum: [transferDate, createdAt] }
+ *       - $ref: '#/components/parameters/SearchByDateValue'
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Página de transferências. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/TransferPageResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListTransfersRoute implements Route {
   public readonly method: HttpMethod = 'get';
