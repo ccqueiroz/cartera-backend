@@ -37,12 +37,12 @@ export class PaymentMethodController {
       description: req.body.description,
       descriptionEnum: req.body.descriptionEnum as PaymentMethodDescription,
     });
-    res.status(201).json(method.toOutput());
+    res.status(201).json({ data: method.toOutput() });
   };
 
   public listAll = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.list.execute();
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
@@ -50,7 +50,7 @@ export class PaymentMethodController {
     const result = await this.useCases.getByEnum.execute({
       descriptionEnum: String(req.params.descriptionEnum),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public update = async (req: Request, res: Response): Promise<void> => {
@@ -60,7 +60,7 @@ export class PaymentMethodController {
       descriptionEnum: req.params.descriptionEnum as PaymentMethodDescription,
       description: req.body.description,
     });
-    res.status(200).json(method.toOutput());
+    res.status(200).json({ data: method.toOutput() });
   };
 
   public remove = async (req: Request, res: Response): Promise<void> => {

@@ -17,14 +17,12 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       204:
- *         description: Forma de pagamento soft-deletada.
- *       400:
- *         description: descriptionEnum fora do conjunto fechado.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Não existe forma de pagamento ativa (inexistente ou já soft-deletada).
+ *       204: { description: "Forma de pagamento soft-deletada." }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PaymentMethodNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class DeletePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'delete';
