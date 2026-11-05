@@ -586,3 +586,22 @@ describe('[BK2-54] category write routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] payment method controller and the read and delete routes', () => {
+  it('payment-method.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(
+        featuresDir,
+        'payment-method/infra/http/payment-method.controller.ts',
+      ),
+    );
+  });
+
+  it.each([
+    'payment-method/infra/http/list-payment-methods.route.ts',
+    'payment-method/infra/http/get-payment-method-by-enum.route.ts',
+    'payment-method/infra/http/delete-payment-method.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

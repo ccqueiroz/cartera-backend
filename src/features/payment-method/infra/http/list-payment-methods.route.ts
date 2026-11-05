@@ -11,10 +11,10 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Lista de formas de pagamento ativas (pode ser vazia).
- *       401:
- *         description: Sessão ausente ou inválida.
+ *       200: { $ref: '#/components/responses/PaymentMethodListResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListPaymentMethodsRoute implements Route {
   public readonly method: HttpMethod = 'get';

@@ -337,6 +337,68 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "PaymentMethodListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethodOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de formas de pagamento."
+      },
+      "PaymentMethodNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Forma de pagamento não encontrada."
+      },
+      "PaymentMethodOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PaymentMethodOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Forma de pagamento."
+      },
       "SettleTransactionResultResponse": {
         "content": {
           "application/json": {
@@ -1618,6 +1680,38 @@
         ],
         "example": "DEBIT_CARD",
         "type": "string"
+      },
+      "PaymentMethodOutput": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionEnum": {
+            "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+          },
+          "id": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "descriptionEnum",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
       },
       "PaymentStatusDescriptionEnum": {
         "description": "Enumeração das descrições dos status de pagamento.",
@@ -3376,13 +3470,19 @@
             "description": "Forma de pagamento soft-deletada."
           },
           "400": {
-            "description": "descriptionEnum fora do conjunto fechado."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Não existe forma de pagamento ativa (inexistente ou já soft-deletada)."
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3458,10 +3558,16 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Lista de formas de pagamento ativas (pode ser vazia)."
+            "$ref": "#/components/responses/PaymentMethodListResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3484,40 +3590,28 @@
             "name": "descriptionEnum",
             "required": true,
             "schema": {
-              "enum": [
-                "DEBIT_CARD",
-                "CREDIT_CARD",
-                "BANK_SLIP",
-                "BANK_DEPOSIT",
-                "BANK_TRANSFER",
-                "AUTOMATIC_DEBIT",
-                "BOOKLET",
-                "CASH",
-                "CHECK",
-                "PROMISSORY",
-                "FINANCING",
-                "MEAL_VOUCHER",
-                "FOOD_VOUCHER",
-                "PIX",
-                "CRYPTOCURRENCY",
-                "DIGITAL_WALLET"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Forma de pagamento (ativa ou soft-deleted mais recente)."
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
           },
           "400": {
-            "description": "descriptionEnum fora do conjunto fechado."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Nenhuma forma de pagamento do tipo existe."
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

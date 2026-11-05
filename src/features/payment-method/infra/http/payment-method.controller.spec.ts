@@ -37,7 +37,7 @@ describe('PaymentMethodController', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('create rejects with ValidationError (400) on invalid payload', async () => {
@@ -76,7 +76,7 @@ describe('PaymentMethodController', () => {
     await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith([]);
+    expect(res.json).toHaveBeenCalledWith({ data: [] });
   });
 
   it('getByEnum returns 200 for a valid descriptionEnum', async () => {
@@ -92,7 +92,7 @@ describe('PaymentMethodController', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('getByEnum rejects with ValidationError (400) on an unknown enum param', async () => {
@@ -137,7 +137,7 @@ describe('PaymentMethodController', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('update rejects with ValidationError (400) on an unknown enum param', async () => {

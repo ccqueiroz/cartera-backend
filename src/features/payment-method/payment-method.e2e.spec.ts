@@ -138,7 +138,7 @@ describe('payment-method e2e (guarda de autenticação via factory)', () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body).toEqual({ data: [] });
   });
 
   it('token inválido: 401 INVALID_TOKEN', async () => {
