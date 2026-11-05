@@ -62,5 +62,51 @@
  *                   code:
  *                     enum:
  *                       - PERSON_NOT_FOUND
+ *     PersonDocumentInUse:
+ *       description: Documento já em uso por outro perfil.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - DOCUMENT_ALREADY_IN_USE
+ *     PersonUpdateRefused:
+ *       description: Documento ou telefone inválido para o tipo declarado.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - DOCUMENT_TYPE_MISMATCH
+ *                       - INVALID_DOCUMENT
+ *                       - INVALID_PHONE
+ *     AvatarTooLarge:
+ *       description: Imagem decodificada acima de 5MB.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - AVATAR_TOO_LARGE
+ *     AvatarUnsupportedType:
+ *       description: Conteúdo não é JPEG nem PNG.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - AVATAR_UNSUPPORTED_TYPE
  */
 export {};
