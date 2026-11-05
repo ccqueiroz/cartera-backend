@@ -107,6 +107,89 @@
         },
         "description": "Saldo ajustado com os movimentos e os avisos."
       },
+      "CategoryGroupListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryGroupEnum"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de grupos."
+      },
+      "CategoryListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de categorias."
+      },
+      "CategoryNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Categoria não encontrada."
+      },
+      "CategoryOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CategoryOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Categoria."
+      },
       "CreateTransactionResultResponse": {
         "content": {
           "application/json": {
@@ -1286,6 +1369,46 @@
         ],
         "example": "MOBILITY_BY_APP",
         "type": "string"
+      },
+      "CategoryOutput": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionEnum": {
+            "$ref": "#/components/schemas/CategoryDescriptionEnum"
+          },
+          "group": {
+            "$ref": "#/components/schemas/CategoryGroupEnum"
+          },
+          "type": {
+            "enum": [
+              "BILLS",
+              "RECEIVABLES"
+            ],
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "descriptionEnum",
+          "group",
+          "type",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
       },
       "CreateTransactionResult": {
         "properties": {
@@ -2885,13 +3008,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Categorias ativas do tipo."
+            "$ref": "#/components/responses/CategoryListResponse"
           },
           "400": {
-            "description": "Type ausente ou fora do enum."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -2920,16 +3049,22 @@
         ],
         "responses": {
           "200": {
-            "description": "Categoria ativa encontrada."
+            "$ref": "#/components/responses/CategoryOutputResponse"
           },
           "400": {
-            "description": "descriptionEnum fora do enum."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Não existe ou está soft-deleted."
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -2970,13 +3105,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Categorias ativas do grupo/tipo."
+            "$ref": "#/components/responses/CategoryListResponse"
           },
           "400": {
-            "description": "Group fora do enum ou type ausente/inválido."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3009,13 +3150,19 @@
         ],
         "responses": {
           "200": {
-            "description": "Grupos distintos do tipo."
+            "$ref": "#/components/responses/CategoryGroupListResponse"
           },
           "400": {
-            "description": "Type ausente ou fora do enum."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

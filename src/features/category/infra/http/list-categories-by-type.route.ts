@@ -18,12 +18,11 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Categorias ativas do tipo.
- *       400:
- *         description: Type ausente ou fora do enum.
- *       401:
- *         description: Sessão ausente ou inválida.
+ *       200: { $ref: '#/components/responses/CategoryListResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListCategoriesByTypeRoute implements Route {
   public readonly method: HttpMethod = 'get';

@@ -559,3 +559,20 @@ describe('[BK2-54] transfer list route', () => {
     );
   });
 });
+
+describe('[BK2-54] category controller and the category read routes', () => {
+  it('category.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'category/infra/http/category.controller.ts'),
+    );
+  });
+
+  it.each([
+    'category/infra/http/list-categories-by-type.route.ts',
+    'category/infra/http/get-category-by-enum.route.ts',
+    'category/infra/http/list-groups-by-type.route.ts',
+    'category/infra/http/list-categories-by-group.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
