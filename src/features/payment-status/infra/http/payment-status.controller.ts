@@ -21,7 +21,7 @@ export class PaymentStatusController {
 
   public listAll = async (_req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.list.execute();
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
@@ -29,6 +29,6 @@ export class PaymentStatusController {
     const result = await this.useCases.getByEnum.execute({
       code: String(req.params.descriptionEnum) as PaymentStatusCode,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }

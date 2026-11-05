@@ -337,6 +337,53 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "PaymentMethodAlreadyExists": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Já existe forma de pagamento ativa para o descriptionEnum."
+      },
+      "PaymentMethodBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_DESCRIPTION_REQUIRED",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou descrição obrigatória ausente."
+      },
       "PaymentMethodListResponse": {
         "content": {
           "application/json": {
@@ -398,6 +445,68 @@
           }
         },
         "description": "Forma de pagamento."
+      },
+      "PaymentStatusListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentStatusCatalogOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de status de pagamento do catálogo."
+      },
+      "PaymentStatusNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_STATUS_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Status de pagamento não encontrado."
+      },
+      "PaymentStatusOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PaymentStatusCatalogOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Status de pagamento do catálogo."
       },
       "SettleTransactionResultResponse": {
         "content": {
@@ -1710,6 +1819,25 @@
           "active",
           "createdAt",
           "updatedAt"
+        ],
+        "type": "object"
+      },
+      "PaymentStatusCatalogOutput": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
+          },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "label"
         ],
         "type": "object"
       },
@@ -3396,25 +3524,7 @@
                     "type": "string"
                   },
                   "descriptionEnum": {
-                    "enum": [
-                      "DEBIT_CARD",
-                      "CREDIT_CARD",
-                      "BANK_SLIP",
-                      "BANK_DEPOSIT",
-                      "BANK_TRANSFER",
-                      "AUTOMATIC_DEBIT",
-                      "BOOKLET",
-                      "CASH",
-                      "CHECK",
-                      "PROMISSORY",
-                      "FINANCING",
-                      "MEAL_VOUCHER",
-                      "FOOD_VOUCHER",
-                      "PIX",
-                      "CRYPTOCURRENCY",
-                      "DIGITAL_WALLET"
-                    ],
-                    "type": "string"
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
                   }
                 },
                 "required": [
@@ -3429,16 +3539,22 @@
         },
         "responses": {
           "201": {
-            "description": "Forma de pagamento criada."
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
           },
           "400": {
-            "description": "Payload inválido."
+            "$ref": "#/components/responses/PaymentMethodBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "409": {
-            "description": "Já existe forma de pagamento ativa para o descriptionEnum."
+            "$ref": "#/components/responses/PaymentMethodAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3530,16 +3646,22 @@
         },
         "responses": {
           "200": {
-            "description": "Forma de pagamento atualizada."
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
           },
           "400": {
-            "description": "Payload inválido ou descriptionEnum fora do conjunto fechado."
+            "$ref": "#/components/responses/PaymentMethodBadRequest"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Não existe forma de pagamento ativa para o descriptionEnum."
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3630,10 +3752,16 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Lista de status de pagamento semeados (pode ser vazia)."
+            "$ref": "#/components/responses/PaymentStatusListResponse"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3656,32 +3784,28 @@
             "name": "descriptionEnum",
             "required": true,
             "schema": {
-              "enum": [
-                "PAID",
-                "RECEIVED",
-                "TO_PAY",
-                "TO_RECEIVE",
-                "DUE_SOON",
-                "DUE_DAY",
-                "OVERDUE",
-                "IN_PROGRESS"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Status de pagamento do catálogo."
+            "$ref": "#/components/responses/PaymentStatusOutputResponse"
           },
           "400": {
-            "description": "descriptionEnum fora do conjunto fechado."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "404": {
-            "description": "Nenhum status semeado para o code informado."
+            "$ref": "#/components/responses/PaymentStatusNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [

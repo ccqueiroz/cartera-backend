@@ -33,7 +33,7 @@ describe('PaymentStatusController', () => {
     await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('list returns 200 with an empty array when the catalog is unseeded', async () => {
@@ -45,7 +45,7 @@ describe('PaymentStatusController', () => {
     await controller.listAll({} as Request, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith([]);
+    expect(res.json).toHaveBeenCalledWith({ data: [] });
   });
 
   it('getByEnum returns 200 for a valid, seeded code', async () => {
@@ -67,7 +67,7 @@ describe('PaymentStatusController', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
   it('getByEnum rejects with ValidationError (400) on a status outside the closed set', async () => {

@@ -17,20 +17,16 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *             required: [description, descriptionEnum]
  *             properties:
  *               description: { type: string, maxLength: 60 }
- *               descriptionEnum:
- *                 type: string
- *                 enum: [DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY, DIGITAL_WALLET]
+ *               descriptionEnum: { $ref: '#/components/schemas/PaymentMethodDescriptionEnum' }
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       201:
- *         description: Forma de pagamento criada.
- *       400:
- *         description: Payload inválido.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       409:
- *         description: Já existe forma de pagamento ativa para o descriptionEnum.
+ *       201: { $ref: '#/components/responses/PaymentMethodOutputResponse' }
+ *       400: { $ref: '#/components/responses/PaymentMethodBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       409: { $ref: '#/components/responses/PaymentMethodAlreadyExists' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreatePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'post';
