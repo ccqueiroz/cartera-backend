@@ -26,14 +26,12 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Forma de pagamento atualizada.
- *       400:
- *         description: Payload inválido ou descriptionEnum fora do conjunto fechado.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Não existe forma de pagamento ativa para o descriptionEnum.
+ *       200: { $ref: '#/components/responses/PaymentMethodOutputResponse' }
+ *       400: { $ref: '#/components/responses/PaymentMethodBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PaymentMethodNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class UpdatePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'put';

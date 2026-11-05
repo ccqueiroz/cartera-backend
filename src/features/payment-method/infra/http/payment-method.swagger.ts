@@ -44,5 +44,28 @@
  *                   code:
  *                     enum:
  *                       - PAYMENT_METHOD_NOT_FOUND
+ *     PaymentMethodBadRequest:
+ *       description: Payload inválido ou descrição obrigatória ausente.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - PAYMENT_METHOD_DESCRIPTION_REQUIRED
+ *                       - VALIDATION_FAILED
+ *     PaymentMethodAlreadyExists:
+ *       description: Já existe forma de pagamento ativa para o descriptionEnum.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - PAYMENT_METHOD_ALREADY_EXISTS
  */
 export {};

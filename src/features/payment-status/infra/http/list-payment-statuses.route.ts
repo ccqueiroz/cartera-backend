@@ -11,10 +11,10 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Lista de status de pagamento semeados (pode ser vazia).
- *       401:
- *         description: Sessão ausente ou inválida.
+ *       200: { $ref: '#/components/responses/PaymentStatusListResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListPaymentStatusesRoute implements Route {
   public readonly method: HttpMethod = 'get';
