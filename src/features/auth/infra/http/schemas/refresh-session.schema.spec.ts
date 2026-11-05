@@ -3,7 +3,7 @@ import { assertAuthInputValid } from '@/features/auth/infra/http/auth-input.vali
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 describe('RefreshSessionSchema', () => {
-  it('aceita refresh token presente', async () => {
+  it('accepts present refresh token', async () => {
     await expect(
       assertAuthInputValid(RefreshSessionSchema, { refreshToken: 'token' }),
     ).resolves.toBeUndefined();

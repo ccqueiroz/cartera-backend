@@ -19,7 +19,7 @@ describe('RecoverPasswordUseCase', () => {
     ErrorCode.USER_NOT_FOUND,
     ErrorCode.ACCOUNT_NOT_FOUND,
   ])(
-    'engole erro de existência de conta (%s) — anti-enumeração',
+    'swallows account existence error (%s) - anti-enumeration',
     async (code) => {
       const authProvider = {
         sendPasswordResetEmail: jest.fn(async () => {
@@ -34,7 +34,7 @@ describe('RecoverPasswordUseCase', () => {
     },
   );
 
-  it('falha de infraestrutura atravessa', async () => {
+  it('infrastructure failure passes through', async () => {
     const authProvider = {
       sendPasswordResetEmail: jest.fn(async () => {
         throw new UnauthorizedError(ErrorCode.INTERNAL_SERVER_ERROR);

@@ -36,7 +36,7 @@ describe('DeleteCategoryUseCase', () => {
     );
   });
 
-  it('lança not found quando não há ativo (404)', async () => {
+  it('throws not found when there is no active one (404)', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       softDelete: async () => {},

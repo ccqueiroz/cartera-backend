@@ -8,12 +8,12 @@ const authMiddleware = { getHandler: jest.fn() } as unknown as Middleware;
 describe('makeCategoryModule', () => {
   const module = makeCategoryModule({ db: {} as any, authMiddleware });
 
-  it('expõe reads.getByEnum/.listByType como instâncias wired', () => {
+  it('exposes reads.getByEnum/.listByType as wired instances', () => {
     expect(module.reads.getByEnum).toBeInstanceOf(GetCategoryByEnumUseCase);
     expect(module.reads.listByType).toBeInstanceOf(ListCategoriesByTypeUseCase);
   });
 
-  it('expõe rotas não vazias, todas autenticadas', () => {
+  it('exposes non-empty routes, all authenticated', () => {
     expect(module.routes.length).toBeGreaterThan(0);
     expect(
       module.routes.every((route) =>

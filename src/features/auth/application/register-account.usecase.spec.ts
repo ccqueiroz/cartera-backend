@@ -39,7 +39,7 @@ const INPUT = {
 };
 
 describe('RegisterAccountUseCase', () => {
-  it('cria conta + person, auto-loga e devolve o output mesclado', async () => {
+  it('creates account and person, auto-logs in and returns the merged output', async () => {
     const authProvider = makeAuthProvider();
     const personGateway = makePersonGateway();
     const useCase = RegisterAccountUseCase.create(authProvider, personGateway);
@@ -67,7 +67,7 @@ describe('RegisterAccountUseCase', () => {
     });
   });
 
-  it('falha na criação do person compensa deletando a conta e relança', async () => {
+  it('person creation failure compensates by deleting the account and rethrows', async () => {
     const boom = new Error('person falhou');
     const authProvider = makeAuthProvider();
     const personGateway = makePersonGateway({
@@ -82,7 +82,7 @@ describe('RegisterAccountUseCase', () => {
     expect(authProvider.signInWithPassword).not.toHaveBeenCalled();
   });
 
-  it('falha no auto-login NÃO desfaz nada — conta e person persistem', async () => {
+  it('auto-login failure does NOT undo anything - account and person persist', async () => {
     const boom = new Error('login falhou');
     const authProvider = makeAuthProvider({
       signInWithPassword: jest.fn(async () => {
@@ -96,7 +96,7 @@ describe('RegisterAccountUseCase', () => {
     expect(authProvider.deleteAccount).not.toHaveBeenCalled();
   });
 
-  it('semeia a wallet após o person (UC8/W5)', async () => {
+  it('seeds the wallet after the person (UC8/W5)', async () => {
     const authProvider = makeAuthProvider();
     const personGateway = makePersonGateway();
     const walletProvisionGateway = {
@@ -115,7 +115,7 @@ describe('RegisterAccountUseCase', () => {
     });
   });
 
-  it('falha no seed da wallet é tolerada (registro conclui, sem compensação)', async () => {
+  it('wallet seed failure is tolerated (registration completes, without compensation)', async () => {
     const authProvider = makeAuthProvider();
     const personGateway = makePersonGateway();
     const walletProvisionGateway = {

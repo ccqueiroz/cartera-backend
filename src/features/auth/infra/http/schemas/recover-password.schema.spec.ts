@@ -14,7 +14,7 @@ const catchCode = async (input: unknown): Promise<ErrorCode> => {
 };
 
 describe('RecoverPasswordSchema', () => {
-  it('aceita e-mail válido', async () => {
+  it('accepts valid email', async () => {
     await expect(
       assertAuthInputValid(RecoverPasswordSchema, { email: 'a@b.com' }),
     ).resolves.toBeUndefined();

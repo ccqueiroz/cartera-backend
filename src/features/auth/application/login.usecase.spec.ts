@@ -28,7 +28,7 @@ const makePersonGateway = (overrides: Record<string, unknown> = {}) =>
 const INPUT = { email: 'a@b.com', password: 'secret' };
 
 describe('LoginUseCase', () => {
-  it('devolve a sessão no sucesso sem consultar o person (caminho quente)', async () => {
+  it('returns the session on success without querying the person (hot path)', async () => {
     const personGateway = makePersonGateway();
     const useCase = LoginUseCase.create(makeAuthProvider(), personGateway);
 
@@ -38,7 +38,7 @@ describe('LoginUseCase', () => {
     expect(personGateway.findByUserIdIncludingDeleted).not.toHaveBeenCalled();
   });
 
-  it('credencial errada propaga INVALID_CREDENTIALS sem lookup', async () => {
+  it('wrong credential propagates INVALID_CREDENTIALS without lookup', async () => {
     const authProvider = makeAuthProvider({
       signInWithPassword: jest.fn(async () => {
         throw new UnauthorizedError(ErrorCode.INVALID_CREDENTIALS);
@@ -53,7 +53,7 @@ describe('LoginUseCase', () => {
     expect(personGateway.findByUserIdIncludingDeleted).not.toHaveBeenCalled();
   });
 
-  it('conta desativada com person soft-deletado vira ACCOUNT_DELETED (terminal)', async () => {
+  it('disabled account with soft-deleted person becomes ACCOUNT_DELETED (terminal)', async () => {
     const authProvider = makeAuthProvider({
       signInWithPassword: jest.fn(async () => {
         throw new ForbiddenError(ErrorCode.USER_DISABLED, {
@@ -76,7 +76,7 @@ describe('LoginUseCase', () => {
     );
   });
 
-  it('conta desativada sem soft-delete segue USER_DISABLED (suspensão)', async () => {
+  it('disabled account without soft-delete stays USER_DISABLED (suspension)', async () => {
     const authProvider = makeAuthProvider({
       signInWithPassword: jest.fn(async () => {
         throw new ForbiddenError(ErrorCode.USER_DISABLED, {
@@ -94,7 +94,7 @@ describe('LoginUseCase', () => {
     });
   });
 
-  it('conta desativada sem uid no erro segue USER_DISABLED sem lookup', async () => {
+  it('disabled account without uid in the error stays USER_DISABLED without lookup', async () => {
     const authProvider = makeAuthProvider({
       signInWithPassword: jest.fn(async () => {
         throw new ForbiddenError(ErrorCode.USER_DISABLED);

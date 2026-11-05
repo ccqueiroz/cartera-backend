@@ -21,7 +21,7 @@ const catchCode = async (input: unknown): Promise<ErrorCode> => {
 };
 
 describe('RegisterAccountSchema', () => {
-  it('aceita payload válido', async () => {
+  it('accepts valid payload', async () => {
     await expect(
       assertAuthInputValid(RegisterAccountSchema, VALID),
     ).resolves.toBeUndefined();
@@ -34,7 +34,7 @@ describe('RegisterAccountSchema', () => {
   });
 
   it.each(['password', 'firstName', 'lastName', 'email'])(
-    'campo obrigatório ausente (%s) vira VALIDATION_FAILED',
+    'required field missing (%s) becomes VALIDATION_FAILED',
     async (field) => {
       const input: Record<string, unknown> = { ...VALID };
       delete input[field];
@@ -48,7 +48,7 @@ describe('RegisterAccountSchema', () => {
     );
   });
 
-  it('props desconhecidas são descartadas sem erro', async () => {
+  it('unknown props are discarded without error', async () => {
     await expect(
       assertAuthInputValid(RegisterAccountSchema, {
         ...VALID,

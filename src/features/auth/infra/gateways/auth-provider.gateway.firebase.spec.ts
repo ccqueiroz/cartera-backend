@@ -47,7 +47,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expiresIn: '3600',
     };
 
-    it('normaliza expiresIn (segundos) para expirationTime ISO-8601 absoluto', async () => {
+    it('normalizes expiresIn (seconds) into an absolute ISO-8601 expirationTime', async () => {
       const fetchLike = jest.fn(async () => jsonResponse(true, successPayload));
       const session = await makeGateway(
         makeAuth(),
@@ -69,7 +69,7 @@ describe('AuthProviderGatewayFirebase', () => {
       'INVALID_PASSWORD',
       'INVALID_LOGIN_CREDENTIALS',
     ])(
-      'miss de credencial %s vira UnauthorizedError(INVALID_CREDENTIALS) — anti-enumeração',
+      'credential miss %s becomes UnauthorizedError(INVALID_CREDENTIALS) - anti-enumeration',
       async (raw) => {
         const fetchLike = jest.fn(async () =>
           jsonResponse(false, { error: { message: raw } }),
@@ -104,7 +104,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expect(auth.getUserByEmail).toHaveBeenCalledWith('a@b.com');
     });
 
-    it('USER_DISABLED sem uid resolvível ainda lança ForbiddenError(USER_DISABLED)', async () => {
+    it('USER_DISABLED without a resolvable uid still throws ForbiddenError(USER_DISABLED)', async () => {
       const auth = makeAuth({
         getUserByEmail: jest.fn(async () => {
           throw new Error('lookup falhou');
@@ -124,7 +124,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expect(error.params).toBeUndefined();
     });
 
-    it('mensagem com sufixo ("TOO_MANY_ATTEMPTS_TRY_LATER : ...") discrimina pelo primeiro token', async () => {
+    it('message with suffix ("TOO_MANY_ATTEMPTS_TRY_LATER : ...") discriminates by the first token', async () => {
       const fetchLike = jest.fn(async () =>
         jsonResponse(false, {
           error: { message: 'TOO_MANY_ATTEMPTS_TRY_LATER : Try again later.' },
@@ -141,7 +141,7 @@ describe('AuthProviderGatewayFirebase', () => {
   });
 
   describe('refreshSession', () => {
-    it('normaliza payload snake_case e expires_in para ISO-8601', async () => {
+    it('normalizes snake_case payload and expires_in into ISO-8601', async () => {
       const fetchLike = jest.fn(async () =>
         jsonResponse(true, {
           user_id: 'uid-1',
@@ -184,7 +184,7 @@ describe('AuthProviderGatewayFirebase', () => {
     });
 
     it.each(['TOKEN_EXPIRED', 'INVALID_REFRESH_TOKEN'])(
-      'refresh inválido/expirado (%s) vira INVALID_TOKEN (relogin)',
+      'invalid/expired refresh (%s) becomes INVALID_TOKEN (relogin)',
       async (raw) => {
         const fetchLike = jest.fn(async () =>
           jsonResponse(false, { error: { message: raw } }),
@@ -211,7 +211,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expect(account).toEqual({ userId: 'uid-novo' });
     });
 
-    it('e-mail duplicado vira DuplicateEntityError(EMAIL_ALREADY_IN_USE) — 409', async () => {
+    it('duplicate email becomes DuplicateEntityError(EMAIL_ALREADY_IN_USE) - 409', async () => {
       const auth = makeAuth({
         createUser: jest.fn(async () => {
           throw { code: 'auth/email-already-exists' };
@@ -244,7 +244,7 @@ describe('AuthProviderGatewayFirebase', () => {
   });
 
   describe('verifyAccessToken', () => {
-    it('verifica com checkRevoked e devolve userId/email', async () => {
+    it('verifies with checkRevoked and returns userId/email', async () => {
       const auth = makeAuth({
         verifyIdToken: jest.fn(async () => ({
           uid: 'uid-1',
@@ -283,7 +283,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expect(error.code).toBe(ErrorCode.INVALID_TOKEN);
     });
 
-    it('conta desativada vira ForbiddenError(USER_DISABLED) — 403, não 401', async () => {
+    it('disabled account becomes ForbiddenError(USER_DISABLED) - 403, not 401', async () => {
       const auth = makeAuth({
         verifyIdToken: jest.fn(async () => {
           throw { code: 'auth/user-disabled' };
@@ -296,7 +296,7 @@ describe('AuthProviderGatewayFirebase', () => {
       expect(error.code).toBe(ErrorCode.USER_DISABLED);
     });
 
-    it('token malformado/erro desconhecido vira INVALID_TOKEN', async () => {
+    it('malformed token/unknown error becomes INVALID_TOKEN', async () => {
       const auth = makeAuth({
         verifyIdToken: jest.fn(async () => {
           throw new Error('malformado');
@@ -310,14 +310,14 @@ describe('AuthProviderGatewayFirebase', () => {
   });
 
   describe('sendPasswordResetEmail', () => {
-    it('sucesso não lança', async () => {
+    it('success does not throw', async () => {
       const fetchLike = jest.fn(async () => jsonResponse(true, {}));
       await expect(
         makeGateway(makeAuth(), fetchLike).sendPasswordResetEmail('a@b.com'),
       ).resolves.toBeUndefined();
     });
 
-    it('EMAIL_NOT_FOUND atravessa traduzido (quem engole é o use case)', async () => {
+    it('EMAIL_NOT_FOUND passes through translated (the use case swallows it)', async () => {
       const fetchLike = jest.fn(async () =>
         jsonResponse(false, { error: { message: 'EMAIL_NOT_FOUND' } }),
       );
