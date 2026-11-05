@@ -28,18 +28,13 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Categoria atualizada.
- *       400:
- *         description: Payload inválido.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       403:
- *         description: Sem autorização de escrita (gate TBD).
- *       404:
- *         description: Não existe ou está soft-deleted.
- *       422:
- *         description: Tentativa de trocar o descriptionEnum imutável.
+ *       200: { $ref: '#/components/responses/CategoryOutputResponse' }
+ *       400: { $ref: '#/components/responses/CategoryBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/CategoryNotFound' }
+ *       422: { $ref: '#/components/responses/CategoryDescriptionEnumImmutable' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class UpdateCategoryRoute implements Route {
   public readonly method: HttpMethod = 'put';

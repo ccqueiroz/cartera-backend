@@ -23,18 +23,13 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       201:
- *         description: Categoria criada.
- *       200:
- *         description: Slot soft-deleted reativado.
- *       400:
- *         description: Payload inválido.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       403:
- *         description: Sem autorização de escrita (gate TBD).
- *       409:
- *         description: descriptionEnum já ativo.
+ *       201: { $ref: '#/components/responses/CategoryOutputResponse' }
+ *       200: { $ref: '#/components/responses/CategoryOutputResponse' }
+ *       400: { $ref: '#/components/responses/CategoryBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       409: { $ref: '#/components/responses/CategoryAlreadyExists' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateCategoryRoute implements Route {
   public readonly method: HttpMethod = 'post';

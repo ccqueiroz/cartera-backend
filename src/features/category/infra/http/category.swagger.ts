@@ -58,5 +58,39 @@
  *                   code:
  *                     enum:
  *                       - CATEGORY_NOT_FOUND
+ *     CategoryBadRequest:
+ *       description: Payload inválido ou descrição obrigatória ausente.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_DESCRIPTION_REQUIRED
+ *                       - VALIDATION_FAILED
+ *     CategoryAlreadyExists:
+ *       description: Categoria já ativa para este descriptionEnum.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_ALREADY_EXISTS
+ *     CategoryDescriptionEnumImmutable:
+ *       description: Tentativa de trocar o descriptionEnum imutável.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - CATEGORY_DESCRIPTION_ENUM_IMMUTABLE
  */
 export {};
