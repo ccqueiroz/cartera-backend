@@ -81,6 +81,66 @@
       }
     },
     {
+      "files": [
+        "src/features/**/domain/**/*.ts",
+        "src/features/**/application/**/*.ts"
+      ],
+      "excludedFiles": ["**/*.spec.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']"
+        ]
+      }
+    },
+    {
+      "files": ["src/features/**/domain/**/*.ts"],
+      "excludedFiles": ["**/*.spec.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']",
+          "Identifier[name='Intl']",
+          "CallExpression[callee.property.name='toLocaleString']",
+          "CallExpression[callee.property.name='getTime']",
+          "NewExpression[callee.name='Date'][arguments.length=0]"
+        ]
+      }
+    },
+    {
+      "files": ["src/features/wallet/domain/overdraft.service.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']",
+          "Identifier[name='Intl']",
+          "CallExpression[callee.property.name='toLocaleString']",
+          "NewExpression[callee.name='Date'][arguments.length=0]"
+        ]
+      }
+    },
+    {
+      "files": ["src/**/*.ts"],
+      "excludedFiles": [
+        "**/*.spec.ts",
+        "**/*.mock.ts",
+        "src/test/**",
+        "src/bootstrap/main.ts",
+        "**/*.factory.ts",
+        "**/transaction.entity.ts"
+      ],
+      "rules": {
+        "max-lines": ["warn", 400],
+        "max-lines-per-function": ["warn", 60]
+      }
+    },
+    {
       "files": ["src/**/*.route.ts"],
       "excludedFiles": ["src/features/*/infra/http/**/*.route.ts"],
       "rules": {

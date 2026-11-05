@@ -43,7 +43,7 @@ export class ReplaceAvatarUseCase {
       );
     } catch (error) {
       this.logger.error(`[AVATAR] upload falhou para ${path}: ${error}`);
-      // Não-domínio de propósito: falha de gateway vira 500 genérico na borda (D7).
+      // eslint-disable-next-line no-restricted-syntax -- Não-domínio de propósito: falha de gateway vira 500 genérico na borda (D7).
       throw new Error(ErrorCode.AVATAR_UPLOAD_FAILED);
     }
 
