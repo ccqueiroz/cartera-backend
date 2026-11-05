@@ -488,3 +488,18 @@ describe('[BK2-54] receivable list routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] wallet controller and the wallet read and delete routes', () => {
+  it('wallet.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'wallet/infra/http/wallet.controller.ts'),
+    );
+  });
+
+  it.each([
+    'wallet/infra/http/get-wallet-by-id.route.ts',
+    'wallet/infra/http/delete-wallet.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
