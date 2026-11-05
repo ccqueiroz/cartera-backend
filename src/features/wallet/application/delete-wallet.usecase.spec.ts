@@ -26,7 +26,7 @@ async function seed(
 }
 
 describe('DeleteWalletUseCase', () => {
-  it('remove com saldo zero', async () => {
+  it('removes with zero balance', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seed(repository, ids);
@@ -37,7 +37,7 @@ describe('DeleteWalletUseCase', () => {
     expect(await repository.findActiveById(id, 'u1')).toBeNull();
   });
 
-  it('bloqueia saldo ≠ 0 sem force (WALLET_HAS_BALANCE)', async () => {
+  it('blocks a balance != 0 without force (WALLET_HAS_BALANCE)', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seed(repository, ids, 50);
@@ -48,7 +48,7 @@ describe('DeleteWalletUseCase', () => {
     });
   });
 
-  it('procede com force mesmo com saldo', async () => {
+  it('proceeds with force even with a balance', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seed(repository, ids, 50);
@@ -79,7 +79,7 @@ describe('DeleteWalletUseCase', () => {
     ).not.toBeNull();
   });
 
-  it('é idempotente (segunda chamada não falha)', async () => {
+  it('is idempotent (a second call does not fail)', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seed(repository, ids);

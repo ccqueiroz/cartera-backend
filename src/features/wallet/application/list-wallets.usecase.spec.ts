@@ -12,7 +12,7 @@ const gateway: FinancialIndicatorGateway = {
 const now = () => '2026-06-14T10:00:00.000Z';
 
 describe('ListWalletsUseCase', () => {
-  it('retorna só ativas do dono, paginadas', async () => {
+  it('returns only the owner active wallets, paginated', async () => {
     const repository = new InMemoryWalletRepository();
     let counter = 0;
     const ids = () => `id-${++counter}`;

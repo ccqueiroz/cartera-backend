@@ -120,7 +120,7 @@ describe('EditWalletUseCase', () => {
     expect(result.overdraft).toBeNull();
   });
 
-  it('404 (WALLET_NOT_FOUND) quando inexistente ou de outro usuário', async () => {
+  it('404 (WALLET_NOT_FOUND) when missing or owned by another user', async () => {
     const repository = new InMemoryWalletRepository();
     const ids = makeIds();
     const id = await seed(repository, ids);

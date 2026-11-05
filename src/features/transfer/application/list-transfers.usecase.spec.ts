@@ -49,7 +49,7 @@ describe('ListTransfersUseCase', () => {
     expect(page.totalElements).toBe(3);
   });
 
-  it('filtra por competência month/year', async () => {
+  it('filters by competence month/year', async () => {
     const repository = repoWith([
       transfer('a', 'u1', '2026-06-15'),
       transfer('b', 'u1', '2026-05-15'),
@@ -63,7 +63,7 @@ describe('ListTransfersUseCase', () => {
     expect(page.totalElements).toBe(1);
   });
 
-  it('período vazio retorna página vazia', async () => {
+  it('empty period returns an empty page', async () => {
     const repository = repoWith([transfer('a', 'u1', '2026-06-15')]);
     const useCase = ListTransfersUseCase.create(repository);
 

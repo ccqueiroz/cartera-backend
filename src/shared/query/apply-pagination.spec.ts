@@ -4,7 +4,7 @@ import { SortOrder } from '@/shared/query/page';
 describe('applyPagination', () => {
   const items = Array.from({ length: 5 }, (_, index) => index);
 
-  it('embrulha o envelope Page com a fatia pedida', () => {
+  it('wraps the Page envelope with the requested slice', () => {
     const page = applyPagination(items, 1, 2);
     expect(page).toEqual({
       content: [2, 3],
@@ -16,7 +16,7 @@ describe('applyPagination', () => {
     });
   });
 
-  it('totalElements reflete o conjunto filtrado, não a fatia', () => {
+  it('totalElements reflects the filtered set, not the slice', () => {
     const filtered = items.filter((value) => value >= 3);
     const page = applyPagination(filtered, 0, 1);
     expect(page.totalElements).toBe(2);

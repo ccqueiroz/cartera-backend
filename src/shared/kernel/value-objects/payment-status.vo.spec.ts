@@ -5,7 +5,7 @@ import { TransactionTypeEnum } from '../enums/transaction-type.enum';
 describe('PaymentStatus', () => {
   const today = new Date('2026-06-03T00:00:00.000Z');
 
-  it('PAID quando pago e BILLS, ignorando as datas', () => {
+  it('PAID when paid and BILLS, ignoring the dates', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2025-01-01',
       transactionType: TransactionTypeEnum.BILLS,
@@ -15,7 +15,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.PAID);
   });
 
-  it('RECEIVED quando pago e RECEIVABLES, ignorando as datas', () => {
+  it('RECEIVED when paid and RECEIVABLES, ignoring the dates', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2025-01-01',
       transactionType: TransactionTypeEnum.RECEIVABLES,
@@ -25,7 +25,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.RECEIVED);
   });
 
-  it('IN_PROGRESS quando não pago e há filhas em aberto, ignorando as datas', () => {
+  it('IN_PROGRESS when unpaid and there are open children, ignoring the dates', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2025-01-01',
       transactionType: TransactionTypeEnum.BILLS,
@@ -36,7 +36,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.IN_PROGRESS);
   });
 
-  it('PAID tem precedência sobre filhas em aberto (BILLS)', () => {
+  it('PAID takes precedence over open children (BILLS)', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2025-01-01',
       transactionType: TransactionTypeEnum.BILLS,
@@ -47,7 +47,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.PAID);
   });
 
-  it('RECEIVED tem precedência sobre filhas em aberto (RECEIVABLES)', () => {
+  it('RECEIVED takes precedence over open children (RECEIVABLES)', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2025-01-01',
       transactionType: TransactionTypeEnum.RECEIVABLES,
@@ -68,7 +68,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.OVERDUE);
   });
 
-  it('OVERDUE quando não pago e a data de análise já passou', () => {
+  it('OVERDUE when unpaid and the analysis date has already passed', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2026-06-02',
       transactionType: TransactionTypeEnum.BILLS,
@@ -78,7 +78,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.OVERDUE);
   });
 
-  it('DUE_DAY quando não pago e a data de análise é hoje', () => {
+  it('DUE_DAY when unpaid and the analysis date is today', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2026-06-03',
       transactionType: TransactionTypeEnum.RECEIVABLES,
@@ -89,7 +89,7 @@ describe('PaymentStatus', () => {
   });
 
   it.each([1, 3, 5])(
-    'DUE_SOON quando não pago e faltam %i dia(s) (janela [1,5])',
+    'DUE_SOON when unpaid and %i day(s) remain (window [1,5])',
     (daysAhead) => {
       const analysisDate = new Date('2026-06-03T00:00:00.000Z');
       analysisDate.setUTCDate(analysisDate.getUTCDate() + daysAhead);
@@ -103,7 +103,7 @@ describe('PaymentStatus', () => {
     },
   );
 
-  it('TO_PAY quando não pago, BILLS e faltam mais de 5 dias', () => {
+  it('TO_PAY when unpaid, BILLS and more than 5 days remain', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2026-06-10',
       transactionType: TransactionTypeEnum.BILLS,
@@ -113,7 +113,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.TO_PAY);
   });
 
-  it('TO_RECEIVE quando não pago, RECEIVABLES e faltam mais de 5 dias', () => {
+  it('TO_RECEIVE when unpaid, RECEIVABLES and more than 5 days remain', () => {
     const result = PaymentStatus.calculate({
       analysisDate: '2026-06-10',
       transactionType: TransactionTypeEnum.RECEIVABLES,
@@ -133,7 +133,7 @@ describe('PaymentStatus', () => {
     expect(result.status).toBe(PaymentStatusEnum.DUE_DAY);
   });
 
-  it('usa a data corrente quando `today` não é injetado', () => {
+  it('uses the current date when `today` is not injected', () => {
     const result = PaymentStatus.calculate({
       analysisDate: new Date(),
       transactionType: TransactionTypeEnum.RECEIVABLES,

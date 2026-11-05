@@ -4,7 +4,7 @@ import { errorCatalog } from './error-catalog';
 describe('errorCatalog', () => {
   const codes = Object.values(ErrorCode);
 
-  it('cada ErrorCode resolve uma string PT não-vazia', () => {
+  it('each ErrorCode resolves to a non-empty PT string', () => {
     for (const code of codes) {
       const message = errorCatalog[code]();
       expect(typeof message).toBe('string');
@@ -12,7 +12,7 @@ describe('errorCatalog', () => {
     }
   });
 
-  it('não há código sem entrada nem entrada órfã', () => {
+  it('there is no code without an entry and no orphan entry', () => {
     const catalogKeys = Object.keys(errorCatalog).sort();
     expect(catalogKeys).toEqual([...codes].sort());
   });
@@ -24,7 +24,7 @@ describe('errorCatalog', () => {
     expect(message).toContain('UBER');
   });
 
-  it('códigos do fluxo de auth resolvem mensagem PT não-vazia', () => {
+  it('auth flow codes resolve to a non-empty PT message', () => {
     for (const code of [ErrorCode.TOKEN_EXPIRED, ErrorCode.ACCOUNT_DELETED]) {
       expect(errorCatalog[code]().trim().length).toBeGreaterThan(0);
     }

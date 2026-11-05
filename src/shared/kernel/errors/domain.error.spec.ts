@@ -10,7 +10,7 @@ import { ErrorCode } from './error-code';
 import { errorCatalog } from './error-catalog';
 
 describe('domain errors', () => {
-  it('ValidationError é DomainError e carrega code/params/name', () => {
+  it('ValidationError is a DomainError and carries code/params/name', () => {
     const details = errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
       attribute: 'name',
     });
@@ -24,7 +24,7 @@ describe('domain errors', () => {
     expect(error.params).toEqual({ details });
   });
 
-  it('message técnico é igual ao code (útil em log/stack)', () => {
+  it('technical message equals the code (useful in log/stack)', () => {
     const error = new EntityNotFoundError(ErrorCode.CATEGORY_NOT_FOUND, {
       descriptionEnum: 'UBER',
     });
@@ -33,7 +33,7 @@ describe('domain errors', () => {
     expect(error.params).toEqual({ descriptionEnum: 'UBER' });
   });
 
-  it('cada subclasse mantém o próprio name', () => {
+  it('each subclass keeps its own name', () => {
     expect(
       new BusinessRuleViolationError(ErrorCode.VALIDATION_FAILED).name,
     ).toBe('BusinessRuleViolationError');
@@ -42,14 +42,14 @@ describe('domain errors', () => {
     ).toBe('DuplicateEntityError');
   });
 
-  it('PayloadTooLargeError é DomainError e mantém o próprio name', () => {
+  it('PayloadTooLargeError is a DomainError and keeps its own name', () => {
     const error = new PayloadTooLargeError(ErrorCode.AVATAR_TOO_LARGE);
     expect(error).toBeInstanceOf(DomainError);
     expect(error.name).toBe('PayloadTooLargeError');
     expect(error.code).toBe(ErrorCode.AVATAR_TOO_LARGE);
   });
 
-  it('params é opcional', () => {
+  it('params is optional', () => {
     const error = new ValidationError(ErrorCode.INVALID_CATEGORY_TYPE);
     expect(error.params).toBeUndefined();
   });

@@ -10,7 +10,7 @@ const gateway: FinancialIndicatorGateway = {
 const now = () => '2026-06-14T10:00:00.000Z';
 
 describe('GetWalletByIdUseCase', () => {
-  it('retorna a wallet do dono com campos derivados', async () => {
+  it('returns the owner wallet with derived fields', async () => {
     const repository = new InMemoryWalletRepository();
     let counter = 0;
     const ids = () => `id-${++counter}`;
@@ -33,7 +33,7 @@ describe('GetWalletByIdUseCase', () => {
     expect(result.accruedInterest).toBe(0);
   });
 
-  it('404 (WALLET_NOT_FOUND) para id de outro usuário', async () => {
+  it('404 (WALLET_NOT_FOUND) for the id of another user', async () => {
     const repository = new InMemoryWalletRepository();
     let counter = 0;
     const ids = () => `id-${++counter}`;

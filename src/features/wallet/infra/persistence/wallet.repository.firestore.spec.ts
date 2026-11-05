@@ -114,7 +114,7 @@ function movement(
 }
 
 describe('WalletRepositoryFirestore', () => {
-  it('saveWithMovements grava saldo + movimentos numa única runTransaction (atômico)', async () => {
+  it('saveWithMovements writes balance + movements in a single runTransaction (atomic)', async () => {
     const { db, store, runTransaction, batch } = makeDb();
     const repo = WalletRepositoryFirestore.create(db);
     const w = wallet({ balance: -50 });
@@ -151,7 +151,7 @@ describe('WalletRepositoryFirestore', () => {
     expect(store['WalletMovement'].get('m1')).toBeDefined();
   });
 
-  it('reconcilia Σ dos movimentos persistidos com o saldo gravado', async () => {
+  it('reconciles the sum of persisted movements with the stored balance', async () => {
     const { db } = makeDb();
     const repo = WalletRepositoryFirestore.create(db);
     const movements = [
@@ -176,7 +176,7 @@ describe('WalletRepositoryFirestore', () => {
     expect(stored?.balance.value).toBe(70);
   });
 
-  it('isola por userId: findById de outro dono retorna null', async () => {
+  it('isolates by userId: findById of another owner returns null', async () => {
     const { db } = makeDb();
     const repo = WalletRepositoryFirestore.create(db);
     await repo.create(wallet({ userId: 'u1' }), [movement()]);

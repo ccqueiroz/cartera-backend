@@ -5,17 +5,17 @@ describe('DateRange', () => {
   const start = new Date('2026-01-01');
   const end = new Date('2026-01-31');
 
-  it('cria intervalo válido', () => {
+  it('creates a valid range', () => {
     const range = DateRange.create(start, end);
     expect(range.initialDate.getTime()).toBe(start.getTime());
     expect(range.finalDate.getTime()).toBe(end.getTime());
   });
 
-  it('aceita intervalo de 1 dia (igual)', () => {
+  it('accepts a one-day range (equal)', () => {
     expect(() => DateRange.create(start, start)).not.toThrow();
   });
 
-  it('rejeita inicial > final', () => {
+  it('rejects start > end', () => {
     expect(() => DateRange.create(end, start)).toThrow(ValidationError);
   });
 
@@ -27,7 +27,7 @@ describe('DateRange', () => {
     expect(range.contains(new Date('2026-02-01'))).toBe(false);
   });
 
-  it('não vaza referência mutável das datas', () => {
+  it('does not leak a mutable reference to the dates', () => {
     const range = DateRange.create(start, end);
     const before = range.initialDate.getTime();
     range.initialDate.setFullYear(1999);
