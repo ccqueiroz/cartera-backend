@@ -36,6 +36,38 @@
  *         warnings:
  *           type: array
  *           items: { $ref: '#/components/schemas/BalanceWarning' }
+ *     WalletMovementOutput:
+ *       type: object
+ *       required: [id, walletId, direction, amount, refType, refId, occurredAt, createdAt]
+ *       properties:
+ *         id: { type: string }
+ *         walletId: { type: string }
+ *         direction: { type: string, enum: [DEBIT, CREDIT] }
+ *         amount: { type: number }
+ *         refType:
+ *           type: string
+ *           enum:
+ *             - SETTLEMENT
+ *             - SETTLEMENT_REVERSAL
+ *             - TRANSFER
+ *             - INVOICE
+ *             - YIELD
+ *             - ADJUST
+ *             - OVERDRAFT_INTEREST
+ *         refId: { type: string, nullable: true }
+ *         occurredAt: { type: string }
+ *         createdAt: { type: string }
+ *     AdjustBalanceResult:
+ *       type: object
+ *       required: [wallet, movements, warnings]
+ *       properties:
+ *         wallet: { $ref: '#/components/schemas/WalletOutput' }
+ *         movements:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/WalletMovementOutput' }
+ *         warnings:
+ *           type: array
+ *           items: { $ref: '#/components/schemas/BalanceWarning' }
  *   responses:
  *     WalletOutputResponse:
  *       description: Carteira.
@@ -116,5 +148,26 @@
  *                   code:
  *                     enum:
  *                       - WALLET_DEFAULT_NO_OVERDRAFT
+ *     AdjustBalanceResultResponse:
+ *       description: Saldo ajustado com os movimentos e os avisos.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data]
+ *             properties:
+ *               data: { $ref: '#/components/schemas/AdjustBalanceResult' }
+ *     WalletAdjustBadRequest:
+ *       description: Valor inválido ou saldo negativo sem limite.
+ *       content:
+ *         application/json:
+ *           schema:
+ *             allOf:
+ *               - $ref: '#/components/schemas/ErrorResponse'
+ *               - properties:
+ *                   code:
+ *                     enum:
+ *                       - MONEY_NEGATIVE
+ *                       - VALIDATION_FAILED
  */
 export {};

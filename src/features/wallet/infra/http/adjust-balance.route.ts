@@ -27,11 +27,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Saldo ajustado (wallet + movimentos + warnings). }
- *       400: { description: Valor inválido. }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Carteira não encontrada. }
- *       409: { description: Carteira removida. }
+ *       200: { $ref: '#/components/responses/AdjustBalanceResultResponse' }
+ *       400: { $ref: '#/components/responses/WalletAdjustBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       409: { $ref: '#/components/responses/WalletDeleted' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class AdjustBalanceRoute implements Route {
   public readonly method: HttpMethod = 'patch';
