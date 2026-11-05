@@ -12,6 +12,7 @@ export interface RequestOptions {
 
 export interface HttpResult {
   status: number;
+  // A 2xx JSON body arrives unwrapped from its `{ data }` envelope; a 204 or a non-2xx body keeps the parsed value as it came.
   body: unknown;
 }
 
@@ -64,6 +65,12 @@ export async function request(
     } catch {
       body = text;
     }
+  }
+  if (response.status >= 200 && response.status < 300 && text) {
+    if (typeof body !== 'object' || body === null || !('data' in body)) {
+      throw new Error(`${method.toUpperCase()} ${path} ${response.status}`);
+    }
+    body = (body as { data: unknown }).data;
   }
   return { status: response.status, body };
 }
