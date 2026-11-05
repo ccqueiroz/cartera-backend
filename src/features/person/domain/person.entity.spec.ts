@@ -36,7 +36,7 @@ const basePersistence = (): PersonPersistence => ({
 });
 
 describe('Person', () => {
-  it('create nasce ativo, sem avatar/document/phone e sem updatedAt', () => {
+  it('create is born active, with no avatar, document or phone, and no updatedAt', () => {
     const person = makePerson();
     const output = person.toOutput();
     expect(output.isActive).toBe(true);
@@ -48,7 +48,7 @@ describe('Person', () => {
     expect(output.monthlyIncome).toEqual({ value: null, currency: null });
   });
 
-  it('toPersistence não contém fullName nem isActive', () => {
+  it('toPersistence has neither fullName nor isActive', () => {
     const persisted = makePerson().toPersistence() as unknown as Record<
       string,
       unknown
@@ -81,7 +81,7 @@ describe('Person', () => {
     });
   });
 
-  it('update aplica campos editáveis e seta updatedAt', () => {
+  it('update applies editable fields and sets updatedAt', () => {
     const person = makePerson();
     person.update(
       {
@@ -103,7 +103,7 @@ describe('Person', () => {
     expect(person.toPersistence().document?.value).toBe(VALID_CPF);
   });
 
-  it('update com document inválido lança erro de domínio', () => {
+  it('update with an invalid document throws a domain error', () => {
     const person = makePerson();
     expect(() =>
       person.update(
@@ -113,7 +113,7 @@ describe('Person', () => {
     ).toThrow(BusinessRuleViolationError);
   });
 
-  it('update com phone inválido lança INVALID_PHONE', () => {
+  it('update with an invalid phone throws INVALID_PHONE', () => {
     const person = makePerson();
     const error = (() => {
       try {
@@ -129,21 +129,21 @@ describe('Person', () => {
     expect(error.code).toBe(ErrorCode.INVALID_PHONE);
   });
 
-  it('rejeita birthDate fora de YYYY-MM-DD', () => {
+  it('rejects a birthDate outside YYYY-MM-DD', () => {
     const person = makePerson();
     expect(() =>
       person.update({ birthDate: '15/01/1990' }, '2026-06-04T14:00:00.000Z'),
     ).toThrow(ValidationError);
   });
 
-  it('rejeita firstName vazio', () => {
+  it('rejects an empty firstName', () => {
     const person = makePerson();
     expect(() =>
       person.update({ firstName: '  ' }, '2026-06-04T14:00:00.000Z'),
     ).toThrow(ValidationError);
   });
 
-  it('softDelete é terminal e idempotente', () => {
+  it('softDelete is terminal and idempotent', () => {
     const person = makePerson();
     person.softDelete('2026-06-04T15:00:00.000Z');
     expect(person.isActive).toBe(false);

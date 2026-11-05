@@ -4,7 +4,7 @@ import { DescriptionEnumParamSchema } from './description-enum-param.schema';
 const options = { whitelist: true, forbidNonWhitelisted: true };
 
 describe('DescriptionEnumParamSchema', () => {
-  it('aceita descriptionEnum válido', async () => {
+  it('accepts a valid descriptionEnum', async () => {
     const errors = await runValidate(
       DescriptionEnumParamSchema,
       { descriptionEnum: 'OVERDUE' },
@@ -13,7 +13,7 @@ describe('DescriptionEnumParamSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('aceita IN_PROGRESS (novo membro do conjunto fechado)', async () => {
+  it('accepts IN_PROGRESS (new member of the closed set)', async () => {
     const errors = await runValidate(
       DescriptionEnumParamSchema,
       { descriptionEnum: 'IN_PROGRESS' },
@@ -22,7 +22,7 @@ describe('DescriptionEnumParamSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita descriptionEnum fora do conjunto fechado', async () => {
+  it('rejects a descriptionEnum outside the closed set', async () => {
     const errors = await runValidate(
       DescriptionEnumParamSchema,
       { descriptionEnum: 'NOPE' },
@@ -31,7 +31,7 @@ describe('DescriptionEnumParamSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita props desconhecidas', async () => {
+  it('rejects unknown props', async () => {
     const errors = await runValidate(
       DescriptionEnumParamSchema,
       { descriptionEnum: 'PAID', extra: 'x' },

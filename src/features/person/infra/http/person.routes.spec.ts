@@ -6,7 +6,7 @@ const controller = PersonController.create({} as any);
 const authMiddleware = { getHandler: jest.fn() } as unknown as Middleware;
 
 describe('personRoutes', () => {
-  it('registra as cinco rotas self-service com método e path corretos', () => {
+  it('registers the five self-service routes with the correct method and path', () => {
     const routes = personRoutes(controller, authMiddleware);
 
     expect(
@@ -20,7 +20,7 @@ describe('personRoutes', () => {
     ]);
   });
 
-  it('todas as rotas passam pelo middleware de autenticação', () => {
+  it('all routes go through the authentication middleware', () => {
     const routes = personRoutes(controller, authMiddleware);
     expect(
       routes.every((route) =>
@@ -29,7 +29,7 @@ describe('personRoutes', () => {
     ).toBe(true);
   });
 
-  it('só a rota de upload de avatar amplia o body parser', () => {
+  it('only the avatar upload route enlarges the body parser', () => {
     const routes = personRoutes(controller, authMiddleware);
     const limitByRoute = Object.fromEntries(
       routes.map((route) => [
@@ -47,7 +47,7 @@ describe('personRoutes', () => {
     });
   });
 
-  it('não expõe endpoint público de criação nem de busca por email', () => {
+  it('exposes no public creation or lookup-by-email endpoint', () => {
     const routes = personRoutes(controller, authMiddleware);
     expect(routes.some((route) => route.method === 'post')).toBe(false);
     expect(routes.every((route) => route.path.startsWith('person/me'))).toBe(

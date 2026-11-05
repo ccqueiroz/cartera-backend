@@ -14,7 +14,7 @@ const makeMethod = (deletedAt: string | null) =>
   });
 
 describe('GetPaymentMethodByEnumUseCase', () => {
-  it('retorna o método (ativo ou soft-deleted) resolvido pelo repositório', async () => {
+  it('returns the method (active or soft-deleted) resolved by the repository', async () => {
     const repository = {
       findLatestByEnum: async () => makeMethod(null),
     } as any;
@@ -28,7 +28,7 @@ describe('GetPaymentMethodByEnumUseCase', () => {
     expect(result.active).toBe(true);
   });
 
-  it('retorna o soft-deleted mais recente quando não há ativo', async () => {
+  it('returns the latest soft-deleted method when none is active', async () => {
     const repository = {
       findLatestByEnum: async () => makeMethod('2026-06-02T10:00:00.000Z'),
     } as any;
@@ -41,7 +41,7 @@ describe('GetPaymentMethodByEnumUseCase', () => {
     expect(result.active).toBe(false);
   });
 
-  it('lança 404 quando não existe nenhum método do tipo', async () => {
+  it('throws 404 when no method of the type exists', async () => {
     const repository = { findLatestByEnum: async () => null } as any;
     const useCase = GetPaymentMethodByEnumUseCase.create(repository);
 
@@ -50,7 +50,7 @@ describe('GetPaymentMethodByEnumUseCase', () => {
     ).rejects.toMatchObject({ code: ErrorCode.PAYMENT_METHOD_NOT_FOUND });
   });
 
-  it('lança ValidationError para enum fora do conjunto fechado', async () => {
+  it('throws ValidationError for an enum outside the closed set', async () => {
     const repository = { findLatestByEnum: async () => null } as any;
     const useCase = GetPaymentMethodByEnumUseCase.create(repository);
 

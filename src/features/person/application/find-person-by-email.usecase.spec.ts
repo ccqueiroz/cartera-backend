@@ -11,7 +11,7 @@ const makeRepository = (result: Person | null) => ({
 });
 
 describe('FindPersonByEmailUseCase', () => {
-  it('retorna o person ativo do email', async () => {
+  it('returns the active person for the email', async () => {
     const person = {} as Person;
     const repository = makeRepository(person);
     const result = await FindPersonByEmailUseCase.create(
@@ -21,7 +21,7 @@ describe('FindPersonByEmailUseCase', () => {
     expect(repository.findByEmail).toHaveBeenCalledWith('caio@example.com');
   });
 
-  it('miss retorna null sem side effects', async () => {
+  it('miss returns null without side effects', async () => {
     const repository = makeRepository(null);
     const result = await FindPersonByEmailUseCase.create(
       repository as any,

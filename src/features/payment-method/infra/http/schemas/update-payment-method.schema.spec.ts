@@ -4,7 +4,7 @@ import { UpdatePaymentMethodSchema } from './update-payment-method.schema';
 const dropUnknown = { whitelist: true, forbidNonWhitelisted: false };
 
 describe('UpdatePaymentMethodSchema', () => {
-  it('aceita description válido', async () => {
+  it('accepts a valid description', async () => {
     const errors = await runValidate(
       UpdatePaymentMethodSchema,
       { description: 'Pix QR' },
@@ -13,7 +13,7 @@ describe('UpdatePaymentMethodSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('não erra ao receber descriptionEnum (descartado pelo whitelist, não rejeitado)', async () => {
+  it('does not fail on a descriptionEnum (dropped by the whitelist, not rejected)', async () => {
     const errors = await runValidate(
       UpdatePaymentMethodSchema,
       { description: 'Pix QR', descriptionEnum: 'CASH' },
@@ -22,7 +22,7 @@ describe('UpdatePaymentMethodSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita description vazio', async () => {
+  it('rejects an empty description', async () => {
     const errors = await runValidate(
       UpdatePaymentMethodSchema,
       { description: '' },
@@ -31,7 +31,7 @@ describe('UpdatePaymentMethodSchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita description acima de 60 caracteres', async () => {
+  it('rejects a description longer than 60 characters', async () => {
     const errors = await runValidate(
       UpdatePaymentMethodSchema,
       { description: 'x'.repeat(61) },

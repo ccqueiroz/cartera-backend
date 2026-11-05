@@ -32,7 +32,7 @@ const makeRepository = (result: Person | null) => ({
 });
 
 describe('FindPersonByUserIdIncludingDeletedUseCase', () => {
-  it('retorna person deletado com deletedAt preenchido', async () => {
+  it('returns the deleted person with deletedAt filled in', async () => {
     const person = Person.with(deletedPersistence);
     const repository = makeRepository(person);
 
@@ -44,7 +44,7 @@ describe('FindPersonByUserIdIncludingDeletedUseCase', () => {
     expect(result?.isActive).toBe(false);
   });
 
-  it('miss retorna null', async () => {
+  it('miss returns null', async () => {
     const repository = makeRepository(null);
     const result = await FindPersonByUserIdIncludingDeletedUseCase.create(
       repository as any,

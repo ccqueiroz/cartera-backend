@@ -10,7 +10,7 @@ const DROP_UNKNOWN: ValidatorOptions = {
 };
 
 describe('ReplaceAvatarSchema', () => {
-  it('aceita image base64 presente', async () => {
+  it('accepts a base64 image when present', async () => {
     const errors = await runValidate(
       ReplaceAvatarSchema,
       { image: Buffer.from('img').toString('base64') },
@@ -19,12 +19,12 @@ describe('ReplaceAvatarSchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita body sem image', async () => {
+  it('rejects a body without image', async () => {
     const errors = await runValidate(ReplaceAvatarSchema, {}, DROP_UNKNOWN);
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita image vazia', async () => {
+  it('rejects an empty image', async () => {
     const errors = await runValidate(
       ReplaceAvatarSchema,
       { image: '' },

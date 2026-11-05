@@ -14,7 +14,7 @@ const makeMethod = () =>
   });
 
 describe('SoftDeletePaymentMethodUseCase', () => {
-  it('soft-deleta um método ativo e persiste', async () => {
+  it('soft-deletes an active method and persists it', async () => {
     const deleted: PaymentMethod[] = [];
     const repository = {
       findActiveByEnum: async () => makeMethod(),
@@ -33,7 +33,7 @@ describe('SoftDeletePaymentMethodUseCase', () => {
     expect(deleted[0].isActive).toBe(false);
   });
 
-  it('lança 404 quando não há método ativo (inexistente ou já soft-deletado)', async () => {
+  it('throws 404 when there is no active method (missing or already soft-deleted)', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       softDelete: async () => {},

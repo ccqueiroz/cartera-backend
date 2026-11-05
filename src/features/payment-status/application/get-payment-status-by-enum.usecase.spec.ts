@@ -12,7 +12,7 @@ const makeEntry = () =>
   });
 
 describe('GetPaymentStatusByEnumUseCase', () => {
-  it('retorna a entrada do catálogo para um code semeado', async () => {
+  it('returns the catalog entry for a seeded code', async () => {
     const repository = { findByCode: async () => makeEntry() } as any;
     const useCase = GetPaymentStatusByEnumUseCase.create(repository);
 
@@ -25,7 +25,7 @@ describe('GetPaymentStatusByEnumUseCase', () => {
     });
   });
 
-  it('lança PaymentStatusNotFoundError quando o code não está semeado', async () => {
+  it('throws PaymentStatusNotFoundError when the code is not seeded', async () => {
     const repository = { findByCode: async () => null } as any;
     const useCase = GetPaymentStatusByEnumUseCase.create(repository);
 
