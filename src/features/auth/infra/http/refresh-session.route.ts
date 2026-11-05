@@ -18,12 +18,10 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *             properties:
  *               refreshToken: { type: string }
  *     responses:
- *       200:
- *         description: Novos tokens no body (expirationTime ISO-8601) e cookie `session` atualizado.
- *       400:
- *         description: Refresh token ausente (VALIDATION_FAILED).
- *       401:
- *         description: Refresh token inválido, expirado ou revogado (INVALID_TOKEN) — exige relogin.
+ *       200: { $ref: '#/components/responses/RefreshedAuthSessionResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/RefreshUnauthorized' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class RefreshSessionRoute implements Route {
   public readonly method: HttpMethod = 'put';

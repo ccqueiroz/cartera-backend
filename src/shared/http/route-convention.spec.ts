@@ -639,3 +639,12 @@ describe('[BK2-54] auth controller and the register route', () => {
     );
   });
 });
+
+describe('[BK2-54] login and session refresh routes', () => {
+  it.each([
+    'auth/infra/http/login.route.ts',
+    'auth/infra/http/refresh-session.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

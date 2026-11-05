@@ -131,6 +131,24 @@
         },
         "description": "E-mail inválido ou campo obrigatório ausente."
       },
+      "AuthSessionResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/AuthSession"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Sessão criada, com os tokens no corpo e o cookie session definido."
+      },
       "CategoryAlreadyExists": {
         "content": {
           "application/json": {
@@ -361,6 +379,55 @@
         },
         "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
       },
+      "LoginForbidden": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_DELETED",
+                        "USER_DISABLED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Conta encerrada ou suspensa."
+      },
+      "LoginUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_CREDENTIALS",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Credenciais inválidas, limite de tentativas ou falha do provedor no login."
+      },
       "PaymentMethodAlreadyExists": {
         "content": {
           "application/json": {
@@ -531,6 +598,48 @@
           }
         },
         "description": "Status de pagamento do catálogo."
+      },
+      "RefreshUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_TOKEN"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Refresh token inválido, expirado ou revogado; exige relogin."
+      },
+      "RefreshedAuthSessionResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RefreshedAuthSession"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Sessão renovada, com os novos tokens no corpo e o cookie session atualizado."
       },
       "RegisterAccountOutputResponse": {
         "content": {
@@ -1418,6 +1527,33 @@
         ],
         "type": "object"
       },
+      "AuthSession": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "email",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
+      },
       "BalanceWarning": {
         "enum": [
           "BALANCE_NEGATIVE",
@@ -1948,6 +2084,29 @@
         ],
         "example": "PAID",
         "type": "string"
+      },
+      "RefreshedAuthSession": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
       },
       "RegisterAccountOutput": {
         "properties": {
@@ -2563,16 +2722,19 @@
         },
         "responses": {
           "200": {
-            "description": "Tokens no body (expirationTime ISO-8601) e cookie `session` setado."
+            "$ref": "#/components/responses/AuthSessionResponse"
           },
           "400": {
-            "description": "E-mail inválido (INVALID_EMAIL) ou campo ausente (VALIDATION_FAILED)."
+            "$ref": "#/components/responses/AuthBadRequest"
           },
           "401": {
-            "description": "Credenciais inválidas (INVALID_CREDENTIALS) — e-mail e senha errados são indistinguíveis."
+            "$ref": "#/components/responses/LoginUnauthorized"
           },
           "403": {
-            "description": "Conta encerrada (ACCOUNT_DELETED) ou suspensa (USER_DISABLED)."
+            "$ref": "#/components/responses/LoginForbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "summary": "Login (cria sessão) com email/senha.",
@@ -2601,13 +2763,16 @@
         },
         "responses": {
           "200": {
-            "description": "Novos tokens no body (expirationTime ISO-8601) e cookie `session` atualizado."
+            "$ref": "#/components/responses/RefreshedAuthSessionResponse"
           },
           "400": {
-            "description": "Refresh token ausente (VALIDATION_FAILED)."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Refresh token inválido, expirado ou revogado (INVALID_TOKEN) — exige relogin."
+            "$ref": "#/components/responses/RefreshUnauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "summary": "Renova a sessão trocando o refresh token.",
