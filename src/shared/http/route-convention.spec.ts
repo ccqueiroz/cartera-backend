@@ -479,3 +479,12 @@ describe('[BK2-54] receivable item routes', () => {
     expectRouteContract(resolve(featuresDir, file));
   });
 });
+
+describe('[BK2-54] receivable list routes', () => {
+  it.each([
+    'core-finance/infra/http/list-receivables.route.ts',
+    'core-finance/infra/http/list-unreceived-receivables-by-period.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});

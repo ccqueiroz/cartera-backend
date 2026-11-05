@@ -3310,12 +3310,47 @@
     },
     "/api/receivable/list-all": {
       "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
@@ -3373,15 +3408,47 @@
     },
     "/api/receivable/list-unreceived-by-period": {
       "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK."
+            "$ref": "#/components/responses/TransactionPageResponse"
           },
           "400": {
-            "description": "Datas inválidas."
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "401": {
-            "description": "Sessão ausente ou inválida."
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "security": [
