@@ -78,7 +78,9 @@ it('POST budget/create answers 201 and the created output', async () => {
     body: { name: 'Housing', limit: 2500, categoryDescriptionEnum: 'RENT' },
   });
   expect(response.statusCode).toBe(201);
-  expect(response.body).toMatchObject({ id: 'budget-1', active: true });
+  expect(response.body).toMatchObject({
+    data: { id: 'budget-1', active: true },
+  });
 });
 
 it('rejects without a session with 401 and the catalog code', async () => {
@@ -88,4 +90,4 @@ it('rejects without a session with 401 and the catalog code', async () => {
 });
 ```
 
-Promote the `dispatch` harness to a shared test helper on the second feature that uses it (today four e2e specs carry their own copy).
+Promote the `dispatch` harness to a shared test helper on the second feature that uses it (today four slice specs carry their own copy).

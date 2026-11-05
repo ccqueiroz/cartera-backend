@@ -22,16 +22,7 @@ import { SettleReceivableSchema } from '@/features/core-finance/receivables/infr
 import { GlobalSettleReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/global-settle-receivable.schema';
 import { EditReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/edit-receivable.schema';
 import { ListUnreceivedByPeriodSchema } from '@/features/core-finance/receivables/infra/http/schemas/list-unreceived-by-period.schema';
-
-const LIST_FIELDS = {
-  ordering: ['dueDate', 'paymentDate', 'amount', 'paidAmount'],
-  sort: [
-    'categoryDescriptionEnum',
-    'paymentMethodDescriptionEnum',
-    'paymentStatus',
-  ],
-  searchByDate: ['dueDate', 'paymentDate'],
-} as const;
+import { TRANSACTION_LIST_FIELDS } from '@/features/core-finance/infra/http/transaction-list-fields';
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'received' || value === 'paid' ? 'paid' : 'to_pay';
@@ -110,7 +101,7 @@ export class ReceivableController {
         : undefined,
       rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
       rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
-      params: readPaginationParams(req.query, LIST_FIELDS),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };
@@ -124,7 +115,7 @@ export class ReceivableController {
       userId: userIdFrom(req),
       startDate: String(req.query.start_date),
       endDate: String(req.query.end_date),
-      params: readPaginationParams(req.query, LIST_FIELDS),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
   };

@@ -27,6 +27,8 @@ describe('applyPagination', () => {
     { length: 5, size: 2, totalPages: 3 },
     { length: 4, size: 2, totalPages: 2 },
     { length: 0, size: 20, totalPages: 0 },
+    { length: 0, size: 0, totalPages: 0 },
+    { length: 2, size: 0, totalPages: 0 },
   ])(
     'counts $totalPages pages for $length items of size $size',
     ({ length, size, totalPages }) => {
