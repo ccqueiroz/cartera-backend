@@ -24,11 +24,13 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       201: { description: Transferência criada (com warnings se a origem ficar negativa). }
- *       400: { description: Payload inválido (mesma carteira, valor não positivo ou data futura). }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Carteira não encontrada. }
- *       422: { description: Forma de pagamento inativa ou inexistente. }
+ *       201: { $ref: '#/components/responses/CreateTransferResultResponse' }
+ *       400: { $ref: '#/components/responses/TransferCreateBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransferPaymentMethodInactive' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateTransferRoute implements Route {
   public readonly method: HttpMethod = 'post';

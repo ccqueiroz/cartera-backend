@@ -32,7 +32,7 @@ export class TransferController {
       paymentMethodDescriptionEnum: req.body.paymentMethodDescriptionEnum,
       transferDate: req.body.transferDate,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -43,7 +43,7 @@ export class TransferController {
       page: numberOrUndefined(req.query.page),
       size: numberOrUndefined(req.query.size),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -51,6 +51,6 @@ export class TransferController {
       userId: userIdFrom(req),
       id: String(req.params.id),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }

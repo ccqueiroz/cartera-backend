@@ -536,3 +536,18 @@ describe('[BK2-54] wallet list route', () => {
     );
   });
 });
+
+describe('[BK2-54] transfer controller and the transfer read and create routes', () => {
+  it('transfer.controller.ts wraps every json body in data', () => {
+    expectControllerEnvelope(
+      resolve(featuresDir, 'transfer/infra/http/transfer.controller.ts'),
+    );
+  });
+
+  it.each([
+    'transfer/infra/http/get-transfer-by-id.route.ts',
+    'transfer/infra/http/create-transfer.route.ts',
+  ])('%s declares every status with its contract', (file) => {
+    expectRouteContract(resolve(featuresDir, file));
+  });
+});
