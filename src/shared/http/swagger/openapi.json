@@ -107,6 +107,30 @@
         },
         "description": "Saldo ajustado com os movimentos e os avisos."
       },
+      "AuthBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INVALID_EMAIL",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "E-mail inválido ou campo obrigatório ausente."
+      },
       "CategoryAlreadyExists": {
         "content": {
           "application/json": {
@@ -507,6 +531,75 @@
           }
         },
         "description": "Status de pagamento do catálogo."
+      },
+      "RegisterAccountOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RegisterAccountOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Conta e perfil criados, com os tokens no corpo e o cookie session definido."
+      },
+      "RegisterConflict": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "EMAIL_ALREADY_IN_USE",
+                        "PERSON_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "E-mail já em uso ou perfil já existente."
+      },
+      "RegisterUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_NOT_FOUND",
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_CREDENTIALS",
+                        "INVALID_EMAIL",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Falha do provedor de autenticação no registro."
       },
       "SettleTransactionResultResponse": {
         "content": {
@@ -1856,6 +1949,58 @@
         "example": "PAID",
         "type": "string"
       },
+      "RegisterAccountOutput": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "userId",
+          "firstName",
+          "lastName",
+          "fullName",
+          "id",
+          "createdAt",
+          "updatedAt",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
+      },
       "SettleTransactionResult": {
         "properties": {
           "root": {
@@ -2309,13 +2454,22 @@
         },
         "responses": {
           "201": {
-            "description": "Conta e perfil criados; tokens no body e cookie `session` setado."
+            "$ref": "#/components/responses/RegisterAccountOutputResponse"
           },
           "400": {
-            "description": "E-mail inválido (INVALID_EMAIL) ou campo obrigatório ausente (VALIDATION_FAILED)."
+            "$ref": "#/components/responses/AuthBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/RegisterUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
           },
           "409": {
-            "description": "E-mail já em uso (EMAIL_ALREADY_IN_USE)."
+            "$ref": "#/components/responses/RegisterConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         },
         "summary": "Registra conta (email/senha) com auto-login.",

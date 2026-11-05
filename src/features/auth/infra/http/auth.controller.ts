@@ -48,7 +48,7 @@ export class AuthController {
       lastName: req.body.lastName,
     });
     res.cookie(SESSION_COOKIE, output.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(201).json(output);
+    res.status(201).json({ data: output });
   };
 
   public login = async (req: Request, res: Response): Promise<void> => {
@@ -58,7 +58,7 @@ export class AuthController {
       password: req.body.password,
     });
     res.cookie(SESSION_COOKIE, session.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(200).json(session);
+    res.status(200).json({ data: session });
   };
 
   public refresh = async (req: Request, res: Response): Promise<void> => {
@@ -67,7 +67,7 @@ export class AuthController {
       refreshToken: req.body.refreshToken,
     });
     res.cookie(SESSION_COOKIE, session.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(200).json(session);
+    res.status(200).json({ data: session });
   };
 
   public signout = async (req: Request, res: Response): Promise<void> => {
@@ -82,6 +82,6 @@ export class AuthController {
   ): Promise<void> => {
     await assertAuthInputValid(RecoverPasswordSchema, req.body);
     await this.useCases.recoverPassword.execute({ email: req.body.email });
-    res.status(202).json({ message: RECOVERY_GENERIC_MESSAGE });
+    res.status(202).json({ data: { message: RECOVERY_GENERIC_MESSAGE } });
   };
 }
