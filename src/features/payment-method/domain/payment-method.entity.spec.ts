@@ -10,7 +10,7 @@ const baseInput = {
 };
 
 describe('PaymentMethod entity', () => {
-  it('nasce ativo com updatedAt/deletedAt nulos', () => {
+  it('is born active with null updatedAt and deletedAt', () => {
     const method = PaymentMethod.create(baseInput);
     const output = method.toOutput();
     expect(output.active).toBe(true);
@@ -18,25 +18,25 @@ describe('PaymentMethod entity', () => {
     expect(method.toPersistence().deletedAt).toBeNull();
   });
 
-  it('não carrega userId em persistence/output', () => {
+  it('does not carry userId in persistence or output', () => {
     const method = PaymentMethod.create(baseInput);
     expect(method.toPersistence()).not.toHaveProperty('userId');
     expect(method.toOutput()).not.toHaveProperty('userId');
   });
 
-  it('rejeita description vazio', () => {
+  it('rejects an empty description', () => {
     expect(() =>
       PaymentMethod.create({ ...baseInput, description: '   ' }),
     ).toThrow(ErrorCode.PAYMENT_METHOD_DESCRIPTION_REQUIRED);
   });
 
-  it('rejeita description acima do tamanho máximo', () => {
+  it('rejects a description above the maximum length', () => {
     expect(() =>
       PaymentMethod.create({ ...baseInput, description: 'x'.repeat(61) }),
     ).toThrow(ErrorCode.PAYMENT_METHOD_DESCRIPTION_TOO_LONG);
   });
 
-  it('rejeita descriptionEnum fora do conjunto fechado', () => {
+  it('rejects a descriptionEnum outside the closed set', () => {
     expect(() =>
       PaymentMethod.create({
         ...baseInput,
@@ -45,7 +45,7 @@ describe('PaymentMethod entity', () => {
     ).toThrow(ErrorCode.INVALID_PAYMENT_METHOD_DESCRIPTION_ENUM);
   });
 
-  it('updateDescription troca a descrição e seta updatedAt; descriptionEnum imutável', () => {
+  it('updateDescription replaces the description and sets updatedAt; descriptionEnum is immutable', () => {
     const method = PaymentMethod.create(baseInput);
     method.updateDescription('Pix Copia e Cola', '2026-06-02T10:00:00.000Z');
     expect(method.descriptionEnum).toBe(PaymentMethodDescriptionEnum.PIX);
@@ -61,7 +61,7 @@ describe('PaymentMethod entity', () => {
     expect(method.toPersistence().updatedAt).toBe('2026-06-03T10:00:00.000Z');
   });
 
-  it('softDelete é idempotente (não sobrescreve timestamps de uma exclusão prévia)', () => {
+  it('softDelete is idempotent (does not overwrite the timestamps of an earlier deletion)', () => {
     const method = PaymentMethod.create(baseInput);
     method.softDelete('2026-06-03T10:00:00.000Z');
     method.softDelete('2026-06-04T10:00:00.000Z');

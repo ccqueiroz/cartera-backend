@@ -1,7 +1,7 @@
 import { CreateCategoryUseCase } from './create-category.usecase';
-import { Category } from '../domain/category.entity';
-import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { Category } from '@/features/category/domain/category.entity';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -27,7 +27,7 @@ const makeSoftDeleted = () => {
 };
 
 describe('CreateCategoryUseCase', () => {
-  it('cria nova categoria quando o enum não existe', async () => {
+  it('creates new category when the enum does not exist', async () => {
     const created: Category[] = [];
     const repository = {
       findByEnum: async () => null,
@@ -50,7 +50,7 @@ describe('CreateCategoryUseCase', () => {
     expect(result.category.toPersistence().id).toBe('uuid-1');
   });
 
-  it('conflita (409) quando o enum já está ativo', async () => {
+  it('conflicts (409) when the enum is already active', async () => {
     const repository = {
       findByEnum: async () =>
         Category.create({
@@ -72,7 +72,7 @@ describe('CreateCategoryUseCase', () => {
     });
   });
 
-  it('reativa (200) quando o enum existe soft-deleted', async () => {
+  it('reactivates (200) when the enum exists soft-deleted', async () => {
     const updated: Category[] = [];
     const repository = {
       findByEnum: async () => makeSoftDeleted(),

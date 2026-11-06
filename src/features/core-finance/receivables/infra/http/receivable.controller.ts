@@ -1,13 +1,11 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  booleanOrUndefined,
+  numberOrUndefined,
+  userIdFrom,
+} from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateSingleReceivableUseCase } from '@/features/core-finance/receivables/application/create-single-receivable.usecase';
 import { CreateInstallmentReceivableUseCase } from '@/features/core-finance/receivables/application/create-installment-receivable.usecase';
 import { ListReceivablesUseCase } from '@/features/core-finance/receivables/application/list-receivables.usecase';
@@ -24,44 +22,7 @@ import { SettleReceivableSchema } from '@/features/core-finance/receivables/infr
 import { GlobalSettleReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/global-settle-receivable.schema';
 import { EditReceivableSchema } from '@/features/core-finance/receivables/infra/http/schemas/edit-receivable.schema';
 import { ListUnreceivedByPeriodSchema } from '@/features/core-finance/receivables/infra/http/schemas/list-unreceived-by-period.schema';
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
-
-function numberOrUndefined(value: unknown): number | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
-
-function boolOrUndefined(value: unknown): boolean | undefined {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  return undefined;
-}
+import { TRANSACTION_LIST_FIELDS } from '@/features/core-finance/infra/http/transaction-list-fields';
 
 function scopeFrom(value: unknown): 'to_pay' | 'paid' {
   return value === 'received' || value === 'paid' ? 'paid' : 'to_pay';
@@ -103,7 +64,7 @@ export class ReceivableController {
       paidAmount: req.body.paidAmount,
       walletId: req.body.walletId,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public createInstallment = async (
@@ -123,7 +84,7 @@ export class ReceivableController {
       installments: req.body.installments,
       entry: req.body.entry,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -138,12 +99,11 @@ export class ReceivableController {
       paymentMethodDescriptionEnum: req.query.paymentMethodDescriptionEnum
         ? String(req.query.paymentMethodDescriptionEnum)
         : undefined,
-      rootHasInstallments: boolOrUndefined(req.query.rootHasInstallments),
-      rootIsFixedCost: boolOrUndefined(req.query.rootIsFixedCost),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
+      rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listUnreceivedByPeriod = async (
@@ -155,10 +115,9 @@ export class ReceivableController {
       userId: userIdFrom(req),
       startDate: String(req.query.start_date),
       endDate: String(req.query.end_date),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -166,7 +125,7 @@ export class ReceivableController {
       String(req.params.id),
       userIdFrom(req),
     );
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public settle = async (req: Request, res: Response): Promise<void> => {
@@ -179,7 +138,7 @@ export class ReceivableController {
       paymentDate: req.body.paymentDate,
       paymentMethodDescriptionEnum: req.body.paymentMethodDescriptionEnum,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public globalSettlement = async (
@@ -196,7 +155,7 @@ export class ReceivableController {
       selection: req.body.selection,
       valorPago: req.body.valorPago,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public edit = async (req: Request, res: Response): Promise<void> => {
@@ -209,7 +168,7 @@ export class ReceivableController {
       categoryDescriptionEnum: req.body.categoryDescriptionEnum,
       propagate: req.body.propagate,
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public delete = async (req: Request, res: Response): Promise<void> => {
@@ -225,6 +184,6 @@ export class ReceivableController {
       id: String(req.params.id),
       userId: userIdFrom(req),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }

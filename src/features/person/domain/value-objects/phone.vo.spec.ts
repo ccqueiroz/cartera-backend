@@ -3,7 +3,7 @@ import { BusinessRuleViolationError } from '@/shared/kernel/errors/domain.error'
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 describe('Phone', () => {
-  it('cria telefone com formato nacional válido', () => {
+  it('creates a phone with a valid national format', () => {
     const phone = Phone.create({
       number: '11987654321',
       countryCode: '+55',
@@ -14,7 +14,7 @@ describe('Phone', () => {
     expect(phone.isWhatsapp).toBe(true);
   });
 
-  it('aceita formato com máscara de exibição', () => {
+  it('accepts the display-mask format', () => {
     const phone = Phone.create({
       number: '(11) 98765-4321',
       countryCode: '+55',
@@ -23,7 +23,7 @@ describe('Phone', () => {
     expect(phone.isWhatsapp).toBe(false);
   });
 
-  it('rejeita número fora do formato com INVALID_PHONE', () => {
+  it('rejects a number outside the format with INVALID_PHONE', () => {
     const error = (() => {
       try {
         Phone.create({ number: '123', countryCode: '+55', isWhatsapp: false });
@@ -36,7 +36,7 @@ describe('Phone', () => {
     expect(error.code).toBe(ErrorCode.INVALID_PHONE);
   });
 
-  it('rejeita countryCode vazio', () => {
+  it('rejects an empty countryCode', () => {
     expect(() =>
       Phone.create({
         number: '11987654321',
@@ -46,7 +46,7 @@ describe('Phone', () => {
     ).toThrow(BusinessRuleViolationError);
   });
 
-  it('guarda isWhatsapp como declarado, sem verificação', () => {
+  it('keeps isWhatsapp as declared, without verification', () => {
     const declared = Phone.create({
       number: '11987654321',
       countryCode: '+55',

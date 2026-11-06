@@ -21,12 +21,12 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *               firstName: { type: string }
  *               lastName: { type: string }
  *     responses:
- *       201:
- *         description: Conta e perfil criados; tokens no body e cookie `session` setado.
- *       400:
- *         description: E-mail inválido (INVALID_EMAIL) ou campo obrigatório ausente (VALIDATION_FAILED).
- *       409:
- *         description: E-mail já em uso (EMAIL_ALREADY_IN_USE).
+ *       201: { $ref: '#/components/responses/RegisterAccountOutputResponse' }
+ *       400: { $ref: '#/components/responses/AuthBadRequest' }
+ *       401: { $ref: '#/components/responses/RegisterUnauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       409: { $ref: '#/components/responses/RegisterConflict' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class RegisterAccountRoute implements Route {
   public readonly method: HttpMethod = 'post';

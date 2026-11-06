@@ -11,6 +11,86 @@ export const errorCatalog: Record<ErrorCode, MessageBuilder> = {
       : 'Parâmetros de entrada inválidos.',
   [ErrorCode.INTERNAL_SERVER_ERROR]: () => 'Erro interno no servidor.',
 
+  [ErrorCode.ATTRIBUTE_MUST_BE_TEXT]: (params) =>
+    `${params?.attribute} deve ser um texto.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_NUMERIC_TEXT]: (params) =>
+    `${params?.attribute} deve ser um texto numérico.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_DATE]: (params) =>
+    `${params?.attribute} deve estar no formato YYYY-MM-DD.`,
+  [ErrorCode.PARAMETER_DOES_NOT_ACCEPT_FIELD]: (params) =>
+    `O parâmetro ${params?.attribute} não aceita o campo ${params?.value}.`,
+  [ErrorCode.PARAMETER_MUST_BE_ASC_OR_DESC]: (params) =>
+    `O parâmetro ${params?.attribute} deve ser asc ou desc.`,
+  [ErrorCode.PARAMETER_MUST_BE_DATE_OR_DATE_RANGE]: (params) =>
+    `O parâmetro ${params?.attribute} deve ser YYYY-MM-DD ou YYYY-MM-DD-YYYY-MM-DD.`,
+  [ErrorCode.PARAMETER_START_DATE_AFTER_END_DATE]: (params) =>
+    `O parâmetro ${params?.attribute} tem a data inicial depois da final.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]: (params) =>
+    `${params?.attribute} deve ser um número.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_MASCULINE]: (params) =>
+    `${params?.attribute} deve ser booleano.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BOOLEAN_FEMININE]: (params) =>
+    `${params?.attribute} deve ser booleana.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_OBJECT]: (params) =>
+    `${params?.attribute} deve ser um objeto.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_LIST]: (params) =>
+    `${params?.attribute} devem ser uma lista.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_ID_LIST]: (params) =>
+    `${params?.attribute} deve ser uma lista de ids.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_SETTLEMENT]: (params) =>
+    `${params?.attribute} é obrigatória na liquidação.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_PAYOFF]: (params) =>
+    `${params?.attribute} é obrigatória na quitação.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_ON_RECEIPT]: (params) =>
+    `${params?.attribute} é obrigatória no recebimento.`,
+  [ErrorCode.AT_LEAST_ONE_INSTALLMENT_REQUIRED]: () =>
+    'Informe ao menos uma parcela.',
+  [ErrorCode.INVALID_PAYMENT_METHOD]: () => 'Forma de pagamento inválida.',
+  [ErrorCode.ATTRIBUTE_MUST_BE_A_BOOLEAN]: (params) =>
+    `${params?.attribute} deve ser um booleano.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_WHOLE_DAYS]: (params) =>
+    `${params?.attribute} deve ser um número inteiro de dias.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE]: (params) =>
+    `${params?.attribute} não pode ser negativa.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_MASCULINE]: (params) =>
+    `${params?.attribute} não pode ser negativo.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_MASCULINE]: (params) =>
+    `${params?.attribute} não pode ser vazio.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_GREATER_THAN_ZERO]: (params) =>
+    `${params?.attribute} deve ser maior que zero.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_DEPOSIT_OR_WITHDRAW]: (params) =>
+    `${params?.attribute} deve ser DEPOSIT ou WITHDRAW.`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]: (params) =>
+    `${params?.attribute} é obrigatória.`,
+  [ErrorCode.ATTRIBUTE_IS_INVALID_FEMININE]: (params) =>
+    `${params?.attribute} é inválida.`,
+  [ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE]: (params) =>
+    `${params?.attribute} é inválido.`,
+  [ErrorCode.ATTRIBUTE_EXCEEDS_MAX_LENGTH]: (params) =>
+    `${params?.attribute} excede o tamanho máximo (${params?.max}).`,
+  [ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]: (params) =>
+    `${params?.attribute} é obrigatório.`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_EMPTY_FEMININE]: (params) =>
+    `${params?.attribute} não pode ser vazia.`,
+  [ErrorCode.ATTRIBUTE_BELOW_MIN_LENGTH]: (params) =>
+    `${params?.attribute} deve ter no mínimo ${params?.min} caracteres.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_BASE64]: (params) =>
+    `${params?.attribute} deve ser enviada como base64.`,
+  [ErrorCode.ATTRIBUTE_MUST_BE_CPF_OR_CNPJ]: (params) =>
+    `${params?.attribute} deve ser CPF ou CNPJ.`,
+  [ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID]: (params) =>
+    `${params?.attribute} exige walletId.`,
+  [ErrorCode.ATTRIBUTE_REQUIRES_CARD_ID]: (params) =>
+    `${params?.attribute} exige cardId.`,
+  [ErrorCode.ATTRIBUTE_WILL_BE_HANDLED_BY_INVOICE]: (params) =>
+    `${params?.attribute} será tratada pela fatura (recurso ainda não disponível).`,
+  [ErrorCode.ATTRIBUTE_MUST_NOT_BE_BEFORE_START_DATE]: (params) =>
+    `${params?.attribute} não pode ser anterior a start_date.`,
+  [ErrorCode.ATTRIBUTES_ARE_REQUIRED]: (params) =>
+    `${params?.attribute} são obrigatórios.`,
+  [ErrorCode.PROPERTY_SHOULD_NOT_EXIST]: (params) =>
+    `property ${params?.attribute} should not exist`,
+
   [ErrorCode.CATEGORY_NOT_FOUND]: (params) =>
     params?.descriptionEnum
       ? `Categoria "${params.descriptionEnum}" não encontrada.`

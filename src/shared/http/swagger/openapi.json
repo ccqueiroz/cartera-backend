@@ -1,0 +1,6112 @@
+{
+  "components": {
+    "parameters": {
+      "DirectionOrder": {
+        "in": "query",
+        "name": "direction_order",
+        "required": false,
+        "schema": {
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "type": "string"
+        }
+      },
+      "Page": {
+        "in": "query",
+        "name": "page",
+        "required": false,
+        "schema": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "SearchByDateValue": {
+        "in": "query",
+        "name": "search_by_date_value",
+        "required": false,
+        "schema": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}(-\\d{4}-\\d{2}-\\d{2})?$",
+          "type": "string"
+        }
+      },
+      "Size": {
+        "in": "query",
+        "name": "size",
+        "required": false,
+        "schema": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "SortValue": {
+        "in": "query",
+        "name": "sort_value",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TransactionOrdering": {
+        "in": "query",
+        "name": "ordering",
+        "required": false,
+        "schema": {
+          "enum": [
+            "dueDate",
+            "paymentDate",
+            "amount",
+            "paidAmount"
+          ],
+          "type": "string"
+        }
+      },
+      "TransactionSearchByDate": {
+        "in": "query",
+        "name": "search_by_date",
+        "required": false,
+        "schema": {
+          "enum": [
+            "dueDate",
+            "paymentDate"
+          ],
+          "type": "string"
+        }
+      },
+      "TransactionSort": {
+        "in": "query",
+        "name": "sort",
+        "required": false,
+        "schema": {
+          "enum": [
+            "categoryDescriptionEnum",
+            "paymentMethodDescriptionEnum",
+            "paymentStatus"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "AdjustBalanceResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/AdjustBalanceResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Saldo ajustado com os movimentos e os avisos."
+      },
+      "AuthBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INVALID_EMAIL",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "E-mail inválido ou campo obrigatório ausente."
+      },
+      "AuthSessionResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/AuthSession"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Sessão criada, com os tokens no corpo e o cookie session definido."
+      },
+      "AvatarTooLarge": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "AVATAR_TOO_LARGE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Imagem decodificada acima de 5MB."
+      },
+      "AvatarUnsupportedType": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "AVATAR_UNSUPPORTED_TYPE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Conteúdo não é JPEG nem PNG."
+      },
+      "CategoryAlreadyExists": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Categoria já ativa para este descriptionEnum."
+      },
+      "CategoryBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_DESCRIPTION_REQUIRED",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou descrição obrigatória ausente."
+      },
+      "CategoryDescriptionEnumImmutable": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_DESCRIPTION_ENUM_IMMUTABLE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Tentativa de trocar o descriptionEnum imutável."
+      },
+      "CategoryGroupListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryGroupEnum"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de grupos."
+      },
+      "CategoryListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de categorias."
+      },
+      "CategoryNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Categoria não encontrada."
+      },
+      "CategoryOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CategoryOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Categoria."
+      },
+      "CreateTransactionResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateTransactionResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação criada."
+      },
+      "CreateTransferResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateTransferResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transferência criada com os saldos das carteiras e os avisos."
+      },
+      "CreateWalletResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/CreateWalletResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Carteira criada com os avisos de saldo."
+      },
+      "HealthStatusResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Serviço no ar."
+      },
+      "InternalServerError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Erro interno, inclusive o de infraestrutura e o do body-parser."
+      },
+      "LoginForbidden": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_DELETED",
+                        "USER_DISABLED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Conta encerrada ou suspensa."
+      },
+      "LoginUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_CREDENTIALS",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Credenciais inválidas, limite de tentativas ou falha do provedor no login."
+      },
+      "PaymentMethodAlreadyExists": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Já existe forma de pagamento ativa para o descriptionEnum."
+      },
+      "PaymentMethodBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_DESCRIPTION_REQUIRED",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou descrição obrigatória ausente."
+      },
+      "PaymentMethodListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentMethodOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de formas de pagamento."
+      },
+      "PaymentMethodNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_METHOD_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Forma de pagamento não encontrada."
+      },
+      "PaymentMethodOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PaymentMethodOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Forma de pagamento."
+      },
+      "PaymentStatusListResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentStatusCatalogOutput"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Lista de status de pagamento do catálogo."
+      },
+      "PaymentStatusNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PAYMENT_STATUS_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Status de pagamento não encontrado."
+      },
+      "PaymentStatusOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PaymentStatusCatalogOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Status de pagamento do catálogo."
+      },
+      "PersonDocumentInUse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "DOCUMENT_ALREADY_IN_USE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Documento já em uso por outro perfil."
+      },
+      "PersonNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "PERSON_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Perfil não encontrado."
+      },
+      "PersonOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/PersonOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Perfil com fullName e isActive computados e o document mascarado."
+      },
+      "PersonUpdateRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "DOCUMENT_TYPE_MISMATCH",
+                        "INVALID_DOCUMENT",
+                        "INVALID_PHONE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Documento ou telefone inválido para o tipo declarado."
+      },
+      "RecoverPasswordOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RecoverPasswordOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Pedido de recuperação aceito, com resposta genérica."
+      },
+      "RecoverPasswordUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Falha do provedor de autenticação ou limite de pedidos excedido."
+      },
+      "RefreshUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_TOKEN"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Refresh token inválido, expirado ou revogado; exige relogin."
+      },
+      "RefreshedAuthSessionResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RefreshedAuthSession"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Sessão renovada, com os novos tokens no corpo e o cookie session atualizado."
+      },
+      "RegisterAccountOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/RegisterAccountOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Conta e perfil criados, com os tokens no corpo e o cookie session definido."
+      },
+      "RegisterConflict": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "EMAIL_ALREADY_IN_USE",
+                        "PERSON_ALREADY_EXISTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "E-mail já em uso ou perfil já existente."
+      },
+      "RegisterUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_NOT_FOUND",
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_CREDENTIALS",
+                        "INVALID_EMAIL",
+                        "TOO_MANY_REQUESTS"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Falha do provedor de autenticação no registro."
+      },
+      "SettleTransactionResultResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/SettleTransactionResult"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Resultado da liquidação da parcela."
+      },
+      "SignoutUnauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "ACCOUNT_NOT_FOUND",
+                        "INTERNAL_SERVER_ERROR",
+                        "INVALID_TOKEN",
+                        "TOKEN_EXPIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Sessão ausente, inválida ou expirada."
+      },
+      "TransactionAlreadyPaid": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_ALREADY_PAID"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação já paga."
+      },
+      "TransactionCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para criar a transação."
+      },
+      "TransactionDetailResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransactionDetail"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação com as filhas imediatas."
+      },
+      "TransactionEditBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_NEGATIVE",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para editar a transação."
+      },
+      "TransactionInstallmentBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "CATEGORY_NOT_FOUND",
+                        "MONEY_INVALID_NUMBER",
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "TRANSACTION_ENTRY_EXCEEDS_TOTAL",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para criar a despesa parcelada."
+      },
+      "TransactionInvalidFixedCost": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_INVALID_FIXED_COST"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Custo fixo inválido para a transação."
+      },
+      "TransactionNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação não encontrada."
+      },
+      "TransactionOrWalletNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_NOT_FOUND",
+                        "WALLET_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transação ou carteira não encontrada."
+      },
+      "TransactionOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransactionOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transação."
+      },
+      "TransactionPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/TransactionOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de transações."
+      },
+      "TransactionReverseRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "SETTLEMENT_MOVEMENT_NOT_FOUND",
+                        "TRANSACTION_ALREADY_REVERSED",
+                        "TRANSACTION_REVERSE_ENTRY"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Estorno recusado para a transação."
+      },
+      "TransactionSettleBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "PAYMENT_METHOD_NOT_FOUND",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados inválidos para liquidar a transação."
+      },
+      "TransactionSettleRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSACTION_ALREADY_PAID",
+                        "TRANSACTION_SETTLE_ON_INTERNAL"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Liquidação recusada para a transação."
+      },
+      "TransferCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_AMOUNT_NOT_POSITIVE",
+                        "TRANSFER_DATE_IN_FUTURE",
+                        "TRANSFER_SAME_WALLET",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido, mesma carteira, valor não positivo ou data futura."
+      },
+      "TransferNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Transferência não encontrada."
+      },
+      "TransferOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/TransferOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Transferência."
+      },
+      "TransferPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/TransferOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de transferências."
+      },
+      "TransferPaymentMethodInactive": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "TRANSFER_PAYMENT_METHOD_INACTIVE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Forma de pagamento inativa ou inexistente."
+      },
+      "Unauthorized": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "INVALID_TOKEN",
+                        "TOKEN_EXPIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Sessão ausente, inválida ou expirada."
+      },
+      "UserDisabled": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "USER_DISABLED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Usuário desabilitado."
+      },
+      "ValidationFailed": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Dados de entrada inválidos."
+      },
+      "WalletAdjustBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "VALIDATION_FAILED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Valor inválido ou saldo negativo sem limite."
+      },
+      "WalletCreateBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "MONEY_NEGATIVE",
+                        "OVERDRAFT_LIMIT_REQUIRED",
+                        "VALIDATION_FAILED",
+                        "WALLET_NAME_REQUIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido ou saldo negativo sem limite."
+      },
+      "WalletDefaultNoOverdraft": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_DEFAULT_NO_OVERDRAFT"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira padrão não aceita cheque especial."
+      },
+      "WalletDeleteRefused": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_HAS_BALANCE",
+                        "WALLET_NOT_DELETABLE"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Remoção recusada para a carteira."
+      },
+      "WalletDeleted": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_DELETED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira removida."
+      },
+      "WalletEditBadRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "OVERDRAFT_LIMIT_REQUIRED",
+                        "VALIDATION_FAILED",
+                        "WALLET_NAME_REQUIRED"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Payload inválido na edição da carteira."
+      },
+      "WalletMovementPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/WalletMovementOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de movimentos do extrato."
+      },
+      "WalletNotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                {
+                  "properties": {
+                    "code": {
+                      "enum": [
+                        "WALLET_NOT_FOUND"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "description": "Carteira não encontrada."
+      },
+      "WalletOutputResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/WalletOutput"
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Carteira."
+      },
+      "WalletPageResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "data": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PageMeta"
+                    },
+                    {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "$ref": "#/components/schemas/WalletOutput"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "data"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "description": "Página de carteiras."
+      }
+    },
+    "schemas": {
+      "AdjustBalanceResult": {
+        "properties": {
+          "movements": {
+            "items": {
+              "$ref": "#/components/schemas/WalletMovementOutput"
+            },
+            "type": "array"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "wallet",
+          "movements",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "AuthSession": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "email",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
+      },
+      "BalanceWarning": {
+        "enum": [
+          "BALANCE_NEGATIVE",
+          "OVERDRAFT_LIMIT_EXCEEDED"
+        ],
+        "type": "string"
+      },
+      "CategoryDescriptionEnum": {
+        "description": "Enumeração da descrição da categoria.",
+        "enum": [
+          "UBER",
+          "BLABLACAR",
+          "LYFT",
+          "CABIFY",
+          "99POP",
+          "BUS",
+          "SUBWAY",
+          "TRAIN",
+          "FUEL",
+          "VEHICLE_MAINTENANCE",
+          "TOLLS_PARKING",
+          "IFOOD",
+          "UBER_EATS",
+          "RAPPI",
+          "JAMES_DELIVERY",
+          "NINY_NINE_FOOD",
+          "ZE_DELIVERY",
+          "ONLINE_FOOD_ORDERS",
+          "RESTAURANT",
+          "FAST_FOOD",
+          "CAFE_BISTRO",
+          "PHARMACY",
+          "GYM",
+          "BEAUTY",
+          "SUPPLEMENTS",
+          "RENT",
+          "CONDOMINIUM_FEE",
+          "ENERGY",
+          "WATER",
+          "GAS",
+          "INTERNET_TV",
+          "PHONE",
+          "HOME_SERVICES",
+          "REPAIR_MAINTENANCE",
+          "VEHICLE_FINANCING",
+          "PROPERTY_FINANCING",
+          "VEHICLE_CREDIT_LINE",
+          "PROPERTY_CREDIT_LINE",
+          "AUTO_INSURANCE",
+          "HEALTH_INSURANCE",
+          "LIFE_INSURANCE",
+          "HOME_INSURANCE",
+          "CLOTHING_ACCESSORIES",
+          "SUPERMARKET",
+          "ONLINE_SHOPPING",
+          "HOME_DECOR",
+          "FLIGHT_TICKETS",
+          "TRAVEL_PACKAGES",
+          "ACCOMMODATION",
+          "TOURS",
+          "CAR_RENTAL",
+          "SCHOOL_TUITION",
+          "COLLEGE_TUITION",
+          "POSTGRADUATE_TUITION",
+          "LANGUAGE_COURSES",
+          "TECH_COURSES",
+          "ONLINE_COURSES",
+          "CERTIFICATIONS",
+          "TUTORING",
+          "SCHOOL_SUPPLIES",
+          "UNIFORM",
+          "EDUCATIONAL_SUBSCRIPTIONS",
+          "SCHOOL_TRANSPORT",
+          "GIFTS_DONATIONS",
+          "TAXES",
+          "PET_FOOD",
+          "PET_VETERINARY",
+          "PET_SHOP",
+          "PHARMACY_VET",
+          "DEPENDENTS_CARE",
+          "OFFICE_SUPPLIES",
+          "COWORKING",
+          "BUSINESS_SOFTWARE",
+          "INVOICE_ISSUANCE",
+          "HARDWARE",
+          "SOFTWARE_APPS",
+          "CONSULTING",
+          "TECHNICAL_MAINTENANCE",
+          "SPORTS_HOBBIES",
+          "EVENTS_SHOWS_TICKETS",
+          "ENTERTAINMENT_SUBSCRIPTIONS",
+          "CREDIT_CARD_PAYMENT",
+          "BANK_TAXES",
+          "OTHER_EXPENSES",
+          "INVESTMENT",
+          "BUYING_ASSETS_AND_CRYPTOCURRENCIES",
+          "LOAN_REPAYMENT",
+          "SALARY",
+          "PROFIT_WITHDRAWAL",
+          "RENT_INCOME",
+          "INVESTMENT_INCOME",
+          "REIMBURSEMENTS",
+          "COMMISSIONS_BONUSES",
+          "DONATIONS_INHERITANCE",
+          "CAPITAL_CONTRIBUTIONS",
+          "PARTNERSHIP_SPONSOR_INCOME",
+          "PENSIONS",
+          "CASHBACK_REWARDS",
+          "RECEIVE_LOAN",
+          "OTHER_INCOME",
+          "BAKERY",
+          "BUTCHER",
+          "FARMERS_MARKET",
+          "BEVERAGES_LIQUOR",
+          "BAR_PUB",
+          "ICE_CREAM_DESSERTS",
+          "SNACK_BAR",
+          "INDRIVE",
+          "TAXI",
+          "CAR_WASH",
+          "PARKING_MONTHLY",
+          "INTERCITY_BUS",
+          "FERRY_BOAT",
+          "BIKE_SCOOTER_SHARING",
+          "EV_CHARGING",
+          "MEDICAL_CONSULTATION",
+          "DENTIST",
+          "LAB_EXAMS",
+          "THERAPY",
+          "HOSPITAL",
+          "OPTICAL",
+          "PHYSIOTHERAPY",
+          "VACCINES",
+          "HAIR_BARBER",
+          "NAILS_MANICURE",
+          "MASSAGE_SPA",
+          "NUTRITIONIST",
+          "ALTERNATIVE_THERAPY",
+          "HOUSEHOLD_SUPPLIES",
+          "FURNITURE_APPLIANCES",
+          "DOMESTIC_WORKER",
+          "GARDENING",
+          "HOME_SECURITY",
+          "STUDENT_LOAN",
+          "PERSONAL_LOAN",
+          "CONSORTIUM",
+          "DEVICE_INSURANCE",
+          "TRAVEL_INSURANCE",
+          "PET_INSURANCE",
+          "DENTAL_INSURANCE",
+          "BUSINESS_INSURANCE",
+          "SHOES",
+          "ELECTRONICS",
+          "BOOKS_STATIONERY",
+          "COSMETICS_PERFUMERY",
+          "TOYS",
+          "JEWELRY_WATCHES",
+          "GIFTS",
+          "CURRENCY_EXCHANGE",
+          "BAGGAGE",
+          "CRUISE",
+          "TRANSFER_SHUTTLE",
+          "PET_GROOMING",
+          "PET_BOARDING",
+          "PET_TRAINING",
+          "CHILD_SUPPORT",
+          "NANNY",
+          "DAYCARE",
+          "ELDERLY_CARE",
+          "ALLOWANCE_GIVEN",
+          "CHILD_SUPPLIES",
+          "TEXTBOOKS",
+          "SCHOOL_TRIP",
+          "GRADUATION_FEES",
+          "EXAM_FEES",
+          "LAUNDRY",
+          "LOCKSMITH",
+          "TAILOR_SEWING",
+          "POSTAL_COURIER",
+          "FUNERAL_SERVICES",
+          "STORAGE_RENTAL",
+          "CLUB_MEMBERSHIP",
+          "ACCOUNTING",
+          "LEGAL_SERVICES",
+          "NOTARY",
+          "CUSTOMS_BROKER",
+          "TRANSLATION",
+          "DESIGN_AGENCY",
+          "RAW_MATERIALS",
+          "INVENTORY_GOODS",
+          "PACKAGING",
+          "SHIPPING_LOGISTICS",
+          "PAYMENT_PROCESSING_FEES",
+          "SALES_COMMISSIONS_PAID",
+          "MARKETING_ADVERTISING",
+          "ONLINE_ADS",
+          "PAYROLL",
+          "PRO_LABORE",
+          "EMPLOYEE_BENEFITS",
+          "COMMERCIAL_RENT",
+          "SUPPLIERS",
+          "EQUIPMENT",
+          "EQUIPMENT_MAINTENANCE",
+          "TEAM_TRAINING",
+          "PRIVATE_PENSION",
+          "EMERGENCY_FUND",
+          "STOCKS",
+          "FIXED_INCOME",
+          "FUNDS",
+          "WEB_HOSTING_DOMAIN",
+          "CLOUD_STORAGE",
+          "GADGETS",
+          "TECH_REPAIR",
+          "CINEMA_THEATER",
+          "GAMES",
+          "BOOKS_MUSIC",
+          "NIGHTLIFE",
+          "PARK_ATTRACTIONS",
+          "PROPERTY_TAX_IPTU",
+          "VEHICLE_TAX_IPVA",
+          "INCOME_TAX_IR",
+          "VEHICLE_LICENSING",
+          "TRAFFIC_FINES",
+          "SIMPLES_DAS",
+          "ISS",
+          "ICMS",
+          "INSS_CONTRIBUTION",
+          "FGTS_EMPLOYER",
+          "CARD_ANNUAL_FEE",
+          "IOF",
+          "TRANSFER_FEES",
+          "OVERDRAFT_INTEREST",
+          "ACCOUNT_MAINTENANCE",
+          "INTEREST_CHARGES",
+          "TITHE_OFFERING",
+          "CHARITY_DONATION",
+          "LOSSES_THEFT",
+          "MISC_FINES",
+          "UNEXPECTED",
+          "PRODUCT_SALES",
+          "SERVICE_REVENUE",
+          "FREELANCE_INCOME",
+          "THIRTEENTH_SALARY",
+          "VACATION_PAY",
+          "PROFIT_SHARING_PLR",
+          "TAX_REFUND",
+          "FGTS_WITHDRAWAL",
+          "USED_GOODS_SALE",
+          "PRIZES_LOTTERY",
+          "ALLOWANCE_RECEIVED",
+          "GOVERNMENT_BENEFIT",
+          "ADVANCE_RECEIVED"
+        ],
+        "example": "UBER",
+        "type": "string"
+      },
+      "CategoryGroupEnum": {
+        "description": "Grupo da categoria.",
+        "enum": [
+          "MOBILITY_BY_APP",
+          "TRANSPORT",
+          "FOOD_DELIVERY",
+          "FOOD",
+          "HEALTH_AND_WELL_BEING",
+          "HOUSING",
+          "FINANCING",
+          "INSURANCE",
+          "SHOPPING",
+          "TRAVEL_AND_TOURISM",
+          "PET_CARE",
+          "CARE",
+          "EDUCATION_AND_STUDIES",
+          "SERVICES",
+          "PROFESSIONAL_SERVICES",
+          "BUSINESS",
+          "INVESTIMENTS",
+          "TECHNOLOGY",
+          "LEISURE",
+          "REVENUES",
+          "TAXES",
+          "BANK",
+          "OTHERS"
+        ],
+        "example": "MOBILITY_BY_APP",
+        "type": "string"
+      },
+      "CategoryOutput": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionEnum": {
+            "$ref": "#/components/schemas/CategoryDescriptionEnum"
+          },
+          "group": {
+            "$ref": "#/components/schemas/CategoryGroupEnum"
+          },
+          "type": {
+            "enum": [
+              "BILLS",
+              "RECEIVABLES"
+            ],
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "descriptionEnum",
+          "group",
+          "type",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "CreateTransactionResult": {
+        "properties": {
+          "root": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "root"
+        ],
+        "type": "object"
+      },
+      "CreateTransferResult": {
+        "properties": {
+          "fromWallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "toWallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "transfer": {
+            "$ref": "#/components/schemas/TransferOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "transfer",
+          "fromWallet",
+          "toWallet",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "CreateWalletResult": {
+        "properties": {
+          "wallet": {
+            "$ref": "#/components/schemas/WalletOutput"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "wallet",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "code": {
+            "description": "Código do erro (ErrorCode).",
+            "type": "string"
+          },
+          "message": {
+            "description": "Mensagem em português do catálogo de erros.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "code"
+        ],
+        "type": "object"
+      },
+      "HealthStatus": {
+        "properties": {
+          "status": {
+            "enum": [
+              "ok"
+            ],
+            "type": "string"
+          },
+          "uptimeSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "uptimeSeconds"
+        ],
+        "type": "object"
+      },
+      "PageMeta": {
+        "properties": {
+          "ordering": {
+            "additionalProperties": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "object"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "ordering"
+        ],
+        "type": "object"
+      },
+      "PaymentMethodDescriptionEnum": {
+        "description": "Enumeração das descrições dos métodos de pagamento.",
+        "enum": [
+          "DEBIT_CARD",
+          "CREDIT_CARD",
+          "BANK_SLIP",
+          "BANK_DEPOSIT",
+          "BANK_TRANSFER",
+          "AUTOMATIC_DEBIT",
+          "BOOKLET",
+          "CASH",
+          "CHECK",
+          "PROMISSORY",
+          "FINANCING",
+          "MEAL_VOUCHER",
+          "FOOD_VOUCHER",
+          "PIX",
+          "CRYPTOCURRENCY",
+          "DIGITAL_WALLET"
+        ],
+        "example": "DEBIT_CARD",
+        "type": "string"
+      },
+      "PaymentMethodOutput": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionEnum": {
+            "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+          },
+          "id": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "descriptionEnum",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "PaymentStatusCatalogOutput": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
+          },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "label"
+        ],
+        "type": "object"
+      },
+      "PaymentStatusDescriptionEnum": {
+        "description": "Enumeração das descrições dos status de pagamento.",
+        "enum": [
+          "PAID",
+          "RECEIVED",
+          "TO_PAY",
+          "TO_RECEIVE",
+          "DUE_SOON",
+          "DUE_DAY",
+          "OVERDUE",
+          "IN_PROGRESS"
+        ],
+        "example": "PAID",
+        "type": "string"
+      },
+      "PersonOutput": {
+        "properties": {
+          "avatarUrl": {
+            "nullable": true,
+            "type": "string"
+          },
+          "birthDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "defaultCurrency": {
+            "nullable": true,
+            "type": "string"
+          },
+          "deletedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "document": {
+            "nullable": true,
+            "properties": {
+              "type": {
+                "enum": [
+                  "CPF",
+                  "CNPJ"
+                ],
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "value"
+            ],
+            "type": "object"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "monthlyIncome": {
+            "properties": {
+              "currency": {
+                "nullable": true,
+                "type": "string"
+              },
+              "value": {
+                "nullable": true,
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "currency"
+            ],
+            "type": "object"
+          },
+          "occupation": {
+            "nullable": true,
+            "type": "string"
+          },
+          "phone": {
+            "nullable": true,
+            "properties": {
+              "countryCode": {
+                "type": "string"
+              },
+              "isWhatsapp": {
+                "type": "boolean"
+              },
+              "number": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "number",
+              "countryCode",
+              "isWhatsapp"
+            ],
+            "type": "object"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "email",
+          "firstName",
+          "lastName",
+          "fullName",
+          "phone",
+          "document",
+          "avatarUrl",
+          "birthDate",
+          "occupation",
+          "monthlyIncome",
+          "defaultCurrency",
+          "isActive",
+          "createdAt",
+          "updatedAt",
+          "deletedAt"
+        ],
+        "type": "object"
+      },
+      "RecoverPasswordOutput": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "RefreshedAuthSession": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
+      },
+      "RegisterAccountOutput": {
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "userId",
+          "firstName",
+          "lastName",
+          "fullName",
+          "id",
+          "createdAt",
+          "updatedAt",
+          "accessToken",
+          "refreshToken",
+          "expirationTime"
+        ],
+        "type": "object"
+      },
+      "SettleTransactionResult": {
+        "properties": {
+          "root": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          },
+          "wallet": {
+            "$ref": "#/components/schemas/WalletBalanceView"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/BalanceWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "root",
+          "wallet",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "TransactionDetail": {
+        "properties": {
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionOutput"
+            },
+            "type": "array"
+          },
+          "node": {
+            "$ref": "#/components/schemas/TransactionOutput"
+          }
+        },
+        "required": [
+          "node",
+          "children"
+        ],
+        "type": "object"
+      },
+      "TransactionOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "categoryDescriptionEnum": {
+            "nullable": true,
+            "type": "string"
+          },
+          "categoryGroup": {
+            "nullable": true,
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "currentAmount": {
+            "type": "number"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "effectiveRate": {
+            "type": "number"
+          },
+          "firstInstallment": {
+            "type": "boolean"
+          },
+          "frequency": {
+            "nullable": true,
+            "type": "number"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isFixedCost": {
+            "type": "boolean"
+          },
+          "origin": {
+            "enum": [
+              "MANUAL",
+              "CARD_PURCHASE",
+              "CARD_INVOICE",
+              "SHOPPING_LIST",
+              "RECURRENCE",
+              "IMPORT"
+            ],
+            "type": "string"
+          },
+          "paid": {
+            "type": "boolean"
+          },
+          "paidAmount": {
+            "type": "number"
+          },
+          "paidInstallmentsCount": {
+            "type": "number"
+          },
+          "parentId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentDate": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentMethodDescriptionEnum": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paymentStatus": {
+            "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
+          },
+          "paymentVariance": {
+            "type": "number"
+          },
+          "period": {
+            "enum": [
+              "WEEK",
+              "MONTH",
+              "YEAR",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "personId": {
+            "type": "string"
+          },
+          "refMonthDueDate": {
+            "type": "number"
+          },
+          "refMonthPaymentDate": {
+            "nullable": true,
+            "type": "number"
+          },
+          "refYearDueDate": {
+            "type": "number"
+          },
+          "refYearPaymentDate": {
+            "nullable": true,
+            "type": "number"
+          },
+          "reversed": {
+            "type": "boolean"
+          },
+          "rootHasInstallments": {
+            "type": "boolean"
+          },
+          "rootId": {
+            "type": "string"
+          },
+          "rootIsFixedCost": {
+            "type": "boolean"
+          },
+          "totalInterest": {
+            "type": "number"
+          },
+          "type": {
+            "enum": [
+              "BILLS",
+              "RECEIVABLES"
+            ],
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "parentId",
+          "rootId",
+          "userId",
+          "personId",
+          "type",
+          "amount",
+          "currentAmount",
+          "paidAmount",
+          "dueDate",
+          "paymentDate",
+          "paid",
+          "paymentStatus",
+          "paymentMethodDescriptionEnum",
+          "refMonthDueDate",
+          "refYearDueDate",
+          "refMonthPaymentDate",
+          "refYearPaymentDate",
+          "totalInterest",
+          "paymentVariance",
+          "effectiveRate",
+          "paidInstallmentsCount",
+          "firstInstallment",
+          "categoryDescriptionEnum",
+          "categoryGroup",
+          "isFixedCost",
+          "period",
+          "frequency",
+          "rootIsFixedCost",
+          "rootHasInstallments",
+          "hasChildren",
+          "origin",
+          "reversed",
+          "deleted",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "TransferOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "fromWalletId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "paymentMethodDescriptionEnum": {
+            "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+          },
+          "toWalletId": {
+            "type": "string"
+          },
+          "transferDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fromWalletId",
+          "toWalletId",
+          "amount",
+          "paymentMethodDescriptionEnum",
+          "transferDate",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "WalletBalanceView": {
+        "properties": {
+          "balance": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "balance"
+        ],
+        "type": "object"
+      },
+      "WalletMovementOutput": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "DEBIT",
+              "CREDIT"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "refId": {
+            "nullable": true,
+            "type": "string"
+          },
+          "refType": {
+            "enum": [
+              "SETTLEMENT",
+              "SETTLEMENT_REVERSAL",
+              "TRANSFER",
+              "INVOICE",
+              "YIELD",
+              "ADJUST",
+              "OVERDRAFT_INTEREST"
+            ],
+            "type": "string"
+          },
+          "walletId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "walletId",
+          "direction",
+          "amount",
+          "refType",
+          "refId",
+          "occurredAt",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "WalletOutput": {
+        "properties": {
+          "accruedInterest": {
+            "type": "number"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "amountToPay": {
+            "type": "number"
+          },
+          "availableBalance": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "effectiveBalance": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "overdraft": {
+            "nullable": true,
+            "properties": {
+              "graceDays": {
+                "type": "number"
+              },
+              "limit": {
+                "type": "number"
+              },
+              "monthlyRate": {
+                "type": "number"
+              },
+              "since": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "limit",
+              "monthlyRate",
+              "graceDays",
+              "since"
+            ],
+            "type": "object"
+          },
+          "overdraftAvailable": {
+            "type": "number"
+          },
+          "overdraftUsed": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "balance",
+          "isDefault",
+          "effectiveBalance",
+          "overdraftUsed",
+          "overdraftAvailable",
+          "availableBalance",
+          "accruedInterest",
+          "amountToPay",
+          "overdraft",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "sessionCookieAuth": {
+        "in": "cookie",
+        "name": "session",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "Cartera-Api",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/account": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "minLength": 6,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password",
+                  "firstName",
+                  "lastName"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/RegisterAccountOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/AuthBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/RegisterUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "409": {
+            "$ref": "#/components/responses/RegisterConflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Registra conta (email/senha) com auto-login.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/password-recovery": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/RecoverPasswordOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/AuthBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/RecoverPasswordUnauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Solicita recuperação de senha (resposta genérica anti-enumeração).",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/session": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Sessão encerrada; cookie `session` expirado."
+          },
+          "401": {
+            "$ref": "#/components/responses/SignoutUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Signout — revoga todos os refresh tokens do usuário (todos os devices).",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthSessionResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/AuthBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/LoginUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/LoginForbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Login (cria sessão) com email/senha.",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RefreshedAuthSessionResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/RefreshUnauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Renova a sessão trocando o refresh token.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/bill/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "cardId": {
+                    "type": "string"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paidAt": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma despesa única (a vencer ou nascida paga, exigindo walletId).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/create-installment": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "entry": {
+                    "type": "object"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "installments": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate",
+                  "installments"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionInstallmentBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma despesa parcelada (entrada paga exige walletId).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/delete/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Despesa excluída, sem corpo."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Exclui (soft-delete) a despesa; nao mexe em caixa.",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/edit/{id}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "propagate": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionEditBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita a despesa (com propagacao opcional).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/global-settlement/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "selection": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "valorPago": {
+                    "type": "number"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionAlreadyPaid"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Quitacao global (debito total + um movimento por folha).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionDetailResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da despesa (no + filhas imediatas).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/list-unpaid-by-period": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas nao pagas no intervalo de vencimento.",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/reverse/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionReverseRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Estorna um pagamento (devolve o caixa na wallet original).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/settle/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paidAmount",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionSettleRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Paga uma parcela (liquidacao atomica com a wallet).",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/category/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "descriptionEnum": {
+                    "type": "string"
+                  },
+                  "group": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "BILLS",
+                      "RECEIVABLES"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "descriptionEnum",
+                  "group",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryOutputResponse"
+          },
+          "201": {
+            "$ref": "#/components/responses/CategoryOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/CategoryBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "409": {
+            "$ref": "#/components/responses/CategoryAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma categoria (ou reativa um slot soft-deleted).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/delete/{descriptionEnum}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Categoria soft-deletada."
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft-deleta uma categoria ativa (documento permanece).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/edit/{descriptionEnum}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "group": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "BILLS",
+                      "RECEIVABLES"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description",
+                  "group",
+                  "type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/CategoryBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/CategoryDescriptionEnumImmutable"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita uma categoria ativa (descriptionEnum imutável).",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a categoria ativa por descriptionEnum.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-by-groups/{group}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um grupo filtradas por tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/list-groups": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryGroupListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista os grupos distintos com ≥1 categoria ativa do tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Rota pública de liveness; retorna o status e o uptime do processo.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HealthStatusResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "summary": "Verifica a saúde do serviço.",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/payment-method/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "maxLength": 60,
+                    "type": "string"
+                  },
+                  "descriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  }
+                },
+                "required": [
+                  "description",
+                  "descriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/PaymentMethodBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "409": {
+            "$ref": "#/components/responses/PaymentMethodAlreadyExists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma forma de pagamento.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/delete/{descriptionEnum}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Forma de pagamento soft-deletada."
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft-delete da forma de pagamento ativa identificada por descriptionEnum.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/edit/{descriptionEnum}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "maxLength": 60,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/PaymentMethodBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Atualiza apenas a description de uma forma de pagamento ativa.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentMethodListResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as formas de pagamento ativas.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-method/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a forma de pagamento por descriptionEnum (ativa, senão soft-deleted mais recente).",
+        "tags": [
+          "PaymentMethod"
+        ]
+      }
+    },
+    "/api/payment-status/list-all": {
+      "get": {
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentStatusListResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista o catálogo de status de pagamento.",
+        "tags": [
+          "PaymentStatus"
+        ]
+      }
+    },
+    "/api/payment-status/list-by-enum/{descriptionEnum}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "descriptionEnum",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentStatusOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PaymentStatusNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca um status de pagamento do catálogo pelo code.",
+        "tags": [
+          "PaymentStatus"
+        ]
+      }
+    },
+    "/api/person/me": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Conta desabilitada e perfil marcado como deletado (idempotente)."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Soft delete terminal disable-first (desabilita conta, revoga tokens, marca deletedAt).",
+        "tags": [
+          "Person"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PersonOutputResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Retorna o perfil do usuário autenticado.",
+        "tags": [
+          "Person"
+        ]
+      },
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "birthDate": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "defaultCurrency": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "document": {
+                    "nullable": true,
+                    "properties": {
+                      "type": {
+                        "enum": [
+                          "CPF",
+                          "CNPJ"
+                        ],
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Cru, sem máscara",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "monthlyIncome": {
+                    "properties": {
+                      "currency": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "value": {
+                        "nullable": true,
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "occupation": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "nullable": true,
+                    "properties": {
+                      "countryCode": {
+                        "type": "string"
+                      },
+                      "isWhatsapp": {
+                        "type": "boolean"
+                      },
+                      "number": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PersonOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/PersonDocumentInUse"
+          },
+          "422": {
+            "$ref": "#/components/responses/PersonUpdateRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita o perfil do usuário autenticado (email e avatar excluídos).",
+        "tags": [
+          "Person"
+        ]
+      }
+    },
+    "/api/person/me/avatar": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Avatar removido (no-op se não havia avatar)."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Remove o avatar (deleta do bucket e zera avatarUrl).",
+        "tags": [
+          "Person"
+        ]
+      },
+      "put": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "image": {
+                    "description": "Imagem em base64 (com ou sem prefixo data URL)",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "image"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PersonOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PersonNotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/AvatarTooLarge"
+          },
+          "422": {
+            "$ref": "#/components/responses/AvatarUnsupportedType"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Substitui o avatar (base64 JPEG/PNG até 5MB, validado por magic bytes).",
+        "tags": [
+          "Person"
+        ]
+      }
+    },
+    "/api/receivable/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paidAt": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma receita única (a receber ou nascida recebida, exigindo walletId).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/create-installment": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "entry": {
+                    "type": "object"
+                  },
+                  "frequency": {
+                    "type": "number"
+                  },
+                  "installments": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "isFixedCost": {
+                    "type": "boolean"
+                  },
+                  "period": {
+                    "type": "string"
+                  },
+                  "personId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "dueDate",
+                  "installments"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionInstallmentBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionInvalidFixedCost"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma receita parcelada (entrada recebida exige walletId).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/delete/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Receita excluída, sem corpo."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Exclui (soft-delete) a receita; nao mexe em caixa.",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/edit/{id}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "categoryDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "dueDate": {
+                    "type": "string"
+                  },
+                  "propagate": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionEditBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita a receita (com propagacao opcional).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/global-settlement/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "selection": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "valorPago": {
+                    "type": "number"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionAlreadyPaid"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Recebimento global (credito total + um movimento por folha).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionDetailResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da receita (no + filhas imediatas).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/list-unreceived-by-period": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas nao recebidas no intervalo de vencimento.",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/reverse/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionReverseRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Estorna um recebimento (debita o caixa na wallet original).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/settle/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "paidAmount": {
+                    "type": "number"
+                  },
+                  "paymentDate": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+                  },
+                  "walletId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "walletId",
+                  "paidAmount",
+                  "paymentDate",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SettleTransactionResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransactionSettleBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionOrWalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransactionSettleRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Recebe uma parcela (liquidacao atomica creditando a wallet).",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/transfer/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "fromWalletId": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "toWalletId": {
+                    "type": "string"
+                  },
+                  "transferDate": {
+                    "example": "2026-06-17",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fromWalletId",
+                  "toWalletId",
+                  "amount",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransferResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransferCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransferPaymentMethodInactive"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Transfere um valor entre duas carteiras do usuário autenticado (movimento neutro).",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/transfer/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "month",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "in": "query",
+            "name": "ordering",
+            "schema": {
+              "enum": [
+                "transferDate",
+                "amount",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "enum": [
+                "paymentMethodDescriptionEnum"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "in": "query",
+            "name": "search_by_date",
+            "schema": {
+              "enum": [
+                "transferDate",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransferPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as transferências do usuário autenticado, por competência, ordenadas desc.",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/transfer/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransferOutputResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransferNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe de uma transferência do usuário autenticado.",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/api/wallet/adjust-balance/{id}": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "occurredAt": {
+                    "type": "string"
+                  },
+                  "operation": {
+                    "enum": [
+                      "DEPOSIT",
+                      "WITHDRAW"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation",
+                  "amount"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AdjustBalanceResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletAdjustBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Ajuste manual de saldo (depósito/saque) com movimento ADJUST.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/create": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "balance": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateWalletResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma carteira do usuário autenticado.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/delete/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Carteira removida, sem corpo."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "422": {
+            "$ref": "#/components/responses/WalletDeleteRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Remove (soft-delete) uma carteira; saldo ≠ 0 exige force.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/edit/{id}": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WalletOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletEditBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "422": {
+            "$ref": "#/components/responses/WalletDefaultNoOverdraft"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita nome e config de cheque-especial da carteira (saldo fora da whitelist).",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/list-all": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "in": "query",
+            "name": "ordering",
+            "schema": {
+              "enum": [
+                "name",
+                "balance",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "enum": [
+                "isDefault"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "in": "query",
+            "name": "search_by_date",
+            "schema": {
+              "enum": [
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WalletPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as carteiras ativas do usuário autenticado.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/list-by-id/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WalletOutputResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Obtém uma carteira do usuário, com os campos derivados de cheque-especial.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/statement/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "in": "query",
+            "name": "ordering",
+            "schema": {
+              "enum": [
+                "occurredAt",
+                "amount",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "enum": [
+                "direction",
+                "refType"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "in": "query",
+            "name": "search_by_date",
+            "schema": {
+              "enum": [
+                "occurredAt",
+                "createdAt"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WalletMovementPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Extrato (livro de caixa) de uma carteira, por competência.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    }
+  },
+  "tags": [
+  ]
+}

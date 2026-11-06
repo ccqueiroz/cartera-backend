@@ -4,14 +4,23 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/reverse/:id:
+ * /api/bill/reverse/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Estorna um pagamento (devolve o caixa na wallet original).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/SettleTransactionResultResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionOrWalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionReverseRefused' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ReverseBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';

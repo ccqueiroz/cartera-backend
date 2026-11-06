@@ -16,9 +16,11 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Carteira com campos derivados. }
- *       401: { description: Sessão ausente ou inválida. }
- *       404: { description: Carteira não encontrada. }
+ *       200: { $ref: '#/components/responses/WalletOutputResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetWalletByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';

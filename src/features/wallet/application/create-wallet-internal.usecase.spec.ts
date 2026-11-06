@@ -12,7 +12,7 @@ function makeIds() {
 const now = () => '2026-06-14T10:00:00.000Z';
 
 describe('CreateWalletInternalUseCase', () => {
-  it('cria a wallet "Cartera" com saldo 0', async () => {
+  it('creates the "Cartera" wallet with zero balance', async () => {
     const repository = new InMemoryWalletRepository();
     const useCase = CreateWalletInternalUseCase.create(
       repository,
@@ -31,7 +31,7 @@ describe('CreateWalletInternalUseCase', () => {
     expect(out.overdraft).toBeNull();
   });
 
-  it('é idempotente por usuário (não duplica)', async () => {
+  it('is idempotent per user (does not duplicate)', async () => {
     const repository = new InMemoryWalletRepository();
     const useCase = CreateWalletInternalUseCase.create(
       repository,

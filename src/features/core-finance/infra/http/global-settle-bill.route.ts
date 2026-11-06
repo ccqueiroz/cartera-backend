@@ -4,14 +4,38 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/global-settlement/:id:
+ * /api/bill/global-settlement/{id}:
  *   patch:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Quitacao global (debito total + um movimento por folha).
  *     tags: [Bill]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [walletId, paymentDate, paymentMethodDescriptionEnum]
+ *             properties:
+ *               walletId: { type: string }
+ *               paymentDate: { type: string }
+ *               paymentMethodDescriptionEnum:
+ *                 $ref: '#/components/schemas/PaymentMethodDescriptionEnum'
+ *               selection: { type: array, items: { type: string } }
+ *               valorPago: { type: number }
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/SettleTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionSettleBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionOrWalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionAlreadyPaid' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GlobalSettleBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';

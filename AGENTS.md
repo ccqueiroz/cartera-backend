@@ -80,7 +80,7 @@ Filters go in the query and identity in the path. `{key}` is the `descriptionEnu
 Jest with ts-jest; each `*.spec.ts` sits next to the file it tests. The unit run (`jest-unit-config.ts`) measures coverage on domain and application code; `infra/`, factories, `src/bootstrap/` and `src/shared/http/` are outside the measure, not outside testing. `test/e2e/*.e2e-live.spec.ts` write to the staging project and are not part of the unit run. How each piece is tested, and which assertion fails first, is in the `be-tests` skill.
 
 - Unit coverage stays at 85% or more in `src/features/` and 90% or more in `src/shared/kernel/`. [sensor: jest-unit-config.ts]
-- Test titles (`describe`, `it`) are in English with ASCII characters only, and every `it` has an `expect`; both are warnings for now. [sensor: .eslintrc.json]
+- Test titles (`describe`, `it`) are in English with ASCII characters only (an error; a warning in the maintainer's `test/e2e/*.e2e-live.spec.ts`), and every `it` has an `expect` (still a warning). [sensor: .eslintrc.json]
 
 ## Commands
 

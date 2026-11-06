@@ -70,14 +70,14 @@ describe('ErrorMiddleware', () => {
   ];
 
   it.each(cases)(
-    'mapeia cada subclasse para o próprio status (%s)',
+    'maps each subclass to its own status (%s)',
     (error, expectedStatus) => {
       const { response } = run(error);
       expect(response.status).toHaveBeenCalledWith(expectedStatus);
     },
   );
 
-  it('resolve a mensagem PT pelo code do erro de domínio e expõe o code no body', () => {
+  it('resolves the PT message by the domain error code and exposes the code in the body', () => {
     const error = new EntityNotFoundError(ErrorCode.CATEGORY_NOT_FOUND, {
       descriptionEnum: 'UBER',
     });
@@ -108,7 +108,7 @@ describe('ErrorMiddleware', () => {
     );
   });
 
-  it('força INTERNAL_SERVER_ERROR para não-DomainError', () => {
+  it('forces INTERNAL_SERVER_ERROR for a non-DomainError', () => {
     const { response } = run(new Error('boom'));
     expect(response.status).toHaveBeenCalledWith(
       HttpStatus.INTERNAL_SERVER_ERROR,
@@ -119,7 +119,7 @@ describe('ErrorMiddleware', () => {
     });
   });
 
-  it('loga stack mas nunca vaza stack/erro cru no body', () => {
+  it('logs the stack but never leaks the stack or the raw error in the body', () => {
     const error = new Error('segredo interno');
     const { logger, response } = run(error);
     expect(logger.error).toHaveBeenCalledTimes(1);

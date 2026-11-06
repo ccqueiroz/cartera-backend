@@ -9,6 +9,6 @@ export class HealthController {
   }
 
   public handle = (_req: Request, res: Response): void => {
-    res.status(200).json(this.useCase.execute());
+    res.status(200).json({ data: this.useCase.execute() });
   };
 }

@@ -1,6 +1,5 @@
 import type { CookieOptions, Request, Response } from 'express';
-import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { userIdFrom } from '@/shared/http/request-input';
 import { RegisterAccountUseCase } from '@/features/auth/application/register-account.usecase';
 import { LoginUseCase } from '@/features/auth/application/login.usecase';
 import { RefreshSessionUseCase } from '@/features/auth/application/refresh-session.usecase';
@@ -24,12 +23,6 @@ const SESSION_COOKIE_OPTIONS: CookieOptions = {
 
 // Anti-enumeração (UC-06): mesma resposta exista a conta ou não.
 const RECOVERY_GENERIC_MESSAGE = 'Se o e-mail existir, enviaremos instruções.';
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
 
 export interface AuthUseCases {
   registerAccount: RegisterAccountUseCase;
@@ -55,7 +48,7 @@ export class AuthController {
       lastName: req.body.lastName,
     });
     res.cookie(SESSION_COOKIE, output.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(201).json(output);
+    res.status(201).json({ data: output });
   };
 
   public login = async (req: Request, res: Response): Promise<void> => {
@@ -65,7 +58,7 @@ export class AuthController {
       password: req.body.password,
     });
     res.cookie(SESSION_COOKIE, session.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(200).json(session);
+    res.status(200).json({ data: session });
   };
 
   public refresh = async (req: Request, res: Response): Promise<void> => {
@@ -74,7 +67,7 @@ export class AuthController {
       refreshToken: req.body.refreshToken,
     });
     res.cookie(SESSION_COOKIE, session.accessToken, SESSION_COOKIE_OPTIONS);
-    res.status(200).json(session);
+    res.status(200).json({ data: session });
   };
 
   public signout = async (req: Request, res: Response): Promise<void> => {
@@ -89,6 +82,6 @@ export class AuthController {
   ): Promise<void> => {
     await assertAuthInputValid(RecoverPasswordSchema, req.body);
     await this.useCases.recoverPassword.execute({ email: req.body.email });
-    res.status(202).json({ message: RECOVERY_GENERIC_MESSAGE });
+    res.status(202).json({ data: { message: RECOVERY_GENERIC_MESSAGE } });
   };
 }

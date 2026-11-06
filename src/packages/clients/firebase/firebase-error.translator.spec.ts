@@ -27,13 +27,13 @@ describe('translateFirebaseError', () => {
   ];
 
   it.each(knownByCode)(
-    'traduz o firebase code %s para o ErrorCode mapeado',
+    'translates the firebase code %s to the mapped ErrorCode',
     (firebaseCode, expected) => {
       expect(catchCode({ code: firebaseCode })).toBe(expected);
     },
   );
 
-  it('traduz códigos vindos no message (ex.: INVALID_LOGIN_CREDENTIALS)', () => {
+  it('translates codes coming in the message (e.g.: INVALID_LOGIN_CREDENTIALS)', () => {
     expect(catchCode({ message: 'INVALID_LOGIN_CREDENTIALS' })).toBe(
       ErrorCode.INVALID_CREDENTIALS,
     );
@@ -45,13 +45,13 @@ describe('translateFirebaseError', () => {
     );
   });
 
-  it('refresh token expirado (REST TOKEN_EXPIRED) segue INVALID_TOKEN — relogin, não refresh', () => {
+  it('expired refresh token (REST TOKEN_EXPIRED) stays INVALID_TOKEN: relogin, not refresh', () => {
     expect(catchCode({ message: 'TOKEN_EXPIRED' })).toBe(
       ErrorCode.INVALID_TOKEN,
     );
   });
 
-  it('nenhum código cru do provider traduz para ACCOUNT_DELETED (decisão do fluxo de login, não do provider)', () => {
+  it('no raw provider code translates to ACCOUNT_DELETED (a login flow decision, not the provider one)', () => {
     const allRawCodes = [
       ...knownByCode.map(([raw]) => raw),
       'INVALID_LOGIN_CREDENTIALS',
@@ -70,18 +70,18 @@ describe('translateFirebaseError', () => {
     }
   });
 
-  it('código desconhecido vira INTERNAL_SERVER_ERROR', () => {
+  it('unknown code becomes INTERNAL_SERVER_ERROR', () => {
     expect(catchCode({ code: 'auth/quantum-glitch' })).toBe(
       ErrorCode.INTERNAL_SERVER_ERROR,
     );
   });
 
-  it('entrada sem code/message vira INTERNAL_SERVER_ERROR', () => {
+  it('input without code/message becomes INTERNAL_SERVER_ERROR', () => {
     expect(catchCode(null)).toBe(ErrorCode.INTERNAL_SERVER_ERROR);
     expect(catchCode({})).toBe(ErrorCode.INTERNAL_SERVER_ERROR);
   });
 
-  it('não vaza code/message cru do firebase no erro lançado', () => {
+  it('does not leak the raw firebase code/message in the thrown error', () => {
     let thrown: DomainError | undefined;
     try {
       translateFirebaseError({ code: 'auth/quantum-glitch', message: 'raw' });

@@ -109,7 +109,7 @@ function movements(): TransferMovement[] {
 }
 
 describe('TransferRepositoryFirestore', () => {
-  it('saveTransfer grava os 5 efeitos numa única runTransaction', async () => {
+  it('saveTransfer writes the 5 effects in a single runTransaction', async () => {
     const { db, store, runTransaction } = makeDb();
     const repo = TransferRepositoryFirestore.create(db);
 
@@ -130,7 +130,7 @@ describe('TransferRepositoryFirestore', () => {
     expect(store['Transfer'].get('t1').amount).toBe(100);
   });
 
-  it('falha na transação não deixa efeito parcial (rollback)', async () => {
+  it('a failed transaction leaves no partial effect (rollback)', async () => {
     const { db, store } = makeDb(true);
     const repo = TransferRepositoryFirestore.create(db);
 
@@ -158,7 +158,7 @@ describe('TransferRepositoryFirestore', () => {
     expect(await repo.findById('t1', 'u1')).not.toBeNull();
   });
 
-  it('listByUser devolve só as transferências do dono', async () => {
+  it('listByUser returns only the transfers of the owner', async () => {
     const { db } = makeDb();
     const repo = TransferRepositoryFirestore.create(db);
     await repo.saveTransfer(

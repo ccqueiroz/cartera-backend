@@ -12,20 +12,16 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  *       - in: path
  *         name: descriptionEnum
  *         required: true
- *         schema:
- *           type: string
- *           enum: [PAID, RECEIVED, TO_PAY, TO_RECEIVE, DUE_SOON, DUE_DAY, OVERDUE, IN_PROGRESS]
+ *         schema: { $ref: '#/components/schemas/PaymentStatusDescriptionEnum' }
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Status de pagamento do catálogo.
- *       400:
- *         description: descriptionEnum fora do conjunto fechado.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Nenhum status semeado para o code informado.
+ *       200: { $ref: '#/components/responses/PaymentStatusOutputResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PaymentStatusNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetPaymentStatusByEnumRoute implements Route {
   public readonly method: HttpMethod = 'get';

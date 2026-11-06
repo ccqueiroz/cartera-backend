@@ -8,6 +8,7 @@ import {
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import {
@@ -77,7 +78,9 @@ export class CreateInstallmentReceivableUseCase {
   ): Promise<CreateReceivableResult> {
     if (input.entry && !input.entry.walletId)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'A entrada recebida exige walletId.',
+        details: errorCatalog[ErrorCode.ATTRIBUTE_REQUIRES_WALLET_ID]({
+          attribute: 'A entrada recebida',
+        }),
       });
 
     const base = {

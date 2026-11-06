@@ -2,13 +2,13 @@ import { WalletOutput } from '@/features/wallet/domain/wallet.entity';
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { FinancialIndicatorGateway } from '@/features/wallet/domain/ports/financial-indicator.gateway.port';
 import { computeAccruedInterest } from '@/features/wallet/application/compute-accrued-interest';
+import { applyListParams } from '@/shared/query/apply-list-params';
 import { applyPagination } from '@/shared/query/apply-pagination';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 
 interface ListWalletsInput {
   userId: string;
-  page?: number;
-  size?: number;
+  params?: PaginationParams;
 }
 
 export class ListWalletsUseCase {
@@ -27,6 +27,7 @@ export class ListWalletsUseCase {
   }
 
   public async execute(input: ListWalletsInput): Promise<Page<WalletOutput>> {
+    const { params = {} } = input;
     const wallets = await this.repository.listActiveByUser(input.userId);
     wallets.sort((a, b) => a.id.localeCompare(b.id));
 
@@ -54,6 +55,11 @@ export class ListWalletsUseCase {
       outputs.push(wallet.toOutput(accrued));
     }
 
-    return applyPagination(outputs, input.page, input.size);
+    return applyPagination(
+      applyListParams(outputs, params),
+      params.page,
+      params.size,
+      params.ordering ?? null,
+    );
   }
 }

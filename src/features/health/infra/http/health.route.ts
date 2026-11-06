@@ -11,19 +11,8 @@ import { HealthController } from '@/features/health/infra/http/health.controller
  *     tags:
  *       - Health
  *     responses:
- *       200:
- *         description: Serviço no ar.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: ok
- *                 uptimeSeconds:
- *                   type: number
- *                   example: 1234
+ *       200: { $ref: '#/components/responses/HealthStatusResponse' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class HealthRoute implements Route {
   public readonly method: HttpMethod = 'get';

@@ -11,12 +11,10 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       204:
- *         description: Sessão encerrada; cookie `session` expirado.
- *       401:
- *         description: Sessão ausente, inválida (INVALID_TOKEN) ou expirada (TOKEN_EXPIRED).
- *       403:
- *         description: Conta desativada (USER_DISABLED).
+ *       204: { description: "Sessão encerrada; cookie `session` expirado." }
+ *       401: { $ref: '#/components/responses/SignoutUnauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class SignoutRoute implements Route {
   public readonly method: HttpMethod = 'delete';

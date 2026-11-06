@@ -8,11 +8,29 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *   get:
  *     summary: Lista as carteiras ativas do usuário autenticado.
  *     tags: [Wallet]
+ *     parameters:
+ *       - $ref: '#/components/parameters/Page'
+ *       - $ref: '#/components/parameters/Size'
+ *       - in: query
+ *         name: ordering
+ *         schema: { type: string, enum: [name, balance, createdAt] }
+ *       - $ref: '#/components/parameters/DirectionOrder'
+ *       - in: query
+ *         name: sort
+ *         schema: { type: string, enum: [isDefault] }
+ *       - $ref: '#/components/parameters/SortValue'
+ *       - in: query
+ *         name: search_by_date
+ *         schema: { type: string, enum: [createdAt] }
+ *       - $ref: '#/components/parameters/SearchByDateValue'
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200: { description: Página de carteiras. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/WalletPageResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class ListWalletsRoute implements Route {
   public readonly method: HttpMethod = 'get';

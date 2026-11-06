@@ -1,14 +1,9 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-  ValidatorOptions,
-} from '@/packages/clients/class-validator';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  DROP_UNKNOWN,
+  userIdFrom,
+} from '@/shared/http/request-input';
 import { GetOwnPersonUseCase } from '@/features/person/application/get-own-person.usecase';
 import { UpdateOwnPersonUseCase } from '@/features/person/application/update-own-person.usecase';
 import { DeleteOwnPersonUseCase } from '@/features/person/application/delete-own-person.usecase';
@@ -17,35 +12,6 @@ import { RemoveAvatarUseCase } from '@/features/person/application/remove-avatar
 import { UpdatePersonSchema } from '@/features/person/infra/http/schemas/update-person.schema';
 import { ReplaceAvatarSchema } from '@/features/person/infra/http/schemas/replace-avatar.schema';
 import { parseAvatarImage } from '@/features/person/infra/http/avatar-image.parser';
-
-const DROP_UNKNOWN: ValidatorOptions = {
-  whitelist: true,
-  forbidNonWhitelisted: false,
-};
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-  options: ValidatorOptions,
-): Promise<void> {
-  const errors = await runValidate(schema, input, options);
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
 
 export interface PersonUseCases {
   getOwn: GetOwnPersonUseCase;
@@ -66,7 +32,7 @@ export class PersonController {
     const person = await this.useCases.getOwn.execute({
       userId: userIdFrom(req),
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public updateOwn = async (req: Request, res: Response): Promise<void> => {
@@ -82,7 +48,7 @@ export class PersonController {
       monthlyIncome: req.body.monthlyIncome,
       defaultCurrency: req.body.defaultCurrency,
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public deleteOwn = async (req: Request, res: Response): Promise<void> => {
@@ -98,7 +64,7 @@ export class PersonController {
       buffer,
       contentType,
     });
-    res.status(200).json(person.toOutput());
+    res.status(200).json({ data: person.toOutput() });
   };
 
   public removeAvatar = async (req: Request, res: Response): Promise<void> => {

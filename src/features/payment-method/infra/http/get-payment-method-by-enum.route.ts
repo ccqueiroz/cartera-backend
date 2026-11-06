@@ -12,20 +12,16 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  *       - in: path
  *         name: descriptionEnum
  *         required: true
- *         schema:
- *           type: string
- *           enum: [DEBIT_CARD, CREDIT_CARD, BANK_SLIP, BANK_DEPOSIT, BANK_TRANSFER, AUTOMATIC_DEBIT, BOOKLET, CASH, CHECK, PROMISSORY, FINANCING, MEAL_VOUCHER, FOOD_VOUCHER, PIX, CRYPTOCURRENCY, DIGITAL_WALLET]
+ *         schema: { $ref: '#/components/schemas/PaymentMethodDescriptionEnum' }
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       200:
- *         description: Forma de pagamento (ativa ou soft-deleted mais recente).
- *       400:
- *         description: descriptionEnum fora do conjunto fechado.
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Nenhuma forma de pagamento do tipo existe.
+ *       200: { $ref: '#/components/responses/PaymentMethodOutputResponse' }
+ *       400: { $ref: '#/components/responses/ValidationFailed' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PaymentMethodNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetPaymentMethodByEnumRoute implements Route {
   public readonly method: HttpMethod = 'get';

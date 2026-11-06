@@ -21,7 +21,7 @@ describe('AtomicRunner', () => {
     expect(result).toBe('ok');
   });
 
-  it('propaga a falha do trabalho (a transação não comita)', async () => {
+  it('propagates the failure of the work (the transaction does not commit)', async () => {
     const db = {
       runTransaction: jest.fn(async (work: (t: unknown) => Promise<unknown>) =>
         work({}),

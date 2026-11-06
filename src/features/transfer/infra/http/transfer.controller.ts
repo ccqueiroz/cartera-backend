@@ -1,49 +1,20 @@
 import type { Request, Response } from 'express';
 import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import {
-  UnauthorizedError,
-  ValidationError,
-} from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+  assertValid,
+  numberOrUndefined,
+  userIdFrom,
+} from '@/shared/http/request-input';
+import { readPaginationParams } from '@/shared/http/pagination-params';
 import { CreateTransferUseCase } from '@/features/transfer/application/create-transfer.usecase';
 import { ListTransfersUseCase } from '@/features/transfer/application/list-transfers.usecase';
 import { GetTransferByIdUseCase } from '@/features/transfer/application/get-transfer-by-id.usecase';
 import { CreateTransferSchema } from '@/features/transfer/infra/http/schemas/create-transfer.schema';
 
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
-
-function userIdFrom(req: Request): string {
-  const userId = req.user_auth?.userId;
-  if (!userId) throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);
-  return userId;
-}
-
-function numberOrUndefined(value: unknown): number | undefined {
-  if (value === undefined || value === null || value === '') return undefined;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
-}
+const TRANSFER_LIST_FIELDS = {
+  ordering: ['transferDate', 'amount', 'createdAt'],
+  sort: ['paymentMethodDescriptionEnum'],
+  searchByDate: ['transferDate', 'createdAt'],
+} as const;
 
 export interface TransferUseCases {
   create: CreateTransferUseCase;
@@ -68,7 +39,7 @@ export class TransferController {
       paymentMethodDescriptionEnum: req.body.paymentMethodDescriptionEnum,
       transferDate: req.body.transferDate,
     });
-    res.status(201).json(result);
+    res.status(201).json({ data: result });
   };
 
   public listAll = async (req: Request, res: Response): Promise<void> => {
@@ -76,10 +47,9 @@ export class TransferController {
       userId: userIdFrom(req),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
-      page: numberOrUndefined(req.query.page),
-      size: numberOrUndefined(req.query.size),
+      params: readPaginationParams(req.query, TRANSFER_LIST_FIELDS),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listById = async (req: Request, res: Response): Promise<void> => {
@@ -87,6 +57,6 @@ export class TransferController {
       userId: userIdFrom(req),
       id: String(req.params.id),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 }

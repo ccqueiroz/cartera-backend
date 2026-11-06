@@ -14,7 +14,7 @@ const baseInput = {
 };
 
 describe('Category entity', () => {
-  it('nasce ativo com updatedAt/deletedAt nulos', () => {
+  it('is born active with null updatedAt/deletedAt', () => {
     const category = Category.create(baseInput);
     const output = category.toOutput();
     expect(output.active).toBe(true);
@@ -22,13 +22,13 @@ describe('Category entity', () => {
     expect(category.toPersistence().deletedAt).toBeNull();
   });
 
-  it('rejeita description vazio', () => {
+  it('rejects empty description', () => {
     expect(() => Category.create({ ...baseInput, description: '   ' })).toThrow(
       ErrorCode.CATEGORY_DESCRIPTION_REQUIRED,
     );
   });
 
-  it('edit não troca o descriptionEnum imutável e seta updatedAt', () => {
+  it('edit does not change the immutable descriptionEnum and sets updatedAt', () => {
     const category = Category.create(baseInput);
     category.edit({
       description: 'Uber Black',

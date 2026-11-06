@@ -1,7 +1,7 @@
 import { SignedMoney } from './signed-money.vo';
 import { Money } from './money.vo';
-import { ValidationError } from '../errors/domain.error';
-import { ErrorCode } from '../errors/error-code';
+import { ValidationError } from '@/shared/kernel/errors/domain.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 function captureError(fn: () => unknown): unknown {
   try {
@@ -13,13 +13,13 @@ function captureError(fn: () => unknown): unknown {
 }
 
 describe('SignedMoney', () => {
-  it('aceita valor negativo e normaliza para 2 casas', () => {
+  it('accepts a negative value and normalizes to 2 decimal places', () => {
     expect(SignedMoney.create(-100.5).value).toBe(-100.5);
     expect(SignedMoney.create(-1.005).value).toBe(-1);
     expect(SignedMoney.zero().value).toBe(0);
   });
 
-  it('rejeita não-finito com MONEY_INVALID_NUMBER', () => {
+  it('rejects non-finite with MONEY_INVALID_NUMBER', () => {
     expect(() => SignedMoney.create(Number.POSITIVE_INFINITY)).toThrow(
       ValidationError,
     );
@@ -30,7 +30,7 @@ describe('SignedMoney', () => {
     );
   });
 
-  it('subtract NÃO clampa (ao contrário de Money)', () => {
+  it('subtract does NOT clamp (unlike Money)', () => {
     expect(SignedMoney.create(50).subtract(SignedMoney.create(80)).value).toBe(
       -30,
     );
@@ -44,13 +44,13 @@ describe('SignedMoney', () => {
     expect(SignedMoney.create(-30).add(SignedMoney.create(10)).value).toBe(-20);
   });
 
-  it('isNegative discrimina a posição', () => {
+  it('isNegative discriminates the position', () => {
     expect(SignedMoney.create(-0.01).isNegative()).toBe(true);
     expect(SignedMoney.create(0).isNegative()).toBe(false);
     expect(SignedMoney.create(0.01).isNegative()).toBe(false);
   });
 
-  it('é imutável (operações retornam nova instância)', () => {
+  it('is immutable (operations return a new instance)', () => {
     const a = SignedMoney.create(10);
     const b = a.subtract(SignedMoney.create(30));
     expect(a.value).toBe(10);
@@ -66,7 +66,7 @@ describe('SignedMoney', () => {
     expect(SignedMoney.create(-1234.5).format()).toContain('1.234,50');
   });
 
-  it('Money permanece com invariante ≥ 0 (regressão)', () => {
+  it('Money keeps the invariant >= 0 (regression)', () => {
     expect(() => Money.create(-1)).toThrow(ValidationError);
     expect(Money.create(3).subtract(Money.create(10)).value).toBe(0);
   });

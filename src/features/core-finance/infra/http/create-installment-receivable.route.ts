@@ -9,9 +9,31 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *     summary: Cria uma receita parcelada (entrada recebida exige walletId).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amount, dueDate, installments]
+ *             properties:
+ *               personId: { type: string }
+ *               amount: { type: number }
+ *               dueDate: { type: string }
+ *               categoryDescriptionEnum: { type: string }
+ *               isFixedCost: { type: boolean }
+ *               period: { type: string }
+ *               frequency: { type: number }
+ *               installments: { type: array, items: { type: object } }
+ *               entry: { type: object }
  *     responses:
- *       201: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       201: { $ref: '#/components/responses/CreateTransactionResultResponse' }
+ *       400: { $ref: '#/components/responses/TransactionInstallmentBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/WalletNotFound' }
+ *       422: { $ref: '#/components/responses/TransactionInvalidFixedCost' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateInstallmentReceivableRoute implements Route {
   public readonly method: HttpMethod = 'post';

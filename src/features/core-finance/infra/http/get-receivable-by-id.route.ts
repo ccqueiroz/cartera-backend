@@ -4,14 +4,22 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-by-id/:id:
+ * /api/receivable/list-by-id/{id}:
  *   get:
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
  *     summary: Detalhe da receita (no + filhas imediatas).
  *     tags: [Receivable]
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
- *       200: { description: OK. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       200: { $ref: '#/components/responses/TransactionDetailResponse' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/TransactionNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class GetReceivableByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';

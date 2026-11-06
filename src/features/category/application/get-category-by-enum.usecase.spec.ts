@@ -1,7 +1,7 @@
 import { GetCategoryByEnumUseCase } from './get-category-by-enum.usecase';
-import { Category } from '../domain/category.entity';
-import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { Category } from '@/features/category/domain/category.entity';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -16,7 +16,7 @@ const makeCategory = () =>
   });
 
 describe('GetCategoryByEnumUseCase', () => {
-  it('retorna o ativo encontrado', async () => {
+  it('returns the found active one', async () => {
     const repository = {
       findActiveByEnum: async () => makeCategory(),
     } as any;
@@ -27,7 +27,7 @@ describe('GetCategoryByEnumUseCase', () => {
     expect(result.descriptionEnum).toBe(CategoryDescriptionEnum.UBER);
   });
 
-  it('rejeita descriptionEnum fora do enum (400)', async () => {
+  it('rejects descriptionEnum outside the enum (400)', async () => {
     const repository = { findActiveByEnum: async () => null } as any;
     const useCase = GetCategoryByEnumUseCase.create(repository);
 
@@ -38,7 +38,7 @@ describe('GetCategoryByEnumUseCase', () => {
     });
   });
 
-  it('lança not found quando não há doc ativo (404)', async () => {
+  it('throws not found when there is no active doc (404)', async () => {
     const repository = { findActiveByEnum: async () => null } as any;
     const useCase = GetCategoryByEnumUseCase.create(repository);
 

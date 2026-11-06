@@ -1,7 +1,7 @@
 import { SignoutUseCase } from './signout.usecase';
 
 describe('SignoutUseCase', () => {
-  it('revoga todos os refresh tokens do usuário', async () => {
+  it('revokes all refresh tokens of the user', async () => {
     const authProvider = {
       revokeRefreshTokens: jest.fn(async () => undefined),
     } as any;
@@ -12,7 +12,7 @@ describe('SignoutUseCase', () => {
     expect(authProvider.revokeRefreshTokens).toHaveBeenCalledWith('uid-1');
   });
 
-  it('falha do provider propaga', async () => {
+  it('provider failure propagates', async () => {
     const boom = new Error('provider caiu');
     const authProvider = {
       revokeRefreshTokens: jest.fn(async () => {

@@ -1,14 +1,14 @@
 import { TransferOutput } from '@/features/transfer/domain/transfer.entity';
 import { TransferRepository } from '@/features/transfer/domain/ports/transfer.repository.port';
+import { applyListParams } from '@/shared/query/apply-list-params';
 import { applyPagination } from '@/shared/query/apply-pagination';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 
 interface ListTransfersInput {
   userId: string;
   month?: number;
   year?: number;
-  page?: number;
-  size?: number;
+  params?: PaginationParams;
 }
 
 export class ListTransfersUseCase {
@@ -21,6 +21,7 @@ export class ListTransfersUseCase {
   public async execute(
     input: ListTransfersInput,
   ): Promise<Page<TransferOutput>> {
+    const { params = {} } = input;
     const transfers = await this.repository.listByUser(input.userId, {
       month: input.month,
       year: input.year,
@@ -33,7 +34,12 @@ export class ListTransfersUseCase {
       .sort((a, b) => b.transferDate.localeCompare(a.transferDate))
       .map((transfer) => transfer.toOutput());
 
-    return applyPagination(sorted, input.page, input.size);
+    return applyPagination(
+      applyListParams(sorted, params),
+      params.page,
+      params.size,
+      params.ordering ?? null,
+    );
   }
 
   private matchesCompetence(

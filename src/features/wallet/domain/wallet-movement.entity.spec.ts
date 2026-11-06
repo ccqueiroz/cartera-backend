@@ -24,7 +24,7 @@ function build(
 }
 
 describe('WalletMovement entity', () => {
-  it('cria movimento válido e serializa puro', () => {
+  it('creates a valid movement and serializes it as pure data', () => {
     const movement = build();
     const persisted = movement.toPersistence();
     expect(persisted.amount).toBe(100);
@@ -33,11 +33,11 @@ describe('WalletMovement entity', () => {
     expect(persisted.refId).toBeNull();
   });
 
-  it('rejeita amount zero', () => {
+  it('rejects a zero amount', () => {
     expect(() => build({ amount: Money.zero() })).toThrow(ValidationError);
   });
 
-  it('round-trip de persistência reconstrói o amount como Money', () => {
+  it('persistence round-trip rebuilds the amount as Money', () => {
     const restored = WalletMovement.with({
       id: 'm2',
       userId: 'u1',
@@ -53,7 +53,7 @@ describe('WalletMovement entity', () => {
     expect(restored.refType).toBe('OVERDRAFT_INTEREST');
   });
 
-  it('expõe saída sem userId (contrato de extrato)', () => {
+  it('exposes output without userId (statement contract)', () => {
     const out = build({
       direction: WalletMovementDirectionEnum.CREDIT,
     }).toOutput();

@@ -19,14 +19,11 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *               email: { type: string, format: email }
  *               password: { type: string }
  *     responses:
- *       200:
- *         description: Tokens no body (expirationTime ISO-8601) e cookie `session` setado.
- *       400:
- *         description: E-mail inválido (INVALID_EMAIL) ou campo ausente (VALIDATION_FAILED).
- *       401:
- *         description: Credenciais inválidas (INVALID_CREDENTIALS) — e-mail e senha errados são indistinguíveis.
- *       403:
- *         description: Conta encerrada (ACCOUNT_DELETED) ou suspensa (USER_DISABLED).
+ *       200: { $ref: '#/components/responses/AuthSessionResponse' }
+ *       400: { $ref: '#/components/responses/AuthBadRequest' }
+ *       401: { $ref: '#/components/responses/LoginUnauthorized' }
+ *       403: { $ref: '#/components/responses/LoginForbidden' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class LoginRoute implements Route {
   public readonly method: HttpMethod = 'post';

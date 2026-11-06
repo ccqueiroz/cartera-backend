@@ -4,22 +4,60 @@ import {
   IsString,
   MinLength,
 } from '@/packages/clients/class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export class RegisterAccountSchema {
-  @IsEmail({}, { message: 'O e-mail informado é inválido.' })
+  @IsEmail(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_IS_INVALID_MASCULINE]({
+        attribute: 'O e-mail informado',
+      }),
+    },
+  )
   email!: string;
 
-  @IsString({ message: 'A senha deve ser um texto.' })
-  @IsNotEmpty({ message: 'A senha é obrigatória.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'A senha',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_FEMININE]({
+      attribute: 'A senha',
+    }),
+  })
   // Regra dura do Firebase Auth: senha < 6 caracteres é rejeitada pelo provider.
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres.' })
+  @MinLength(6, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_BELOW_MIN_LENGTH]({
+      attribute: 'A senha',
+      min: 6,
+    }),
+  })
   password!: string;
 
-  @IsString({ message: 'O primeiro nome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O primeiro nome é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O primeiro nome',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O primeiro nome',
+    }),
+  })
   firstName!: string;
 
-  @IsString({ message: 'O sobrenome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O sobrenome é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O sobrenome',
+    }),
+  })
+  @IsNotEmpty({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_IS_REQUIRED_MASCULINE]({
+      attribute: 'O sobrenome',
+    }),
+  })
   lastName!: string;
 }

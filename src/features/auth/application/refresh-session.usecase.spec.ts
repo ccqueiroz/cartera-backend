@@ -3,7 +3,7 @@ import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 describe('RefreshSessionUseCase', () => {
-  it('troca o refresh token e devolve a nova sessão', async () => {
+  it('exchanges the refresh token and returns the new session', async () => {
     const refreshed = {
       userId: 'uid-1',
       accessToken: 'novo-access',
@@ -23,7 +23,7 @@ describe('RefreshSessionUseCase', () => {
     });
   });
 
-  it('token inválido/revogado propaga UnauthorizedError(INVALID_TOKEN)', async () => {
+  it('invalid/revoked token propagates UnauthorizedError(INVALID_TOKEN)', async () => {
     const authProvider = {
       refreshSession: jest.fn(async () => {
         throw new UnauthorizedError(ErrorCode.INVALID_TOKEN);

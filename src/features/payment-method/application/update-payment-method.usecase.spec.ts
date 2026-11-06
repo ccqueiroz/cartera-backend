@@ -1,6 +1,6 @@
 import { UpdatePaymentMethodUseCase } from './update-payment-method.usecase';
-import { PaymentMethod } from '../domain/payment-method.entity';
-import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
+import { PaymentMethod } from '@/features/payment-method/domain/payment-method.entity';
+import { PaymentMethodDescriptionEnum } from '@/features/payment-method/domain/enums/payment-method-description.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const makeMethod = () =>
@@ -35,7 +35,7 @@ describe('UpdatePaymentMethodUseCase', () => {
     expect(updated).toHaveLength(1);
   });
 
-  it('lança 404 quando não há método ativo para o descriptionEnum', async () => {
+  it('throws 404 when there is no active method for the descriptionEnum', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       update: async () => {},
@@ -53,7 +53,7 @@ describe('UpdatePaymentMethodUseCase', () => {
     ).rejects.toMatchObject({ code: ErrorCode.PAYMENT_METHOD_NOT_FOUND });
   });
 
-  it('rejeita description inválido via invariante', async () => {
+  it('rejects an invalid description through the invariant', async () => {
     const repository = {
       findActiveByEnum: async () => makeMethod(),
       update: async () => {},

@@ -6,7 +6,7 @@ const controller = AuthController.create({} as any);
 const authMiddleware = { getHandler: jest.fn() } as unknown as Middleware;
 
 describe('authRoutes', () => {
-  it('registra as cinco rotas com método e path corretos (sessão como recurso)', () => {
+  it('registers the five routes with correct method and path (session as resource)', () => {
     const routes = authRoutes(controller, authMiddleware);
 
     expect(
@@ -20,7 +20,7 @@ describe('authRoutes', () => {
     ]);
   });
 
-  it('só o signout é protegido pelo middleware de autenticação', () => {
+  it('only signout is protected by the authentication middleware', () => {
     const routes = authRoutes(controller, authMiddleware);
     const guarded = routes.filter((route) =>
       (route.middlewares ?? []).includes(authMiddleware),

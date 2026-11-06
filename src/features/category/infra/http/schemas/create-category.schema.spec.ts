@@ -4,7 +4,7 @@ import { CreateCategorySchema } from './create-category.schema';
 const options = { whitelist: true, forbidNonWhitelisted: true };
 
 describe('CreateCategorySchema', () => {
-  it('aceita payload válido', async () => {
+  it('accepts valid payload', async () => {
     const errors = await runValidate(
       CreateCategorySchema,
       {
@@ -18,7 +18,7 @@ describe('CreateCategorySchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita props desconhecidas', async () => {
+  it('rejects unknown props', async () => {
     const errors = await runValidate(
       CreateCategorySchema,
       {
@@ -33,7 +33,7 @@ describe('CreateCategorySchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita group/type fora do enum', async () => {
+  it('rejects group/type outside the enum', async () => {
     const errors = await runValidate(
       CreateCategorySchema,
       {

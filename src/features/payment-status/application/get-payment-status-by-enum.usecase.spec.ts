@@ -1,5 +1,5 @@
 import { GetPaymentStatusByEnumUseCase } from './get-payment-status-by-enum.usecase';
-import { PaymentStatusCatalog } from '../domain/payment-status-catalog.entity';
+import { PaymentStatusCatalog } from '@/features/payment-status/domain/payment-status-catalog.entity';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -12,7 +12,7 @@ const makeEntry = () =>
   });
 
 describe('GetPaymentStatusByEnumUseCase', () => {
-  it('retorna a entrada do catálogo para um code semeado', async () => {
+  it('returns the catalog entry for a seeded code', async () => {
     const repository = { findByCode: async () => makeEntry() } as any;
     const useCase = GetPaymentStatusByEnumUseCase.create(repository);
 
@@ -25,7 +25,7 @@ describe('GetPaymentStatusByEnumUseCase', () => {
     });
   });
 
-  it('lança PaymentStatusNotFoundError quando o code não está semeado', async () => {
+  it('throws PaymentStatusNotFoundError when the code is not seeded', async () => {
     const repository = { findByCode: async () => null } as any;
     const useCase = GetPaymentStatusByEnumUseCase.create(repository);
 

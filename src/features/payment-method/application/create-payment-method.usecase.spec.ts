@@ -1,6 +1,6 @@
 import { CreatePaymentMethodUseCase } from './create-payment-method.usecase';
-import { PaymentMethod } from '../domain/payment-method.entity';
-import { PaymentMethodDescriptionEnum } from '../domain/enums/payment-method-description.enum';
+import { PaymentMethod } from '@/features/payment-method/domain/payment-method.entity';
+import { PaymentMethodDescriptionEnum } from '@/features/payment-method/domain/enums/payment-method-description.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 const payload = {
@@ -9,7 +9,7 @@ const payload = {
 };
 
 describe('CreatePaymentMethodUseCase', () => {
-  it('cria nova forma de pagamento quando não há ativa para o enum', async () => {
+  it('creates a new payment method when none is active for the enum', async () => {
     const created: PaymentMethod[] = [];
     const repository = {
       findActiveByEnum: async () => null,
@@ -29,7 +29,7 @@ describe('CreatePaymentMethodUseCase', () => {
     expect(method.toPersistence().deletedAt).toBeNull();
   });
 
-  it('conflita (409) quando o enum já tem método ativo', async () => {
+  it('throws a 409 conflict when the enum already has an active method', async () => {
     const repository = {
       findActiveByEnum: async () =>
         PaymentMethod.create({
@@ -50,7 +50,7 @@ describe('CreatePaymentMethodUseCase', () => {
     });
   });
 
-  it('nunca reativa: cria documento novo mesmo havendo soft-deleted', async () => {
+  it('never reactivates: creates a new document even with a soft-deleted one', async () => {
     const created: PaymentMethod[] = [];
     const repository = {
       findActiveByEnum: async () => null,
@@ -68,7 +68,7 @@ describe('CreatePaymentMethodUseCase', () => {
     expect(created).toHaveLength(1);
   });
 
-  it('rejeita description inválido via invariante da entidade', async () => {
+  it('rejects an invalid description through the entity invariant', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       create: async () => {},

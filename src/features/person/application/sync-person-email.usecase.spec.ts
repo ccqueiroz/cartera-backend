@@ -38,7 +38,7 @@ describe('SyncPersonEmailUseCase', () => {
     expect(repository.update).toHaveBeenCalledWith(person);
   });
 
-  it('404 quando não há person ativo para o userId', async () => {
+  it('404 when there is no active person for the userId', async () => {
     const repository = makeRepository(null);
     await expect(
       SyncPersonEmailUseCase.create(repository as any, () => NOW).execute({

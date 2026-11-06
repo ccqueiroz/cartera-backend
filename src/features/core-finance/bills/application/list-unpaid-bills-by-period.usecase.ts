@@ -1,10 +1,11 @@
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { TransactionOriginEnum } from '@/shared/kernel/enums/transaction-origin.enum';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 import { TransactionOutput } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import { TransactionEngine } from '@/features/core-finance/transaction-engine/transaction-engine.factory';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 
 export interface ListUnpaidBillsByPeriodInput {
   userId: string;
@@ -12,6 +13,7 @@ export interface ListUnpaidBillsByPeriodInput {
   endDate: string;
   page?: number;
   size?: number;
+  params?: PaginationParams;
 }
 
 /**
@@ -34,7 +36,11 @@ export class ListUnpaidBillsByPeriodUseCase {
   ): Promise<Page<TransactionOutput>> {
     if (input.endDate < input.startDate)
       throw new ValidationError(ErrorCode.VALIDATION_FAILED, {
-        details: 'end_date não pode ser anterior a start_date.',
+        details: errorCatalog[
+          ErrorCode.ATTRIBUTE_MUST_NOT_BE_BEFORE_START_DATE
+        ]({
+          attribute: 'end_date',
+        }),
       });
 
     return this.engine.list.execute({
@@ -46,6 +52,7 @@ export class ListUnpaidBillsByPeriodUseCase {
       dueDateTo: input.endDate,
       page: input.page,
       size: input.size,
+      params: input.params,
     });
   }
 }

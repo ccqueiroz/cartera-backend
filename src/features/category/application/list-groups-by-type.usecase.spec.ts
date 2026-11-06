@@ -1,9 +1,9 @@
 import { ListGroupsByTypeUseCase } from './list-groups-by-type.usecase';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 describe('ListGroupsByTypeUseCase', () => {
-  it('retorna os grupos distintos do tipo', async () => {
+  it('returns the distinct groups of the type', async () => {
     const repository = {
       listGroupsByType: async () => [
         CategoryGroupEnum.MOBILITY_BY_APP,
@@ -20,14 +20,14 @@ describe('ListGroupsByTypeUseCase', () => {
     ]);
   });
 
-  it('retorna [] quando nenhum grupo tem ativo do tipo', async () => {
+  it('returns [] when no group has an active item of the type', async () => {
     const repository = { listGroupsByType: async () => [] } as any;
     const useCase = ListGroupsByTypeUseCase.create(repository);
 
     expect(await useCase.execute({ type: 'RECEIVABLES' })).toEqual([]);
   });
 
-  it('rejeita type fora do enum', async () => {
+  it('rejects type outside the enum', async () => {
     const repository = { listGroupsByType: async () => [] } as any;
     const useCase = ListGroupsByTypeUseCase.create(repository);
 

@@ -42,7 +42,7 @@ const jpegBase64 = () => {
 };
 
 describe('PersonController', () => {
-  it('getOwn responde 200 com o output do person', async () => {
+  it('getOwn responds 200 with the person output', async () => {
     const useCases = makeUseCases();
     const output = { id: 'person-1', fullName: 'Caio Queiroz' };
     useCases.getOwn.execute.mockResolvedValue({ toOutput: () => output });
@@ -54,10 +54,10 @@ describe('PersonController', () => {
       userId: 'user-1',
     });
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
-  it('rejeita request sem user_auth com UnauthorizedError (401)', async () => {
+  it('rejects a request without user_auth with UnauthorizedError (401)', async () => {
     const useCases = makeUseCases();
     const res = makeResponse();
 
@@ -67,7 +67,7 @@ describe('PersonController', () => {
     expect(useCases.getOwn.execute).not.toHaveBeenCalled();
   });
 
-  it('updateOwn valida o schema e repassa só os campos editáveis', async () => {
+  it('updateOwn validates the schema and passes only the editable fields', async () => {
     const useCases = makeUseCases();
     const output = { id: 'person-1' };
     useCases.updateOwn.execute.mockResolvedValue({ toOutput: () => output });
@@ -90,7 +90,7 @@ describe('PersonController', () => {
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
-  it('updateOwn rejeita payload inválido com ValidationError (400)', async () => {
+  it('updateOwn rejects an invalid payload with ValidationError (400)', async () => {
     const useCases = makeUseCases();
     const res = makeResponse();
 
@@ -135,10 +135,10 @@ describe('PersonController', () => {
     expect(input.contentType).toBe('image/jpeg');
     expect(Buffer.isBuffer(input.buffer)).toBe(true);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(output);
+    expect(res.json).toHaveBeenCalledWith({ data: output });
   });
 
-  it('replaceAvatar rejeita conteúdo não-imagem com 422 (AVATAR_UNSUPPORTED_TYPE)', async () => {
+  it('replaceAvatar rejects non-image content with 422 (AVATAR_UNSUPPORTED_TYPE)', async () => {
     const useCases = makeUseCases();
     const res = makeResponse();
 
@@ -153,7 +153,7 @@ describe('PersonController', () => {
     expect(useCases.replaceAvatar.execute).not.toHaveBeenCalled();
   });
 
-  it('replaceAvatar rejeita imagem acima de 5MB com 413 (AVATAR_TOO_LARGE)', async () => {
+  it('replaceAvatar rejects an image above 5MB with 413 (AVATAR_TOO_LARGE)', async () => {
     const useCases = makeUseCases();
     const res = makeResponse();
     const oversized = Buffer.alloc(5 * 1024 * 1024 + 1);
@@ -171,7 +171,7 @@ describe('PersonController', () => {
     });
   });
 
-  it('replaceAvatar rejeita body sem image com ValidationError', async () => {
+  it('replaceAvatar rejects a body without image with ValidationError', async () => {
     const useCases = makeUseCases();
     const res = makeResponse();
 

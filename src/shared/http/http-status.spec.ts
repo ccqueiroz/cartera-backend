@@ -1,7 +1,7 @@
 import { HttpStatus } from './http-status';
 
 describe('HttpStatus', () => {
-  it('mapeia nomes do protocolo para os códigos numéricos corretos', () => {
+  it('maps protocol names to the correct numeric codes', () => {
     expect(HttpStatus.OK).toBe(200);
     expect(HttpStatus.BAD_REQUEST).toBe(400);
     expect(HttpStatus.UNAUTHORIZED).toBe(401);

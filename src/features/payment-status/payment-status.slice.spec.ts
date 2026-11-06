@@ -110,14 +110,14 @@ function makeHarness() {
   return { dispatch };
 }
 
-describe('payment-status e2e (guarda de autenticação via factory)', () => {
+describe('payment-status e2e (authentication guard via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
     ['get', 'payment-status/list-all'],
     ['get', 'payment-status/list-by-enum/:descriptionEnum'],
   ];
 
   it.each(protectedRoutes)(
-    'sem credencial: %s %s responde 401 INVALID_TOKEN',
+    'no credential: %s %s responds 401 INVALID_TOKEN',
     async (method, path) => {
       const { dispatch } = makeHarness();
       const response = await dispatch(method, path);
@@ -127,17 +127,17 @@ describe('payment-status e2e (guarda de autenticação via factory)', () => {
     },
   );
 
-  it('com sessão válida a leitura executa normalmente (200)', async () => {
+  it('with a valid session the read runs normally (200)', async () => {
     const { dispatch } = makeHarness();
     const response = await dispatch('get', 'payment-status/list-all', {
       authorization: `Bearer ${VALID_TOKEN}`,
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body).toEqual({ data: [] });
   });
 
-  it('token inválido: 401 INVALID_TOKEN', async () => {
+  it('invalid token: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
     const response = await dispatch('get', 'payment-status/list-all', {
       authorization: 'Bearer token-desconhecido',

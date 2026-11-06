@@ -32,7 +32,7 @@ const makeUseCase = (repository: any) =>
   UpdateOwnPersonUseCase.create(repository, () => NOW);
 
 describe('UpdateOwnPersonUseCase', () => {
-  it('aplica campos editáveis, persiste puro e seta updatedAt', async () => {
+  it('applies editable fields, persists the pure value and sets updatedAt', async () => {
     const repository = makeRepository();
     repository.findByUserId.mockResolvedValue(makePerson());
 
@@ -51,7 +51,7 @@ describe('UpdateOwnPersonUseCase', () => {
     expect(person.toOutput().document?.value).toBe('390.xxx.xxx-05');
   });
 
-  it('404 quando não há person ativo para o userId', async () => {
+  it('404 when there is no active person for the userId', async () => {
     const repository = makeRepository();
     const promise = makeUseCase(repository).execute({
       userId: 'user-1',
@@ -63,7 +63,7 @@ describe('UpdateOwnPersonUseCase', () => {
     });
   });
 
-  it('document de outro person → DOCUMENT_ALREADY_IN_USE', async () => {
+  it('document of another person gives DOCUMENT_ALREADY_IN_USE', async () => {
     const repository = makeRepository();
     repository.findByUserId.mockResolvedValue(makePerson());
     repository.findByDocument.mockResolvedValue(makePerson('user-2'));
@@ -79,7 +79,7 @@ describe('UpdateOwnPersonUseCase', () => {
     expect(repository.update).not.toHaveBeenCalled();
   });
 
-  it('document já do próprio person não conflita', async () => {
+  it('document already owned by the same person does not conflict', async () => {
     const repository = makeRepository();
     repository.findByUserId.mockResolvedValue(makePerson());
     repository.findByDocument.mockResolvedValue(makePerson('user-1'));
@@ -92,7 +92,7 @@ describe('UpdateOwnPersonUseCase', () => {
     ).resolves.toBeInstanceOf(Person);
   });
 
-  it('busca de unicidade usa o document sanitizado (só dígitos)', async () => {
+  it('uniqueness lookup uses the sanitized document (digits only)', async () => {
     const repository = makeRepository();
     repository.findByUserId.mockResolvedValue(makePerson());
 

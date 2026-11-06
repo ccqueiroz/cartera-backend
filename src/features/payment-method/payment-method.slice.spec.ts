@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { makeCategoryModule } from '@/features/category/category.factory';
+import { makePaymentMethodModule } from '@/features/payment-method/payment-method.factory';
 import { Route } from '@/shared/http/route';
 import { VerifyTokenMiddleware } from '@/shared/http/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from '@/shared/http/express/middlewares/error.middleware';
@@ -43,7 +43,7 @@ interface DispatchedResponse {
 
 function makeHarness() {
   const authMiddleware = VerifyTokenMiddleware.create(sessionVerifier);
-  const module = makeCategoryModule({ db: makeFakeDb(), authMiddleware });
+  const routes = makePaymentMethodModule({ db: makeFakeDb(), authMiddleware });
   const logger = {
     info: jest.fn(),
     warn: jest.fn(),
@@ -55,13 +55,12 @@ function makeHarness() {
     method: string,
     path: string,
     input: {
-      query?: Record<string, string>;
       params?: Record<string, string>;
       body?: unknown;
       authorization?: string;
     } = {},
   ): Promise<DispatchedResponse> => {
-    const route = module.routes.find(
+    const route = routes.find(
       (candidate: Route) =>
         candidate.method === method && candidate.path === path,
     );
@@ -83,7 +82,7 @@ function makeHarness() {
     } as unknown as Response;
     const request = {
       body: input.body ?? {},
-      query: input.query ?? {},
+      query: {},
       params: input.params ?? {},
       headers: { authorization: input.authorization },
       cookies: {},
@@ -112,19 +111,17 @@ function makeHarness() {
   return { dispatch };
 }
 
-describe('category e2e (guarda de autenticação via factory)', () => {
+describe('payment-method e2e (authentication guard via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
-    ['get', 'category/list-all'],
-    ['get', 'category/list-by-enum/:descriptionEnum'],
-    ['get', 'category/list-groups'],
-    ['get', 'category/list-by-groups/:group'],
-    ['post', 'category/create'],
-    ['put', 'category/edit/:descriptionEnum'],
-    ['delete', 'category/delete/:descriptionEnum'],
+    ['get', 'payment-method/list-all'],
+    ['get', 'payment-method/list-by-enum/:descriptionEnum'],
+    ['post', 'payment-method/create'],
+    ['put', 'payment-method/edit/:descriptionEnum'],
+    ['delete', 'payment-method/delete/:descriptionEnum'],
   ];
 
   it.each(protectedRoutes)(
-    'sem credencial: %s %s responde 401 INVALID_TOKEN',
+    'no credential: %s %s responds 401 INVALID_TOKEN',
     async (method, path) => {
       const { dispatch } = makeHarness();
       const response = await dispatch(method, path);
@@ -134,21 +131,19 @@ describe('category e2e (guarda de autenticação via factory)', () => {
     },
   );
 
-  it('com sessão válida a leitura executa normalmente (200)', async () => {
+  it('with a valid session the read runs normally (200)', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category/list-all', {
-      query: { type: 'BILLS' },
+    const response = await dispatch('get', 'payment-method/list-all', {
       authorization: `Bearer ${VALID_TOKEN}`,
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual([]);
+    expect(response.body).toEqual({ data: [] });
   });
 
-  it('token inválido: 401 INVALID_TOKEN', async () => {
+  it('invalid token: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category/list-all', {
-      query: { type: 'BILLS' },
+    const response = await dispatch('get', 'payment-method/list-all', {
       authorization: 'Bearer token-desconhecido',
     });
 

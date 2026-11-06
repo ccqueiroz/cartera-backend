@@ -1,5 +1,5 @@
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
-import { Page } from '@/shared/query/page';
+import { Page, PaginationParams } from '@/shared/query/page';
 import { TransactionOutput } from '@/features/core-finance/transaction-engine/domain/transaction.entity';
 import {
   ListScope,
@@ -18,6 +18,7 @@ export interface ListReceivablesInput {
   rootIsFixedCost?: boolean;
   page?: number;
   size?: number;
+  params?: PaginationParams;
 }
 
 /** UC-RV3: lista folhas RECEIVABLES por competência, delegando ao motor (folhas, type fixo). */
@@ -43,6 +44,7 @@ export class ListReceivablesUseCase {
       rootIsFixedCost: input.rootIsFixedCost,
       page: input.page,
       size: input.size,
+      params: input.params,
     };
     return this.engine.list.execute(query);
   }

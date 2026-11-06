@@ -11,12 +11,11 @@ import { PersonController } from '@/features/person/infra/http/person.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       204:
- *         description: Avatar removido (no-op se não havia avatar).
- *       401:
- *         description: Sessão ausente ou inválida.
- *       404:
- *         description: Perfil não encontrado.
+ *       204: { description: "Avatar removido (no-op se não havia avatar)." }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       404: { $ref: '#/components/responses/PersonNotFound' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class RemoveAvatarRoute implements Route {
   public readonly method: HttpMethod = 'delete';

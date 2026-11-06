@@ -7,7 +7,7 @@ import {
 
 describe('overdraft.service', () => {
   describe('overdraftDailyFactor', () => {
-    it('soma IOF direto no fator (fórmula literal W13)', () => {
+    it('adds IOF directly to the factor (literal formula W13)', () => {
       expect(overdraftDailyFactor(0.1, 0.0038)).toBeCloseTo(1.0071333, 6);
     });
 
@@ -17,17 +17,17 @@ describe('overdraft.service', () => {
   });
 
   describe('accruedInterestFromOutstanding', () => {
-    it('caso de referência: R$ 1.000, 10%/mês, IOF 0.0038, 15 dias ⇒ ~R$ 112,5', () => {
+    it('reference case: R$ 1.000, 10%/month, IOF 0.0038, 15 days => ~R$ 112,5', () => {
       const outstanding = Array<number>(15).fill(1000);
       const accrued = accruedInterestFromOutstanding(outstanding, 0.1, 0.0038);
       expect(accrued).toBeCloseTo(112.5, 0);
     });
 
-    it('sem dias com juros ⇒ 0 (carência cobre o episódio)', () => {
+    it('no days with interest => 0 (grace period covers the episode)', () => {
       expect(accruedInterestFromOutstanding([], 0.1, 0.0038)).toBe(0);
     });
 
-    it('principal variável rende mais que o constante menor', () => {
+    it('variable principal yields more than the smaller constant one', () => {
       const constant = accruedInterestFromOutstanding(
         Array<number>(10).fill(1000),
         0.1,
@@ -42,7 +42,7 @@ describe('overdraft.service', () => {
       expect(Number.isFinite(growing)).toBe(true);
     });
 
-    it('nunca retorna negativo', () => {
+    it('never returns a negative value', () => {
       expect(
         accruedInterestFromOutstanding([1000, 0, 0], 0.1, 0.0038),
       ).toBeGreaterThanOrEqual(0);
@@ -50,12 +50,12 @@ describe('overdraft.service', () => {
   });
 
   describe('date helpers', () => {
-    it('addDays atravessa virada de mês', () => {
+    it('addDays crosses a month boundary', () => {
       expect(addDays('2026-01-31', 1)).toBe('2026-02-01');
       expect(addDays('2026-03-01', -1)).toBe('2026-02-28');
     });
 
-    it('listDays é inclusivo e vazio quando from > to', () => {
+    it('listDays is inclusive and empty when from > to', () => {
       expect(listDays('2026-06-10', '2026-06-12')).toEqual([
         '2026-06-10',
         '2026-06-11',

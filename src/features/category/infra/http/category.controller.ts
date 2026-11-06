@@ -1,10 +1,5 @@
 import type { Request, Response } from 'express';
-import {
-  ClassConstructor,
-  runValidate,
-} from '@/packages/clients/class-validator';
-import { ValidationError } from '@/shared/kernel/errors/domain.error';
-import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { assertValid } from '@/shared/http/request-input';
 import { ListCategoriesByTypeUseCase } from '@/features/category/application/list-categories-by-type.usecase';
 import { GetCategoryByEnumUseCase } from '@/features/category/application/get-category-by-enum.usecase';
 import { ListGroupsByTypeUseCase } from '@/features/category/application/list-groups-by-type.usecase';
@@ -20,26 +15,6 @@ import { EditCategorySchema } from '@/features/category/infra/http/schemas/edit-
 import { CategoryDescription } from '@/features/category/domain/enums/category-description.enum';
 import { CategoryGroup } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionType } from '@/shared/kernel/enums/transaction-type.enum';
-
-async function assertValid<T extends object>(
-  schema: ClassConstructor<T>,
-  input: unknown,
-): Promise<void> {
-  const errors = await runValidate(schema, input, {
-    whitelist: true,
-    forbidNonWhitelisted: true,
-  });
-  if (errors.length) {
-    const details = errors
-      .map((error) => Object.values(error.constraints ?? {}).join(', '))
-      .filter(Boolean)
-      .join('; ');
-    throw new ValidationError(
-      ErrorCode.VALIDATION_FAILED,
-      details ? { details } : undefined,
-    );
-  }
-}
 
 export interface CategoryUseCases {
   listByType: ListCategoriesByTypeUseCase;
@@ -63,7 +38,7 @@ export class CategoryController {
     const result = await this.useCases.listByType.execute({
       type: String(req.query.type),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
@@ -71,7 +46,7 @@ export class CategoryController {
     const result = await this.useCases.getByEnum.execute({
       descriptionEnum: String(req.params.descriptionEnum),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listGroups = async (req: Request, res: Response): Promise<void> => {
@@ -79,7 +54,7 @@ export class CategoryController {
     const result = await this.useCases.listGroups.execute({
       type: String(req.query.type),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public listByGroups = async (req: Request, res: Response): Promise<void> => {
@@ -89,7 +64,7 @@ export class CategoryController {
       group: String(req.params.group),
       type: String(req.query.type),
     });
-    res.status(200).json(result);
+    res.status(200).json({ data: result });
   };
 
   public create = async (req: Request, res: Response): Promise<void> => {
@@ -100,7 +75,9 @@ export class CategoryController {
       group: req.body.group as CategoryGroup,
       type: req.body.type as TransactionType,
     });
-    res.status(result.reactivated ? 200 : 201).json(result.category.toOutput());
+    res
+      .status(result.reactivated ? 200 : 201)
+      .json({ data: result.category.toOutput() });
   };
 
   public update = async (req: Request, res: Response): Promise<void> => {
@@ -113,7 +90,7 @@ export class CategoryController {
       type: req.body.type as TransactionType,
       requestedDescriptionEnum: req.body.descriptionEnum,
     });
-    res.status(200).json(category.toOutput());
+    res.status(200).json({ data: category.toOutput() });
   };
 
   public remove = async (req: Request, res: Response): Promise<void> => {

@@ -1,14 +1,14 @@
 import { Money } from './money.vo';
-import { ValidationError } from '../errors/domain.error';
+import { ValidationError } from '@/shared/kernel/errors/domain.error';
 
 describe('Money', () => {
-  it('cria e normaliza para 2 casas', () => {
+  it('creates and normalizes to 2 decimal places', () => {
     expect(Money.create(10.999).value).toBe(11);
     expect(Money.create(10.1).value).toBe(10.1);
     expect(Money.zero().value).toBe(0);
   });
 
-  it('rejeita negativo e não-finito', () => {
+  it('rejects negative and non-finite values', () => {
     expect(() => Money.create(-1)).toThrow(ValidationError);
     expect(() => Money.create(Number.NaN)).toThrow(ValidationError);
     expect(() => Money.create(Number.POSITIVE_INFINITY)).toThrow(
@@ -16,7 +16,7 @@ describe('Money', () => {
     );
   });
 
-  it('soma e subtrai (sem negativo)', () => {
+  it('adds and subtracts (no negative result)', () => {
     expect(Money.create(10).add(Money.create(5.55)).value).toBe(15.55);
     expect(Money.create(10).subtract(Money.create(3)).value).toBe(7);
     expect(Money.create(3).subtract(Money.create(10)).value).toBe(0);
@@ -34,7 +34,7 @@ describe('Money', () => {
     expect(Money.create(1234.5).format()).toContain('1.234,50');
   });
 
-  it('é imutável (operações retornam nova instância)', () => {
+  it('is immutable (operations return a new instance)', () => {
     const a = Money.create(10);
     const b = a.add(Money.create(1));
     expect(a.value).toBe(10);
@@ -45,7 +45,7 @@ describe('Money', () => {
     const sum = (slices: Money[]): number =>
       Number(slices.reduce((acc, s) => acc + s.value, 0).toFixed(2));
 
-    it('11 pesos iguais sobre 1300: Σ = 1300, centavo extra nos maiores restos', () => {
+    it('11 equal weights over 1300: sum = 1300, extra cent goes to the largest remainders', () => {
       const slices = Money.create(1300).allocate(Array(11).fill(200));
       expect(slices).toHaveLength(11);
       expect(sum(slices)).toBe(1300);
@@ -59,7 +59,7 @@ describe('Money', () => {
       expect(sum(slices)).toBe(100);
     });
 
-    it('ratio único recebe o valor inteiro', () => {
+    it('a single ratio gets the whole value', () => {
       const slices = Money.create(118.18).allocate([150]);
       expect(slices).toHaveLength(1);
       expect(slices[0].value).toBe(118.18);
@@ -87,13 +87,13 @@ describe('Money', () => {
       expect(slices[1].value).toBeGreaterThan(slices[0].value);
     });
 
-    it('é puro: não muta a instância original', () => {
+    it('is pure: does not mutate the original instance', () => {
       const original = Money.create(1300);
       original.allocate(Array(11).fill(200));
       expect(original.value).toBe(1300);
     });
 
-    it('propriedade: Σ fatias = entrada para valores e pesos variados', () => {
+    it('property: sum of slices = input for varied values and weights', () => {
       const cases: Array<[number, number[]]> = [
         [1300, Array(11).fill(200)],
         [100, [1, 1, 1]],

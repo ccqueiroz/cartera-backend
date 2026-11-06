@@ -18,10 +18,10 @@ import { AuthController } from '@/features/auth/infra/http/auth.controller';
  *             properties:
  *               email: { type: string, format: email }
  *     responses:
- *       202:
- *         description: Resposta genérica idêntica exista a conta ou não — nunca vaza existência.
- *       400:
- *         description: E-mail malformado (INVALID_EMAIL).
+ *       202: { $ref: '#/components/responses/RecoverPasswordOutputResponse' }
+ *       400: { $ref: '#/components/responses/AuthBadRequest' }
+ *       401: { $ref: '#/components/responses/RecoverPasswordUnauthorized' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class RecoverPasswordRoute implements Route {
   public readonly method: HttpMethod = 'post';

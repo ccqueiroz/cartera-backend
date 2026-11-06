@@ -24,9 +24,11 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  *     security:
  *       - sessionCookieAuth: []
  *     responses:
- *       201: { description: Carteira criada (com warnings se saldo negativo). }
- *       400: { description: Payload inválido. }
- *       401: { description: Sessão ausente ou inválida. }
+ *       201: { $ref: '#/components/responses/CreateWalletResultResponse' }
+ *       400: { $ref: '#/components/responses/WalletCreateBadRequest' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/UserDisabled' }
+ *       500: { $ref: '#/components/responses/InternalServerError' }
  */
 export class CreateWalletRoute implements Route {
   public readonly method: HttpMethod = 'post';

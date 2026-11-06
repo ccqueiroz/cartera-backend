@@ -12,7 +12,7 @@ function makeIds() {
 describe('CreateWalletUseCase', () => {
   const now = () => '2026-06-14T10:00:00.000Z';
 
-  it('cria com defaults e saldo zero sem movimento de abertura', async () => {
+  it('creates with defaults and zero balance and no opening movement', async () => {
     const repository = new InMemoryWalletRepository();
     const useCase = CreateWalletUseCase.create(repository, makeIds(), now);
 
@@ -70,7 +70,7 @@ describe('CreateWalletUseCase', () => {
     expect(movements[0].toOutput().amount).toBe(200);
   });
 
-  it('saldo inicial negativo é permitido com warning BALANCE_NEGATIVE', async () => {
+  it('negative initial balance is allowed with BALANCE_NEGATIVE warning', async () => {
     const repository = new InMemoryWalletRepository();
     const useCase = CreateWalletUseCase.create(repository, makeIds(), now);
 

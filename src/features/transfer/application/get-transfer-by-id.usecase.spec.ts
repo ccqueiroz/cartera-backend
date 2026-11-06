@@ -27,7 +27,7 @@ function repoWith(transfers: Transfer[]): TransferRepository {
 }
 
 describe('GetTransferByIdUseCase', () => {
-  it('retorna a transferência do próprio dono', async () => {
+  it('returns the transfer to its own owner', async () => {
     const useCase = GetTransferByIdUseCase.create(
       repoWith([transfer('t1', 'u1')]),
     );
@@ -37,7 +37,7 @@ describe('GetTransferByIdUseCase', () => {
     expect(output.id).toBe('t1');
   });
 
-  it('inexistente lança TRANSFER_NOT_FOUND (404)', async () => {
+  it('missing transfer throws TRANSFER_NOT_FOUND (404)', async () => {
     const useCase = GetTransferByIdUseCase.create(repoWith([]));
 
     await expect(
@@ -48,7 +48,7 @@ describe('GetTransferByIdUseCase', () => {
     ).rejects.toMatchObject({ code: ErrorCode.TRANSFER_NOT_FOUND });
   });
 
-  it('transferência de outro usuário lança TRANSFER_NOT_FOUND (não vaza existência)', async () => {
+  it('transfer of another user throws TRANSFER_NOT_FOUND (does not leak existence)', async () => {
     const useCase = GetTransferByIdUseCase.create(
       repoWith([transfer('t1', 'u2')]),
     );

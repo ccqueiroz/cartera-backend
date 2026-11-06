@@ -55,7 +55,7 @@
         ]
       }
     ],
-    "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }],
+    "jest/valid-title": ["error", { "mustMatch": "^[\\x20-\\x7E]*$" }],
     "jest/expect-expect": "warn",
     "no-warning-comments": [
       "error",
@@ -63,6 +63,83 @@
     ]
   },
   "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "excludedFiles": ["src/shared/http/**"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+            "message": "Importe o helper de @/shared/http/request-input; não declare uma cópia."
+          },
+          {
+            "selector": "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+            "message": "Importe o helper de @/shared/http/request-input; não declare uma cópia."
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/features/**/domain/**/*.ts",
+        "src/features/**/application/**/*.ts"
+      ],
+      "excludedFiles": ["**/*.spec.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']"
+        ]
+      }
+    },
+    {
+      "files": ["src/features/**/domain/**/*.ts"],
+      "excludedFiles": ["**/*.spec.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']",
+          "Identifier[name='Intl']",
+          "CallExpression[callee.property.name='toLocaleString']",
+          "CallExpression[callee.property.name='getTime']",
+          "NewExpression[callee.name='Date'][arguments.length=0]"
+        ]
+      }
+    },
+    {
+      "files": ["src/features/wallet/domain/overdraft.service.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          "FunctionDeclaration[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "VariableDeclarator[id.name=/^(assertValid|userIdFrom|numberOrUndefined|boolOrUndefined|booleanOrUndefined)$/]",
+          "NewExpression[callee.name='Error']",
+          "Identifier[name='Intl']",
+          "CallExpression[callee.property.name='toLocaleString']",
+          "NewExpression[callee.name='Date'][arguments.length=0]"
+        ]
+      }
+    },
+    {
+      "files": ["src/**/*.ts"],
+      "excludedFiles": [
+        "**/*.spec.ts",
+        "**/*.mock.ts",
+        "src/test/**",
+        "src/bootstrap/main.ts",
+        "**/*.factory.ts",
+        "**/transaction.entity.ts"
+      ],
+      "rules": {
+        "max-lines": ["warn", 400],
+        "max-lines-per-function": ["warn", 60]
+      }
+    },
     {
       "files": ["src/**/*.route.ts"],
       "excludedFiles": ["src/features/*/infra/http/**/*.route.ts"],
@@ -74,6 +151,12 @@
             "message": "Arquivos *.route.ts só podem existir em features/*/infra/http (AGENTS.md, Routes)."
           }
         ]
+      }
+    },
+    {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": ["error", { "patterns": ["../*"] }]
       }
     },
     {
@@ -95,7 +178,8 @@
               "**/shared/http",
               "**/shared/http/**",
               "@/shared/http",
-              "@/shared/http/**"
+              "@/shared/http/**",
+              "../*"
             ]
           }
         ]
@@ -120,6 +204,22 @@
         "@typescript-eslint/no-explicit-any": "off",
         "no-console": "off",
         "@typescript-eslint/no-empty-function": "off"
+      }
+    },
+    {
+      "files": ["test/e2e/**/*.e2e-live.spec.ts"],
+      "rules": {
+        "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }]
+      }
+    },
+    {
+      "files": [
+        "migrations-firebase/001-create-payment-methods.spec.ts",
+        "migrations-firebase/002-create-category.spec.ts",
+        "migrations-firebase/005-seed-financial-indicators.spec.ts"
+      ],
+      "rules": {
+        "jest/valid-title": ["warn", { "mustMatch": "^[\\x20-\\x7E]*$" }]
       }
     }
   ],

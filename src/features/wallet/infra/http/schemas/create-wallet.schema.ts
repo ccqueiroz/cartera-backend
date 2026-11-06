@@ -7,32 +7,79 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
 export class CreateWalletSchema {
-  @IsString({ message: 'O nome deve ser um texto.' })
-  @IsNotEmpty({ message: 'O nome da carteira é obrigatório.' })
+  @IsString({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_TEXT]({
+      attribute: 'O nome',
+    }),
+  })
+  @IsNotEmpty({ message: errorCatalog[ErrorCode.WALLET_NAME_REQUIRED]() })
   name!: string;
 
   @IsOptional()
-  @IsNumber({}, { message: 'O saldo inicial deve ser um número.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'O saldo inicial',
+      }),
+    },
+  )
   balance?: number;
 
   @IsOptional()
-  @IsBoolean({ message: 'hasOverdraft deve ser um booleano.' })
+  @IsBoolean({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_A_BOOLEAN]({
+      attribute: 'hasOverdraft',
+    }),
+  })
   hasOverdraft?: boolean;
 
   @IsOptional()
-  @IsNumber({}, { message: 'O limite do cheque deve ser um número.' })
-  @Min(0, { message: 'O limite do cheque não pode ser negativo.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'O limite do cheque',
+      }),
+    },
+  )
+  @Min(0, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_MASCULINE]({
+      attribute: 'O limite do cheque',
+    }),
+  })
   overdraftLimit?: number;
 
   @IsOptional()
-  @IsNumber({}, { message: 'A taxa mensal deve ser um número.' })
-  @Min(0, { message: 'A taxa mensal não pode ser negativa.' })
+  @IsNumber(
+    {},
+    {
+      message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_NUMBER]({
+        attribute: 'A taxa mensal',
+      }),
+    },
+  )
+  @Min(0, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE]({
+      attribute: 'A taxa mensal',
+    }),
+  })
   overdraftMonthlyRate?: number;
 
   @IsOptional()
-  @IsInt({ message: 'A carência deve ser um número inteiro de dias.' })
-  @Min(0, { message: 'A carência não pode ser negativa.' })
+  @IsInt({
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_BE_WHOLE_DAYS]({
+      attribute: 'A carência',
+    }),
+  })
+  @Min(0, {
+    message: errorCatalog[ErrorCode.ATTRIBUTE_MUST_NOT_BE_NEGATIVE_FEMININE]({
+      attribute: 'A carência',
+    }),
+  })
   overdraftGraceDays?: number;
 }

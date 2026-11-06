@@ -29,7 +29,7 @@ const input = {
 };
 
 describe('CreatePersonUseCase', () => {
-  it('cria person ativo com createdAt e email espelho', async () => {
+  it('creates an active person with createdAt and a mirrored email', async () => {
     const repository = makeRepository();
     const person = await makeUseCase(repository).execute(input);
 
@@ -42,7 +42,7 @@ describe('CreatePersonUseCase', () => {
     expect(person.toOutput().isActive).toBe(true);
   });
 
-  it('rejeita userId que já tem person com PERSON_ALREADY_EXISTS', async () => {
+  it('rejects a userId that already has a person with PERSON_ALREADY_EXISTS', async () => {
     const repository = makeRepository();
     repository.findByUserIdIncludingDeleted.mockResolvedValue({} as Person);
 

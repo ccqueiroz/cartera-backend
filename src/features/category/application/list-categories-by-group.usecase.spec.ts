@@ -1,7 +1,7 @@
 import { ListCategoriesByGroupUseCase } from './list-categories-by-group.usecase';
-import { Category } from '../domain/category.entity';
-import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { Category } from '@/features/category/domain/category.entity';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -16,7 +16,7 @@ const makeCategory = () =>
   });
 
 describe('ListCategoriesByGroupUseCase', () => {
-  it('retorna ativos do grupo filtrados por tipo', async () => {
+  it('returns active items of the group filtered by type', async () => {
     const repository = {
       findActiveByGroupAndType: async () => [makeCategory()],
     } as any;
@@ -28,7 +28,7 @@ describe('ListCategoriesByGroupUseCase', () => {
     expect(result[0].group).toBe(CategoryGroupEnum.BANK);
   });
 
-  it('retorna [] quando não há ativos no grupo/tipo', async () => {
+  it('returns [] when no active items match the group/type', async () => {
     const repository = { findActiveByGroupAndType: async () => [] } as any;
     const useCase = ListCategoriesByGroupUseCase.create(repository);
 
@@ -37,7 +37,7 @@ describe('ListCategoriesByGroupUseCase', () => {
     ).toEqual([]);
   });
 
-  it('rejeita group fora do enum', async () => {
+  it('rejects group outside the enum', async () => {
     const repository = { findActiveByGroupAndType: async () => [] } as any;
     const useCase = ListCategoriesByGroupUseCase.create(repository);
 
@@ -46,7 +46,7 @@ describe('ListCategoriesByGroupUseCase', () => {
     ).rejects.toMatchObject({ code: ErrorCode.INVALID_CATEGORY_GROUP });
   });
 
-  it('rejeita type fora do enum', async () => {
+  it('rejects type outside the enum', async () => {
     const repository = { findActiveByGroupAndType: async () => [] } as any;
     const useCase = ListCategoriesByGroupUseCase.create(repository);
 

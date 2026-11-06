@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check origem do PR
         run: |
@@ -94,5 +96,14 @@ jobs:
       - name: Checando arquitetura
         run: yarn arch:check
 
-      - name: Build do OpenAPI
-        run: node scripts/build-openapi.cjs
+      - name: Regras e índices do Firestore no repo
+        run: jq -er ".firestore.rules, .firestore.indexes" firebase.json | while read -r f; do test -f "$f" || exit 1; done
+        shell: bash
+
+      - name: Contrato OpenAPI gerado em dia
+        run: node scripts/build-swagger-schemas.cjs && node scripts/build-openapi.cjs && git diff --exit-code -- src/shared/http/swagger/openapi.json src/shared/http/swagger/schemas.swagger.ts
+        shell: bash
+
+      - name: Migrações já rodadas sem edição
+        run: git diff --name-status origin/dev -- migrations-firebase/ | awk '/^M/ { edited = 1; print } END { exit edited }'
+        shell: bash

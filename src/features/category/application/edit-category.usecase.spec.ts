@@ -1,7 +1,7 @@
 import { EditCategoryUseCase } from './edit-category.usecase';
-import { Category } from '../domain/category.entity';
-import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { Category } from '@/features/category/domain/category.entity';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -41,7 +41,7 @@ describe('EditCategoryUseCase', () => {
     expect(updated).toHaveLength(1);
   });
 
-  it('lança not found quando não existe ativo (404)', async () => {
+  it('throws not found when no active one exists (404)', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       update: async () => {},
@@ -56,7 +56,7 @@ describe('EditCategoryUseCase', () => {
     });
   });
 
-  it('rejeita troca de descriptionEnum (422)', async () => {
+  it('rejects descriptionEnum change (422)', async () => {
     const repository = {
       findActiveByEnum: async () => makeActive(),
       update: async () => {},

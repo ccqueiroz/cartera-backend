@@ -274,14 +274,14 @@ const REGISTER_BODY = {
 
 describe('auth e2e (slice via factory + deps fake)', () => {
   describe('7.1 registro', () => {
-    it('registro feliz: 201, shape do body e cookie com atributos', async () => {
+    it('happy registration: 201, body shape and cookie with attributes', async () => {
       const { dispatch } = makeHarness();
       const response = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.body).toMatchObject({
+      expect((response.body as any).data).toMatchObject({
         email: 'ana@example.com',
         userId: 'uid-1',
         firstName: 'Ana',
@@ -290,7 +290,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
         id: 'person-1',
         updatedAt: null,
       });
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data;
       expect(body.accessToken).toBeTruthy();
       expect(body.refreshToken).toBeTruthy();
       expect(body.expirationTime).toMatch(ISO_8601);
@@ -313,7 +313,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('falha do person compensa: nenhuma conta órfã sobra no provider', async () => {
+    it('person failure compensates: no orphan account is left in the provider', async () => {
       const { dispatch, provider, personGateway } = makeHarness();
       personGateway.failNextCreate = true;
 
@@ -327,7 +327,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
   });
 
   describe('7.2 login', () => {
-    it('login feliz: 200 com tokens no body e cookie setado', async () => {
+    it('happy login: 200 with tokens in the body and cookie set', async () => {
       const { dispatch } = makeHarness();
       await dispatch('post', 'auth/account', { body: REGISTER_BODY });
 
@@ -336,7 +336,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data;
       expect(body.userId).toBe('uid-1');
       expect(body.expirationTime).toMatch(ISO_8601);
       expect(response.cookies['session']).toEqual({
@@ -345,7 +345,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('e-mail inexistente e senha errada são 401 INVALID_CREDENTIALS indistinguíveis', async () => {
+    it('unknown email and wrong password are indistinguishable 401 INVALID_CREDENTIALS', async () => {
       const { dispatch } = makeHarness();
       await dispatch('post', 'auth/account', { body: REGISTER_BODY });
 
@@ -364,7 +364,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('conta desativada com person soft-deletado: 403 ACCOUNT_DELETED', async () => {
+    it('disabled account with soft-deleted person: 403 ACCOUNT_DELETED', async () => {
       const { dispatch, provider, personGateway } = makeHarness();
       await dispatch('post', 'auth/account', { body: REGISTER_BODY });
       provider.accounts.get('uid-1')!.disabled = true;
@@ -379,7 +379,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       expect(response.body).toMatchObject({ code: ErrorCode.ACCOUNT_DELETED });
     });
 
-    it('conta desativada sem soft-delete: 403 USER_DISABLED', async () => {
+    it('disabled account without soft-delete: 403 USER_DISABLED', async () => {
       const { dispatch, provider } = makeHarness();
       await dispatch('post', 'auth/account', { body: REGISTER_BODY });
       provider.accounts.get('uid-1')!.disabled = true;
@@ -394,19 +394,19 @@ describe('auth e2e (slice via factory + deps fake)', () => {
   });
 
   describe('7.3 refresh', () => {
-    it('refresh feliz: 200 com tokens novos e expirationTime no MESMO formato do login', async () => {
+    it('happy refresh: 200 with new tokens and expirationTime in the SAME format as login', async () => {
       const { dispatch } = makeHarness();
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
 
       const response = await dispatch('put', 'auth/session', {
         body: { refreshToken: registerBody.refreshToken },
       });
 
       expect(response.statusCode).toBe(200);
-      const body = response.body as Record<string, string>;
+      const body = (response.body as any).data;
       expect(body.accessToken).not.toBe(registerBody.accessToken);
       expect(body.expirationTime).toMatch(ISO_8601);
       expect(registerBody.expirationTime).toMatch(ISO_8601);
@@ -416,7 +416,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('refresh sem token: 400 VALIDATION_FAILED', async () => {
+    it('refresh without token: 400 VALIDATION_FAILED', async () => {
       const { dispatch } = makeHarness();
       const response = await dispatch('put', 'auth/session', { body: {} });
 
@@ -426,12 +426,12 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('refresh revogado (pós-signout): 401 INVALID_TOKEN', async () => {
+    it('revoked refresh (after signout): 401 INVALID_TOKEN', async () => {
       const { dispatch } = makeHarness();
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
       await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
       });
@@ -451,7 +451,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
 
       const signout = await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
@@ -470,12 +470,12 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       });
     });
 
-    it('Bearer vence o cookie quando ambos presentes', async () => {
+    it('Bearer wins over the cookie when both are present', async () => {
       const { dispatch } = makeHarness();
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
 
       const response = await dispatch('delete', 'auth/session', {
         authorization: `Bearer ${registerBody.accessToken}`,
@@ -485,12 +485,12 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       expect(response.statusCode).toBe(204);
     });
 
-    it('cookie session funciona como fallback sem header', async () => {
+    it('session cookie works as fallback without header', async () => {
       const { dispatch } = makeHarness();
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
 
       const response = await dispatch('delete', 'auth/session', {
         sessionCookie: registerBody.accessToken,
@@ -499,7 +499,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       expect(response.statusCode).toBe(204);
     });
 
-    it('token expirado: 401 TOKEN_EXPIRED (≠ INVALID_TOKEN)', async () => {
+    it('expired token: 401 TOKEN_EXPIRED (not INVALID_TOKEN)', async () => {
       const { dispatch } = makeHarness();
       const expired = await dispatch('delete', 'auth/session', {
         authorization: 'Bearer expired:uid-1:1',
@@ -514,7 +514,7 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       expect(invalid.body).toMatchObject({ code: ErrorCode.INVALID_TOKEN });
     });
 
-    it('sem credencial nenhuma: 401 INVALID_TOKEN', async () => {
+    it('no credential at all: 401 INVALID_TOKEN', async () => {
       const { dispatch } = makeHarness();
       const response = await dispatch('delete', 'auth/session');
 
@@ -522,12 +522,12 @@ describe('auth e2e (slice via factory + deps fake)', () => {
       expect(response.body).toMatchObject({ code: ErrorCode.INVALID_TOKEN });
     });
 
-    it('conta desativada no meio da sessão: 403', async () => {
+    it('disabled account in the middle of the session: 403', async () => {
       const { dispatch, provider } = makeHarness();
       const registered = await dispatch('post', 'auth/account', {
         body: REGISTER_BODY,
       });
-      const registerBody = registered.body as Record<string, string>;
+      const registerBody = (registered.body as any).data;
       provider.accounts.get('uid-1')!.disabled = true;
 
       const response = await dispatch('delete', 'auth/session', {
@@ -539,8 +539,8 @@ describe('auth e2e (slice via factory + deps fake)', () => {
     });
   });
 
-  describe('7.5 recuperação de senha', () => {
-    it('e-mail existente e desconhecido: mesmo 202 com body idêntico', async () => {
+  describe('7.5 password recovery', () => {
+    it('existing and unknown email: same 202 with identical body', async () => {
       const { dispatch } = makeHarness();
       await dispatch('post', 'auth/account', { body: REGISTER_BODY });
 

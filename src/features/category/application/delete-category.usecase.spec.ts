@@ -1,7 +1,7 @@
 import { DeleteCategoryUseCase } from './delete-category.usecase';
-import { Category } from '../domain/category.entity';
-import { CategoryDescriptionEnum } from '../domain/enums/category-description.enum';
-import { CategoryGroupEnum } from '../domain/enums/category-group.enum';
+import { Category } from '@/features/category/domain/category.entity';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { CategoryGroupEnum } from '@/features/category/domain/enums/category-group.enum';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 
@@ -36,7 +36,7 @@ describe('DeleteCategoryUseCase', () => {
     );
   });
 
-  it('lança not found quando não há ativo (404)', async () => {
+  it('throws not found when there is no active one (404)', async () => {
     const repository = {
       findActiveByEnum: async () => null,
       softDelete: async () => {},

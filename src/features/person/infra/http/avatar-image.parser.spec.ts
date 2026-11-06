@@ -32,7 +32,7 @@ const pngBuffer = (size = 100) => {
 };
 
 describe('parseAvatarImage', () => {
-  it('aceita JPEG pelos magic bytes', () => {
+  it('accepts JPEG by its magic bytes', () => {
     const { buffer, contentType } = parseAvatarImage(
       jpegBuffer().toString('base64'),
     );
@@ -40,24 +40,24 @@ describe('parseAvatarImage', () => {
     expect(buffer.length).toBe(100);
   });
 
-  it('aceita PNG pelos magic bytes', () => {
+  it('accepts PNG by its magic bytes', () => {
     const { contentType } = parseAvatarImage(pngBuffer().toString('base64'));
     expect(contentType).toBe('image/png');
   });
 
-  it('aceita data URL e ignora o type declarado pelo cliente', () => {
+  it('accepts a data URL and ignores the type declared by the client', () => {
     const dataUrl = `data:image/gif;base64,${pngBuffer().toString('base64')}`;
     expect(parseAvatarImage(dataUrl).contentType).toBe('image/png');
   });
 
-  it('rejeita conteúdo que não é JPEG/PNG com AVATAR_UNSUPPORTED_TYPE', () => {
+  it('rejects content that is not JPEG or PNG with AVATAR_UNSUPPORTED_TYPE', () => {
     const gif = Buffer.from('GIF89a-not-an-image');
     const error = captureError(() => parseAvatarImage(gif.toString('base64')));
     expect(error).toBeInstanceOf(BusinessRuleViolationError);
     expect(error.code).toBe(ErrorCode.AVATAR_UNSUPPORTED_TYPE);
   });
 
-  it('rejeita imagem decodificada acima de 5MB com AVATAR_TOO_LARGE (413)', () => {
+  it('rejects a decoded image above 5MB with AVATAR_TOO_LARGE (413)', () => {
     const oversized = jpegBuffer(5 * 1024 * 1024 + 1);
     const error = captureError(() =>
       parseAvatarImage(oversized.toString('base64')),
@@ -66,7 +66,7 @@ describe('parseAvatarImage', () => {
     expect(error.code).toBe(ErrorCode.AVATAR_TOO_LARGE);
   });
 
-  it('aceita imagem exatamente no limite de 5MB', () => {
+  it('accepts an image exactly at the 5MB limit', () => {
     const atLimit = jpegBuffer(5 * 1024 * 1024);
     expect(parseAvatarImage(atLimit.toString('base64')).contentType).toBe(
       'image/jpeg',

@@ -22,11 +22,6 @@ export const swaggerDefinition: OAS3Options = {
           in: 'cookie',
           name: 'session',
         },
-        refreshCookieAuth: {
-          type: 'apiKey',
-          in: 'cookie',
-          name: 'refresh_session',
-        },
       },
     },
   },

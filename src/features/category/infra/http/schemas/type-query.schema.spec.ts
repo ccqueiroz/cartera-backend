@@ -4,7 +4,7 @@ import { TypeQuerySchema } from './type-query.schema';
 const options = { whitelist: true, forbidNonWhitelisted: true };
 
 describe('TypeQuerySchema', () => {
-  it('aceita type válido', async () => {
+  it('accepts valid type', async () => {
     const errors = await runValidate(
       TypeQuerySchema,
       { type: 'BILLS' },
@@ -13,7 +13,7 @@ describe('TypeQuerySchema', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('rejeita type fora do enum', async () => {
+  it('rejects type outside the enum', async () => {
     const errors = await runValidate(
       TypeQuerySchema,
       { type: 'NOPE' },
@@ -22,7 +22,7 @@ describe('TypeQuerySchema', () => {
     expect(errors.length).toBeGreaterThan(0);
   });
 
-  it('rejeita props desconhecidas', async () => {
+  it('rejects unknown props', async () => {
     const errors = await runValidate(
       TypeQuerySchema,
       { type: 'BILLS', extra: 'x' },

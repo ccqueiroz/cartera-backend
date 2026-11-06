@@ -1,6 +1,6 @@
-# Slice e2e spec (in process)
+# Slice spec (in process)
 
-`src/features/<feature>/<feature>.e2e.spec.ts`. The whole slice through the factory with a fake Firestore db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.e2e.spec.ts`, with a local `makeFakeDb()` until the shared fake exists.
+`src/features/<feature>/<feature>.slice.spec.ts`. The whole slice through the factory with a fake Firestore db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.slice.spec.ts`, with a local `makeFakeDb()` until the shared fake exists.
 
 ```ts
 const VALID_TOKEN = 'valid-token';
@@ -78,7 +78,9 @@ it('POST budget/create answers 201 and the created output', async () => {
     body: { name: 'Housing', limit: 2500, categoryDescriptionEnum: 'RENT' },
   });
   expect(response.statusCode).toBe(201);
-  expect(response.body).toMatchObject({ id: 'budget-1', active: true });
+  expect(response.body).toMatchObject({
+    data: { id: 'budget-1', active: true },
+  });
 });
 
 it('rejects without a session with 401 and the catalog code', async () => {
@@ -88,4 +90,4 @@ it('rejects without a session with 401 and the catalog code', async () => {
 });
 ```
 
-Promote the `dispatch` harness to a shared test helper on the second feature that uses it (today four e2e specs carry their own copy).
+Promote the `dispatch` harness to a shared test helper on the second feature that uses it (today four slice specs carry their own copy).
