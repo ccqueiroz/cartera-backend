@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { Firestore } from 'firebase-admin/firestore';
 import { makePaymentStatusModule } from '@/features/payment-status/payment-status.factory';
 import { Route } from '@/shared/http/route';
 import { VerifyTokenMiddleware } from '@/shared/http/express/middlewares/verify-token.middleware';
@@ -6,6 +7,7 @@ import { ErrorMiddleware } from '@/shared/http/express/middlewares/error.middlew
 import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
 import { LoggerGateway } from '@/shared/logger/logger.gateway';
+import { firestoreEmulator } from '@/test/support/firestore-emulator';
 
 const VALID_TOKEN = 'token-valido';
 
@@ -18,23 +20,15 @@ const sessionVerifier = {
   },
 };
 
-function makeFakeDb(): any {
-  const query: any = {
-    get: async () => ({ empty: true, docs: [] }),
-  };
-  query.where = () => query;
-  query.orderBy = () => query;
-  query.limit = () => query;
-  return {
-    collection: () => ({
-      ...query,
-      doc: () => ({
-        set: async () => undefined,
-        get: async () => ({ exists: false }),
-      }),
-    }),
-  };
-}
+jest.setTimeout(60_000);
+
+let db: Firestore;
+
+beforeAll(async () => {
+  db = await firestoreEmulator.connect();
+});
+beforeEach(() => firestoreEmulator.clear());
+afterAll(() => db.terminate());
 
 interface DispatchedResponse {
   statusCode: number;
@@ -43,7 +37,7 @@ interface DispatchedResponse {
 
 function makeHarness() {
   const authMiddleware = VerifyTokenMiddleware.create(sessionVerifier);
-  const routes = makePaymentStatusModule({ db: makeFakeDb(), authMiddleware });
+  const routes = makePaymentStatusModule({ db, authMiddleware });
   const logger = {
     info: jest.fn(),
     warn: jest.fn(),
