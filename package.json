@@ -28,6 +28,8 @@
     "migrate": "ts-node scripts/run-migrations-firebase.ts",
     "start:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml --env-file .env.docker.env up --build -d",
     "stop:docker:dev": "COMPOSE_PROJECT_NAME=carteira-backend-dev docker compose -f docker-compose.dev.yml down",
+    "emulator:start": "docker run -d --rm --name cartera-firestore-emulator -p 127.0.0.1:8085:8085 gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-emulators gcloud emulators firestore start --host-port=0.0.0.0:8085 --project=demo-cartera && for i in $(seq 1 60); do curl -sf http://127.0.0.1:8085/ > /dev/null && exit 0; sleep 1; done; exit 1",
+    "emulator:stop": "docker stop cartera-firestore-emulator",
     "start:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml --env-file .env.docker.prod.env up --build -d",
     "stop:docker:prod": "COMPOSE_PROJECT_NAME=carteira-backend-prod docker compose -f docker-compose.prod.yml down"
   },
