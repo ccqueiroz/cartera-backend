@@ -1,15 +1,24 @@
 # Repository contract spec
 
-`infra/persistence/<feature>.repository.contract.spec.ts`. One `describe.each` over both adapters; the Firestore adapter runs over a Firestore fake that encodes the Firestore rules: `== null` only matches a present null, reads before writes in a transaction, writes applied on commit, `undefined` rejected. A shared fake is planned; until it exists, keep the fake local to the spec, as the sibling specs do.
+`infra/persistence/<feature>.repository.contract.spec.ts`. One `describe.each` over both adapters; the Firestore adapter runs over the Firestore emulator (`src/test/support/firestore-emulator.ts`), which enforces the Firestore rules itself: `== null` only matches a present null, reads before writes in a transaction, writes applied on commit, `undefined` rejected.
 
 ```ts
+import { Firestore } from 'firebase-admin/firestore';
+import { firestoreEmulator } from '@/test/support/firestore-emulator';
 import { Budget } from '@/features/budget/domain/budget.entity';
 import { BudgetRepository } from '@/features/budget/domain/ports/budget.repository.port';
 import { InMemoryBudgetRepository } from '@/features/budget/infra/persistence/in-memory-budget.repository';
 import { BudgetRepositoryFirestore } from '@/features/budget/infra/persistence/budget.repository.firestore';
 
-// Local Firestore fake with the rules above; replace it by the shared fake when that exists.
-declare function makeFirestoreFake(): { db: any };
+jest.setTimeout(60_000);
+
+let db: Firestore;
+
+beforeAll(async () => {
+  db = await firestoreEmulator.connect();
+});
+beforeEach(() => firestoreEmulator.clear());
+afterAll(() => db.terminate());
 
 const build = (id: string, userId = 'user-1') =>
   Budget.create({
@@ -22,10 +31,7 @@ const build = (id: string, userId = 'user-1') =>
 
 const adapters: [string, () => BudgetRepository][] = [
   ['in-memory', () => new InMemoryBudgetRepository()],
-  [
-    'firestore (fake)',
-    () => BudgetRepositoryFirestore.create(makeFirestoreFake().db),
-  ],
+  ['firestore (emulator)', () => BudgetRepositoryFirestore.create(db)],
 ];
 
 describe.each(adapters)(
@@ -57,4 +63,4 @@ describe.each(adapters)(
 );
 ```
 
-Transactional repositories (wallet, transaction-tree, transfer) add cases for atomicity: a failing `work` leaves the store untouched; reads after a write inside the callback throw (the fake enforces it).
+Transactional repositories (wallet, transaction-tree, transfer) add cases for atomicity: a failing `work` leaves the store untouched; reads after a write inside the callback throw (the emulator enforces it).

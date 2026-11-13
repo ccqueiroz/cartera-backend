@@ -1,6 +1,6 @@
 # Slice spec (in process)
 
-`src/features/<feature>/<feature>.slice.spec.ts`. The whole slice through the factory with a fake Firestore db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.slice.spec.ts`, with a local `makeFakeDb()` until the shared fake exists.
+`src/features/<feature>/<feature>.slice.spec.ts`. The whole slice through the factory with the Firestore emulator db, the real `VerifyTokenMiddleware` (session verifier as a literal) and the real `ErrorMiddleware`, dispatched without Express. Proves wiring, guard, validation and the `{message, code}` envelope end to end. Pattern of `src/features/category/category.slice.spec.ts`, with the `db` of `firestoreEmulator.connect()`.
 
 ```ts
 const VALID_TOKEN = 'valid-token';
@@ -15,7 +15,7 @@ const sessionVerifier = {
 function makeHarness() {
   const authMiddleware = VerifyTokenMiddleware.create(sessionVerifier);
   const module = makeBudgetModule({
-    db: makeFakeDb(),
+    db,
     authMiddleware,
     categoryGateway: {
       resolve: async (e) =>

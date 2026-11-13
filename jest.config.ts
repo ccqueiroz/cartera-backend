@@ -8,6 +8,8 @@ import { resolve } from 'path';
 import { pathsToModuleNameMapper } from 'ts-jest';
 import { compilerOptions } from './tsconfig.json';
 
+process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8085';
+
 const root = resolve(__dirname);
 
 const config: Config = {
