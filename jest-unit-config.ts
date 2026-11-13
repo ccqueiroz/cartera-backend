@@ -17,6 +17,7 @@ config.collectCoverageFrom = [
   // Estrutura nova: camadas de wiring/transport são cobertas por testes de
   // integração, não unitários — fora do gate de cobertura unitária.
   '!**/src/**/infra/**/*.ts',
+  '**/src/features/**/infra/persistence/**/*.ts',
   '!**/src/**/*.factory.ts',
   '!**/src/bootstrap/**/*.ts',
   '!**/src/shared/http/**/*.ts',
@@ -38,6 +39,21 @@ config.coverageThreshold = {
     lines: 85,
     statements: 85,
   },
+  ...Object.fromEntries(
+    [
+      'category',
+      'core-finance/transaction-engine',
+      'financial-indicator',
+      'payment-method',
+      'payment-status',
+      'person',
+      'transfer',
+      'wallet',
+    ].map((folder) => [
+      `./src/features/${folder}/infra/persistence/`,
+      { branches: 90, functions: 95, lines: 95, statements: 95 },
+    ]),
+  ),
 };
 
 export default config;
