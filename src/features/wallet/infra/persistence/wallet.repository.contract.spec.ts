@@ -237,4 +237,38 @@ describe('WalletRepositoryFirestore atomic run', () => {
     expect(await repository.findById('w1', 'u1')).toBeNull();
     expect(await repository.listMovements('w1', 'u1')).toEqual([]);
   });
+
+  const brokenMovement = () =>
+    WalletMovement.with({
+      ...movement({ id: 'm2' }).toPersistence(),
+      occurredAt: undefined as unknown as string,
+    });
+
+  it('[BK3-09] a movement with an undefined field makes saveWithMovements reject and leaves no wallet and no movement (rollback)', async () => {
+    const repository = WalletRepositoryFirestore.create(db);
+
+    await expect(
+      repository.saveWithMovements(wallet({ balance: 100 }), [
+        movement(),
+        brokenMovement(),
+      ]),
+    ).rejects.toThrow();
+
+    expect(await repository.findById('w1', 'u1')).toBeNull();
+    expect(await repository.listMovements('w1', 'u1')).toEqual([]);
+  });
+
+  it('[BK3-09] a movement with an undefined field makes create reject and leaves no wallet and no movement', async () => {
+    const repository = WalletRepositoryFirestore.create(db);
+
+    await expect(
+      repository.create(wallet({ balance: 100 }), [
+        movement(),
+        brokenMovement(),
+      ]),
+    ).rejects.toThrow();
+
+    expect(await repository.findById('w1', 'u1')).toBeNull();
+    expect(await repository.listMovements('w1', 'u1')).toEqual([]);
+  });
 });
