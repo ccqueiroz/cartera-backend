@@ -11,6 +11,12 @@ jobs:
     name: '🚀 Build & Test'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      firestore-emulator:
+        image: gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-emulators
+        command: gcloud emulators firestore start --host-port=0.0.0.0:8085 --project=demo-cartera
+        ports:
+          - '8085:8085'
     env:
       CI: true
     outputs:
@@ -81,6 +87,9 @@ jobs:
 
       - name: Limpeza do cache do Jest
         run: npx jest --clearCache
+
+      - name: Esperando o emulador do Firestore
+        run: for i in $(seq 1 60); do curl -sf http://127.0.0.1:8085/ > /dev/null && exit 0; sleep 1; done; exit 1
 
       - name: Analisando Testes Unitários
         id: unit-tests
