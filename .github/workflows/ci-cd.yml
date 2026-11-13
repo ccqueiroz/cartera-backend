@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
-      firestore-emulator:
+      firestore:
         image: gcr.io/google.com/cloudsdktool/google-cloud-cli:591.0.0-emulators
         command: gcloud emulators firestore start --host-port=0.0.0.0:8085 --project=demo-cartera
         ports:

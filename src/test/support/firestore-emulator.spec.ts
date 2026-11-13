@@ -147,4 +147,19 @@ describe('firestore emulator support', () => {
         ),
       ),
   );
+
+  it('[BK3-02] assertTarget rejects an empty host before checking the project', () =>
+    expect(firestoreEmulator.assertTarget('', 'cartera-tst')).rejects.toThrow(
+      expect.objectContaining({ message: HOST_NOT_SET }),
+    ));
+
+  it('[BK3-03] assertTarget rejects a non demo project before calling the host', () =>
+    expect(
+      firestoreEmulator.assertTarget('not a host', 'cartera-tst'),
+    ).rejects.toThrow(
+      expect.objectContaining({
+        message:
+          '[firestore emulator] project "cartera-tst" is not a demo-* project; aborted',
+      }),
+    ));
 });
