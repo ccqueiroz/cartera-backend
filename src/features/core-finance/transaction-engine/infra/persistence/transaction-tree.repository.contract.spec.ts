@@ -9,6 +9,7 @@ import {
 } from '@/features/core-finance/transaction-engine/domain/ports/transaction-tree.repository.port';
 import { InMemoryTransactionTreeRepository } from '@/features/core-finance/transaction-engine/infra/persistence/in-memory-transaction-tree.repository';
 import { TransactionTreeRepositoryFirestore } from '@/features/core-finance/transaction-engine/infra/persistence/transaction-tree.repository.firestore';
+import { TransactionNotFoundError } from '@/features/core-finance/transaction-engine/domain/errors/transaction-not-found.error';
 import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
@@ -65,6 +66,49 @@ const PAID: NodeOverrides = {
 };
 
 const ids = (items: { id: string }[]) => items.map((item) => item.id).sort();
+
+function settle(paidAmount: number) {
+  return (target: Transaction) =>
+    target.settle({
+      paymentDate: '2026-06-12',
+      paidAmount: Money.create(paidAmount),
+      paymentMethodDescriptionEnum: 'PIX',
+      updatedAt: '2026-06-12T00:00:00.000Z',
+    });
+}
+
+const tree = () => [
+  node({ id: 'r1', amount: 300, hasChildren: true }),
+  child('c1', 'r1', { amount: 200, hasChildren: true }),
+  child('g1', 'c1', { hasChildren: true }),
+  child('l1', 'g1'),
+  child('g2', 'c1'),
+  child('c2', 'r1'),
+];
+
+const SETTLEMENTS = [
+  { leafId: 'l1', mutate: settle(120) },
+  { leafId: 'missing', mutate: settle(100) },
+  { leafId: 'g2', mutate: settle(100) },
+  { leafId: 'c2', mutate: settle(100) },
+];
+
+const reread = (
+  repository: TransactionTreeRepository,
+  field: 'paidAmount' | 'currentAmount',
+  nodeIds: string[],
+) =>
+  Promise.all(
+    nodeIds.map(
+      async (id) =>
+        (await repository.findActiveById(id, 'u1'))?.toPersistence()[field],
+    ),
+  );
+
+const persisted = (nodes: Transaction[]) =>
+  nodes
+    .map((item) => item.toPersistence())
+    .sort((a, b) => a.id.localeCompare(b.id));
 
 type RunAtomic = (work: (ctx: AtomicContext) => Promise<void>) => Promise<void>;
 
@@ -265,5 +309,121 @@ describe.each(adapters)(
       ).toEqual(node({ id: 'r1', hasChildren: true }).toPersistence());
       expect(ids(await repository.findChildren('r1'))).toEqual(['c1', 'c2']);
     });
+
+    it('[BK3-17] mutateAndRollup changes the target, recomputes the ancestors up to the root and returns the root', async () => {
+      const repository = makeRepository();
+      await repository.saveMany(tree());
+
+      const root = await repository.mutateAndRollup('l1', settle(120));
+
+      expect(root.id).toBe('r1');
+      expect(
+        await reread(repository, 'paidAmount', ['l1', 'g1', 'c1', 'r1']),
+      ).toEqual([120, 120, 120, 120]);
+    });
+
+    it('[BK3-17] mutateAndRollup rejects with TransactionNotFoundError for a missing target', async () => {
+      const repository = makeRepository();
+
+      await expect(
+        repository.mutateAndRollup('missing', settle(120)),
+      ).rejects.toBeInstanceOf(TransactionNotFoundError);
+    });
+
+    it('[BK3-17] mutateAndRollupTx inside the adapter atomic run does the same as mutateAndRollup', async () => {
+      const repository = makeRepository();
+      await repository.saveMany(tree());
+      let rootId = '';
+
+      await runAtomic(async (ctx) => {
+        rootId = (await repository.mutateAndRollupTx(ctx, 'l1', settle(120)))
+          .id;
+      });
+
+      expect(rootId).toBe('r1');
+      expect(
+        await reread(repository, 'paidAmount', ['l1', 'g1', 'c1', 'r1']),
+      ).toEqual([120, 120, 120, 120]);
+    });
+
+    it('[BK3-17] settleLeavesAndRollup settles the leaves, skips a missing one, recomputes the ancestors and returns the settled leaves', async () => {
+      const repository = makeRepository();
+      await repository.saveMany(tree());
+
+      const settled = await repository.settleLeavesAndRollup(SETTLEMENTS);
+
+      expect(ids(settled)).toEqual(['c2', 'g2', 'l1']);
+      expect(
+        await reread(repository, 'paidAmount', [
+          'l1',
+          'g2',
+          'c2',
+          'g1',
+          'c1',
+          'r1',
+        ]),
+      ).toEqual([120, 100, 100, 120, 220, 320]);
+    });
+
+    it('[BK3-17] settleLeavesAndRollupTx inside the adapter atomic run does the same as settleLeavesAndRollup', async () => {
+      const repository = makeRepository();
+      await repository.saveMany(tree());
+      let settled: Transaction[] = [];
+
+      await runAtomic(async (ctx) => {
+        settled = await repository.settleLeavesAndRollupTx(ctx, SETTLEMENTS);
+      });
+
+      expect(ids(settled)).toEqual(['c2', 'g2', 'l1']);
+      expect(
+        await reread(repository, 'paidAmount', [
+          'l1',
+          'g2',
+          'c2',
+          'g1',
+          'c1',
+          'r1',
+        ]),
+      ).toEqual([120, 100, 100, 120, 220, 320]);
+    });
+
+    it('[BK3-17] softDeleteSubtreeAndRollup deletes the subtree and recomputes the ancestors', async () => {
+      const repository = makeRepository();
+      await repository.saveMany(tree());
+
+      await repository.softDeleteSubtreeAndRollup('g1', DELETED_AT);
+
+      expect(ids(await repository.listDeleted('r1'))).toEqual(['g1', 'l1']);
+      expect(await reread(repository, 'currentAmount', ['c1', 'r1'])).toEqual([
+        100, 200,
+      ]);
+    });
+
+    it('[BK3-17] softDeleteSubtreeAndRollup rejects with TransactionNotFoundError for a missing target', async () => {
+      const repository = makeRepository();
+
+      await expect(
+        repository.softDeleteSubtreeAndRollup('missing', DELETED_AT),
+      ).rejects.toBeInstanceOf(TransactionNotFoundError);
+    });
   },
 );
+
+describe('TransactionTreeRepositoryFirestore atomic run', () => {
+  it('[BK3-17] a work that throws after mutateAndRollupTx inside AtomicRunner.run leaves the tree as it was', async () => {
+    const repository = TransactionTreeRepositoryFirestore.create(db);
+    await repository.saveMany(tree());
+    const failure = new Error();
+
+    await expect(
+      AtomicRunner.create(db).run(async (ctx) => {
+        await repository.mutateAndRollupTx(ctx, 'l1', settle(120));
+        throw failure;
+      }),
+    ).rejects.toBe(failure);
+
+    expect(persisted(await repository.loadSubtree('r1'))).toEqual(
+      persisted(tree()),
+    );
+  });
+});
