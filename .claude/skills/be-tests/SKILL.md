@@ -3,8 +3,8 @@ name: be-tests
 description: >
   How each layer of the cartera-backend is tested: red-first by assertion, what to test
   where (domain and application without IO, repositories by contract against the
-  in-memory adapter and the Firestore fake, controllers with jest.fn use cases, routes
-  registry, factory, bootstrap adapters, slice spec via factory + fake db + real guard),
+  in-memory adapter and the Firestore emulator, controllers with jest.fn use cases, routes
+  registry, factory, bootstrap adapters, slice spec via factory + emulator db + real guard),
   the mocks in src/test/, describe/it naming in English, the unit coverage gate (85%
   features, 90% kernel) and what is outside it. Use when writing, reviewing or fixing a
   *.spec.ts, choosing a mock or fake, making a test fail first, or reading the coverage
@@ -22,15 +22,15 @@ present tense, behavior not implementation (`'rejects a zero limit'`, not `'call
 
 ## Routing table
 
-| Piece                               | Template                                | Doubles                                                                                                                                       | Red first (the assertion that fails on the skeleton) |
-| ----------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Entity / VO                         | `templates/entity-spec.md`              | none                                                                                                                                          | `toOutput().active` is undefined                     |
-| Use case                            | `templates/usecase-spec.md`             | in-memory repository, gateway as object literal                                                                                               | result field undefined / promise does not reject     |
-| Schema                              | `templates/schema-spec.md`              | `runValidate` with `REJECT_UNKNOWN`                                                                                                           | `errors.length` is 0 where an error is expected      |
-| Repository (both adapters)          | `templates/repository-contract-spec.md` | the shared Firestore fake, planned; until it exists, the local fake of the sibling spec, as in `src/features/category/category.slice.spec.ts` | `findById` returns null                              |
-| Controller                          | `templates/controller-spec.md`          | use cases as `jest.fn`, minimal req/res                                                                                                       | `res.status` not called with 201                     |
-| Routes registry / factory / adapter | `templates/wiring-spec.md`              | `jest.fn` middleware, internal use case as `jest.fn`                                                                                          | list of `VERB path` differs                          |
-| Slice spec (in process)             | `templates/slice-spec.md`               | fake db + real `VerifyTokenMiddleware` + real `ErrorMiddleware`                                                                               | `statusCode` is 0                                    |
+| Piece                               | Template                                | Doubles                                                             | Red first (the assertion that fails on the skeleton) |
+| ----------------------------------- | --------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------- |
+| Entity / VO                         | `templates/entity-spec.md`              | none                                                                | `toOutput().active` is undefined                     |
+| Use case                            | `templates/usecase-spec.md`             | in-memory repository, gateway as object literal                     | result field undefined / promise does not reject     |
+| Schema                              | `templates/schema-spec.md`              | `runValidate` with `REJECT_UNKNOWN`                                 | `errors.length` is 0 where an error is expected      |
+| Repository (both adapters)          | `templates/repository-contract-spec.md` | the Firestore emulator (src/test/support/firestore-emulator.ts)     | `findById` returns null                              |
+| Controller                          | `templates/controller-spec.md`          | use cases as `jest.fn`, minimal req/res                             | `res.status` not called with 201                     |
+| Routes registry / factory / adapter | `templates/wiring-spec.md`              | `jest.fn` middleware, internal use case as `jest.fn`                | list of `VERB path` differs                          |
+| Slice spec (in process)             | `templates/slice-spec.md`               | emulator db + real `VerifyTokenMiddleware` + real `ErrorMiddleware` | `statusCode` is 0                                    |
 
 ## Rules
 
@@ -40,14 +40,16 @@ present tense, behavior not implementation (`'rejects a zero limit'`, not `'call
    missing), ports of other features as literals. `jest.fn()` per repository method tests the
    implementation and is forbidden for use cases (the 10 person specs are legacy, not a model).
 3. Repositories are tested by contract: the same `describe.each` runs against the in-memory
-   adapter and the Firestore adapter over the shared Firestore fake, planned; until it exists,
-   over the local fake of the sibling spec, as in `src/features/category/category.slice.spec.ts`;
-   never a hand-written `makeDb` per spec.
-4. Infra (routes, controller, factory, adapters, shared/http) is outside the unit coverage gate
-   but not outside testing: one spec each, small.
+   adapter, when the feature has one, and the Firestore adapter over the Firestore emulator
+   (`src/test/support/firestore-emulator.ts`, `yarn emulator:start`); never a hand-written
+   `makeDb` or `makeFakeDb` per spec, which the lint blocks.
+4. Infra (routes, controller, factory, gateway adapters, shared/http) is outside the unit coverage
+   gate but not outside testing: one spec each, small; `infra/persistence/` is inside the gate.
 5. Every `it` has at least one `expect`; `it.each` for tables (status map, catalog codes).
 6. Error assertions check the code: `rejects.toMatchObject({ code: ErrorCode.X })` or
    `toThrow(expect.objectContaining({ code }))`; status is asserted only at the controller/e2e level.
-7. The gate (`yarn test:ci:unit`): 85% in `src/features/`, 90% in `src/shared/kernel/`;
-   `infra/**`, `*.factory.ts`, `bootstrap/**`, `shared/http/**` are excluded from the measure.
+7. The gate (`yarn test:ci:unit`): 85% in `src/features/`, 90% in `src/shared/kernel/`, and in
+   each `infra/persistence/` 95% in lines, statements and functions and 90% in branches;
+   `infra/http/**`, `infra/gateways/**`, `*.factory.ts`, `bootstrap/**` and `shared/http/**`
+   are excluded from the measure.
 8. e2e-live (`test/e2e`, staging) is run only by the maintainer; never by an agent.
