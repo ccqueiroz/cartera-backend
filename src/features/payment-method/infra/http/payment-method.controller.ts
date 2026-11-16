@@ -48,7 +48,7 @@ export class PaymentMethodController {
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     const result = await this.useCases.getByEnum.execute({
-      descriptionEnum: String(req.params.descriptionEnum),
+      descriptionEnum: String(req.params.description_enum),
     });
     res.status(200).json({ data: result });
   };
@@ -57,7 +57,7 @@ export class PaymentMethodController {
     await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     await assertValid(UpdatePaymentMethodSchema, req.body, DROP_UNKNOWN);
     const method = await this.useCases.update.execute({
-      descriptionEnum: req.params.descriptionEnum as PaymentMethodDescription,
+      descriptionEnum: req.params.description_enum as PaymentMethodDescription,
       description: req.body.description,
     });
     res.status(200).json({ data: method.toOutput() });
@@ -66,7 +66,7 @@ export class PaymentMethodController {
   public remove = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     await this.useCases.remove.execute({
-      descriptionEnum: req.params.descriptionEnum as PaymentMethodDescription,
+      descriptionEnum: req.params.description_enum as PaymentMethodDescription,
     });
     res.status(204).send();
   };

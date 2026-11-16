@@ -3,6 +3,8 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { DuplicatePaymentMethodError } from '@/features/payment-method/domain/errors/duplicate-payment-method.error';
 import { PaymentMethodNotFoundError } from '@/features/payment-method/domain/errors/payment-method-not-found.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 
 function makeResponse() {
   const res: Partial<Response> = {
@@ -87,7 +89,7 @@ describe('PaymentMethodController', () => {
     const res = makeResponse();
 
     await controller.getByEnum(
-      { params: { descriptionEnum: 'PIX' } } as unknown as Request,
+      { params: { description_enum: 'PIX' } } as unknown as Request,
       res,
     );
 
@@ -100,7 +102,7 @@ describe('PaymentMethodController', () => {
 
     await expect(
       controller.getByEnum(
-        { params: { descriptionEnum: 'NOPE' } } as unknown as Request,
+        { params: { description_enum: 'NOPE' } } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(ValidationError);
@@ -115,10 +117,30 @@ describe('PaymentMethodController', () => {
 
     await expect(
       controller.getByEnum(
-        { params: { descriptionEnum: 'PIX' } } as unknown as Request,
+        { params: { description_enum: 'PIX' } } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(PaymentMethodNotFoundError);
+  });
+
+  it('[PDR-08] getByEnum rejects the old descriptionEnum param name of a payment method', async () => {
+    const controller = PaymentMethodController.create(makeUseCases());
+    const rejection = controller.getByEnum(
+      { params: { descriptionEnum: 'PIX' } } as unknown as Request,
+      makeResponse(),
+    );
+
+    await expect(rejection).rejects.toBeInstanceOf(ValidationError);
+    await expect(rejection).rejects.toMatchObject({
+      code: ErrorCode.VALIDATION_FAILED,
+      params: {
+        details: expect.stringContaining(
+          errorCatalog[ErrorCode.PROPERTY_SHOULD_NOT_EXIST]({
+            attribute: 'descriptionEnum',
+          }),
+        ),
+      },
+    });
   });
 
   it('update returns 200 with the updated method output', async () => {
@@ -130,7 +152,7 @@ describe('PaymentMethodController', () => {
 
     await controller.update(
       {
-        params: { descriptionEnum: 'PIX' },
+        params: { description_enum: 'PIX' },
         body: { description: 'New' },
       } as unknown as Request,
       res,
@@ -146,7 +168,7 @@ describe('PaymentMethodController', () => {
     await expect(
       controller.update(
         {
-          params: { descriptionEnum: 'NOPE' },
+          params: { description_enum: 'NOPE' },
           body: { description: 'New' },
         } as unknown as Request,
         makeResponse(),
@@ -164,7 +186,7 @@ describe('PaymentMethodController', () => {
     await expect(
       controller.update(
         {
-          params: { descriptionEnum: 'PIX' },
+          params: { description_enum: 'PIX' },
           body: { description: 'New' },
         } as unknown as Request,
         makeResponse(),
@@ -179,7 +201,7 @@ describe('PaymentMethodController', () => {
     const res = makeResponse();
 
     await controller.remove(
-      { params: { descriptionEnum: 'PIX' } } as unknown as Request,
+      { params: { description_enum: 'PIX' } } as unknown as Request,
       res,
     );
 
@@ -192,7 +214,7 @@ describe('PaymentMethodController', () => {
 
     await expect(
       controller.remove(
-        { params: { descriptionEnum: 'NOPE' } } as unknown as Request,
+        { params: { description_enum: 'NOPE' } } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(ValidationError);
