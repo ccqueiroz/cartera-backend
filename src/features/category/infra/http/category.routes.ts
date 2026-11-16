@@ -17,8 +17,8 @@ export function categoryRoutes(
 
   return [
     ListCategoriesByTypeRoute.create(controller, authenticated),
-    GetCategoryByEnumRoute.create(controller, authenticated),
     ListGroupsByTypeRoute.create(controller, authenticated),
+    GetCategoryByEnumRoute.create(controller, authenticated),
     ListCategoriesByGroupRoute.create(controller, authenticated),
     CreateCategoryRoute.create(controller, authenticated),
     UpdateCategoryRoute.create(controller, authenticated),

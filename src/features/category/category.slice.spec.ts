@@ -1,11 +1,14 @@
 import type { Request, Response } from 'express';
 import { Firestore } from 'firebase-admin/firestore';
 import { makeCategoryModule } from '@/features/category/category.factory';
+import { CategoryDescriptionEnum } from '@/features/category/domain/enums/category-description.enum';
+import { GetCategoryByEnumRoute } from '@/features/category/infra/http/get-category-by-enum.route';
 import { Route } from '@/shared/http/route';
 import { VerifyTokenMiddleware } from '@/shared/http/express/middlewares/verify-token.middleware';
 import { ErrorMiddleware } from '@/shared/http/express/middlewares/error.middleware';
 import { UnauthorizedError } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 import { LoggerGateway } from '@/shared/logger/logger.gateway';
 import { firestoreEmulator } from '@/test/support/firestore-emulator';
 
@@ -103,18 +106,18 @@ function makeHarness() {
     return result;
   };
 
-  return { dispatch };
+  return { dispatch, module };
 }
 
 describe('category e2e (authentication guard via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
-    ['get', 'category/list-all'],
-    ['get', 'category/list-by-enum/:descriptionEnum'],
-    ['get', 'category/list-groups'],
-    ['get', 'category/list-by-groups/:group'],
-    ['post', 'category/create'],
-    ['put', 'category/edit/:descriptionEnum'],
-    ['delete', 'category/delete/:descriptionEnum'],
+    ['get', 'category'],
+    ['get', 'category/:description_enum'],
+    ['get', 'category/group'],
+    ['get', 'category/group/:group'],
+    ['post', 'category'],
+    ['put', 'category/:description_enum'],
+    ['delete', 'category/:description_enum'],
   ];
 
   it.each(protectedRoutes)(
@@ -130,7 +133,7 @@ describe('category e2e (authentication guard via factory)', () => {
 
   it('with a valid session the read runs normally (200)', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category/list-all', {
+    const response = await dispatch('get', 'category', {
       query: { type: 'BILLS' },
       authorization: `Bearer ${VALID_TOKEN}`,
     });
@@ -141,12 +144,52 @@ describe('category e2e (authentication guard via factory)', () => {
 
   it('invalid token: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'category/list-all', {
+    const response = await dispatch('get', 'category', {
       query: { type: 'BILLS' },
       authorization: 'Bearer token-desconhecido',
     });
 
     expect(response.statusCode).toBe(401);
     expect(response.body).toMatchObject({ code: ErrorCode.INVALID_TOKEN });
+  });
+});
+
+describe('category route by enum (the description_enum path param)', () => {
+  // Found by class, not by path: a path change then fails an assertion instead of throwing in dispatch, outside its try.
+  const byEnumPath = (routes: Route[]): string =>
+    routes.find((route) => route instanceof GetCategoryByEnumRoute)?.path ?? '';
+
+  it('[PDR-08] the category route by enum answers 400 to the old descriptionEnum param name', async () => {
+    const { dispatch, module } = makeHarness();
+    const response = await dispatch('get', byEnumPath(module.routes), {
+      params: { descriptionEnum: CategoryDescriptionEnum.UBER },
+      authorization: `Bearer ${VALID_TOKEN}`,
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toEqual({
+      code: ErrorCode.VALIDATION_FAILED,
+      message: expect.stringContaining(
+        errorCatalog[ErrorCode.PROPERTY_SHOULD_NOT_EXIST]({
+          attribute: 'descriptionEnum',
+        }),
+      ),
+    });
+  });
+
+  it('[PDR-08] the category route by enum takes a valid description_enum to the lookup', async () => {
+    const { dispatch, module } = makeHarness();
+    const response = await dispatch('get', byEnumPath(module.routes), {
+      params: { description_enum: CategoryDescriptionEnum.UBER },
+      authorization: `Bearer ${VALID_TOKEN}`,
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({
+      code: ErrorCode.CATEGORY_NOT_FOUND,
+      message: errorCatalog[ErrorCode.CATEGORY_NOT_FOUND]({
+        descriptionEnum: CategoryDescriptionEnum.UBER,
+      }),
+    });
   });
 });
