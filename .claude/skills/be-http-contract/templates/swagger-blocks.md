@@ -13,7 +13,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
 ```ts
 /**
  * @swagger
- * /api/budget/list-all:
+ * /api/budget:
  *   get:
  *     summary: Lista os orçamentos ativos do usuário autenticado, paginados.
  *     tags: [Budget]
@@ -48,7 +48,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
 ```ts
 /**
  * @swagger
- * /api/budget/list-by-id/{id}:
+ * /api/budget/{budget_id}:
  *   get:
  *     summary: Obtém um orçamento ativo do usuário autenticado.
  *     tags: [Budget]
@@ -56,7 +56,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
  *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: budget_id
  *         required: true
  *         schema: { type: string, format: uuid }
  *     responses:
@@ -74,7 +74,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
 ```ts
 /**
  * @swagger
- * /api/budget/create:
+ * /api/budget:
  *   post:
  *     summary: Cria um orçamento do usuário autenticado.
  *     tags: [Budget]
@@ -108,7 +108,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
 ```ts
 /**
  * @swagger
- * /api/budget/edit/{id}:
+ * /api/budget/{budget_id}:
  *   put:
  *     summary: Edita nome e limite de um orçamento ativo.
  *     tags: [Budget]
@@ -116,7 +116,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
  *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: budget_id
  *         required: true
  *         schema: { type: string, format: uuid }
  *     requestBody:
@@ -144,7 +144,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
 ```ts
 /**
  * @swagger
- * /api/budget/delete/{id}:
+ * /api/budget/{budget_id}:
  *   delete:
  *     summary: Remove (soft-delete) um orçamento do usuário autenticado.
  *     tags: [Budget]
@@ -152,7 +152,7 @@ feature uses lives in `src/features/<feature>/infra/http/<feature>.swagger.ts` (
  *       - sessionCookieAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: budget_id
  *         required: true
  *         schema: { type: string, format: uuid }
  *     responses:

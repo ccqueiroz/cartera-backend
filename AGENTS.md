@@ -57,20 +57,22 @@ The mold of each piece (entity, value object, port, use case, schema, route, con
 
 ## Routes
 
-Every route path is `{controller}/{slug}[/{param}][?{filters}]`, with the controller in the singular and kebab-case slugs.
+Every route path sits under `/api` and starts with its controller in the singular; the HTTP verb names the operation, and the path falls in one of five drawers. Filters go in the query and identity in the path. The `@swagger` block for each verb is in the `be-http-contract` skill.
 
-| Class               | Path                                                                     | Verb                                                       |
-| ------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| Broad listing       | `{controller}/list-all?<filters>`                                        | GET                                                        |
-| Specialized listing | `{controller}/list-<slug>` or `{controller}/list-by-<dimension>/{value}` | GET                                                        |
-| One item by enum    | `{controller}/list-by-enum/{descriptionEnum}`                            | GET                                                        |
-| One item by id      | `{controller}/list-by-id/{id}`                                           | GET                                                        |
-| Creation            | `{controller}/create` or `{controller}/create-<variant>`                 | POST                                                       |
-| Edit or deletion    | `{controller}/edit/{key}` or `{controller}/delete/{key}`                 | PUT or DELETE                                              |
-| Action on state     | `{controller}/{verb}[/{id}]`                                             | PATCH; POST when it creates a new fact; GET when read-only |
+| Drawer                  | Path                                                               | Verbs                           | Returns                                                                       |
+| ----------------------- | ------------------------------------------------------------------ | ------------------------------- | ----------------------------------------------------------------------------- |
+| Collection              | `{controller}`                                                     | GET lists, POST creates         | GET: a page or an array, empty when there is nothing; POST: 201 with the item |
+| Item                    | `{controller}/{key}`                                               | GET, PUT, PATCH, DELETE         | one element; 404 when it does not exist                                       |
+| Slice of the collection | `{controller}/{slice}` or `{controller}/{slice}/{value}`           | GET; POST only on `installment` | a list already filtered by a business rule                                    |
+| Action on the item      | `{controller}/{key}/{action}`                                      | PATCH                           | the item after the action                                                     |
+| Box inside the item     | `{controller}/{key}/{sub}` or `{controller}/{key}/{sub}/{sub_key}` | GET, POST, PUT, DELETE          | a list or an item of the inner box                                            |
 
-Filters go in the query and identity in the path. `{key}` is the `descriptionEnum` in the enum catalogs (`category`, `payment-method`, `payment-status`) and the id elsewhere. The only two exceptions are a nested sub-resource, `{controller}/{sub}/{class}/{parentId}`, and the self resource, `{controller}/me[/{sub}]`. The `@swagger` block for each verb is in the `be-http-contract` skill.
-
+- A path falls in one drawer with a verb that drawer takes (the action and the inner box share a shape, and the verb tells them apart), and no segment is an operation word: `list`, `create`, `edit`, `update`, `delete`, or one starting with `list-`, `create-` or `get-`. [sensor: src/shared/http/route-convention.spec.ts]
+- Literal segments are in kebab-case; a path param comes right after what it identifies, and path and query param names are in snake_case: the `{key}` is the id named after its controller (`wallet_id`, `payment_method_id`) or the `description_enum` of a catalog, and a bare `id` never appears. [sensor: src/shared/http/route-convention.spec.ts]
+- The controller translates on capture, `id: String(req.params.wallet_id)`, and the use case, the entity and the repository keep their internal names. [sensor: src/shared/http/route-convention.spec.ts]
+- A slice with a required dimension is named `-by-<dimension>`, and the dimension goes in the query with `required: true` in the contract. [sensor: src/shared/http/route-convention.spec.ts]
+- In `<feature>.routes.ts`, a route with a literal segment is registered before the route with a param in the same position and the same verb, because the path id is not validated as a uuid. [sensor: src/shared/http/route-convention.spec.ts]
+- Only `auth`, `person/me` and `health` stay outside the drawers, in a closed list of 11 routes: `POST auth/account`, `POST auth/session`, `PUT auth/session`, `DELETE auth/session`, `POST auth/password-recovery`, `GET person/me`, `PATCH person/me`, `DELETE person/me`, `PUT person/me/avatar`, `DELETE person/me/avatar` and `GET health`. [sensor: src/shared/http/route-convention.spec.ts]
 - Every `*.route.ts` has an `@swagger` block and is registered in its `<feature>.routes.ts`. [sensor: src/shared/http/route-convention.spec.ts]
 - A route whose handler reads `req.body` validates it in the controller with `assertValid`, `assertAuthInputValid` or `runValidate` and a `*Schema` class. [sensor: src/shared/http/route-convention.spec.ts]
 - The OpenAPI spec built from the `@swagger` blocks has no YAML error, and its operations equal the route classes, verb and path. [sensor: scripts/build-openapi.cjs]

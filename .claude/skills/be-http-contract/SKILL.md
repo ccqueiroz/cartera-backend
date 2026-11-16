@@ -18,13 +18,13 @@ The contract is the `@swagger` block on each `*.route.ts` plus the class-validat
 plus the controller status. `swagger-jsdoc` reads the blocks at boot (`swagger-definition.ts`
 globs) and serves `/api-docs`. Read `templates/swagger-blocks.md` for the exact block per verb.
 
-## URL and verb (AGENTS.md, Routes, unchanged)
+## URL and verb (AGENTS.md, Routes, five drawers)
 
-`{controller-singular}/{slug}[/{param}][?filters]` · `list-all` GET · `list-by-id/{id}` GET ·
-`list-by-<dim>/{value}` GET · `create`, `create-<variant>` POST · `edit/{key}` PUT ·
-`delete/{key}` DELETE · `<verb>/{id}` PATCH (state action) · identity in path, filter in
-query · `{key}` is `descriptionEnum` for catalogs, uuid elsewhere · exceptions only
-`person/me[/{sub}]` and `credit-card/invoice/...`.
+`budget` GET list, POST create · `budget/{budget_id}` GET, PUT, PATCH, DELETE ·
+`budget/<slice>` GET, POST only on `installment` · `budget/{budget_id}/<action>` PATCH ·
+`budget/{budget_id}/<sub>` GET, POST, PUT, DELETE · the verb names the operation · path
+and query params in snake_case, the id named after the controller, `description_enum` for
+catalogs · identity in path, filter in query · exempt only `auth`, `person/me` and `health`.
 
 ## Status and envelope
 
@@ -47,7 +47,7 @@ Success body is `{ data: <Output> }`; a paginated list is `{ data: { content, pa
 
 ## Block rules (rule 5 and the operation count are checked by `node scripts/build-openapi.cjs`; the others in review)
 
-1. Path in OpenAPI form `{id}`, never `:id`; verb equals `method`; `tags: [<Feature>]`.
+1. Path in OpenAPI form `{budget_id}`, never `:budget_id`; verb equals `method`; `tags: [<Feature>]`.
 2. `security: [sessionCookieAuth]` on every guarded route; none on auth/health.
 3. `requestBody` mirrors the schema field by field; `required` = fields without `@IsOptional()`;
    enums through `$ref: '#/components/schemas/<Enum>'`.
