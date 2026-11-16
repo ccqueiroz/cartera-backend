@@ -17,6 +17,14 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *       - $ref: '#/components/parameters/SortValue'
  *       - $ref: '#/components/parameters/TransactionSearchByDate'
  *       - $ref: '#/components/parameters/SearchByDateValue'
+ *       - in: query
+ *         name: start_date
+ *         required: true
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: end_date
+ *         required: true
+ *         schema: { type: string, format: date }
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       200: { $ref: '#/components/responses/TransactionPageResponse' }
