@@ -4206,7 +4206,33 @@
         ]
       }
     },
-    "/api/payment-method/create": {
+    "/api/payment-method": {
+      "get": {
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentMethodListResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista as formas de pagamento ativas.",
+        "tags": [
+          "PaymentMethod"
+        ]
+      },
       "post": {
         "requestBody": {
           "content": {
@@ -4263,12 +4289,12 @@
         ]
       }
     },
-    "/api/payment-method/delete/{descriptionEnum}": {
+    "/api/payment-method/{description_enum}": {
       "delete": {
         "parameters": [
           {
             "in": "path",
-            "name": "descriptionEnum",
+            "name": "description_enum",
             "required": true,
             "schema": {
               "type": "string"
@@ -4305,14 +4331,54 @@
         "tags": [
           "PaymentMethod"
         ]
-      }
-    },
-    "/api/payment-method/edit/{descriptionEnum}": {
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "description_enum",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PaymentMethodOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/PaymentMethodNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a forma de pagamento por descriptionEnum (ativa, senão soft-deleted mais recente).",
+        "tags": [
+          "PaymentMethod"
+        ]
+      },
       "put": {
         "parameters": [
           {
             "in": "path",
-            "name": "descriptionEnum",
+            "name": "description_enum",
             "required": true,
             "schema": {
               "type": "string"
@@ -4365,78 +4431,6 @@
           }
         ],
         "summary": "Atualiza apenas a description de uma forma de pagamento ativa.",
-        "tags": [
-          "PaymentMethod"
-        ]
-      }
-    },
-    "/api/payment-method/list-all": {
-      "get": {
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PaymentMethodListResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista as formas de pagamento ativas.",
-        "tags": [
-          "PaymentMethod"
-        ]
-      }
-    },
-    "/api/payment-method/list-by-enum/{descriptionEnum}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "descriptionEnum",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/PaymentMethodDescriptionEnum"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/PaymentMethodOutputResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/PaymentMethodNotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Busca a forma de pagamento por descriptionEnum (ativa, senão soft-deleted mais recente).",
         "tags": [
           "PaymentMethod"
         ]

@@ -780,7 +780,6 @@ const EXEMPT_ROUTES = [
 
 // Each path task removes its controller here: the it.failing below breaks once a listed controller follows the pattern.
 const PENDING_CONTROLLERS: Record<string, string> = {
-  'payment-method': 'T2',
   category: 'T3',
   bill: 'T4',
   receivable: 'T5',
@@ -911,6 +910,19 @@ const orderViolations = (
       ),
   );
 
+const duplicateViolations = (
+  routes: (RouteParts & { file: string })[],
+): string[] => {
+  const filesByRoute = new Map<string, string[]>();
+  routes.forEach(({ method, path, file }) => {
+    const route = `${method} ${path}`;
+    filesByRoute.set(route, [...(filesByRoute.get(route) ?? []), file]);
+  });
+  return Array.from(filesByRoute)
+    .filter(([, files]) => files.length > 1)
+    .map(([route, files]) => `${route}: declared by ${files.join(' and ')}`);
+};
+
 const sample = (route: string, handlerBody?: string): RouteParts => {
   const [method, path] = route.split(' ');
   const reads = path
@@ -1032,6 +1044,33 @@ describe('route pattern', () => {
       orderViolations('category.routes.ts', [
         { method: 'get', path: 'category/group/:group' },
         { method: 'get', path: 'category/group' },
+      ]),
+    ).toEqual([]);
+  });
+
+  it('[PDR-03] no two route files declare the same verb and path', () => {
+    expect(
+      duplicateViolations(
+        routeFiles.map((file) => ({
+          ...readRoute(file),
+          file: basename(file),
+        })),
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-03] the duplicate check names both files of a repeated verb and path', () => {
+    const getWallet = { method: 'get', path: 'wallet' };
+    expect(
+      duplicateViolations([
+        { ...getWallet, file: 'a.route.ts' },
+        { ...getWallet, file: 'b.route.ts' },
+      ]),
+    ).toEqual(['get wallet: declared by a.route.ts and b.route.ts']);
+    expect(
+      duplicateViolations([
+        { ...getWallet, file: 'a.route.ts' },
+        { method: 'post', path: 'wallet', file: 'b.route.ts' },
       ]),
     ).toEqual([]);
   });
