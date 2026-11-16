@@ -4,13 +4,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/statement/{id}:
+ * /api/wallet/{wallet_id}/statement:
  *   get:
  *     summary: Extrato (livro de caixa) de uma carteira, por competência.
  *     tags: [Wallet]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: wallet_id
  *         required: true
  *         schema: { type: string }
  *       - in: query
@@ -45,7 +45,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class WalletStatementRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'wallet/statement/:id';
+  public readonly path: string = 'wallet/:wallet_id/statement';
   public readonly handler: HttpHandler;
 
   private constructor(

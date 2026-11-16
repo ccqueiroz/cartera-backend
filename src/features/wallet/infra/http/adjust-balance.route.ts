@@ -4,13 +4,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/adjust-balance/{id}:
+ * /api/wallet/{wallet_id}/adjust-balance:
  *   patch:
  *     summary: Ajuste manual de saldo (depósito/saque) com movimento ADJUST.
  *     tags: [Wallet]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: wallet_id
  *         required: true
  *         schema: { type: string }
  *     requestBody:
@@ -37,7 +37,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class AdjustBalanceRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'wallet/adjust-balance/:id';
+  public readonly path: string = 'wallet/:wallet_id/adjust-balance';
   public readonly handler: HttpHandler;
 
   private constructor(
