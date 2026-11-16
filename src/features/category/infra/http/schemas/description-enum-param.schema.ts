@@ -14,5 +14,5 @@ export class DescriptionEnumParamSchema {
       attribute: 'O identificador da categoria (descriptionEnum)',
     }),
   })
-  descriptionEnum!: CategoryDescription;
+  description_enum!: CategoryDescription;
 }

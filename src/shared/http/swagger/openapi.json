@@ -3810,7 +3810,50 @@
         ]
       }
     },
-    "/api/category/create": {
+    "/api/category": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um tipo.",
+        "tags": [
+          "Category"
+        ]
+      },
       "post": {
         "requestBody": {
           "content": {
@@ -3881,12 +3924,110 @@
         ]
       }
     },
-    "/api/category/delete/{descriptionEnum}": {
+    "/api/category/group": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryGroupListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista os grupos distintos com ≥1 categoria ativa do tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/group/{group}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "BILLS",
+                "RECEIVABLES"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryListResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista categorias ativas de um grupo filtradas por tipo.",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/api/category/{description_enum}": {
       "delete": {
         "parameters": [
           {
             "in": "path",
-            "name": "descriptionEnum",
+            "name": "description_enum",
             "required": true,
             "schema": {
               "type": "string"
@@ -3923,14 +4064,54 @@
         "tags": [
           "Category"
         ]
-      }
-    },
-    "/api/category/edit/{descriptionEnum}": {
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "description_enum",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CategoryOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/CategoryNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Busca a categoria ativa por descriptionEnum.",
+        "tags": [
+          "Category"
+        ]
+      },
       "put": {
         "parameters": [
           {
             "in": "path",
-            "name": "descriptionEnum",
+            "name": "description_enum",
             "required": true,
             "schema": {
               "type": "string"
@@ -3997,193 +4178,6 @@
           }
         ],
         "summary": "Edita uma categoria ativa (descriptionEnum imutável).",
-        "tags": [
-          "Category"
-        ]
-      }
-    },
-    "/api/category/list-all": {
-      "get": {
-        "parameters": [
-          {
-            "in": "query",
-            "name": "type",
-            "required": true,
-            "schema": {
-              "enum": [
-                "BILLS",
-                "RECEIVABLES"
-              ],
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/CategoryListResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista categorias ativas de um tipo.",
-        "tags": [
-          "Category"
-        ]
-      }
-    },
-    "/api/category/list-by-enum/{descriptionEnum}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "descriptionEnum",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/CategoryOutputResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/CategoryNotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Busca a categoria ativa por descriptionEnum.",
-        "tags": [
-          "Category"
-        ]
-      }
-    },
-    "/api/category/list-by-groups/{group}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "group",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "type",
-            "required": true,
-            "schema": {
-              "enum": [
-                "BILLS",
-                "RECEIVABLES"
-              ],
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/CategoryListResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista categorias ativas de um grupo filtradas por tipo.",
-        "tags": [
-          "Category"
-        ]
-      }
-    },
-    "/api/category/list-groups": {
-      "get": {
-        "parameters": [
-          {
-            "in": "query",
-            "name": "type",
-            "required": true,
-            "schema": {
-              "enum": [
-                "BILLS",
-                "RECEIVABLES"
-              ],
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/CategoryGroupListResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista os grupos distintos com ≥1 categoria ativa do tipo.",
         "tags": [
           "Category"
         ]
