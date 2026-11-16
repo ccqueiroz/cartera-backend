@@ -4442,7 +4442,7 @@
         ]
       }
     },
-    "/api/payment-status/list-all": {
+    "/api/payment-status": {
       "get": {
         "responses": {
           "200": {
@@ -4470,12 +4470,12 @@
         ]
       }
     },
-    "/api/payment-status/list-by-enum/{descriptionEnum}": {
+    "/api/payment-status/{description_enum}": {
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "descriptionEnum",
+            "name": "description_enum",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/PaymentStatusDescriptionEnum"

@@ -11,10 +11,7 @@ describe('paymentStatusRoutes', () => {
 
     expect(
       routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
-    ).toEqual([
-      'GET payment-status/list-all',
-      'GET payment-status/list-by-enum/:descriptionEnum',
-    ]);
+    ).toEqual(['GET payment-status', 'GET payment-status/:description_enum']);
   });
 
   it('applies the auth middleware to both read routes', () => {

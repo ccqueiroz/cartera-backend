@@ -3,6 +3,8 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
 import { PaymentStatusNotFoundError } from '@/features/payment-status/domain/errors/payment-status-not-found.error';
 import { PaymentStatusEnum } from '@/shared/kernel/enums/payment-status.enum';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { errorCatalog } from '@/shared/kernel/errors/error-catalog';
 
 function makeResponse() {
   const res: Partial<Response> = {
@@ -61,7 +63,7 @@ describe('PaymentStatusController', () => {
 
     await controller.getByEnum(
       {
-        params: { descriptionEnum: PaymentStatusEnum.OVERDUE },
+        params: { description_enum: PaymentStatusEnum.OVERDUE },
       } as unknown as Request,
       res,
     );
@@ -75,7 +77,7 @@ describe('PaymentStatusController', () => {
 
     await expect(
       controller.getByEnum(
-        { params: { descriptionEnum: 'NOPE' } } as unknown as Request,
+        { params: { description_enum: 'NOPE' } } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(ValidationError);
@@ -91,10 +93,30 @@ describe('PaymentStatusController', () => {
     await expect(
       controller.getByEnum(
         {
-          params: { descriptionEnum: PaymentStatusEnum.PAID },
+          params: { description_enum: PaymentStatusEnum.PAID },
         } as unknown as Request,
         makeResponse(),
       ),
     ).rejects.toBeInstanceOf(PaymentStatusNotFoundError);
+  });
+
+  it('[PDR-08] getByEnum rejects the old descriptionEnum param name', async () => {
+    const controller = PaymentStatusController.create(makeUseCases());
+    const rejection = controller.getByEnum(
+      { params: { descriptionEnum: 'PAID' } } as unknown as Request,
+      makeResponse(),
+    );
+
+    await expect(rejection).rejects.toBeInstanceOf(ValidationError);
+    await expect(rejection).rejects.toMatchObject({
+      code: ErrorCode.VALIDATION_FAILED,
+      params: {
+        details: expect.stringContaining(
+          errorCatalog[ErrorCode.PROPERTY_SHOULD_NOT_EXIST]({
+            attribute: 'descriptionEnum',
+          }),
+        ),
+      },
+    });
   });
 });

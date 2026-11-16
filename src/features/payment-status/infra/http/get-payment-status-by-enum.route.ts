@@ -4,13 +4,13 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-status/list-by-enum/{descriptionEnum}:
+ * /api/payment-status/{description_enum}:
  *   get:
  *     summary: Busca um status de pagamento do catálogo pelo code.
  *     tags: [PaymentStatus]
  *     parameters:
  *       - in: path
- *         name: descriptionEnum
+ *         name: description_enum
  *         required: true
  *         schema: { $ref: '#/components/schemas/PaymentStatusDescriptionEnum' }
  *     security:
@@ -25,7 +25,7 @@ import { PaymentStatusController } from '@/features/payment-status/infra/http/pa
  */
 export class GetPaymentStatusByEnumRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'payment-status/list-by-enum/:descriptionEnum';
+  public readonly path: string = 'payment-status/:description_enum';
   public readonly handler: HttpHandler;
 
   private constructor(
