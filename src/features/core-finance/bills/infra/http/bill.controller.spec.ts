@@ -51,10 +51,10 @@ describe.each([
       scope: 'paid',
       month: '1',
       year: '2026',
-      categoryDescriptionEnum: 'FOOD',
-      paymentMethodDescriptionEnum: 'PIX',
-      rootHasInstallments: 'true',
-      rootIsFixedCost: 'false',
+      category_description_enum: 'FOOD',
+      payment_method_description_enum: 'PIX',
+      root_has_installments: 'true',
+      root_is_fixed_cost: 'false',
     },
     ownInput: {
       scope: 'paid',
@@ -113,3 +113,25 @@ describe.each([
     });
   },
 );
+
+it('[PDR-09] BillController listAll reads the filters by their snake_case query names', async () => {
+  const execute = jest.fn().mockResolvedValue(page);
+  await BillController.create({ list: { execute } } as any).listAll(
+    requestWith({
+      category_description_enum: 'FOOD',
+      payment_method_description_enum: 'PIX',
+      root_has_installments: 'true',
+      root_is_fixed_cost: 'false',
+    }),
+    makeResponse(),
+  );
+
+  expect(execute).toHaveBeenCalledWith(
+    expect.objectContaining({
+      categoryDescriptionEnum: 'FOOD',
+      paymentMethodDescriptionEnum: 'PIX',
+      rootHasInstallments: true,
+      rootIsFixedCost: false,
+    }),
+  );
+});

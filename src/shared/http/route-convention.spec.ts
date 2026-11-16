@@ -1083,3 +1083,116 @@ describe('route pattern', () => {
     },
   );
 });
+
+type OpenApiParameterOrRef = OpenApiParameter & { $ref?: string };
+
+const PARAMETERS_REF = '#/components/parameters/';
+
+const resolvedParameters = (
+  parameters: OpenApiParameterOrRef[] = [],
+  components = componentsOf(openapi).parameters ?? {},
+): OpenApiParameter[] =>
+  parameters.flatMap((parameter) =>
+    parameter.$ref?.startsWith(PARAMETERS_REF)
+      ? components[parameter.$ref.slice(PARAMETERS_REF.length)] ?? []
+      : [parameter],
+  );
+
+const queryViolations = (
+  where: string,
+  parameters?: OpenApiParameterOrRef[],
+  components?: OpenApiComponents['parameters'],
+): string[] =>
+  resolvedParameters(parameters, components)
+    .filter(
+      ({ in: location, name = '' }) =>
+        location === 'query' && !SNAKE_CASE.test(name),
+    )
+    .map(({ name }) => `${where}: query "${name}" is not snake_case`);
+
+const QUERY_COMPONENTS = {
+  CategoryFilter: { in: 'query', name: 'categoryDescriptionEnum' },
+  SearchByDate: { in: 'query', name: 'search_by_date' },
+};
+
+const queriesOf = (path: string): OpenApiParameter[] =>
+  resolvedParameters(openapi.paths?.[path]?.get?.parameters);
+
+const LIST_QUERIES = [
+  'scope',
+  'month',
+  'year',
+  'category_description_enum',
+  'payment_method_description_enum',
+  'root_has_installments',
+  'root_is_fixed_cost',
+].map((name) => expect.objectContaining({ in: 'query', name }));
+
+const PERIOD_QUERIES = ['start_date', 'end_date'].map((name) =>
+  expect.objectContaining({ in: 'query', name, required: true }),
+);
+
+describe('query pattern', () => {
+  it('[PDR-05] every query of every openapi.json operation is snake_case', () => {
+    // ponytail: reads the parameters under each verb; a path-level parameters list escapes it; merge it into each operation if a @swagger block declares one.
+    expect(
+      Object.entries(openapi.paths ?? {}).flatMap(([path, operations]) =>
+        Object.entries(operations ?? {}).flatMap(([method, operation]) =>
+          queryViolations(`${method} ${path}`, operation?.parameters),
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-05] the query check names each query that is not snake_case, inline or referenced', () => {
+    expect(
+      queryViolations(
+        'get /api/bill',
+        [
+          { in: 'query', name: 'categoryDescriptionEnum' },
+          { $ref: `${PARAMETERS_REF}CategoryFilter` },
+        ],
+        QUERY_COMPONENTS,
+      ),
+    ).toEqual([
+      'get /api/bill: query "categoryDescriptionEnum" is not snake_case',
+      'get /api/bill: query "categoryDescriptionEnum" is not snake_case',
+    ]);
+    expect(
+      queryViolations(
+        'get /api/bill',
+        [
+          { in: 'query', name: 'page' },
+          { in: 'query', name: 'search_by_date' },
+          { $ref: `${PARAMETERS_REF}SearchByDate` },
+          { in: 'path', name: 'billId' },
+        ],
+        QUERY_COMPONENTS,
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-10] get /api/bill declares the list queries', () => {
+    expect(queriesOf('/api/bill')).toEqual(
+      expect.arrayContaining(LIST_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/receivable declares the list queries', () => {
+    expect(queriesOf('/api/receivable')).toEqual(
+      expect.arrayContaining(LIST_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/bill/unpaid-by-period requires start_date and end_date', () => {
+    expect(queriesOf('/api/bill/unpaid-by-period')).toEqual(
+      expect.arrayContaining(PERIOD_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/receivable/unreceived-by-period requires start_date and end_date', () => {
+    expect(queriesOf('/api/receivable/unreceived-by-period')).toEqual(
+      expect.arrayContaining(PERIOD_QUERIES),
+    );
+  });
+});

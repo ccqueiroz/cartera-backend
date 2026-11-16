@@ -93,14 +93,14 @@ export class ReceivableController {
       scope: scopeFrom(req.query.scope),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
-      categoryDescriptionEnum: req.query.categoryDescriptionEnum
-        ? String(req.query.categoryDescriptionEnum)
+      categoryDescriptionEnum: req.query.category_description_enum
+        ? String(req.query.category_description_enum)
         : undefined,
-      paymentMethodDescriptionEnum: req.query.paymentMethodDescriptionEnum
-        ? String(req.query.paymentMethodDescriptionEnum)
+      paymentMethodDescriptionEnum: req.query.payment_method_description_enum
+        ? String(req.query.payment_method_description_enum)
         : undefined,
-      rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
-      rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
+      rootHasInstallments: booleanOrUndefined(req.query.root_has_installments),
+      rootIsFixedCost: booleanOrUndefined(req.query.root_is_fixed_cost),
       params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
