@@ -5523,78 +5523,7 @@
         ]
       }
     },
-    "/api/transfer/create": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "amount": {
-                    "type": "number"
-                  },
-                  "fromWalletId": {
-                    "type": "string"
-                  },
-                  "paymentMethodDescriptionEnum": {
-                    "type": "string"
-                  },
-                  "toWalletId": {
-                    "type": "string"
-                  },
-                  "transferDate": {
-                    "example": "2026-06-17",
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "fromWalletId",
-                  "toWalletId",
-                  "amount",
-                  "paymentMethodDescriptionEnum"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "$ref": "#/components/responses/CreateTransferResultResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/TransferCreateBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/WalletNotFound"
-          },
-          "422": {
-            "$ref": "#/components/responses/TransferPaymentMethodInactive"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Transfere um valor entre duas carteiras do usuário autenticado (movimento neutro).",
-        "tags": [
-          "Transfer"
-        ]
-      }
-    },
-    "/api/transfer/list-all": {
+    "/api/transfer": {
       "get": {
         "parameters": [
           {
@@ -5687,14 +5616,83 @@
         "tags": [
           "Transfer"
         ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "fromWalletId": {
+                    "type": "string"
+                  },
+                  "paymentMethodDescriptionEnum": {
+                    "type": "string"
+                  },
+                  "toWalletId": {
+                    "type": "string"
+                  },
+                  "transferDate": {
+                    "example": "2026-06-17",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fromWalletId",
+                  "toWalletId",
+                  "amount",
+                  "paymentMethodDescriptionEnum"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateTransferResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/TransferCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/TransferPaymentMethodInactive"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Transfere um valor entre duas carteiras do usuário autenticado (movimento neutro).",
+        "tags": [
+          "Transfer"
+        ]
       }
     },
-    "/api/transfer/list-by-id/{id}": {
+    "/api/transfer/{transfer_id}": {
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "transfer_id",
             "required": true,
             "schema": {
               "type": "string"

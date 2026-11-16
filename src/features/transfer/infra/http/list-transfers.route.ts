@@ -4,7 +4,7 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
 
 /**
  * @swagger
- * /api/transfer/list-all:
+ * /api/transfer:
  *   get:
  *     summary: Lista as transferências do usuário autenticado, por competência, ordenadas desc.
  *     tags: [Transfer]
@@ -40,7 +40,7 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  */
 export class ListTransfersRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'transfer/list-all';
+  public readonly path: string = 'transfer';
   public readonly handler: HttpHandler;
 
   private constructor(

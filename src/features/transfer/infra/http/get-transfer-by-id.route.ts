@@ -4,13 +4,13 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
 
 /**
  * @swagger
- * /api/transfer/list-by-id/{id}:
+ * /api/transfer/{transfer_id}:
  *   get:
  *     summary: Detalhe de uma transferência do usuário autenticado.
  *     tags: [Transfer]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: transfer_id
  *         required: true
  *         schema: { type: string }
  *     security:
@@ -24,7 +24,7 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  */
 export class GetTransferByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'transfer/list-by-id/:id';
+  public readonly path: string = 'transfer/:transfer_id';
   public readonly handler: HttpHandler;
 
   private constructor(
