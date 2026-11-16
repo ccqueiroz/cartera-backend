@@ -4,13 +4,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/edit/{id}:
+ * /api/wallet/{wallet_id}:
  *   put:
  *     summary: Edita nome e config de cheque-especial da carteira (saldo fora da whitelist).
  *     tags: [Wallet]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: wallet_id
  *         required: true
  *         schema: { type: string }
  *     requestBody:
@@ -37,7 +37,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class EditWalletRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'wallet/edit/:id';
+  public readonly path: string = 'wallet/:wallet_id';
   public readonly handler: HttpHandler;
 
   private constructor(

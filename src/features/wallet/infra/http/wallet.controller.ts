@@ -70,7 +70,7 @@ export class WalletController {
   public listById = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.getById.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.wallet_id),
     });
     res.status(200).json({ data: result });
   };
@@ -78,7 +78,7 @@ export class WalletController {
   public statement = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.statement.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.wallet_id),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
       params: readPaginationParams(req.query, STATEMENT_FIELDS),
@@ -90,7 +90,7 @@ export class WalletController {
     await assertValid(EditWalletSchema, req.body);
     const result = await this.useCases.edit.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.wallet_id),
       name: req.body.name,
       hasOverdraft: req.body.hasOverdraft,
       overdraftLimit: req.body.overdraftLimit,
@@ -104,7 +104,7 @@ export class WalletController {
     await assertValid(AdjustBalanceSchema, req.body);
     const result = await this.useCases.adjust.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.wallet_id),
       operation: req.body.operation,
       amount: req.body.amount,
       occurredAt: req.body.occurredAt,
@@ -115,7 +115,7 @@ export class WalletController {
   public remove = async (req: Request, res: Response): Promise<void> => {
     await this.useCases.remove.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.wallet_id),
       force: req.query.force === 'true',
     });
     res.status(204).send();
