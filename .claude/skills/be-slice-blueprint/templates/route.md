@@ -2,7 +2,7 @@
 
 ## `infra/http/<verb>-<feature>.route.ts`
 
-One class per route, `implements Route`, `method`/`path`/`handler` + `middlewares` by constructor; the `@swagger` block sits on the class. Path follows AGENTS.md, Routes: `{controller-singular}/{slug}[/{param}]` with slugs `list-all`, `list-by-id`, `list-by-<dim>`, `create`, `create-<variant>`, `edit`, `delete`, `<verb>` (action, PATCH). The full per-verb swagger blocks are in the `be-http-contract` skill.
+One class per route, `implements Route`, `method`/`path`/`handler` + `middlewares` by constructor; the `@swagger` block sits on the class. Path follows the five drawers of AGENTS.md, Routes (`budget`, `budget/:budget_id`, `budget/<slice>`, `budget/:budget_id/<action>`, `budget/:budget_id/<sub>`): the verb names the operation, and the param is in snake_case, `:budget_id` in `path` and `{budget_id}` in the `@swagger` block. The full per-verb swagger blocks are in the `be-http-contract` skill.
 
 ```ts
 import { HttpHandler, HttpMethod, Route } from '@/shared/http/route';
@@ -11,7 +11,7 @@ import { BudgetController } from '@/features/budget/infra/http/budget.controller
 
 /**
  * @swagger
- * /api/budget/create:
+ * /api/budget:
  *   post:
  *     summary: Cria um orçamento do usuário autenticado.
  *     tags: [Budget]
@@ -39,7 +39,7 @@ import { BudgetController } from '@/features/budget/infra/http/budget.controller
  */
 export class CreateBudgetRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'budget/create';
+  public readonly path: string = 'budget';
   public readonly handler: HttpHandler;
 
   private constructor(
