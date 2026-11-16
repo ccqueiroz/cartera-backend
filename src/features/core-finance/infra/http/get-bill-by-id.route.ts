@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-by-id/{id}:
+ * /api/bill/{bill_id}:
  *   get:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Detalhe da despesa (no + filhas imediatas).
@@ -23,7 +23,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class GetBillByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'bill/list-by-id/:id';
+  public readonly path: string = 'bill/:bill_id';
   public readonly handler: HttpHandler;
 
   private constructor(

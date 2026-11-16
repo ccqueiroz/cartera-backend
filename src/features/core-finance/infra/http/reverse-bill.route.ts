@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/reverse/{id}:
+ * /api/bill/{bill_id}/reverse:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Estorna um pagamento (devolve o caixa na wallet original).
@@ -24,7 +24,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class ReverseBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'bill/reverse/:id';
+  public readonly path: string = 'bill/:bill_id/reverse';
   public readonly handler: HttpHandler;
 
   private constructor(

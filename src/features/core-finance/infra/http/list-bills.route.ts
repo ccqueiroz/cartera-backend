@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-all:
+ * /api/bill:
  *   get:
  *     summary: Lista despesas por competencia (folhas, filtros do motor).
  *     tags: [Bill]
@@ -27,7 +27,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class ListBillsRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'bill/list-all';
+  public readonly path: string = 'bill';
   public readonly handler: HttpHandler;
 
   private constructor(

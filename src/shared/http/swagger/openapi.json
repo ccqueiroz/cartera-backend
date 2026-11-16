@@ -3170,7 +3170,62 @@
         ]
       }
     },
-    "/api/bill/create": {
+    "/api/bill": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Bill"
+        ]
+      },
       "post": {
         "requestBody": {
           "content": {
@@ -3259,7 +3314,7 @@
         ]
       }
     },
-    "/api/bill/create-installment": {
+    "/api/bill/installment": {
       "post": {
         "requestBody": {
           "content": {
@@ -3343,12 +3398,69 @@
         ]
       }
     },
-    "/api/bill/delete/{id}": {
+    "/api/bill/unpaid-by-period": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista despesas nao pagas no intervalo de vencimento.",
+        "tags": [
+          "Bill"
+        ]
+      }
+    },
+    "/api/bill/{bill_id}": {
       "delete": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "bill_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3382,14 +3494,51 @@
         "tags": [
           "Bill"
         ]
-      }
-    },
-    "/api/bill/edit/{id}": {
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bill_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionDetailResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da despesa (no + filhas imediatas).",
+        "tags": [
+          "Bill"
+        ]
+      },
       "put": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "bill_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3452,12 +3601,12 @@
         ]
       }
     },
-    "/api/bill/global-settlement/{id}": {
+    "/api/bill/{bill_id}/global-settlement": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "bill_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3534,167 +3683,12 @@
         ]
       }
     },
-    "/api/bill/list-all": {
-      "get": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionOrdering"
-          },
-          {
-            "$ref": "#/components/parameters/DirectionOrder"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSort"
-          },
-          {
-            "$ref": "#/components/parameters/SortValue"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSearchByDate"
-          },
-          {
-            "$ref": "#/components/parameters/SearchByDateValue"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionPageResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista despesas por competencia (folhas, filtros do motor).",
-        "tags": [
-          "Bill"
-        ]
-      }
-    },
-    "/api/bill/list-by-id/{id}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionDetailResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/TransactionNotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Detalhe da despesa (no + filhas imediatas).",
-        "tags": [
-          "Bill"
-        ]
-      }
-    },
-    "/api/bill/list-unpaid-by-period": {
-      "get": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionOrdering"
-          },
-          {
-            "$ref": "#/components/parameters/DirectionOrder"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSort"
-          },
-          {
-            "$ref": "#/components/parameters/SortValue"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSearchByDate"
-          },
-          {
-            "$ref": "#/components/parameters/SearchByDateValue"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionPageResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista despesas nao pagas no intervalo de vencimento.",
-        "tags": [
-          "Bill"
-        ]
-      }
-    },
-    "/api/bill/reverse/{id}": {
+    "/api/bill/{bill_id}/reverse": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "bill_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3733,12 +3727,12 @@
         ]
       }
     },
-    "/api/bill/settle/{id}": {
+    "/api/bill/{bill_id}/settle": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "bill_id",
             "required": true,
             "schema": {
               "type": "string"

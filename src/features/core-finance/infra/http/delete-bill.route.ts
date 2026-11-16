@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/delete/{id}:
+ * /api/bill/{bill_id}:
  *   delete:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Exclui (soft-delete) a despesa; nao mexe em caixa.
@@ -23,7 +23,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class DeleteBillRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'bill/delete/:id';
+  public readonly path: string = 'bill/:bill_id';
   public readonly handler: HttpHandler;
 
   private constructor(

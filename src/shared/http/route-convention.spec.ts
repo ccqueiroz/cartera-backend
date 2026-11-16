@@ -780,7 +780,6 @@ const EXEMPT_ROUTES = [
 
 // Each path task removes its controller here: the it.failing below breaks once a listed controller follows the pattern.
 const PENDING_CONTROLLERS: Record<string, string> = {
-  bill: 'T4',
   wallet: 'T6',
   transfer: 'T7',
 };

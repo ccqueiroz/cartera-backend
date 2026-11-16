@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/create:
+ * /api/bill:
  *   post:
  *     summary: Cria uma despesa única (a vencer ou nascida paga, exigindo walletId).
  *     tags: [Bill]
@@ -41,7 +41,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class CreateBillRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'bill/create';
+  public readonly path: string = 'bill';
   public readonly handler: HttpHandler;
 
   private constructor(
