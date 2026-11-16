@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-by-id/{id}:
+ * /api/receivable/{receivable_id}:
  *   get:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Detalhe da receita (no + filhas imediatas).
@@ -23,7 +23,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class GetReceivableByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'receivable/list-by-id/:id';
+  public readonly path: string = 'receivable/:receivable_id';
   public readonly handler: HttpHandler;
 
   private constructor(

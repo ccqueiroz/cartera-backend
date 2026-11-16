@@ -4,7 +4,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-unreceived-by-period:
+ * /api/receivable/unreceived-by-period:
  *   get:
  *     summary: Lista receitas nao recebidas no intervalo de vencimento.
  *     tags: [Receivable]
@@ -27,7 +27,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class ListUnreceivedReceivablesByPeriodRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'receivable/list-unreceived-by-period';
+  public readonly path: string = 'receivable/unreceived-by-period';
   public readonly handler: HttpHandler;
 
   private constructor(

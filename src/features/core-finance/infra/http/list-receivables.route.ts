@@ -4,7 +4,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-all:
+ * /api/receivable:
  *   get:
  *     summary: Lista receitas por competencia (folhas, filtros do motor).
  *     tags: [Receivable]
@@ -27,7 +27,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class ListReceivablesRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'receivable/list-all';
+  public readonly path: string = 'receivable';
   public readonly handler: HttpHandler;
 
   private constructor(

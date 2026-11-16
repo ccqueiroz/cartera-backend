@@ -4,7 +4,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/create-installment:
+ * /api/receivable/installment:
  *   post:
  *     summary: Cria uma receita parcelada (entrada recebida exige walletId).
  *     tags: [Receivable]
@@ -37,7 +37,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class CreateInstallmentReceivableRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'receivable/create-installment';
+  public readonly path: string = 'receivable/installment';
   public readonly handler: HttpHandler;
 
   private constructor(

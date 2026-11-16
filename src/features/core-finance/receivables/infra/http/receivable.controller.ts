@@ -122,7 +122,7 @@ export class ReceivableController {
 
   public listById = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.getById.execute(
-      String(req.params.id),
+      String(req.params.receivable_id),
       userIdFrom(req),
     );
     res.status(200).json({ data: result });
@@ -131,7 +131,7 @@ export class ReceivableController {
   public settle = async (req: Request, res: Response): Promise<void> => {
     await assertValid(SettleReceivableSchema, req.body);
     const result = await this.useCases.settle.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
       walletId: req.body.walletId,
       paidAmount: req.body.paidAmount,
@@ -147,7 +147,7 @@ export class ReceivableController {
   ): Promise<void> => {
     await assertValid(GlobalSettleReceivableSchema, req.body);
     const result = await this.useCases.globalSettlement.execute({
-      nodeId: String(req.params.id),
+      nodeId: String(req.params.receivable_id),
       userId: userIdFrom(req),
       walletId: req.body.walletId,
       paymentDate: req.body.paymentDate,
@@ -161,7 +161,7 @@ export class ReceivableController {
   public edit = async (req: Request, res: Response): Promise<void> => {
     await assertValid(EditReceivableSchema, req.body);
     const result = await this.useCases.edit.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
       amount: req.body.amount,
       dueDate: req.body.dueDate,
@@ -173,7 +173,7 @@ export class ReceivableController {
 
   public delete = async (req: Request, res: Response): Promise<void> => {
     await this.useCases.softDelete.execute(
-      String(req.params.id),
+      String(req.params.receivable_id),
       userIdFrom(req),
     );
     res.status(204).send();
@@ -181,7 +181,7 @@ export class ReceivableController {
 
   public reverse = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.reverse.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
     });
     res.status(200).json({ data: result });
