@@ -17,7 +17,7 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 async function findDefaultWallet(token: string): Promise<string | undefined> {
   for (let attempt = 0; attempt < 15; attempt++) {
-    const res = await request('get', 'wallet/list-all', {
+    const res = await request('get', 'wallet', {
       token,
       query: { size: 50 },
     });

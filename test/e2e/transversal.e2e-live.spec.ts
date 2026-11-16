@@ -16,7 +16,7 @@ describe('transversal (e2e-live)', () => {
   });
 
   it('guarded route without token → 401', async () => {
-    const res = await request('get', 'wallet/list-all');
+    const res = await request('get', 'wallet');
     expect(res.status).toBe(401);
     expect((res.body as Record<string, unknown>).code).toBe(
       ErrorCode.INVALID_TOKEN,
@@ -24,7 +24,7 @@ describe('transversal (e2e-live)', () => {
   });
 
   it('invalid payload → 400 VALIDATION_FAILED', async () => {
-    const res = await request('post', 'bill/create', {
+    const res = await request('post', 'bill', {
       token: userA.token,
       body: { dueDate: 'not-a-date' },
     });
@@ -35,7 +35,7 @@ describe('transversal (e2e-live)', () => {
   });
 
   it('cross-user: B cannot read A resource → 403/404', async () => {
-    const billOfA = await request('post', 'bill/create', {
+    const billOfA = await request('post', 'bill', {
       token: userA.token,
       body: {
         amount: 100,
@@ -47,7 +47,7 @@ describe('transversal (e2e-live)', () => {
     expect(billOfA.status).toBe(201);
     const billId = idOf(billOfA.body);
 
-    const crossRead = await request('get', `bill/list-by-id/${billId}`, {
+    const crossRead = await request('get', `bill/${billId}`, {
       token: userB.token,
     });
     expect([403, 404]).toContain(crossRead.status);

@@ -31,7 +31,7 @@ async function categoryEnumFor(
   token: string,
   type: string,
 ): Promise<string | undefined> {
-  const res = await request('get', 'category/list-all', {
+  const res = await request('get', 'category', {
     token,
     query: { type },
   });
@@ -43,8 +43,8 @@ export async function pickCatalogIds(token: string): Promise<CatalogIds> {
     await Promise.all([
       categoryEnumFor(token, 'BILLS'),
       categoryEnumFor(token, 'RECEIVABLE'),
-      request('get', 'payment-method/list-all', { token }),
-      request('get', 'payment-status/list-all', { token }),
+      request('get', 'payment-method', { token }),
+      request('get', 'payment-status', { token }),
     ]);
 
   const paymentMethodEnum = firstActiveEnum(paymentMethods.body);
