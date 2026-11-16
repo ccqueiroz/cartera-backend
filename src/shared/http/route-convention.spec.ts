@@ -1027,6 +1027,15 @@ describe('route pattern', () => {
     ]);
   });
 
+  it('[PDR-04] the order check does not match a longer pattern against a shorter path', () => {
+    expect(
+      orderViolations('category.routes.ts', [
+        { method: 'get', path: 'category/group/:group' },
+        { method: 'get', path: 'category/group' },
+      ]),
+    ).toEqual([]);
+  });
+
   it.failing.each(pendingControllers)(
     '%s still has a route outside the pattern',
     (controller) => {
