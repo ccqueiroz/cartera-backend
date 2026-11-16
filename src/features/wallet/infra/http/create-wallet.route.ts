@@ -4,7 +4,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/create:
+ * /api/wallet:
  *   post:
  *     summary: Cria uma carteira do usuário autenticado.
  *     tags: [Wallet]
@@ -32,7 +32,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class CreateWalletRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'wallet/create';
+  public readonly path: string = 'wallet';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -5596,265 +5596,7 @@
         ]
       }
     },
-    "/api/wallet/adjust-balance/{id}": {
-      "patch": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "amount": {
-                    "type": "number"
-                  },
-                  "occurredAt": {
-                    "type": "string"
-                  },
-                  "operation": {
-                    "enum": [
-                      "DEPOSIT",
-                      "WITHDRAW"
-                    ],
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "operation",
-                  "amount"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/AdjustBalanceResultResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/WalletAdjustBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/WalletNotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/WalletDeleted"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Ajuste manual de saldo (depósito/saque) com movimento ADJUST.",
-        "tags": [
-          "Wallet"
-        ]
-      }
-    },
-    "/api/wallet/create": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "balance": {
-                    "type": "number"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "overdraftGraceDays": {
-                    "type": "integer"
-                  },
-                  "overdraftLimit": {
-                    "type": "number"
-                  },
-                  "overdraftMonthlyRate": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "name"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "$ref": "#/components/responses/CreateWalletResultResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/WalletCreateBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Cria uma carteira do usuário autenticado.",
-        "tags": [
-          "Wallet"
-        ]
-      }
-    },
-    "/api/wallet/delete/{id}": {
-      "delete": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "force",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Carteira removida, sem corpo."
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "422": {
-            "$ref": "#/components/responses/WalletDeleteRefused"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Remove (soft-delete) uma carteira; saldo ≠ 0 exige force.",
-        "tags": [
-          "Wallet"
-        ]
-      }
-    },
-    "/api/wallet/edit/{id}": {
-      "put": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "overdraftGraceDays": {
-                    "type": "integer"
-                  },
-                  "overdraftLimit": {
-                    "type": "number"
-                  },
-                  "overdraftMonthlyRate": {
-                    "type": "number"
-                  }
-                },
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/WalletOutputResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/WalletEditBadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/WalletNotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/WalletDeleted"
-          },
-          "422": {
-            "$ref": "#/components/responses/WalletDefaultNoOverdraft"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Edita nome e config de cheque-especial da carteira (saldo fora da whitelist).",
-        "tags": [
-          "Wallet"
-        ]
-      }
-    },
-    "/api/wallet/list-all": {
+    "/api/wallet": {
       "get": {
         "parameters": [
           {
@@ -5932,14 +5674,119 @@
         "tags": [
           "Wallet"
         ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "balance": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/CreateWalletResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletCreateBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Cria uma carteira do usuário autenticado.",
+        "tags": [
+          "Wallet"
+        ]
       }
     },
-    "/api/wallet/list-by-id/{id}": {
+    "/api/wallet/{wallet_id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wallet_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Carteira removida, sem corpo."
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "422": {
+            "$ref": "#/components/responses/WalletDeleteRefused"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Remove (soft-delete) uma carteira; saldo ≠ 0 exige force.",
+        "tags": [
+          "Wallet"
+        ]
+      },
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "wallet_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -5973,14 +5820,161 @@
         "tags": [
           "Wallet"
         ]
+      },
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wallet_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "overdraftGraceDays": {
+                    "type": "integer"
+                  },
+                  "overdraftLimit": {
+                    "type": "number"
+                  },
+                  "overdraftMonthlyRate": {
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/WalletOutputResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletEditBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "422": {
+            "$ref": "#/components/responses/WalletDefaultNoOverdraft"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Edita nome e config de cheque-especial da carteira (saldo fora da whitelist).",
+        "tags": [
+          "Wallet"
+        ]
       }
     },
-    "/api/wallet/statement/{id}": {
+    "/api/wallet/{wallet_id}/adjust-balance": {
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wallet_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "occurredAt": {
+                    "type": "string"
+                  },
+                  "operation": {
+                    "enum": [
+                      "DEPOSIT",
+                      "WITHDRAW"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation",
+                  "amount"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AdjustBalanceResultResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/WalletAdjustBadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/WalletNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/WalletDeleted"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Ajuste manual de saldo (depósito/saque) com movimento ADJUST.",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/api/wallet/{wallet_id}/statement": {
       "get": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "wallet_id",
             "required": true,
             "schema": {
               "type": "string"
