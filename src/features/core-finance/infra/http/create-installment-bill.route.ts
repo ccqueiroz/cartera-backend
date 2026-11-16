@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/create-installment:
+ * /api/bill/installment:
  *   post:
  *     summary: Cria uma despesa parcelada (entrada paga exige walletId).
  *     tags: [Bill]
@@ -37,7 +37,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class CreateInstallmentBillRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'bill/create-installment';
+  public readonly path: string = 'bill/installment';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/edit/{id}:
+ * /api/bill/{bill_id}:
  *   put:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Edita a despesa (com propagacao opcional).
@@ -35,7 +35,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class EditBillRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'bill/edit/:id';
+  public readonly path: string = 'bill/:bill_id';
   public readonly handler: HttpHandler;
 
   private constructor(
