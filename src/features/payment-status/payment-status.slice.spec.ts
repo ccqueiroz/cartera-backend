@@ -106,8 +106,8 @@ function makeHarness() {
 
 describe('payment-status e2e (authentication guard via factory)', () => {
   const protectedRoutes: Array<[string, string]> = [
-    ['get', 'payment-status/list-all'],
-    ['get', 'payment-status/list-by-enum/:descriptionEnum'],
+    ['get', 'payment-status'],
+    ['get', 'payment-status/:description_enum'],
   ];
 
   it.each(protectedRoutes)(
@@ -123,7 +123,7 @@ describe('payment-status e2e (authentication guard via factory)', () => {
 
   it('with a valid session the read runs normally (200)', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'payment-status/list-all', {
+    const response = await dispatch('get', 'payment-status', {
       authorization: `Bearer ${VALID_TOKEN}`,
     });
 
@@ -133,7 +133,7 @@ describe('payment-status e2e (authentication guard via factory)', () => {
 
   it('invalid token: 401 INVALID_TOKEN', async () => {
     const { dispatch } = makeHarness();
-    const response = await dispatch('get', 'payment-status/list-all', {
+    const response = await dispatch('get', 'payment-status', {
       authorization: 'Bearer token-desconhecido',
     });
 
