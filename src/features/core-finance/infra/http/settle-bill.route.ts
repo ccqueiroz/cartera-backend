@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/settle/{id}:
+ * /api/bill/{bill_id}/settle:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Paga uma parcela (liquidacao atomica com a wallet).
@@ -38,7 +38,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class SettleBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'bill/settle/:id';
+  public readonly path: string = 'bill/:bill_id/settle';
   public readonly handler: HttpHandler;
 
   private constructor(

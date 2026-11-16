@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-unpaid-by-period:
+ * /api/bill/unpaid-by-period:
  *   get:
  *     summary: Lista despesas nao pagas no intervalo de vencimento.
  *     tags: [Bill]
@@ -27,7 +27,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class ListUnpaidBillsByPeriodRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'bill/list-unpaid-by-period';
+  public readonly path: string = 'bill/unpaid-by-period';
   public readonly handler: HttpHandler;
 
   private constructor(

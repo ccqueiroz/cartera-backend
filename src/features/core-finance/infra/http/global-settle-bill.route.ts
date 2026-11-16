@@ -4,11 +4,11 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/global-settlement/{id}:
+ * /api/bill/{bill_id}/global-settlement:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: bill_id
  *         required: true
  *         schema: { type: string }
  *     summary: Quitacao global (debito total + um movimento por folha).
@@ -39,7 +39,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class GlobalSettleBillRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'bill/global-settlement/:id';
+  public readonly path: string = 'bill/:bill_id/global-settlement';
   public readonly handler: HttpHandler;
 
   private constructor(
