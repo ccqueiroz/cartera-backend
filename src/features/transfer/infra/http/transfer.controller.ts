@@ -55,7 +55,7 @@ export class TransferController {
   public listById = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.getById.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.transfer_id),
     });
     res.status(200).json({ data: result });
   };

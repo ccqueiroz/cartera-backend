@@ -778,11 +778,6 @@ const EXEMPT_ROUTES = [
   'get health',
 ];
 
-// Each path task removes its controller here: the it.failing below breaks once a listed controller follows the pattern.
-const PENDING_CONTROLLERS: Record<string, string> = {
-  transfer: 'T7',
-};
-
 const OPERATION_WORDS = ['list', 'create', 'edit', 'update', 'delete'];
 const OPERATION_PREFIXES = ['list-', 'create-', 'get-'];
 const KEBAB_CASE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
@@ -800,8 +795,6 @@ const DRAWERS: Record<string, string[]> = {
 const COLLECTION_POSTS = ['installment'];
 
 const isParam = (segment: string): boolean => segment.startsWith(':');
-
-const controllerOf = (path = ''): string => path.split('/')[0];
 
 const isExempt = ({ method, path }: RouteParts): boolean =>
   EXEMPT_ROUTES.includes(`${method} ${path}`);
@@ -983,14 +976,7 @@ const PASSING_SAMPLES = [
   sample('get wallet/:wallet_id'),
 ];
 
-const pendingControllers = Object.keys(PENDING_CONTROLLERS);
-
-const patternFiles = routeFiles.filter((file) => {
-  const route = readRoute(file);
-  return (
-    !isExempt(route) && !pendingControllers.includes(controllerOf(route.path))
-  );
-});
+const patternFiles = routeFiles.filter((file) => !isExempt(readRoute(file)));
 
 const routesFiles = [...new Set(routeFiles.map(routesFileFor))];
 
@@ -1070,16 +1056,4 @@ describe('route pattern', () => {
       ]),
     ).toEqual([]);
   });
-
-  it.failing.each(pendingControllers)(
-    '%s still has a route outside the pattern',
-    (controller) => {
-      expect(
-        routeFiles
-          .map((file) => readRoute(file))
-          .filter((route) => controllerOf(route.path) === controller)
-          .flatMap(routeViolations),
-      ).toEqual([]);
-    },
-  );
 });
