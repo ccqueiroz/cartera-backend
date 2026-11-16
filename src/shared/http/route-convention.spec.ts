@@ -763,3 +763,410 @@ describe('[BK2-54] every route, every controller and every thrown error code', (
     ).toEqual([]);
   });
 });
+
+const EXEMPT_ROUTES = [
+  'post auth/account',
+  'post auth/session',
+  'put auth/session',
+  'delete auth/session',
+  'post auth/password-recovery',
+  'get person/me',
+  'patch person/me',
+  'delete person/me',
+  'put person/me/avatar',
+  'delete person/me/avatar',
+  'get health',
+];
+
+const OPERATION_WORDS = ['list', 'create', 'edit', 'update', 'delete'];
+const OPERATION_PREFIXES = ['list-', 'create-', 'get-'];
+const KEBAB_CASE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+const SNAKE_CASE = /^[a-z][a-z0-9]*(_[a-z0-9]+)*$/;
+
+// Verbs by path shape (c controller, x literal, p param); a literal under the controller takes POST only to create installments.
+const DRAWERS: Record<string, string[]> = {
+  c: ['get', 'post'],
+  'c/p': ['get', 'put', 'patch', 'delete'],
+  'c/x': ['get'],
+  'c/x/p': ['get'],
+  'c/p/x': ['get', 'post', 'put', 'patch', 'delete'],
+  'c/p/x/p': ['get', 'post', 'put', 'delete'],
+};
+const COLLECTION_POSTS = ['installment'];
+
+const isParam = (segment: string): boolean => segment.startsWith(':');
+
+const isExempt = ({ method, path }: RouteParts): boolean =>
+  EXEMPT_ROUTES.includes(`${method} ${path}`);
+
+const drawerTakes = (segments: string[], method: string): boolean => {
+  const shape = segments
+    .map((segment, index) => (isParam(segment) ? 'p' : index === 0 ? 'c' : 'x'))
+    .join('/');
+  return (
+    (DRAWERS[shape] ?? []).includes(method) ||
+    (shape === 'c/x' &&
+      method === 'post' &&
+      COLLECTION_POSTS.includes(segments[1]))
+  );
+};
+
+const routeViolations = (route: RouteParts): string[] => {
+  if (isExempt(route)) return [];
+  const { method = '', path = '', handler, handlerBody = '' } = route;
+  const where = `${method} ${path}`;
+  const segments = path.split('/');
+  const literals = segments.filter((segment) => !isParam(segment));
+  const params = segments.filter(isParam).map((segment) => segment.slice(1));
+  return [
+    ...literals
+      .filter(
+        (segment) =>
+          OPERATION_WORDS.includes(segment) ||
+          OPERATION_PREFIXES.some((prefix) => segment.startsWith(prefix)),
+      )
+      .map((segment) => `${where}: segment "${segment}" is an operation word`),
+    ...literals
+      .filter((segment) => !KEBAB_CASE.test(segment))
+      .map((segment) => `${where}: segment "${segment}" is not kebab-case`),
+    ...(drawerTakes(segments, method)
+      ? []
+      : [`${where}: no drawer takes this path with ${method}`]),
+    ...params
+      .filter((param) => !SNAKE_CASE.test(param))
+      .map((param) => `${where}: param "${param}" is not snake_case`),
+    ...segments.flatMap((segment, index) => {
+      const param = segment.slice(1);
+      const expected = `${(segments[index - 1] ?? '').replace(/-/g, '_')}_id`;
+      return isParam(segment) &&
+        (param === 'id' || param.endsWith('_id')) &&
+        param !== expected
+        ? [`${where}: param "${param}" should be ${expected}`]
+        : [];
+    }),
+    ...params
+      .filter(
+        (param) =>
+          !new RegExp(`\\breq\\.params\\.${param}\\b`).test(handlerBody),
+      )
+      .map(
+        (param) =>
+          `${where}: handler ${handler} does not read req.params.${param}`,
+      ),
+  ];
+};
+
+const routeOfClass = new Map(
+  routeFiles.map(
+    (file) =>
+      [
+        readFileSync(file, 'utf8').match(/\bexport class (\w+)/)?.[1],
+        readRoute(file),
+      ] as const,
+  ),
+);
+
+// ponytail: reads the registration order from the Route.create( lines as text; a route registered by a helper or a loop escapes it; call each <feature>Routes function if that shows up.
+const registeredRoutes = (routesFile: string): RouteParts[] =>
+  Array.from(
+    readFileSync(routesFile, 'utf8').matchAll(/\b(\w+Route)\.create\(/g),
+  ).flatMap((match) => routeOfClass.get(match[1]) ?? []);
+
+const matchesPath = (pattern: string[], path: string[]): boolean =>
+  pattern.length === path.length &&
+  pattern.every(
+    (segment, index) => isParam(segment) || segment === path[index],
+  );
+
+const orderViolations = (
+  routesFile: string,
+  registered: RouteParts[],
+): string[] =>
+  registered.flatMap((first, index) =>
+    registered
+      .slice(index + 1)
+      .filter(
+        (later) =>
+          later.method === first.method &&
+          matchesPath(
+            (first.path ?? '').split('/'),
+            (later.path ?? '').split('/'),
+          ),
+      )
+      .map(
+        (later) =>
+          `${routesFile}: ${first.method} ${first.path} comes before ${later.method} ${later.path}`,
+      ),
+  );
+
+const duplicateViolations = (
+  routes: (RouteParts & { file: string })[],
+): string[] => {
+  const filesByRoute = new Map<string, string[]>();
+  routes.forEach(({ method, path, file }) => {
+    const route = `${method} ${path}`;
+    filesByRoute.set(route, [...(filesByRoute.get(route) ?? []), file]);
+  });
+  return Array.from(filesByRoute)
+    .filter(([, files]) => files.length > 1)
+    .map(([route, files]) => `${route}: declared by ${files.join(' and ')}`);
+};
+
+const sample = (route: string, handlerBody?: string): RouteParts => {
+  const [method, path] = route.split(' ');
+  const reads = path
+    .split('/')
+    .filter(isParam)
+    .map((param) => `req.params.${param.slice(1)}`);
+  return {
+    method,
+    path,
+    handler: 'listById',
+    handlerBody: handlerBody ?? reads.join(' '),
+  };
+};
+
+const FAILING_SAMPLES = [
+  sample('get wallet/list-all'),
+  sample('get bill/get-one'),
+  sample('delete wallet'),
+  sample('patch bill/settle/:bill_id'),
+  sample('post bill/installments'),
+  sample('post auth/sessions'),
+  sample('delete person/me/avatar/x'),
+  sample('get payment_method'),
+  sample('get wallet/:walletId'),
+  sample('get wallet/:id'),
+  sample('get wallet/:bill_id'),
+  sample('get wallet/:wallet_id', 'req.params.id'),
+  sample('get wallet/:wallet_id', 'req.params.wallet_idx'),
+];
+
+const FAILING_LINES = [
+  'get wallet/list-all: segment "list-all" is an operation word',
+  'get bill/get-one: segment "get-one" is an operation word',
+  'delete wallet: no drawer takes this path with delete',
+  'patch bill/settle/:bill_id: no drawer takes this path with patch',
+  'patch bill/settle/:bill_id: param "bill_id" should be settle_id',
+  'post bill/installments: no drawer takes this path with post',
+  'post auth/sessions: no drawer takes this path with post',
+  'delete person/me/avatar/x: no drawer takes this path with delete',
+  'get payment_method: segment "payment_method" is not kebab-case',
+  'get wallet/:walletId: param "walletId" is not snake_case',
+  'get wallet/:id: param "id" should be wallet_id',
+  'get wallet/:bill_id: param "bill_id" should be wallet_id',
+  'get wallet/:wallet_id: handler listById does not read req.params.wallet_id',
+  'get wallet/:wallet_id: handler listById does not read req.params.wallet_id',
+];
+
+const PASSING_SAMPLES = [
+  sample('get wallet/listing'),
+  sample('get wallet/created'),
+  sample('get bill/unpaid-by-period'),
+  sample('get wallet'),
+  sample('post wallet'),
+  sample('patch bill/:bill_id/settle'),
+  sample('post bill/installment'),
+  sample('post auth/session'),
+  sample('get payment-method'),
+  sample('get payment-method/:payment_method_id'),
+  sample('get category/:description_enum'),
+  sample('get category/group/:group'),
+  sample('get wallet/:wallet_id/statement'),
+  sample('get wallet/:wallet_id'),
+];
+
+const patternFiles = routeFiles.filter((file) => !isExempt(readRoute(file)));
+
+const routesFiles = [...new Set(routeFiles.map(routesFileFor))];
+
+describe('route pattern', () => {
+  it.each(patternFiles)('[PDR-01] %s follows the route pattern', (file) => {
+    expect(routeViolations(readRoute(file))).toEqual([]);
+  });
+
+  it('[PDR-02] the route checker gives one line per violation of each near miss', () => {
+    expect(FAILING_SAMPLES.flatMap(routeViolations)).toEqual(FAILING_LINES);
+  });
+
+  it('[PDR-02] the route checker accepts the near misses that follow the pattern', () => {
+    expect(PASSING_SAMPLES.flatMap(routeViolations)).toEqual([]);
+  });
+
+  it.each(routesFiles)(
+    '[PDR-04] %s registers each literal before the param that matches it',
+    (routesFile) => {
+      expect(
+        orderViolations(basename(routesFile), registeredRoutes(routesFile)),
+      ).toEqual([]);
+    },
+  );
+
+  it('[PDR-04] the order check refuses a param registered before a literal it matches', () => {
+    const group = { method: 'get', path: 'category/group' };
+    const byEnum = { method: 'get', path: 'category/:description_enum' };
+    expect([
+      ...orderViolations('category.routes.ts', [byEnum, group]),
+      ...orderViolations('category.routes.ts', [group, byEnum]),
+      ...orderViolations('category.routes.ts', [
+        { method: 'put', path: 'category/:description_enum' },
+        group,
+      ]),
+      ...orderViolations('category.routes.ts', [
+        { method: 'get', path: 'category/group/:group' },
+        byEnum,
+      ]),
+    ]).toEqual([
+      'category.routes.ts: get category/:description_enum comes before get category/group',
+    ]);
+  });
+
+  it('[PDR-04] the order check does not match a longer pattern against a shorter path', () => {
+    expect(
+      orderViolations('category.routes.ts', [
+        { method: 'get', path: 'category/group/:group' },
+        { method: 'get', path: 'category/group' },
+      ]),
+    ).toEqual([]);
+  });
+
+  it('[PDR-03] no two route files declare the same verb and path', () => {
+    expect(
+      duplicateViolations(
+        routeFiles.map((file) => ({
+          ...readRoute(file),
+          file: basename(file),
+        })),
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-03] the duplicate check names both files of a repeated verb and path', () => {
+    const getWallet = { method: 'get', path: 'wallet' };
+    expect(
+      duplicateViolations([
+        { ...getWallet, file: 'a.route.ts' },
+        { ...getWallet, file: 'b.route.ts' },
+      ]),
+    ).toEqual(['get wallet: declared by a.route.ts and b.route.ts']);
+    expect(
+      duplicateViolations([
+        { ...getWallet, file: 'a.route.ts' },
+        { method: 'post', path: 'wallet', file: 'b.route.ts' },
+      ]),
+    ).toEqual([]);
+  });
+});
+
+type OpenApiParameterOrRef = OpenApiParameter & { $ref?: string };
+
+const PARAMETERS_REF = '#/components/parameters/';
+
+const resolvedParameters = (
+  parameters: OpenApiParameterOrRef[] = [],
+  components = componentsOf(openapi).parameters ?? {},
+): OpenApiParameter[] =>
+  parameters.flatMap((parameter) =>
+    parameter.$ref?.startsWith(PARAMETERS_REF)
+      ? components[parameter.$ref.slice(PARAMETERS_REF.length)] ?? []
+      : [parameter],
+  );
+
+const queryViolations = (
+  where: string,
+  parameters?: OpenApiParameterOrRef[],
+  components?: OpenApiComponents['parameters'],
+): string[] =>
+  resolvedParameters(parameters, components)
+    .filter(
+      ({ in: location, name = '' }) =>
+        location === 'query' && !SNAKE_CASE.test(name),
+    )
+    .map(({ name }) => `${where}: query "${name}" is not snake_case`);
+
+const QUERY_COMPONENTS = {
+  CategoryFilter: { in: 'query', name: 'categoryDescriptionEnum' },
+  SearchByDate: { in: 'query', name: 'search_by_date' },
+};
+
+const queriesOf = (path: string): OpenApiParameter[] =>
+  resolvedParameters(openapi.paths?.[path]?.get?.parameters);
+
+const LIST_QUERIES = [
+  'scope',
+  'month',
+  'year',
+  'category_description_enum',
+  'payment_method_description_enum',
+  'root_has_installments',
+  'root_is_fixed_cost',
+].map((name) => expect.objectContaining({ in: 'query', name }));
+
+const PERIOD_QUERIES = ['start_date', 'end_date'].map((name) =>
+  expect.objectContaining({ in: 'query', name, required: true }),
+);
+
+describe('query pattern', () => {
+  it('[PDR-05] every query of every openapi.json operation is snake_case', () => {
+    // ponytail: reads the parameters under each verb; a path-level parameters list escapes it; merge it into each operation if a @swagger block declares one.
+    expect(
+      Object.entries(openapi.paths ?? {}).flatMap(([path, operations]) =>
+        Object.entries(operations ?? {}).flatMap(([method, operation]) =>
+          queryViolations(`${method} ${path}`, operation?.parameters),
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-05] the query check names each query that is not snake_case, inline or referenced', () => {
+    expect(
+      queryViolations(
+        'get /api/bill',
+        [
+          { in: 'query', name: 'categoryDescriptionEnum' },
+          { $ref: `${PARAMETERS_REF}CategoryFilter` },
+        ],
+        QUERY_COMPONENTS,
+      ),
+    ).toEqual([
+      'get /api/bill: query "categoryDescriptionEnum" is not snake_case',
+      'get /api/bill: query "categoryDescriptionEnum" is not snake_case',
+    ]);
+    expect(
+      queryViolations(
+        'get /api/bill',
+        [
+          { in: 'query', name: 'page' },
+          { in: 'query', name: 'search_by_date' },
+          { $ref: `${PARAMETERS_REF}SearchByDate` },
+          { in: 'path', name: 'billId' },
+        ],
+        QUERY_COMPONENTS,
+      ),
+    ).toEqual([]);
+  });
+
+  it('[PDR-10] get /api/bill declares the list queries', () => {
+    expect(queriesOf('/api/bill')).toEqual(
+      expect.arrayContaining(LIST_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/receivable declares the list queries', () => {
+    expect(queriesOf('/api/receivable')).toEqual(
+      expect.arrayContaining(LIST_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/bill/unpaid-by-period requires start_date and end_date', () => {
+    expect(queriesOf('/api/bill/unpaid-by-period')).toEqual(
+      expect.arrayContaining(PERIOD_QUERIES),
+    );
+  });
+
+  it('[PDR-10] get /api/receivable/unreceived-by-period requires start_date and end_date', () => {
+    expect(queriesOf('/api/receivable/unreceived-by-period')).toEqual(
+      expect.arrayContaining(PERIOD_QUERIES),
+    );
+  });
+});

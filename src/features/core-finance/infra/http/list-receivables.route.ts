@@ -4,7 +4,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/list-all:
+ * /api/receivable:
  *   get:
  *     summary: Lista receitas por competencia (folhas, filtros do motor).
  *     tags: [Receivable]
@@ -17,6 +17,27 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  *       - $ref: '#/components/parameters/SortValue'
  *       - $ref: '#/components/parameters/TransactionSearchByDate'
  *       - $ref: '#/components/parameters/SearchByDateValue'
+ *       - in: query
+ *         name: scope
+ *         schema: { type: string }
+ *       - in: query
+ *         name: month
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: year
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: category_description_enum
+ *         schema: { type: string }
+ *       - in: query
+ *         name: payment_method_description_enum
+ *         schema: { type: string }
+ *       - in: query
+ *         name: root_has_installments
+ *         schema: { type: boolean }
+ *       - in: query
+ *         name: root_is_fixed_cost
+ *         schema: { type: boolean }
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       200: { $ref: '#/components/responses/TransactionPageResponse' }
@@ -27,7 +48,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class ListReceivablesRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'receivable/list-all';
+  public readonly path: string = 'receivable';
   public readonly handler: HttpHandler;
 
   private constructor(

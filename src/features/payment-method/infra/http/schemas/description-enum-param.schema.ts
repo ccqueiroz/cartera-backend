@@ -14,5 +14,5 @@ export class DescriptionEnumParamSchema {
       attribute: 'O identificador da forma de pagamento (descriptionEnum)',
     }),
   })
-  descriptionEnum!: PaymentMethodDescription;
+  description_enum!: PaymentMethodDescription;
 }

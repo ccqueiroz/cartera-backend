@@ -71,9 +71,9 @@ function makeHarness() {
   };
 }
 
-it('POST budget/create answers 201 and the created output', async () => {
+it('POST budget answers 201 and the created output', async () => {
   const dispatch = makeHarness();
-  const response = await dispatch('post', 'budget/create', {
+  const response = await dispatch('post', 'budget', {
     token: VALID_TOKEN,
     body: { name: 'Housing', limit: 2500, categoryDescriptionEnum: 'RENT' },
   });
@@ -84,7 +84,7 @@ it('POST budget/create answers 201 and the created output', async () => {
 });
 
 it('rejects without a session with 401 and the catalog code', async () => {
-  const response = await makeHarness()('post', 'budget/create', { body: {} });
+  const response = await makeHarness()('post', 'budget', { body: {} });
   expect(response.statusCode).toBe(401);
   expect(response.body).toMatchObject({ code: ErrorCode.INVALID_TOKEN });
 });

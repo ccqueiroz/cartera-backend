@@ -4,13 +4,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/list-by-id/{id}:
+ * /api/wallet/{wallet_id}:
  *   get:
  *     summary: Obtém uma carteira do usuário, com os campos derivados de cheque-especial.
  *     tags: [Wallet]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: wallet_id
  *         required: true
  *         schema: { type: string }
  *     security:
@@ -24,7 +24,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class GetWalletByIdRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'wallet/list-by-id/:id';
+  public readonly path: string = 'wallet/:wallet_id';
   public readonly handler: HttpHandler;
 
   private constructor(

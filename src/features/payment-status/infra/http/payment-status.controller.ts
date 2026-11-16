@@ -27,7 +27,7 @@ export class PaymentStatusController {
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params, REJECT_UNKNOWN);
     const result = await this.useCases.getByEnum.execute({
-      code: String(req.params.descriptionEnum) as PaymentStatusCode,
+      code: String(req.params.description_enum) as PaymentStatusCode,
     });
     res.status(200).json({ data: result });
   };

@@ -11,11 +11,11 @@ it('registers every route with the canonical method and path', () => {
   expect(
     routes.map((route) => `${route.method.toUpperCase()} ${route.path}`),
   ).toEqual([
-    'GET budget/list-all',
-    'GET budget/list-by-id/:id',
-    'POST budget/create',
-    'PUT budget/edit/:id',
-    'DELETE budget/delete/:id',
+    'GET budget',
+    'GET budget/:budget_id',
+    'POST budget',
+    'PUT budget/:budget_id',
+    'DELETE budget/:budget_id',
   ]);
 });
 
@@ -46,13 +46,11 @@ it('builds the slice and exposes the routes plus the internal contract', () => {
 ```ts
 it('maps the owner output to the raw shape the port promises', async () => {
   const getByEnum = {
-    execute: jest
-      .fn()
-      .mockResolvedValue({
-        descriptionEnum: 'RENT',
-        group: 'HOUSING',
-        active: true,
-      }),
+    execute: jest.fn().mockResolvedValue({
+      descriptionEnum: 'RENT',
+      group: 'HOUSING',
+      active: true,
+    }),
   };
   await expect(
     BudgetCategoryGatewayAdapter.create({ getByEnum } as never).resolve('RENT'),

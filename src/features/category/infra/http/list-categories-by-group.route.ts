@@ -4,7 +4,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
 
 /**
  * @swagger
- * /api/category/list-by-groups/{group}:
+ * /api/category/group/{group}:
  *   get:
  *     summary: Lista categorias ativas de um grupo filtradas por tipo.
  *     tags: [Category]
@@ -31,7 +31,7 @@ import { CategoryController } from '@/features/category/infra/http/category.cont
  */
 export class ListCategoriesByGroupRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'category/list-by-groups/:group';
+  public readonly path: string = 'category/group/:group';
   public readonly handler: HttpHandler;
 
   private constructor(

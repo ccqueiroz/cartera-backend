@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/global-settlement/{id}:
+ * /api/receivable/{receivable_id}/global-settlement:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Recebimento global (credito total + um movimento por folha).
@@ -39,7 +39,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class GlobalSettleReceivableRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'receivable/global-settlement/:id';
+  public readonly path: string = 'receivable/:receivable_id/global-settlement';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -12,7 +12,7 @@ describe('bills (e2e-live)', () => {
   beforeAll(async () => {
     session = await registerAndLogin();
     catalog = await pickCatalogIds(session.token);
-    const wallet = await request('post', 'wallet/create', {
+    const wallet = await request('post', 'wallet', {
       token: session.token,
       body: { name: 'Bills Fund', balance: 5000 },
     });
@@ -30,7 +30,7 @@ describe('bills (e2e-live)', () => {
   });
 
   it('create-single + installment → list → period → get → edit → settle → global → reverse → delete', async () => {
-    const single = await request('post', 'bill/create', {
+    const single = await request('post', 'bill', {
       token: session.token,
       body: {
         amount: 100,
@@ -43,7 +43,7 @@ describe('bills (e2e-live)', () => {
     const singleId = idOf(single.body);
     recordEntity('bill', singleId);
 
-    const installment = await request('post', 'bill/create-installment', {
+    const installment = await request('post', 'bill/installment', {
       token: session.token,
       body: {
         amount: 600,
@@ -59,31 +59,31 @@ describe('bills (e2e-live)', () => {
     const motherId = idOf(installment.body);
     recordEntity('bill', motherId);
 
-    const list = await request('get', 'bill/list-all', {
+    const list = await request('get', 'bill', {
       token: session.token,
       query: { scope: 'to_pay' },
     });
     expect(list.status).toBe(200);
     expect(contentIds(list.body)).toContain(singleId);
 
-    const byPeriod = await request('get', 'bill/list-unpaid-by-period', {
+    const byPeriod = await request('get', 'bill/unpaid-by-period', {
       token: session.token,
       query: { start_date: '2030-01-01', end_date: '2030-12-31' },
     });
     expect(byPeriod.status).toBe(200);
 
-    const detail = await request('get', `bill/list-by-id/${singleId}`, {
+    const detail = await request('get', `bill/${singleId}`, {
       token: session.token,
     });
     expect(detail.status).toBe(200);
 
-    const edited = await request('put', `bill/edit/${singleId}`, {
+    const edited = await request('put', `bill/${singleId}`, {
       token: session.token,
       body: { amount: 120 },
     });
     expect(edited.status).toBe(200);
 
-    const settled = await request('patch', `bill/settle/${singleId}`, {
+    const settled = await request('patch', `bill/${singleId}/settle`, {
       token: session.token,
       body: {
         walletId: fundedWalletId,
@@ -96,7 +96,7 @@ describe('bills (e2e-live)', () => {
 
     const globalSettle = await request(
       'patch',
-      `bill/global-settlement/${motherId}`,
+      `bill/${motherId}/global-settlement`,
       {
         token: session.token,
         body: {
@@ -108,17 +108,17 @@ describe('bills (e2e-live)', () => {
     );
     expect(globalSettle.status).toBe(200);
 
-    const reversed = await request('patch', `bill/reverse/${singleId}`, {
+    const reversed = await request('patch', `bill/${singleId}/reverse`, {
       token: session.token,
     });
     expect(reversed.status).toBe(200);
 
-    const deleted = await request('delete', `bill/delete/${singleId}`, {
+    const deleted = await request('delete', `bill/${singleId}`, {
       token: session.token,
     });
     expect(deleted.status).toBe(204);
 
-    const afterDelete = await request('get', 'bill/list-all', {
+    const afterDelete = await request('get', 'bill', {
       token: session.token,
       query: { scope: 'to_pay' },
     });

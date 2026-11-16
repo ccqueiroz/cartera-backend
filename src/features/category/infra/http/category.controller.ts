@@ -44,7 +44,7 @@ export class CategoryController {
   public getByEnum = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params);
     const result = await this.useCases.getByEnum.execute({
-      descriptionEnum: String(req.params.descriptionEnum),
+      descriptionEnum: String(req.params.description_enum),
     });
     res.status(200).json({ data: result });
   };
@@ -84,7 +84,7 @@ export class CategoryController {
     await assertValid(DescriptionEnumParamSchema, req.params);
     await assertValid(EditCategorySchema, req.body);
     const category = await this.useCases.edit.execute({
-      descriptionEnum: req.params.descriptionEnum as CategoryDescription,
+      descriptionEnum: req.params.description_enum as CategoryDescription,
       description: req.body.description,
       group: req.body.group as CategoryGroup,
       type: req.body.type as TransactionType,
@@ -96,7 +96,7 @@ export class CategoryController {
   public remove = async (req: Request, res: Response): Promise<void> => {
     await assertValid(DescriptionEnumParamSchema, req.params);
     await this.useCases.remove.execute({
-      descriptionEnum: req.params.descriptionEnum as CategoryDescription,
+      descriptionEnum: req.params.description_enum as CategoryDescription,
     });
     res.status(204).send();
   };

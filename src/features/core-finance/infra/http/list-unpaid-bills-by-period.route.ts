@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-unpaid-by-period:
+ * /api/bill/unpaid-by-period:
  *   get:
  *     summary: Lista despesas nao pagas no intervalo de vencimento.
  *     tags: [Bill]
@@ -17,6 +17,14 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *       - $ref: '#/components/parameters/SortValue'
  *       - $ref: '#/components/parameters/TransactionSearchByDate'
  *       - $ref: '#/components/parameters/SearchByDateValue'
+ *       - in: query
+ *         name: start_date
+ *         required: true
+ *         schema: { type: string, format: date }
+ *       - in: query
+ *         name: end_date
+ *         required: true
+ *         schema: { type: string, format: date }
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       200: { $ref: '#/components/responses/TransactionPageResponse' }
@@ -27,7 +35,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class ListUnpaidBillsByPeriodRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'bill/list-unpaid-by-period';
+  public readonly path: string = 'bill/unpaid-by-period';
   public readonly handler: HttpHandler;
 
   private constructor(

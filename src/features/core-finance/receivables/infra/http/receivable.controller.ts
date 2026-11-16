@@ -93,14 +93,14 @@ export class ReceivableController {
       scope: scopeFrom(req.query.scope),
       month: numberOrUndefined(req.query.month),
       year: numberOrUndefined(req.query.year),
-      categoryDescriptionEnum: req.query.categoryDescriptionEnum
-        ? String(req.query.categoryDescriptionEnum)
+      categoryDescriptionEnum: req.query.category_description_enum
+        ? String(req.query.category_description_enum)
         : undefined,
-      paymentMethodDescriptionEnum: req.query.paymentMethodDescriptionEnum
-        ? String(req.query.paymentMethodDescriptionEnum)
+      paymentMethodDescriptionEnum: req.query.payment_method_description_enum
+        ? String(req.query.payment_method_description_enum)
         : undefined,
-      rootHasInstallments: booleanOrUndefined(req.query.rootHasInstallments),
-      rootIsFixedCost: booleanOrUndefined(req.query.rootIsFixedCost),
+      rootHasInstallments: booleanOrUndefined(req.query.root_has_installments),
+      rootIsFixedCost: booleanOrUndefined(req.query.root_is_fixed_cost),
       params: readPaginationParams(req.query, TRANSACTION_LIST_FIELDS),
     });
     res.status(200).json({ data: result });
@@ -122,7 +122,7 @@ export class ReceivableController {
 
   public listById = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.getById.execute(
-      String(req.params.id),
+      String(req.params.receivable_id),
       userIdFrom(req),
     );
     res.status(200).json({ data: result });
@@ -131,7 +131,7 @@ export class ReceivableController {
   public settle = async (req: Request, res: Response): Promise<void> => {
     await assertValid(SettleReceivableSchema, req.body);
     const result = await this.useCases.settle.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
       walletId: req.body.walletId,
       paidAmount: req.body.paidAmount,
@@ -147,7 +147,7 @@ export class ReceivableController {
   ): Promise<void> => {
     await assertValid(GlobalSettleReceivableSchema, req.body);
     const result = await this.useCases.globalSettlement.execute({
-      nodeId: String(req.params.id),
+      nodeId: String(req.params.receivable_id),
       userId: userIdFrom(req),
       walletId: req.body.walletId,
       paymentDate: req.body.paymentDate,
@@ -161,7 +161,7 @@ export class ReceivableController {
   public edit = async (req: Request, res: Response): Promise<void> => {
     await assertValid(EditReceivableSchema, req.body);
     const result = await this.useCases.edit.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
       amount: req.body.amount,
       dueDate: req.body.dueDate,
@@ -173,7 +173,7 @@ export class ReceivableController {
 
   public delete = async (req: Request, res: Response): Promise<void> => {
     await this.useCases.softDelete.execute(
-      String(req.params.id),
+      String(req.params.receivable_id),
       userIdFrom(req),
     );
     res.status(204).send();
@@ -181,7 +181,7 @@ export class ReceivableController {
 
   public reverse = async (req: Request, res: Response): Promise<void> => {
     const result = await this.useCases.reverse.execute({
-      id: String(req.params.id),
+      id: String(req.params.receivable_id),
       userId: userIdFrom(req),
     });
     res.status(200).json({ data: result });

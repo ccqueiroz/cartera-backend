@@ -4,7 +4,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/list-all:
+ * /api/wallet:
  *   get:
  *     summary: Lista as carteiras ativas do usuário autenticado.
  *     tags: [Wallet]
@@ -34,7 +34,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class ListWalletsRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'wallet/list-all';
+  public readonly path: string = 'wallet';
   public readonly handler: HttpHandler;
 
   private constructor(

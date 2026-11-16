@@ -15,7 +15,7 @@ function walletOf(createBody: unknown): Rec {
 }
 
 async function createWallet(token: string, body: Rec): Promise<Rec> {
-  const created = await request('post', 'wallet/create', { token, body });
+  const created = await request('post', 'wallet', { token, body });
   expect(created.status).toBe(201);
   const wallet = walletOf(created.body);
   recordEntity('wallet', String(wallet.id));
@@ -30,7 +30,7 @@ describe('wallet (e2e-live)', () => {
   });
 
   it('signup provisions exactly one default "Cartera" as pure cash', async () => {
-    const list = await request('get', 'wallet/list-all', {
+    const list = await request('get', 'wallet', {
       token: session.token,
       query: { size: 50 },
     });
@@ -49,7 +49,7 @@ describe('wallet (e2e-live)', () => {
     expect(wallet.overdraft).toBeNull();
     const id = String(wallet.id);
 
-    const list = await request('get', 'wallet/list-all', {
+    const list = await request('get', 'wallet', {
       token: session.token,
       query: { size: 50 },
     });
@@ -58,20 +58,20 @@ describe('wallet (e2e-live)', () => {
     );
     expect(ids).toContain(id);
 
-    const got = await request('get', `wallet/list-by-id/${id}`, {
+    const got = await request('get', `wallet/${id}`, {
       token: session.token,
     });
     expect(got.status).toBe(200);
     expect(asRec(got.body).id).toBe(id);
 
-    const renamed = await request('put', `wallet/edit/${id}`, {
+    const renamed = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { name: 'E2E Wallet Renamed' },
     });
     expect(renamed.status).toBe(200);
     expect(asRec(renamed.body).name).toBe('E2E Wallet Renamed');
 
-    const deleted = await request('delete', `wallet/delete/${id}`, {
+    const deleted = await request('delete', `wallet/${id}`, {
       token: session.token,
     });
     expect(deleted.status).toBe(204);
@@ -92,14 +92,14 @@ describe('wallet (e2e-live)', () => {
   });
 
   it('create with hasOverdraft but no positive limit → OVERDRAFT_LIMIT_REQUIRED (400)', async () => {
-    const missing = await request('post', 'wallet/create', {
+    const missing = await request('post', 'wallet', {
       token: session.token,
       body: { name: 'E2E No Limit', hasOverdraft: true },
     });
     expect(missing.status).toBe(400);
     expect(asRec(missing.body).code).toBe(ErrorCode.OVERDRAFT_LIMIT_REQUIRED);
 
-    const zero = await request('post', 'wallet/create', {
+    const zero = await request('post', 'wallet', {
       token: session.token,
       body: { name: 'E2E Zero Limit', hasOverdraft: true, overdraftLimit: 0 },
     });
@@ -108,7 +108,7 @@ describe('wallet (e2e-live)', () => {
   });
 
   it('isDefault in the create payload is rejected by the whitelist (VALIDATION_FAILED)', async () => {
-    const res = await request('post', 'wallet/create', {
+    const res = await request('post', 'wallet', {
       token: session.token,
       body: { name: 'E2E Sneaky Default', isDefault: true },
     });
@@ -120,14 +120,14 @@ describe('wallet (e2e-live)', () => {
     const wallet = await createWallet(session.token, { name: 'E2E Toggle' });
     const id = String(wallet.id);
 
-    const enabled = await request('put', `wallet/edit/${id}`, {
+    const enabled = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { hasOverdraft: true, overdraftLimit: 300 },
     });
     expect(enabled.status).toBe(200);
     expect(asRec(asRec(enabled.body).overdraft).limit).toBe(300);
 
-    const disabled = await request('put', `wallet/edit/${id}`, {
+    const disabled = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { hasOverdraft: false },
     });
@@ -140,7 +140,7 @@ describe('wallet (e2e-live)', () => {
       name: 'E2E Enable Bad',
     });
     const id = String(wallet.id);
-    const res = await request('put', `wallet/edit/${id}`, {
+    const res = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { hasOverdraft: true },
     });
@@ -156,7 +156,7 @@ describe('wallet (e2e-live)', () => {
     });
     const id = String(wallet.id);
 
-    const withdraw = await request('patch', `wallet/adjust-balance/${id}`, {
+    const withdraw = await request('patch', `wallet/${id}/adjust-balance`, {
       token: session.token,
       body: { operation: 'WITHDRAW', amount: 200, occurredAt: '2026-06-22' },
     });
@@ -166,7 +166,7 @@ describe('wallet (e2e-live)', () => {
       since: '2026-06-22',
     });
 
-    const disabled = await request('put', `wallet/edit/${id}`, {
+    const disabled = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { hasOverdraft: false },
     });
@@ -175,7 +175,7 @@ describe('wallet (e2e-live)', () => {
     expect(asRec(disabled.body).balance).toBe(-200);
 
     // residual balance ≠ 0 → needs force to delete
-    const forced = await request('delete', `wallet/delete/${id}`, {
+    const forced = await request('delete', `wallet/${id}`, {
       token: session.token,
       query: { force: true },
     });
@@ -186,7 +186,7 @@ describe('wallet (e2e-live)', () => {
     const wallet = await createWallet(session.token, { name: 'E2E Cash Neg' });
     const id = String(wallet.id);
 
-    const withdraw = await request('patch', `wallet/adjust-balance/${id}`, {
+    const withdraw = await request('patch', `wallet/${id}/adjust-balance`, {
       token: session.token,
       body: { operation: 'WITHDRAW', amount: 75, occurredAt: '2026-06-22' },
     });
@@ -196,7 +196,7 @@ describe('wallet (e2e-live)', () => {
     expect(warnings).not.toContain(BalanceWarning.OVERDRAFT_LIMIT_EXCEEDED);
     expect(asRec(asRec(withdraw.body).wallet).overdraft).toBeNull();
 
-    await request('delete', `wallet/delete/${id}`, {
+    await request('delete', `wallet/${id}`, {
       token: session.token,
       query: { force: true },
     });
@@ -206,7 +206,7 @@ describe('wallet (e2e-live)', () => {
     expect(session.defaultWalletId).toBeDefined();
     const id = String(session.defaultWalletId);
 
-    const overdraft = await request('put', `wallet/edit/${id}`, {
+    const overdraft = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { hasOverdraft: true, overdraftLimit: 100 },
     });
@@ -215,7 +215,7 @@ describe('wallet (e2e-live)', () => {
       ErrorCode.WALLET_DEFAULT_NO_OVERDRAFT,
     );
 
-    const renamed = await request('put', `wallet/edit/${id}`, {
+    const renamed = await request('put', `wallet/${id}`, {
       token: session.token,
       body: { name: 'Minha Cartera' },
     });
@@ -228,20 +228,20 @@ describe('wallet (e2e-live)', () => {
   it('default wallet cannot be deleted, even with force (WALLET_NOT_DELETABLE)', async () => {
     const id = String(session.defaultWalletId);
 
-    const plain = await request('delete', `wallet/delete/${id}`, {
+    const plain = await request('delete', `wallet/${id}`, {
       token: session.token,
     });
     expect(plain.status).toBe(422);
     expect(asRec(plain.body).code).toBe(ErrorCode.WALLET_NOT_DELETABLE);
 
-    const forced = await request('delete', `wallet/delete/${id}`, {
+    const forced = await request('delete', `wallet/${id}`, {
       token: session.token,
       query: { force: true },
     });
     expect(forced.status).toBe(422);
     expect(asRec(forced.body).code).toBe(ErrorCode.WALLET_NOT_DELETABLE);
 
-    const still = await request('get', `wallet/list-by-id/${id}`, {
+    const still = await request('get', `wallet/${id}`, {
       token: session.token,
     });
     expect(still.status).toBe(200);
@@ -255,13 +255,13 @@ describe('wallet (e2e-live)', () => {
     });
     const id = String(wallet.id);
 
-    const blocked = await request('delete', `wallet/delete/${id}`, {
+    const blocked = await request('delete', `wallet/${id}`, {
       token: session.token,
     });
     expect(blocked.status).toBe(422);
     expect(asRec(blocked.body).code).toBe(ErrorCode.WALLET_HAS_BALANCE);
 
-    const forced = await request('delete', `wallet/delete/${id}`, {
+    const forced = await request('delete', `wallet/${id}`, {
       token: session.token,
       query: { force: true },
     });
@@ -274,12 +274,12 @@ describe('wallet (e2e-live)', () => {
     });
     const id = String(wallet.id);
 
-    const first = await request('delete', `wallet/delete/${id}`, {
+    const first = await request('delete', `wallet/${id}`, {
       token: session.token,
     });
     expect(first.status).toBe(204);
 
-    const second = await request('delete', `wallet/delete/${id}`, {
+    const second = await request('delete', `wallet/${id}`, {
       token: session.token,
     });
     expect(second.status).toBe(204);

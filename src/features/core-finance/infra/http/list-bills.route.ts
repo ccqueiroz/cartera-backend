@@ -4,7 +4,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
 
 /**
  * @swagger
- * /api/bill/list-all:
+ * /api/bill:
  *   get:
  *     summary: Lista despesas por competencia (folhas, filtros do motor).
  *     tags: [Bill]
@@ -17,6 +17,27 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  *       - $ref: '#/components/parameters/SortValue'
  *       - $ref: '#/components/parameters/TransactionSearchByDate'
  *       - $ref: '#/components/parameters/SearchByDateValue'
+ *       - in: query
+ *         name: scope
+ *         schema: { type: string }
+ *       - in: query
+ *         name: month
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: year
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: category_description_enum
+ *         schema: { type: string }
+ *       - in: query
+ *         name: payment_method_description_enum
+ *         schema: { type: string }
+ *       - in: query
+ *         name: root_has_installments
+ *         schema: { type: boolean }
+ *       - in: query
+ *         name: root_is_fixed_cost
+ *         schema: { type: boolean }
  *     security: [{ sessionCookieAuth: [] }]
  *     responses:
  *       200: { $ref: '#/components/responses/TransactionPageResponse' }
@@ -27,7 +48,7 @@ import { BillController } from '@/features/core-finance/bills/infra/http/bill.co
  */
 export class ListBillsRoute implements Route {
   public readonly method: HttpMethod = 'get';
-  public readonly path: string = 'bill/list-all';
+  public readonly path: string = 'bill';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,7 +4,7 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
 
 /**
  * @swagger
- * /api/transfer/create:
+ * /api/transfer:
  *   post:
  *     summary: Transfere um valor entre duas carteiras do usuário autenticado (movimento neutro).
  *     tags: [Transfer]
@@ -34,7 +34,7 @@ import { TransferController } from '@/features/transfer/infra/http/transfer.cont
  */
 export class CreateTransferRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'transfer/create';
+  public readonly path: string = 'transfer';
   public readonly handler: HttpHandler;
 
   private constructor(

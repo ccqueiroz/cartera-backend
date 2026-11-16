@@ -15,7 +15,7 @@ describe('receivables (e2e-live)', () => {
     if (session.defaultWalletId) {
       walletId = session.defaultWalletId;
     } else {
-      const created = await request('post', 'wallet/create', {
+      const created = await request('post', 'wallet', {
         token: session.token,
         body: { name: 'Receivables Wallet' },
       });
@@ -32,7 +32,7 @@ describe('receivables (e2e-live)', () => {
   });
 
   it('mirrors bills: create-single + installment → list → period → get → edit → delete', async () => {
-    const single = await request('post', 'receivable/create', {
+    const single = await request('post', 'receivable', {
       token: session.token,
       body: {
         amount: 150,
@@ -45,7 +45,7 @@ describe('receivables (e2e-live)', () => {
     const singleId = idOf(single.body);
     recordEntity('receivable', singleId);
 
-    const installment = await request('post', 'receivable/create-installment', {
+    const installment = await request('post', 'receivable/installment', {
       token: session.token,
       body: {
         amount: 400,
@@ -60,35 +60,31 @@ describe('receivables (e2e-live)', () => {
     expect(installment.status).toBe(201);
     recordEntity('receivable', idOf(installment.body));
 
-    const list = await request('get', 'receivable/list-all', {
+    const list = await request('get', 'receivable', {
       token: session.token,
       query: { scope: 'to_receive' },
     });
     expect(list.status).toBe(200);
     expect(contentIds(list.body)).toContain(singleId);
 
-    const byPeriod = await request(
-      'get',
-      'receivable/list-unreceived-by-period',
-      {
-        token: session.token,
-        query: { start_date: '2030-01-01', end_date: '2030-12-31' },
-      },
-    );
+    const byPeriod = await request('get', 'receivable/unreceived-by-period', {
+      token: session.token,
+      query: { start_date: '2030-01-01', end_date: '2030-12-31' },
+    });
     expect(byPeriod.status).toBe(200);
 
-    const detail = await request('get', `receivable/list-by-id/${singleId}`, {
+    const detail = await request('get', `receivable/${singleId}`, {
       token: session.token,
     });
     expect(detail.status).toBe(200);
 
-    const edited = await request('put', `receivable/edit/${singleId}`, {
+    const edited = await request('put', `receivable/${singleId}`, {
       token: session.token,
       body: { amount: 175 },
     });
     expect(edited.status).toBe(200);
 
-    const deleted = await request('delete', `receivable/delete/${singleId}`, {
+    const deleted = await request('delete', `receivable/${singleId}`, {
       token: session.token,
     });
     expect(deleted.status).toBe(204);
@@ -97,13 +93,13 @@ describe('receivables (e2e-live)', () => {
   it('settle credits the wallet; reverse debits it back', async () => {
     const before = balanceOf(
       (
-        await request('get', `wallet/list-by-id/${walletId}`, {
+        await request('get', `wallet/${walletId}`, {
           token: session.token,
         })
       ).body,
     );
 
-    const created = await request('post', 'receivable/create', {
+    const created = await request('post', 'receivable', {
       token: session.token,
       body: {
         amount: 200,
@@ -118,7 +114,7 @@ describe('receivables (e2e-live)', () => {
 
     const settled = await request(
       'patch',
-      `receivable/settle/${receivableId}`,
+      `receivable/${receivableId}/settle`,
       {
         token: session.token,
         body: {
@@ -133,7 +129,7 @@ describe('receivables (e2e-live)', () => {
 
     const afterSettle = balanceOf(
       (
-        await request('get', `wallet/list-by-id/${walletId}`, {
+        await request('get', `wallet/${walletId}`, {
           token: session.token,
         })
       ).body,
@@ -142,14 +138,14 @@ describe('receivables (e2e-live)', () => {
 
     const reversed = await request(
       'patch',
-      `receivable/reverse/${receivableId}`,
+      `receivable/${receivableId}/reverse`,
       { token: session.token },
     );
     expect(reversed.status).toBe(200);
 
     const afterReverse = balanceOf(
       (
-        await request('get', `wallet/list-by-id/${walletId}`, {
+        await request('get', `wallet/${walletId}`, {
           token: session.token,
         })
       ).body,

@@ -47,7 +47,7 @@ export class BudgetController {
   public remove = async (req: Request, res: Response): Promise<void> => {
     await this.useCases.remove.execute({
       userId: userIdFrom(req),
-      id: String(req.params.id),
+      id: String(req.params.budget_id),
     });
     res.status(204).send();
   };

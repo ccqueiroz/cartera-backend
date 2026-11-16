@@ -4,13 +4,13 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
 
 /**
  * @swagger
- * /api/wallet/delete/{id}:
+ * /api/wallet/{wallet_id}:
  *   delete:
  *     summary: Remove (soft-delete) uma carteira; saldo ≠ 0 exige force.
  *     tags: [Wallet]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: wallet_id
  *         required: true
  *         schema: { type: string }
  *       - in: query
@@ -27,7 +27,7 @@ import { WalletController } from '@/features/wallet/infra/http/wallet.controller
  */
 export class DeleteWalletRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'wallet/delete/:id';
+  public readonly path: string = 'wallet/:wallet_id';
   public readonly handler: HttpHandler;
 
   private constructor(

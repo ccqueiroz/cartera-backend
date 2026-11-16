@@ -25,7 +25,7 @@ const page = {
 const requestWith = (query: object) =>
   ({
     query,
-    params: { id: 'wallet-1' },
+    params: { wallet_id: 'wallet-1' },
     user_auth: { userId: 'user-1' },
   } as unknown as Request);
 

@@ -4,7 +4,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
 
 /**
  * @swagger
- * /api/payment-method/create:
+ * /api/payment-method:
  *   post:
  *     summary: Cria uma forma de pagamento.
  *     tags: [PaymentMethod]
@@ -30,7 +30,7 @@ import { PaymentMethodController } from '@/features/payment-method/infra/http/pa
  */
 export class CreatePaymentMethodRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'payment-method/create';
+  public readonly path: string = 'payment-method';
   public readonly handler: HttpHandler;
 
   private constructor(

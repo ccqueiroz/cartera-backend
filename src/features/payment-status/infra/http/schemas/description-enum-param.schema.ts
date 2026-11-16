@@ -12,5 +12,5 @@ export class DescriptionEnumParamSchema {
   @IsIn(STATUS_CODES, {
     message: errorCatalog[ErrorCode.INVALID_PAYMENT_STATUS_CODE](),
   })
-  descriptionEnum!: PaymentStatusCode;
+  description_enum!: PaymentStatusCode;
 }
