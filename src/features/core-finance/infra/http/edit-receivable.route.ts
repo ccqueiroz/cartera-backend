@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/edit/{id}:
+ * /api/receivable/{receivable_id}:
  *   put:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Edita a receita (com propagacao opcional).
@@ -35,7 +35,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class EditReceivableRoute implements Route {
   public readonly method: HttpMethod = 'put';
-  public readonly path: string = 'receivable/edit/:id';
+  public readonly path: string = 'receivable/:receivable_id';
   public readonly handler: HttpHandler;
 
   private constructor(

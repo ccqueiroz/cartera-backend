@@ -4758,7 +4758,62 @@
         ]
       }
     },
-    "/api/receivable/create": {
+    "/api/receivable": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas por competencia (folhas, filtros do motor).",
+        "tags": [
+          "Receivable"
+        ]
+      },
       "post": {
         "requestBody": {
           "content": {
@@ -4844,7 +4899,7 @@
         ]
       }
     },
-    "/api/receivable/create-installment": {
+    "/api/receivable/installment": {
       "post": {
         "requestBody": {
           "content": {
@@ -4928,12 +4983,69 @@
         ]
       }
     },
-    "/api/receivable/delete/{id}": {
+    "/api/receivable/unreceived-by-period": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Page"
+          },
+          {
+            "$ref": "#/components/parameters/Size"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionOrdering"
+          },
+          {
+            "$ref": "#/components/parameters/DirectionOrder"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSort"
+          },
+          {
+            "$ref": "#/components/parameters/SortValue"
+          },
+          {
+            "$ref": "#/components/parameters/TransactionSearchByDate"
+          },
+          {
+            "$ref": "#/components/parameters/SearchByDateValue"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionPageResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Lista receitas nao recebidas no intervalo de vencimento.",
+        "tags": [
+          "Receivable"
+        ]
+      }
+    },
+    "/api/receivable/{receivable_id}": {
       "delete": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "receivable_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -4967,14 +5079,51 @@
         "tags": [
           "Receivable"
         ]
-      }
-    },
-    "/api/receivable/edit/{id}": {
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "receivable_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TransactionDetailResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/UserDisabled"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        },
+        "security": [
+          {
+            "sessionCookieAuth": [
+            ]
+          }
+        ],
+        "summary": "Detalhe da receita (no + filhas imediatas).",
+        "tags": [
+          "Receivable"
+        ]
+      },
       "put": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "receivable_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -5037,12 +5186,12 @@
         ]
       }
     },
-    "/api/receivable/global-settlement/{id}": {
+    "/api/receivable/{receivable_id}/global-settlement": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "receivable_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -5119,167 +5268,12 @@
         ]
       }
     },
-    "/api/receivable/list-all": {
-      "get": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionOrdering"
-          },
-          {
-            "$ref": "#/components/parameters/DirectionOrder"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSort"
-          },
-          {
-            "$ref": "#/components/parameters/SortValue"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSearchByDate"
-          },
-          {
-            "$ref": "#/components/parameters/SearchByDateValue"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionPageResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista receitas por competencia (folhas, filtros do motor).",
-        "tags": [
-          "Receivable"
-        ]
-      }
-    },
-    "/api/receivable/list-by-id/{id}": {
-      "get": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionDetailResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "404": {
-            "$ref": "#/components/responses/TransactionNotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Detalhe da receita (no + filhas imediatas).",
-        "tags": [
-          "Receivable"
-        ]
-      }
-    },
-    "/api/receivable/list-unreceived-by-period": {
-      "get": {
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Page"
-          },
-          {
-            "$ref": "#/components/parameters/Size"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionOrdering"
-          },
-          {
-            "$ref": "#/components/parameters/DirectionOrder"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSort"
-          },
-          {
-            "$ref": "#/components/parameters/SortValue"
-          },
-          {
-            "$ref": "#/components/parameters/TransactionSearchByDate"
-          },
-          {
-            "$ref": "#/components/parameters/SearchByDateValue"
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/TransactionPageResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationFailed"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/UserDisabled"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        },
-        "security": [
-          {
-            "sessionCookieAuth": [
-            ]
-          }
-        ],
-        "summary": "Lista receitas nao recebidas no intervalo de vencimento.",
-        "tags": [
-          "Receivable"
-        ]
-      }
-    },
-    "/api/receivable/reverse/{id}": {
+    "/api/receivable/{receivable_id}/reverse": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "receivable_id",
             "required": true,
             "schema": {
               "type": "string"
@@ -5318,12 +5312,12 @@
         ]
       }
     },
-    "/api/receivable/settle/{id}": {
+    "/api/receivable/{receivable_id}/settle": {
       "patch": {
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "receivable_id",
             "required": true,
             "schema": {
               "type": "string"

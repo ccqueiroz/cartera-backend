@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/delete/{id}:
+ * /api/receivable/{receivable_id}:
  *   delete:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Exclui (soft-delete) a receita; nao mexe em caixa.
@@ -23,7 +23,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class DeleteReceivableRoute implements Route {
   public readonly method: HttpMethod = 'delete';
-  public readonly path: string = 'receivable/delete/:id';
+  public readonly path: string = 'receivable/:receivable_id';
   public readonly handler: HttpHandler;
 
   private constructor(

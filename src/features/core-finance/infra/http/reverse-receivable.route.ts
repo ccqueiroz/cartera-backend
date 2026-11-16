@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/reverse/{id}:
+ * /api/receivable/{receivable_id}/reverse:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Estorna um recebimento (debita o caixa na wallet original).
@@ -24,7 +24,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class ReverseReceivableRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'receivable/reverse/:id';
+  public readonly path: string = 'receivable/:receivable_id/reverse';
   public readonly handler: HttpHandler;
 
   private constructor(

@@ -4,11 +4,11 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/settle/{id}:
+ * /api/receivable/{receivable_id}/settle:
  *   patch:
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: receivable_id
  *         required: true
  *         schema: { type: string }
  *     summary: Recebe uma parcela (liquidacao atomica creditando a wallet).
@@ -38,7 +38,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class SettleReceivableRoute implements Route {
   public readonly method: HttpMethod = 'patch';
-  public readonly path: string = 'receivable/settle/:id';
+  public readonly path: string = 'receivable/:receivable_id/settle';
   public readonly handler: HttpHandler;
 
   private constructor(

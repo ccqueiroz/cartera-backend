@@ -4,7 +4,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
 
 /**
  * @swagger
- * /api/receivable/create:
+ * /api/receivable:
  *   post:
  *     summary: Cria uma receita única (a receber ou nascida recebida, exigindo walletId).
  *     tags: [Receivable]
@@ -40,7 +40,7 @@ import { ReceivableController } from '@/features/core-finance/receivables/infra/
  */
 export class CreateReceivableRoute implements Route {
   public readonly method: HttpMethod = 'post';
-  public readonly path: string = 'receivable/create';
+  public readonly path: string = 'receivable';
   public readonly handler: HttpHandler;
 
   private constructor(
