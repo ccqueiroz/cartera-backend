@@ -66,14 +66,10 @@ export class GlobalSettlementUseCase {
   public async execute(
     input: GlobalSettlementInput,
   ): Promise<GlobalSettlementResult> {
-    const { settlements, amounts } = await this.prepare(input);
+    const settlements = await this.prepare(input);
     if (settlements.length === 0)
       return { settledLeafIds: [], settledAmounts: [] };
-    await this.repository.settleLeavesAndRollup(settlements);
-    return {
-      settledLeafIds: amounts.map((a) => a.leafId),
-      settledAmounts: amounts,
-    };
+    return toResult(await this.repository.settleLeavesAndRollup(settlements));
   }
 
   /** Variante tx-aware: quita dentro de uma transação externa (AtomicRunner). */
@@ -81,20 +77,17 @@ export class GlobalSettlementUseCase {
     ctx: AtomicContext,
     input: GlobalSettlementInput,
   ): Promise<GlobalSettlementResult> {
-    const { settlements, amounts } = await this.prepare(input);
+    const settlements = await this.prepare(input);
     if (settlements.length === 0)
       return { settledLeafIds: [], settledAmounts: [] };
-    await this.repository.settleLeavesAndRollupTx(ctx, settlements);
-    return {
-      settledLeafIds: amounts.map((a) => a.leafId),
-      settledAmounts: amounts,
-    };
+    return toResult(
+      await this.repository.settleLeavesAndRollupTx(ctx, settlements),
+    );
   }
 
-  private async prepare(input: GlobalSettlementInput): Promise<{
-    settlements: LeafSettlement[];
-    amounts: SettledLeafAmount[];
-  }> {
+  private async prepare(
+    input: GlobalSettlementInput,
+  ): Promise<LeafSettlement[]> {
     const handle = await this.repository.findActiveById(
       input.nodeId,
       input.userId,
@@ -119,7 +112,7 @@ export class GlobalSettlementUseCase {
         .map(toSettlementNode);
 
     const targets = this.resolveTargets(input, byId, openChildrenOf);
-    if (targets.length === 0) return { settlements: [], amounts: [] };
+    if (targets.length === 0) return [];
 
     const paidAmountByLeaf =
       input.valorPago === undefined
@@ -127,22 +120,16 @@ export class GlobalSettlementUseCase {
         : distributeSettlement(input.valorPago, targets, openChildrenOf);
 
     const updatedAt = this.now();
-    const settlements: LeafSettlement[] = [];
-    const amounts: SettledLeafAmount[] = [];
-    for (const [leafId, paidAmount] of paidAmountByLeaf) {
-      settlements.push({
-        leafId,
-        mutate: (node: Transaction) =>
-          node.settle({
-            paymentDate: input.paymentDate,
-            paidAmount,
-            paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
-            updatedAt,
-          }),
-      });
-      amounts.push({ leafId, paidAmount: paidAmount.value });
-    }
-    return { settlements, amounts };
+    return [...paidAmountByLeaf].map(([leafId, share]) => ({
+      leafId,
+      mutate: (node: Transaction) =>
+        node.settle({
+          paymentDate: input.paymentDate,
+          paidAmount: share ?? node.amount,
+          paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
+          updatedAt,
+        }),
+    }));
   }
 
   private resolveTargets(
@@ -181,15 +168,27 @@ export class GlobalSettlementUseCase {
   private payInFull(
     targets: SettlementNode[],
     openChildrenOf: (id: string) => SettlementNode[],
-  ): Map<string, Money> {
-    const result = new Map<string, Money>();
+  ): Map<string, Money | null> {
+    const result = new Map<string, Money | null>();
     const collect = (node: SettlementNode): void => {
-      if (node.isLeaf) result.set(node.id, Money.create(node.amount));
+      if (node.isLeaf) result.set(node.id, null);
       else openChildrenOf(node.id).forEach(collect);
     };
     targets.forEach(collect);
     return result;
   }
+}
+
+// O repositório devolve só as folhas da tentativa que gravou: a folha sumida fica fora, e a nova tentativa não repete valor.
+function toResult(settled: Transaction[]): GlobalSettlementResult {
+  const settledAmounts = settled.map((leaf) => ({
+    leafId: leaf.id,
+    paidAmount: leaf.toOutput().paidAmount,
+  }));
+  return {
+    settledLeafIds: settledAmounts.map((a) => a.leafId),
+    settledAmounts,
+  };
 }
 
 function toSettlementNode(node: Transaction): SettlementNode {
