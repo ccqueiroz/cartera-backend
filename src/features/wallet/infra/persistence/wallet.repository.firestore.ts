@@ -11,7 +11,10 @@ import {
   WalletMovementPersistence,
 } from '@/features/wallet/domain/wallet-movement.entity';
 import { WalletMovementRefTypeEnum } from '@/features/wallet/domain/enums/wallet-movement.enums';
-import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import {
+  WalletMutation,
+  WalletRepository,
+} from '@/features/wallet/domain/ports/wallet.repository.port';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /**
@@ -114,15 +117,6 @@ export class WalletRepositoryFirestore implements WalletRepository {
     await batch.commit();
   }
 
-  public async saveWithMovements(
-    wallet: Wallet,
-    movements: WalletMovement[],
-  ): Promise<void> {
-    await this.db.runTransaction(async (txn) => {
-      this.saveWithMovementsCore(txn, wallet, movements);
-    });
-  }
-
   public async saveWithMovementsTx(
     ctx: AtomicContext,
     wallet: Wallet,
@@ -141,8 +135,19 @@ export class WalletRepositoryFirestore implements WalletRepository {
       txn.set(this.movements().doc(movement.id), movement.toPersistence());
   }
 
-  public async update(wallet: Wallet): Promise<void> {
-    await this.wallets().doc(wallet.id).set(wallet.toPersistence());
+  public async mutate<T>(
+    id: string,
+    userId: string,
+    fn: (wallet: Wallet | null) => Promise<WalletMutation<T>>,
+  ): Promise<T> {
+    return this.db.runTransaction(async (txn) => {
+      const doc = await txn.get(this.wallets().doc(id));
+      const data = doc.exists ? (doc.data() as WalletPersistence) : null;
+      const wallet = data && data.userId === userId ? Wallet.with(data) : null;
+      const { save, value } = await fn(wallet);
+      if (save) this.saveWithMovementsCore(txn, save.wallet, save.movements);
+      return value;
+    });
   }
 
   public async listMovements(

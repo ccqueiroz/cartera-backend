@@ -30,21 +30,24 @@ export class EditWalletUseCase {
   }
 
   public async execute(input: EditWalletInput): Promise<WalletOutput> {
-    const wallet = await this.loadOwned(input.id, input.userId);
-    wallet.edit({
-      name: input.name,
-      hasOverdraft: input.hasOverdraft,
-      overdraftLimit: input.overdraftLimit,
-      overdraftMonthlyRate: input.overdraftMonthlyRate,
-      overdraftGraceDays: input.overdraftGraceDays,
-      updatedAt: this.now(),
+    return this.repository.mutate(input.id, input.userId, async (loaded) => {
+      const wallet = this.assertOwned(loaded);
+      wallet.edit({
+        name: input.name,
+        hasOverdraft: input.hasOverdraft,
+        overdraftLimit: input.overdraftLimit,
+        overdraftMonthlyRate: input.overdraftMonthlyRate,
+        overdraftGraceDays: input.overdraftGraceDays,
+        updatedAt: this.now(),
+      });
+      return {
+        save: { wallet, movements: [] },
+        value: wallet.toOutput(),
+      };
     });
-    await this.repository.update(wallet);
-    return wallet.toOutput();
   }
 
-  private async loadOwned(id: string, userId: string): Promise<Wallet> {
-    const wallet = await this.repository.findById(id, userId);
+  private assertOwned(wallet: Wallet | null): Wallet {
     if (!wallet) throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND);
     if (!wallet.isActive)
       throw new DuplicateEntityError(ErrorCode.WALLET_DELETED);

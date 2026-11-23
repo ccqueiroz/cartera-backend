@@ -1,7 +1,10 @@
 import { Wallet } from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
 import { WalletMovementRefTypeEnum } from '@/features/wallet/domain/enums/wallet-movement.enums';
-import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import {
+  WalletMutation,
+  WalletRepository,
+} from '@/features/wallet/domain/ports/wallet.repository.port';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 
 /** Repositório em memória para testes de caso de uso (espelha o do transaction-engine). */
@@ -70,7 +73,8 @@ export class InMemoryWalletRepository implements WalletRepository {
     this.movements.push(...movements);
   }
 
-  public async saveWithMovements(
+  public async saveWithMovementsTx(
+    _ctx: AtomicContext,
     wallet: Wallet,
     movements: WalletMovement[],
   ): Promise<void> {
@@ -78,16 +82,20 @@ export class InMemoryWalletRepository implements WalletRepository {
     this.movements.push(...movements);
   }
 
-  public async saveWithMovementsTx(
-    _ctx: AtomicContext,
-    wallet: Wallet,
-    movements: WalletMovement[],
-  ): Promise<void> {
-    return this.saveWithMovements(wallet, movements);
-  }
-
-  public async update(wallet: Wallet): Promise<void> {
-    this.wallets.set(wallet.id, wallet);
+  public async mutate<T>(
+    id: string,
+    userId: string,
+    fn: (wallet: Wallet | null) => Promise<WalletMutation<T>>,
+  ): Promise<T> {
+    const stored = await this.findById(id, userId);
+    const { save, value } = await fn(
+      stored ? Wallet.with(stored.toPersistence()) : null,
+    );
+    if (save) {
+      this.wallets.set(save.wallet.id, save.wallet);
+      this.movements.push(...save.movements);
+    }
+    return value;
   }
 
   public async listMovements(
