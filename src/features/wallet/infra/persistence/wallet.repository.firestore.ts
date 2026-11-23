@@ -10,6 +10,7 @@ import {
   WalletMovement,
   WalletMovementPersistence,
 } from '@/features/wallet/domain/wallet-movement.entity';
+import { WalletMovementRefTypeEnum } from '@/features/wallet/domain/enums/wallet-movement.enums';
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 
@@ -37,6 +38,40 @@ export class WalletRepositoryFirestore implements WalletRepository {
     const data = doc.data() as WalletPersistence;
     if (data.userId !== userId || data.deletedAt !== null) return null;
     return Wallet.with(data);
+  }
+
+  public async findActiveByIdTx(
+    ctx: AtomicContext,
+    id: string,
+    userId: string,
+  ): Promise<Wallet | null> {
+    const doc = await ctx.txn.get(this.wallets().doc(id));
+    if (!doc.exists) return null;
+    const data = doc.data() as WalletPersistence;
+    if (data.userId !== userId || data.deletedAt !== null) return null;
+    return Wallet.with(data);
+  }
+
+  // ponytail: every SETTLEMENT of the leaf is read and the newest createdAt is picked in memory, with no ordering, no limit and no new index; add a composite index sorted by createdAt with limit 1 if a leaf piles up settlements.
+  public async findLatestSettlementTx(
+    ctx: AtomicContext,
+    refId: string,
+    userId: string,
+  ): Promise<WalletMovement | null> {
+    const query = await ctx.txn.get(
+      this.movements()
+        .where('userId', '==', userId)
+        .where('refId', '==', refId)
+        .where('refType', '==', WalletMovementRefTypeEnum.SETTLEMENT),
+    );
+    const newest = query.docs
+      .map((doc) =>
+        WalletMovement.with(doc.data() as WalletMovementPersistence),
+      )
+      .sort((a, b) =>
+        b.toPersistence().createdAt.localeCompare(a.toPersistence().createdAt),
+      )[0];
+    return newest ?? null;
   }
 
   public async findById(id: string, userId: string): Promise<Wallet | null> {

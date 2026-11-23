@@ -1,5 +1,6 @@
 import { Wallet } from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
+import { WalletMovementRefTypeEnum } from '@/features/wallet/domain/enums/wallet-movement.enums';
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { AtomicContext } from '@/shared/database/atomic-runner';
 
@@ -15,6 +16,29 @@ export class InMemoryWalletRepository implements WalletRepository {
     const wallet = this.wallets.get(id);
     if (!wallet || wallet.userId !== userId || !wallet.isActive) return null;
     return wallet;
+  }
+
+  public async findActiveByIdTx(
+    _ctx: AtomicContext,
+    id: string,
+    userId: string,
+  ): Promise<Wallet | null> {
+    return this.findActiveById(id, userId);
+  }
+
+  public async findLatestSettlementTx(
+    _ctx: AtomicContext,
+    refId: string,
+    userId: string,
+  ): Promise<WalletMovement | null> {
+    const newest = this.movements
+      .filter((m) => m.toPersistence().userId === userId)
+      .filter((m) => m.toPersistence().refId === refId)
+      .filter((m) => m.refType === WalletMovementRefTypeEnum.SETTLEMENT)
+      .sort((a, b) =>
+        b.toPersistence().createdAt.localeCompare(a.toPersistence().createdAt),
+      )[0];
+    return newest ?? null;
   }
 
   public async findById(id: string, userId: string): Promise<Wallet | null> {

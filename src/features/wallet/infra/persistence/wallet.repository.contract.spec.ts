@@ -86,6 +86,21 @@ const balanceMovements = () => [
 
 const ids = (items: { id: string }[]) => items.map((item) => item.id).sort();
 
+function settlement(
+  id: string,
+  refId: string,
+  createdAt: string,
+  userId = 'u1',
+  refType = WalletMovementRefTypeEnum.SETTLEMENT,
+) {
+  return WalletMovement.with({
+    ...movement({ id, userId }).toPersistence(),
+    refType,
+    refId,
+    createdAt,
+  });
+}
+
 type RunAtomic = (work: (ctx: AtomicContext) => Promise<void>) => Promise<void>;
 
 const adapters: [string, () => WalletRepository, RunAtomic][] = [
@@ -216,6 +231,55 @@ describe.each(adapters)(
       const ledger = await repository.listMovements('w1', 'u1');
 
       expect(ledger.map((m) => m.id)).toEqual(['m2', 'm3', 'm1']);
+    });
+
+    it('[CDC-01] findActiveByIdTx inside the atomic run returns the active wallet of the owner, and null for a deleted wallet, for another owner and for a missing id', async () => {
+      const repository = makeRepository();
+      await repository.create(wallet({ balance: 100 }), []);
+      await repository.create(deletedWallet('w2'), []);
+      let found: (Wallet | null)[] = [];
+
+      await runAtomic(async (ctx) => {
+        found = [
+          await repository.findActiveByIdTx(ctx, 'w1', 'u1'),
+          await repository.findActiveByIdTx(ctx, 'w2', 'u1'),
+          await repository.findActiveByIdTx(ctx, 'w1', 'u2'),
+          await repository.findActiveByIdTx(ctx, 'missing', 'u1'),
+        ];
+      });
+
+      expect(found[0]?.toPersistence()).toEqual(
+        wallet({ balance: 100 }).toPersistence(),
+      );
+      expect(found.slice(1)).toEqual([null, null, null]);
+    });
+
+    it('[CDC-02] findLatestSettlementTx inside the atomic run returns the SETTLEMENT of the owner with the newest createdAt whatever the id order, and null for a leaf without SETTLEMENT', async () => {
+      const repository = makeRepository();
+      const newestA = settlement('a1', 'leaf-a', '2026-06-12T10:00:00.000Z');
+      const newestB = settlement('b2', 'leaf-b', '2026-06-14T10:00:00.000Z');
+      const reversal = WalletMovementRefTypeEnum.SETTLEMENT_REVERSAL;
+      await repository.create(wallet(), [
+        newestA,
+        settlement('a2', 'leaf-a', '2026-06-11T10:00:00.000Z'),
+        settlement('a0', 'leaf-a', '2026-06-20T10:00:00.000Z', 'u2'),
+        settlement('b1', 'leaf-b', '2026-06-13T10:00:00.000Z'),
+        newestB,
+        settlement('c1', 'leaf-c', '2026-06-15T10:00:00.000Z', 'u1', reversal),
+      ]);
+      let latest: (WalletMovement | null)[] = [];
+
+      await runAtomic(async (ctx) => {
+        latest = [
+          await repository.findLatestSettlementTx(ctx, 'leaf-a', 'u1'),
+          await repository.findLatestSettlementTx(ctx, 'leaf-b', 'u1'),
+          await repository.findLatestSettlementTx(ctx, 'leaf-c', 'u1'),
+        ];
+      });
+
+      expect(latest[0]?.toPersistence()).toEqual(newestA.toPersistence());
+      expect(latest[1]?.toPersistence()).toEqual(newestB.toPersistence());
+      expect(latest[2]).toBeNull();
     });
   },
 );
