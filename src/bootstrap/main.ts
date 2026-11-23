@@ -106,7 +106,10 @@ function main(): void {
     ),
   });
   const atomicRunner = AtomicRunner.create(db);
-  const coreFinanceWalletGateway = CoreFinanceWalletGatewayAdapter.create(db);
+  const coreFinanceWalletGateway = CoreFinanceWalletGatewayAdapter.create(
+    db,
+    wallet.internal.wallets,
+  );
   const bills = makeBillsModule({
     authMiddleware,
     engine: transactionEngine,
