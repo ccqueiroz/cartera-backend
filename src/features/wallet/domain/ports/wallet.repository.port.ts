@@ -4,6 +4,18 @@ import { AtomicContext } from '@/shared/database/atomic-runner';
 
 export interface WalletRepository {
   findActiveById(id: string, userId: string): Promise<Wallet | null>;
+  /** Lê pelo `txn.get` do ctx: a gravação concorrente faz a transação tentar de novo. */
+  findActiveByIdTx(
+    ctx: AtomicContext,
+    id: string,
+    userId: string,
+  ): Promise<Wallet | null>;
+  /** O `SETTLEMENT` de `createdAt` mais novo da folha, lido pelo `txn.get` do ctx; null sem ele. */
+  findLatestSettlementTx(
+    ctx: AtomicContext,
+    refId: string,
+    userId: string,
+  ): Promise<WalletMovement | null>;
   /** Inclui soft-deleted (para distinguir 404 de WALLET_DELETED em edit/adjust/delete). */
   findById(id: string, userId: string): Promise<Wallet | null>;
   listActiveByUser(userId: string): Promise<Wallet[]>;
