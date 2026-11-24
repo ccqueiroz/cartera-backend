@@ -47,6 +47,8 @@ function walletGatewayWith(
 ): WalletGateway {
   return {
     findActiveById: async (walletId: string) => byId[walletId] ?? null,
+    loadWalletTx: async () => null,
+    saveWalletTx: async () => undefined,
   };
 }
 

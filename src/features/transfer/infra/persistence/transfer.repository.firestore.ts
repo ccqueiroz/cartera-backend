@@ -8,6 +8,7 @@ import { TransferMovement } from '@/features/transfer/domain/transfer-movement';
 import {
   ListTransfersFilter,
   TransferRepository,
+  TransferTxContext,
 } from '@/features/transfer/domain/ports/transfer.repository.port';
 
 /**
@@ -46,6 +47,13 @@ export class TransferRepositoryFirestore implements TransferRepository {
         txn.set(this.movements().doc(movement.id), movement);
       txn.set(this.transfers().doc(transfer.id), transfer.toPersistence());
     });
+  }
+
+  public async saveTx(
+    ctx: TransferTxContext,
+    transfer: Transfer,
+  ): Promise<void> {
+    ctx.txn.set(this.transfers().doc(transfer.id), transfer.toPersistence());
   }
 
   public async listByUser(
