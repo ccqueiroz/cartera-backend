@@ -7,7 +7,6 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
-import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 import {
   WalletMovementSpec,
   SettlementMovementRef,
@@ -98,43 +97,6 @@ class FakeWalletGateway implements WalletGateway {
     private readonly overdraftLimit = 0,
   ) {
     this.balance = initialBalance;
-  }
-
-  public async findActiveSnapshot(
-    walletId: string,
-  ): Promise<WalletSnapshot | null> {
-    if (walletId !== this.walletId) return null;
-    return WalletSnapshot.fromRaw(walletId, {
-      userId,
-      balance: this.balance,
-      overdraft:
-        this.overdraftLimit > 0
-          ? {
-              limit: this.overdraftLimit,
-              monthlyRate: 0.08,
-              graceDays: 0,
-              since: null,
-            }
-          : null,
-    });
-  }
-
-  public async findSettlementMovement(
-    leafId: string,
-  ): Promise<SettlementMovementRef | null> {
-    const found = this.movements.find(
-      (m) => m.refId === leafId && m.refType === 'SETTLEMENT',
-    );
-    return found ? { walletId: found.walletId, amount: found.amount } : null;
-  }
-
-  public async persistSettlement(
-    _ctx: AtomicContext,
-    snapshot: WalletSnapshot,
-    movements: WalletMovementSpec[],
-  ): Promise<void> {
-    this.balance = snapshot.balance.value;
-    this.movements.push(...movements);
   }
 
   public async loadWalletTx(

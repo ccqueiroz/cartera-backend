@@ -111,7 +111,6 @@ function main(): void {
     ),
   });
   const coreFinanceWalletGateway = CoreFinanceWalletGatewayAdapter.create(
-    db,
     wallet.internal.wallets,
   );
   const bills = makeBillsModule({
