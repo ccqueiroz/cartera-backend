@@ -53,18 +53,19 @@ export class GlobalSettleBillUseCase {
   public async execute(
     input: GlobalSettleBillInput,
   ): Promise<SettleBillResult> {
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      input.walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: input.walletId,
-      });
-
     const createdAt = this.now();
 
-    await this.atomicRunner.run(async (ctx) => {
+    const wallet = await this.atomicRunner.run(async (ctx) => {
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        input.walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
+          walletId: input.walletId,
+        });
+
       const result = await this.engine.globalSettlement.executeTx(ctx, {
         nodeId: input.nodeId,
         userId: input.userId,
@@ -73,13 +74,13 @@ export class GlobalSettleBillUseCase {
         selection: input.selection,
         valorPago: input.valorPago,
       });
-      if (result.settledAmounts.length === 0) return;
+      if (result.settledAmounts.length === 0) return wallet;
 
       const total = result.settledAmounts.reduce(
         (acc, a) => acc.add(Money.create(a.paidAmount)),
         Money.create(0),
       );
-      snapshot.debit(total, input.paymentDate);
+      wallet.debit(total, input.paymentDate, createdAt);
 
       const movements: WalletMovementSpec[] = result.settledAmounts.map(
         (a) => ({
@@ -94,7 +95,8 @@ export class GlobalSettleBillUseCase {
           createdAt,
         }),
       );
-      await this.walletGateway.persistSettlement(ctx, snapshot, movements);
+      await this.walletGateway.saveWalletTx(ctx, wallet, movements);
+      return wallet;
     });
 
     const detail = await this.engine.getById.execute(
@@ -103,10 +105,10 @@ export class GlobalSettleBillUseCase {
     );
     return {
       root: detail.node,
-      wallet: { id: input.walletId, balance: snapshot.balance.value },
+      wallet: { id: input.walletId, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }
