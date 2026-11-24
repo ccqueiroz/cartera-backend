@@ -1,5 +1,24 @@
 import { AtomicContext } from '@/shared/database/atomic-runner';
 import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
+import { Money } from '@/shared/kernel/value-objects/money.vo';
+import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
+
+/** O adaptador do bootstrap tipa o ctx por aqui, sem importar `src/shared/database/`. */
+export type WalletTxContext = AtomicContext;
+
+/**
+ * A carteira lida dentro da transação: a entidade `Wallet` da feature wallet a
+ * satisfaz por estrutura, sem objeto que a embrulhe, e o core-finance não importa
+ * a outra feature.
+ */
+export interface SettlementWallet {
+  readonly id: string;
+  readonly balance: SignedMoney;
+  debit(amount: Money, occurredAt: string, updatedAt: string): void;
+  credit(amount: Money, updatedAt: string): void;
+  closeOverdraftEpisode(): void;
+  exceedsOverdraftLimit(): boolean;
+}
 
 /** Dado cru de um movimento de caixa a gravar dentro da transação atômica. */
 export interface WalletMovementSpec {
@@ -44,6 +63,26 @@ export interface WalletGateway {
   persistSettlement(
     ctx: AtomicContext,
     snapshot: WalletSnapshot,
+    movements: WalletMovementSpec[],
+  ): Promise<void>;
+
+  /** Lida pelo `txn.get` do ctx: a gravação concorrente faz a transação tentar de novo. */
+  loadWalletTx(
+    ctx: WalletTxContext,
+    walletId: string,
+    userId: string,
+  ): Promise<SettlementWallet | null>;
+
+  /** O `SETTLEMENT` mais novo da folha, lido no ctx, para o estorno mover a carteira certa. */
+  findLatestSettlementTx(
+    ctx: WalletTxContext,
+    leafId: string,
+    userId: string,
+  ): Promise<SettlementMovementRef | null>;
+
+  saveWalletTx(
+    ctx: WalletTxContext,
+    wallet: SettlementWallet,
     movements: WalletMovementSpec[],
   ): Promise<void>;
 }

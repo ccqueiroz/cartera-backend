@@ -3,9 +3,20 @@ import { AtomicContext } from '@/shared/database/atomic-runner';
 import {
   WalletMovementSpec,
   SettlementMovementRef,
+  SettlementWallet,
   WalletGateway,
+  WalletTxContext,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
 import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
+import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import { Wallet } from '@/features/wallet/domain/wallet.entity';
+import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
+import { Money } from '@/shared/kernel/value-objects/money.vo';
+
+type WalletsInternal = Pick<
+  WalletRepository,
+  'findActiveByIdTx' | 'findLatestSettlementTx' | 'saveWithMovementsTx'
+>;
 
 interface OverdraftRecord {
   limit: number;
@@ -38,10 +49,16 @@ export class CoreFinanceWalletGatewayAdapter implements WalletGateway {
   private static readonly WALLETS = 'Wallet';
   private static readonly MOVEMENTS = 'WalletMovement';
 
-  private constructor(private readonly db: Firestore) {}
+  private constructor(
+    private readonly db: Firestore,
+    private readonly walletsInternal: WalletsInternal,
+  ) {}
 
-  public static create(db: Firestore): CoreFinanceWalletGatewayAdapter {
-    return new CoreFinanceWalletGatewayAdapter(db);
+  public static create(
+    db: Firestore,
+    walletsInternal: WalletsInternal,
+  ): CoreFinanceWalletGatewayAdapter {
+    return new CoreFinanceWalletGatewayAdapter(db, walletsInternal);
   }
 
   public async findActiveSnapshot(
@@ -93,5 +110,42 @@ export class CoreFinanceWalletGatewayAdapter implements WalletGateway {
           .doc(movement.id),
         { ...movement },
       );
+  }
+
+  public async loadWalletTx(
+    ctx: WalletTxContext,
+    walletId: string,
+    userId: string,
+  ): Promise<SettlementWallet | null> {
+    return this.walletsInternal.findActiveByIdTx(ctx, walletId, userId);
+  }
+
+  public async findLatestSettlementTx(
+    ctx: WalletTxContext,
+    leafId: string,
+    userId: string,
+  ): Promise<SettlementMovementRef | null> {
+    const movement = await this.walletsInternal.findLatestSettlementTx(
+      ctx,
+      leafId,
+      userId,
+    );
+    if (!movement) return null;
+    const { walletId, amount } = movement.toPersistence();
+    return { walletId, amount };
+  }
+
+  public async saveWalletTx(
+    ctx: WalletTxContext,
+    wallet: SettlementWallet,
+    movements: WalletMovementSpec[],
+  ): Promise<void> {
+    await this.walletsInternal.saveWithMovementsTx(
+      ctx,
+      wallet as Wallet,
+      movements.map((spec) =>
+        WalletMovement.create({ ...spec, amount: Money.create(spec.amount) }),
+      ),
+    );
   }
 }

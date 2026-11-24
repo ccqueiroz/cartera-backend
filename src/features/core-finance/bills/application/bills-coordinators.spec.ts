@@ -11,8 +11,12 @@ import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-sna
 import {
   WalletMovementSpec,
   SettlementMovementRef,
+  SettlementWallet,
   WalletGateway,
+  WalletTxContext,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
+import { Money } from '@/shared/kernel/value-objects/money.vo';
+import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
 import { SettleBillUseCase } from '@/features/core-finance/bills/application/settle-bill.usecase';
 import { ReverseBillUseCase } from '@/features/core-finance/bills/application/reverse-bill.usecase';
 import { GlobalSettleBillUseCase } from '@/features/core-finance/bills/application/global-settle-bill.usecase';
@@ -47,6 +51,29 @@ const fakeRunner = {
   run: async <T>(work: (ctx: AtomicContext) => Promise<T>): Promise<T> =>
     work({ txn: {} } as AtomicContext),
 } as AtomicRunner;
+
+/** Satisfies the port wallet without importing the wallet feature, which core-finance never imports. */
+class TestWallet implements SettlementWallet {
+  constructor(
+    public readonly id: string,
+    public balance: SignedMoney,
+    private readonly overdraftLimit = 0,
+  ) {}
+
+  public debit(amount: Money): void {
+    this.balance = this.balance.subtract(SignedMoney.create(amount.value));
+  }
+
+  public credit(amount: Money): void {
+    this.balance = this.balance.add(SignedMoney.create(amount.value));
+  }
+
+  public closeOverdraftEpisode(): void {}
+
+  public exceedsOverdraftLimit(): boolean {
+    return this.overdraftLimit > 0 && this.balance.value < -this.overdraftLimit;
+  }
+}
 
 class FakeWalletGateway implements WalletGateway {
   public readonly movements: WalletMovementSpec[] = [];
@@ -94,6 +121,37 @@ class FakeWalletGateway implements WalletGateway {
     movements: WalletMovementSpec[],
   ): Promise<void> {
     this.balance = snapshot.balance.value;
+    this.movements.push(...movements);
+  }
+
+  public async loadWalletTx(
+    _ctx: WalletTxContext,
+    walletId: string,
+  ): Promise<SettlementWallet | null> {
+    if (walletId !== this.walletId) return null;
+    return new TestWallet(
+      walletId,
+      SignedMoney.create(this.balance),
+      this.overdraftLimit,
+    );
+  }
+
+  public async findLatestSettlementTx(
+    _ctx: WalletTxContext,
+    leafId: string,
+  ): Promise<SettlementMovementRef | null> {
+    const latest = this.movements
+      .filter((m) => m.refId === leafId && m.refType === 'SETTLEMENT')
+      .pop();
+    return latest ? { walletId: latest.walletId, amount: latest.amount } : null;
+  }
+
+  public async saveWalletTx(
+    _ctx: WalletTxContext,
+    wallet: SettlementWallet,
+    movements: WalletMovementSpec[],
+  ): Promise<void> {
+    this.balance = wallet.balance.value;
     this.movements.push(...movements);
   }
 }
