@@ -85,9 +85,11 @@ function main(): void {
   });
 
   // Transferência: consome wallet e payment-method via portas (adapters do bootstrap), após o suporte.
+  const atomicRunner = AtomicRunner.create(db);
   const transfer = makeTransferModule({
     db,
     authMiddleware,
+    atomicRunner,
     walletGateway: TransferWalletGatewayAdapter.create(
       db,
       wallet.internal.wallets,
@@ -108,7 +110,6 @@ function main(): void {
       PaymentMethodRepositoryFirestore.create(db),
     ),
   });
-  const atomicRunner = AtomicRunner.create(db);
   const coreFinanceWalletGateway = CoreFinanceWalletGatewayAdapter.create(
     db,
     wallet.internal.wallets,
