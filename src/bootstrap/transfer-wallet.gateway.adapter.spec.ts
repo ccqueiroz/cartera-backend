@@ -38,6 +38,10 @@ const debit: TransferMovement = {
 };
 
 describe('TransferWalletGatewayAdapter', () => {
+  // A save that is not awaited leaves its rejection unhandled; one event-loop
+  // turn lets Jest fail the case that dropped it instead of dying after the run.
+  afterEach(() => new Promise((resolve) => setImmediate(resolve)));
+
   it('[CDC-10] loadWalletTx returns the wallet that findActiveByIdTx reads with the very ctx it receives, and null when the internal finds none', async () => {
     const { wallets, adapter } = setup();
     const loaded = wallet();
@@ -86,6 +90,18 @@ describe('TransferWalletGatewayAdapter', () => {
     const { wallets, adapter } = setup();
     const failure = new Error();
     wallets.saveWithMovementsTx.mockRejectedValue(failure);
+
+    await expect(adapter.saveWalletTx(ctx, wallet(), [debit])).rejects.toBe(
+      failure,
+    );
+  });
+
+  it('[CDC-10] saveWalletTx awaits saveWithMovementsTx and rejects with the error of a rejection that already has a handler', async () => {
+    const { wallets, adapter } = setup();
+    const failure = new Error();
+    const handled = Promise.reject(failure);
+    handled.catch(() => undefined);
+    wallets.saveWithMovementsTx.mockReturnValue(handled);
 
     await expect(adapter.saveWalletTx(ctx, wallet(), [debit])).rejects.toBe(
       failure,
