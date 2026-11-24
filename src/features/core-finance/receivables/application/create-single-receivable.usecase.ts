@@ -36,9 +36,10 @@ export interface CreateSingleReceivableInput {
 /**
  * UC-RV1: cria receita única (`type = RECEIVABLES`, `origin = MANUAL` fixo no
  * servidor). A receber → delega só ao motor. Nascida recebida (`paidAt`) → exige
- * `walletId` e cria + liquida num **único bloco atômico**: o motor grava o nó já
- * recebido e a wallet é creditada + `WalletMovement(CREDIT, SETTLEMENT)` na mesma
- * transação (só escritas — não relê o nó recém-criado, respeitando o Firestore).
+ * `walletId` e cria + liquida num **único bloco atômico**: a wallet é lida dentro
+ * da transação, antes do motor, que grava o nó já recebido; a wallet é creditada +
+ * `WalletMovement(CREDIT, SETTLEMENT)` na mesma transação (não relê o nó
+ * recém-criado, respeitando o Firestore).
  */
 export class CreateSingleReceivableUseCase {
   private constructor(
@@ -94,17 +95,18 @@ export class CreateSingleReceivableUseCase {
     }
 
     const walletId = input.walletId as string;
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, { walletId });
-
     const paidAmount = input.paidAmount ?? input.amount;
     const createdAt = this.now();
 
-    const node = await this.atomicRunner.run(async (ctx) => {
+    const { node, wallet } = await this.atomicRunner.run(async (ctx) => {
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, { walletId });
+
       const created = await this.engine.createSingle.executeTx(ctx, {
         ...base,
         paymentDate: input.paidAt,
@@ -112,7 +114,8 @@ export class CreateSingleReceivableUseCase {
         paymentMethodDescriptionEnum:
           input.paymentMethodDescriptionEnum ?? 'CASH',
       });
-      snapshot.credit(Money.create(paidAmount));
+      wallet.credit(Money.create(paidAmount), createdAt);
+      wallet.closeOverdraftEpisode();
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
@@ -124,16 +127,16 @@ export class CreateSingleReceivableUseCase {
         occurredAt: input.paidAt as string,
         createdAt,
       };
-      await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return created;
+      await this.walletGateway.saveWalletTx(ctx, wallet, [movement]);
+      return { node: created, wallet };
     });
 
     return {
       root: node.toOutput(),
-      wallet: { id: walletId, balance: snapshot.balance.value },
+      wallet: { id: walletId, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }
