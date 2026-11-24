@@ -7,6 +7,8 @@ import { InMemoryWalletRepository } from '@/features/wallet/infra/persistence/in
 import { FinancialIndicatorGateway } from '@/features/wallet/domain/ports/financial-indicator.gateway.port';
 import { WalletWarning } from '@/features/wallet/domain/wallet-warnings';
 import { ValidationError } from '@/shared/kernel/errors/domain.error';
+import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { DeleteWalletUseCase } from './delete-wallet.usecase';
 
 function makeIds() {
   let counter = 0;
@@ -157,4 +159,31 @@ describe('AdjustBalanceUseCase', () => {
     expect(result.wallet.balance).toBeCloseTo(87.5, 0);
     expect(result.wallet.overdraft?.since ?? null).toBeNull();
   });
+
+  it.each([
+    ['removed', 100, ErrorCode.WALLET_DELETED],
+    ['missing', 100, ErrorCode.WALLET_NOT_FOUND],
+    ['missing', 0, ErrorCode.INVALID_WALLET_ADJUST_AMOUNT],
+  ])(
+    '[CDC-05] adjusting a %s wallet by %d rejects with %s',
+    async (wallet, amount, code) => {
+      const repository = new InMemoryWalletRepository();
+      const ids = makeIds();
+      const now = () => '2026-06-01T12:00:00.000Z';
+      const id = await seedWallet(repository, ids);
+      await DeleteWalletUseCase.create(repository, now).execute({
+        userId: 'u1',
+        id,
+      });
+
+      await expect(
+        AdjustBalanceUseCase.create(repository, gateway, ids, now).execute({
+          userId: 'u1',
+          id: wallet === 'removed' ? id : wallet,
+          operation: WalletAdjustOperation.DEPOSIT,
+          amount,
+        }),
+      ).rejects.toMatchObject({ code });
+    },
+  );
 });
