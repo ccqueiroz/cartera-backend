@@ -1,5 +1,8 @@
 import { Firestore } from 'firebase-admin/firestore';
-import { Wallet } from '@/features/wallet/domain/wallet.entity';
+import {
+  Wallet,
+  WalletPersistence,
+} from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
 import {
   WalletMovementDirectionEnum,
@@ -85,6 +88,18 @@ const balanceMovements = () => [
 ];
 
 const ids = (items: { id: string }[]) => items.map((item) => item.id).sort();
+
+function debit300(current: Wallet | null) {
+  current?.debit(Money.create(300), '2026-06-15', DELETED_AT);
+  return (
+    current && {
+      wallet: current,
+      movements: [
+        movement({ direction: WalletMovementDirectionEnum.DEBIT, amount: 300 }),
+      ],
+    }
+  );
+}
 
 function settlement(
   id: string,
@@ -180,17 +195,6 @@ describe.each(adapters)(
       expect((await repository.findDefaultByUser('u1'))?.id).toBe('w4');
     });
 
-    it('[BK3-09] saveWithMovements writes the balance and the movements, and the reread movements add up to the reread balance', async () => {
-      const repository = makeRepository();
-
-      await repository.saveWithMovements(
-        wallet({ balance: 70 }),
-        balanceMovements(),
-      );
-
-      await expectReconciledBalance(repository);
-    });
-
     it('[BK3-09] saveWithMovementsTx inside the adapter atomic run writes the balance and the movements', async () => {
       const repository = makeRepository();
 
@@ -205,22 +209,9 @@ describe.each(adapters)(
       await expectReconciledBalance(repository);
     });
 
-    it('[BK3-09] update rewrites the wallet', async () => {
-      const repository = makeRepository();
-      await repository.create(wallet(), []);
-      const edited = wallet();
-      edited.edit({ name: 'Renamed', updatedAt: DELETED_AT });
-
-      await repository.update(edited);
-
-      expect(
-        (await repository.findById('w1', 'u1'))?.toPersistence(),
-      ).toMatchObject({ name: 'Renamed', updatedAt: DELETED_AT });
-    });
-
     it('[BK3-09] listMovements returns only the movements of the wallet and owner, by occurredAt ascending', async () => {
       const repository = makeRepository();
-      await repository.saveWithMovements(wallet(), [
+      await repository.create(wallet(), [
         movement({ id: 'm1', occurredAt: '2026-06-12' }),
         movement({ id: 'm2', occurredAt: '2026-06-10' }),
         movement({ id: 'm3', occurredAt: '2026-06-11' }),
@@ -281,6 +272,68 @@ describe.each(adapters)(
       expect(latest[1]?.toPersistence()).toEqual(newestB.toPersistence());
       expect(latest[2]).toBeNull();
     });
+
+    it('[CDC-03] mutate passes the wallet of the owner to fn, writes the wallet and the movements fn returns and resolves with the value of fn', async () => {
+      const repository = makeRepository();
+      await repository.create(wallet({ balance: 1000 }), []);
+      let received: WalletPersistence | undefined;
+
+      const value = await repository.mutate('w1', 'u1', async (current) => {
+        received = current?.toPersistence();
+        return { save: debit300(current), value: 'debited' };
+      });
+
+      expect(value).toBe('debited');
+      expect(received).toEqual(wallet({ balance: 1000 }).toPersistence());
+      expect((await repository.findById('w1', 'u1'))?.balance.value).toBe(700);
+      expect(ids(await repository.listMovements('w1', 'u1'))).toEqual(['m1']);
+    });
+
+    it('[CDC-03] mutate rejects with the error fn throws and leaves the stored wallet as it was, even when fn changed it before throwing', async () => {
+      const repository = makeRepository();
+      await repository.create(wallet({ balance: 1000 }), []);
+      const failure = new Error();
+
+      await expect(
+        repository.mutate('w1', 'u1', async (current) => {
+          debit300(current);
+          throw failure;
+        }),
+      ).rejects.toBe(failure);
+
+      expect((await repository.findById('w1', 'u1'))?.toPersistence()).toEqual(
+        wallet({ balance: 1000 }).toPersistence(),
+      );
+      expect(await repository.listMovements('w1', 'u1')).toEqual([]);
+    });
+
+    it('[CDC-03] mutate passes the deleted wallet, and null for another owner and for a missing id, and writes nothing when fn returns no save', async () => {
+      const repository = makeRepository();
+      await repository.create(deletedWallet('w2'), []);
+      const received: (WalletPersistence | null)[] = [];
+      const skip = async (current: Wallet | null) => {
+        received.push(current?.toPersistence() ?? null);
+        debit300(current);
+        return { save: null, value: 'skipped' };
+      };
+
+      const values = [
+        await repository.mutate('w2', 'u1', skip),
+        await repository.mutate('w2', 'u2', skip),
+        await repository.mutate('missing', 'u1', skip),
+      ];
+
+      expect(values).toEqual(['skipped', 'skipped', 'skipped']);
+      expect(received).toEqual([
+        deletedWallet('w2').toPersistence(),
+        null,
+        null,
+      ]);
+      expect((await repository.findById('w2', 'u1'))?.toPersistence()).toEqual(
+        deletedWallet('w2').toPersistence(),
+      );
+      expect(await repository.listMovements('w2', 'u1')).toEqual([]);
+    });
   },
 );
 
@@ -308,20 +361,6 @@ describe('WalletRepositoryFirestore atomic run', () => {
       occurredAt: undefined as unknown as string,
     });
 
-  it('[BK3-09] a movement with an undefined field makes saveWithMovements reject and leaves no wallet and no movement (rollback)', async () => {
-    const repository = WalletRepositoryFirestore.create(db);
-
-    await expect(
-      repository.saveWithMovements(wallet({ balance: 100 }), [
-        movement(),
-        brokenMovement(),
-      ]),
-    ).rejects.toThrow();
-
-    expect(await repository.findById('w1', 'u1')).toBeNull();
-    expect(await repository.listMovements('w1', 'u1')).toEqual([]);
-  });
-
   it('[BK3-09] a movement with an undefined field makes create reject and leaves no wallet and no movement', async () => {
     const repository = WalletRepositoryFirestore.create(db);
 
@@ -334,5 +373,33 @@ describe('WalletRepositoryFirestore atomic run', () => {
 
     expect(await repository.findById('w1', 'u1')).toBeNull();
     expect(await repository.listMovements('w1', 'u1')).toEqual([]);
+  });
+
+  it('[CDC-04] two mutate calls in parallel on a wallet of 1000, one debiting 300 with a movement and the other renaming it, keep the new name, the balance of 700 and the movement', async () => {
+    const repository = WalletRepositoryFirestore.create(db);
+    await repository.create(wallet({ balance: 1000 }), []);
+    // The pause after the read makes both transactions read before either writes, so a read
+    // outside the transaction loses one of the two writes every time.
+    const pause = () => new Promise((resolve) => setTimeout(resolve, 100));
+
+    await Promise.all([
+      repository.mutate('w1', 'u1', async (current) => {
+        await pause();
+        return { save: debit300(current), value: undefined };
+      }),
+      repository.mutate('w1', 'u1', async (current) => {
+        await pause();
+        current?.edit({ name: 'Renamed', updatedAt: DELETED_AT });
+        return {
+          save: current && { wallet: current, movements: [] },
+          value: undefined,
+        };
+      }),
+    ]);
+
+    expect(
+      (await repository.findById('w1', 'u1'))?.toPersistence(),
+    ).toMatchObject({ name: 'Renamed', balance: 700 });
+    expect(ids(await repository.listMovements('w1', 'u1'))).toEqual(['m1']);
   });
 });
