@@ -112,4 +112,16 @@ describe('CoreFinanceWalletGatewayAdapter', () => {
       movements.map((movement: WalletMovement) => movement.toPersistence()),
     ).toEqual(specs);
   });
+
+  it('[CDC-06] loadWalletTx and findLatestSettlementTx pass the very ctx they receive to the wallet internal', async () => {
+    const { wallets, adapter } = setup();
+    wallets.findActiveByIdTx.mockResolvedValue(null);
+    wallets.findLatestSettlementTx.mockResolvedValue(null);
+
+    await adapter.loadWalletTx(ctx, 'w1', 'user-1');
+    await adapter.findLatestSettlementTx(ctx, 'leaf-1', 'user-1');
+
+    expect(wallets.findActiveByIdTx.mock.calls[0][0]).toBe(ctx);
+    expect(wallets.findLatestSettlementTx.mock.calls[0][0]).toBe(ctx);
+  });
 });
