@@ -22,8 +22,8 @@ export interface SettleReceivableInput {
 /**
  * UC-RV5: recebe uma folha em bloco atômico — folha recebida + rollup (motor) +
  * **crédito** na wallet + `WalletMovement(CREDIT, SETTLEMENT)`, tudo num único
- * `AtomicRunner.run`. A wallet é lida fora da transação (snapshot) e só escrita
- * dentro dela, depois das leituras transacionais do motor (reads-before-writes).
+ * `AtomicRunner.run`. A wallet é lida dentro da transação, antes das leituras do
+ * motor, e só escrita depois delas (reads-before-writes).
  * Receber credita → nunca negativa → sem warning de saldo.
  */
 export class SettleReceivableUseCase {
@@ -54,19 +54,20 @@ export class SettleReceivableUseCase {
   public async execute(
     input: SettleReceivableInput,
   ): Promise<SettleReceivableResult> {
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      input.walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: input.walletId,
-      });
-
     const amount = Money.create(input.paidAmount);
     const createdAt = this.now();
 
-    const root = await this.atomicRunner.run(async (ctx) => {
+    const { root, wallet } = await this.atomicRunner.run(async (ctx) => {
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        input.walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
+          walletId: input.walletId,
+        });
+
       const settledRoot = await this.engine.settle.executeTx(ctx, {
         id: input.id,
         userId: input.userId,
@@ -75,7 +76,8 @@ export class SettleReceivableUseCase {
         paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
       });
 
-      snapshot.credit(amount);
+      wallet.credit(amount, createdAt);
+      wallet.closeOverdraftEpisode();
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
@@ -87,16 +89,16 @@ export class SettleReceivableUseCase {
         occurredAt: input.paymentDate,
         createdAt,
       };
-      await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return settledRoot;
+      await this.walletGateway.saveWalletTx(ctx, wallet, [movement]);
+      return { root: settledRoot, wallet };
     });
 
     return {
       root: root.toOutput(),
-      wallet: { id: input.walletId, balance: snapshot.balance.value },
+      wallet: { id: input.walletId, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }

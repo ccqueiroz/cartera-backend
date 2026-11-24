@@ -1,5 +1,4 @@
 import { AtomicContext } from '@/shared/database/atomic-runner';
-import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
 import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
 
@@ -43,29 +42,11 @@ export interface SettlementMovementRef {
  * Porta de **escrita** de carteira que os condutores de core-finance
  * (bills/receivables) consomem: wallet é outra feature, então
  * core-finance define a porta e o bootstrap injeta o adapter. Distinta da
- * `WalletGateway` read-only do transfer. As leituras de snapshot/movimento são
- * não-transacionais (acontecem antes do bloco); a escrita participa do `ctx` do
- * AtomicRunner (só escreve — reads-before-writes do motor já rodaram).
+ * `WalletGateway` read-only do transfer. A carteira e o movimento são lidos e
+ * gravados no `ctx` do AtomicRunner: as leituras antes das do motor, a escrita
+ * depois delas (reads-before-writes).
  */
 export interface WalletGateway {
-  findActiveSnapshot(
-    walletId: string,
-    userId: string,
-  ): Promise<WalletSnapshot | null>;
-
-  /** Movimento `SETTLEMENT` rastreável da folha (para o estorno mover a wallet certa). */
-  findSettlementMovement(
-    leafId: string,
-    userId: string,
-  ): Promise<SettlementMovementRef | null>;
-
-  /** Grava saldo + movimentos na transação externa (AtomicRunner). Só escrita. */
-  persistSettlement(
-    ctx: AtomicContext,
-    snapshot: WalletSnapshot,
-    movements: WalletMovementSpec[],
-  ): Promise<void>;
-
   /** Lida pelo `txn.get` do ctx: a gravação concorrente faz a transação tentar de novo. */
   loadWalletTx(
     ctx: WalletTxContext,
