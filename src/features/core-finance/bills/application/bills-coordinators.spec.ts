@@ -434,6 +434,45 @@ describe('GlobalSettleBillUseCase', () => {
     ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
     expect(wallet.movements).toHaveLength(0);
   });
+
+  it('[CDC-07] loads and saves the wallet with the run context and the input owner', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', 100);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const global = GlobalSettleBillUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const plan = await engine.createInstallmentPlan.execute({
+      userId,
+      personId: userId,
+      type: TransactionTypeEnum.BILLS,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 50, dueDate: '2026-06-10' }],
+    });
+
+    await global.execute({
+      nodeId: plan.mother.id,
+      userId,
+      walletId: 'w1',
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+  });
 });
 
 describe('ListUnpaidBillsByPeriodUseCase', () => {
