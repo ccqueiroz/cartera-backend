@@ -88,7 +88,10 @@ function main(): void {
   const transfer = makeTransferModule({
     db,
     authMiddleware,
-    walletGateway: TransferWalletGatewayAdapter.create(db),
+    walletGateway: TransferWalletGatewayAdapter.create(
+      db,
+      wallet.internal.wallets,
+    ),
     paymentMethodGateway: TransferPaymentMethodGatewayAdapter.create(
       PaymentMethodRepositoryFirestore.create(db),
     ),

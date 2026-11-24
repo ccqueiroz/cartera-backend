@@ -6,6 +6,7 @@ import { TransferRepository } from '@/features/transfer/domain/ports/transfer.re
 import { InMemoryTransferRepository } from '@/features/transfer/infra/persistence/in-memory-transfer.repository';
 import { TransferRepositoryFirestore } from '@/features/transfer/infra/persistence/transfer.repository.firestore';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
+import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { firestoreEmulator } from '@/test/support/firestore-emulator';
 
 jest.setTimeout(60_000);
@@ -106,6 +107,17 @@ describe.each(adapters)(
 
       expect(ids(await repository.listByUser('u1', {}))).toEqual(['t1', 't2']);
     });
+
+    it('[CDC-11] saveTx inside the atomic run then findById returns the transfer to the owner', async () => {
+      const repository = makeRepository();
+      await AtomicRunner.create(db).run((ctx) =>
+        repository.saveTx(ctx, transfer()),
+      );
+
+      expect((await repository.findById('t1', 'u1'))?.toPersistence()).toEqual(
+        transfer().toPersistence(),
+      );
+    });
   },
 );
 
@@ -151,5 +163,22 @@ describe('TransferRepositoryFirestore atomic write', () => {
       undefined,
       undefined,
     ]);
+  });
+
+  it('[CDC-11] a work that throws after saveTx inside AtomicRunner.run leaves no transfer, while a saveTx run that commits keeps its own', async () => {
+    const repository = TransferRepositoryFirestore.create(db);
+    const runner = AtomicRunner.create(db);
+    const failure = new Error();
+
+    await runner.run((ctx) => repository.saveTx(ctx, transfer('t2')));
+    await expect(
+      runner.run(async (ctx) => {
+        await repository.saveTx(ctx, transfer());
+        throw failure;
+      }),
+    ).rejects.toBe(failure);
+
+    expect((await repository.findById('t2', 'u1'))?.id).toBe('t2');
+    expect(await repository.findById('t1', 'u1')).toBeNull();
   });
 });

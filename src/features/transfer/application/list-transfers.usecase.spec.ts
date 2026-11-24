@@ -22,6 +22,7 @@ function transfer(id: string, userId: string, transferDate: string): Transfer {
 function repoWith(transfers: Transfer[]): TransferRepository {
   return {
     saveTransfer: async () => undefined,
+    saveTx: async () => undefined,
     findById: async () => null,
     listByUser: async (userId: string, _filter: ListTransfersFilter) =>
       transfers.filter((t) => t.userId === userId),

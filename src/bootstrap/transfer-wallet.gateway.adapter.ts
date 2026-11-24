@@ -1,6 +1,20 @@
 import { Firestore } from 'firebase-admin/firestore';
-import { WalletGateway } from '@/features/transfer/domain/ports/wallet.gateway.port';
+import {
+  TransferWallet,
+  WalletGateway,
+} from '@/features/transfer/domain/ports/wallet.gateway.port';
+import { TransferTxContext } from '@/features/transfer/domain/ports/transfer.repository.port';
+import { TransferMovement } from '@/features/transfer/domain/transfer-movement';
 import { TransferWalletSnapshot } from '@/features/transfer/domain/transfer-wallet-snapshot';
+import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import { Wallet } from '@/features/wallet/domain/wallet.entity';
+import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
+import { Money } from '@/shared/kernel/value-objects/money.vo';
+
+type WalletsInternal = Pick<
+  WalletRepository,
+  'findActiveByIdTx' | 'saveWithMovementsTx'
+>;
 
 interface OverdraftRecord {
   limit: number;
@@ -26,10 +40,16 @@ interface WalletRecord {
 export class TransferWalletGatewayAdapter implements WalletGateway {
   private static readonly WALLETS = 'Wallet';
 
-  private constructor(private readonly db: Firestore) {}
+  private constructor(
+    private readonly db: Firestore,
+    private readonly walletsInternal: WalletsInternal,
+  ) {}
 
-  public static create(db: Firestore): TransferWalletGatewayAdapter {
-    return new TransferWalletGatewayAdapter(db);
+  public static create(
+    db: Firestore,
+    walletsInternal: WalletsInternal,
+  ): TransferWalletGatewayAdapter {
+    return new TransferWalletGatewayAdapter(db, walletsInternal);
   }
 
   public async findActiveById(
@@ -44,5 +64,30 @@ export class TransferWalletGatewayAdapter implements WalletGateway {
     const data = doc.data() as WalletRecord;
     if (data.userId !== userId || data.deletedAt !== null) return null;
     return TransferWalletSnapshot.fromRaw(data);
+  }
+
+  public async loadWalletTx(
+    ctx: TransferTxContext,
+    walletId: string,
+    userId: string,
+  ): Promise<TransferWallet | null> {
+    return this.walletsInternal.findActiveByIdTx(ctx, walletId, userId);
+  }
+
+  public async saveWalletTx(
+    ctx: TransferTxContext,
+    wallet: TransferWallet,
+    movements: TransferMovement[],
+  ): Promise<void> {
+    await this.walletsInternal.saveWithMovementsTx(
+      ctx,
+      wallet as Wallet,
+      movements.map((movement) =>
+        WalletMovement.create({
+          ...movement,
+          amount: Money.create(movement.amount),
+        }),
+      ),
+    );
   }
 }
