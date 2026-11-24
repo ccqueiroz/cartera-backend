@@ -149,4 +149,15 @@ describe('EditWalletUseCase', () => {
       useCase.execute({ userId: 'u1', id: wallet.id, name: 'X' }),
     ).rejects.toMatchObject({ code: ErrorCode.WALLET_DELETED });
   });
+
+  it('[CDC-05] writes the edit to the repository', async () => {
+    const repository = new InMemoryWalletRepository();
+    const id = await seed(repository, makeIds());
+    const useCase = EditWalletUseCase.create(repository, now);
+
+    await useCase.execute({ userId: 'u1', id, name: 'Inter' });
+
+    const stored = await repository.findById(id, 'u1');
+    expect(stored?.toOutput().name).toBe('Inter');
+  });
 });
