@@ -23,7 +23,8 @@ export interface ReverseBillInput {
  * `paymentHistory`) + crédito de volta na wallet do **movimento original** +
  * `WalletMovement(SETTLEMENT_REVERSAL, CREDIT)` (B3). A wallet de devolução é
  * localizada pelo movimento `SETTLEMENT` rastreável (`refId = folha`); sem ele →
- * `SETTLEMENT_MOVEMENT_NOT_FOUND` (422).
+ * `SETTLEMENT_MOVEMENT_NOT_FOUND` (422). O movimento e a wallet são lidos dentro
+ * da transação, antes do motor.
  */
 export class ReverseBillUseCase {
   private constructor(
@@ -51,37 +52,39 @@ export class ReverseBillUseCase {
   }
 
   public async execute(input: ReverseBillInput): Promise<SettleBillResult> {
-    const movementRef = await this.walletGateway.findSettlementMovement(
-      input.id,
-      input.userId,
-    );
-    if (!movementRef)
-      throw new BusinessRuleViolationError(
-        ErrorCode.SETTLEMENT_MOVEMENT_NOT_FOUND,
-        { leafId: input.id },
-      );
-
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      movementRef.walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: movementRef.walletId,
-      });
-
-    const amount = Money.create(movementRef.amount);
     const occurredAt = this.now();
     const occurredDate = occurredAt.slice(0, 10);
 
-    const root = await this.atomicRunner.run(async (ctx) => {
+    const { root, wallet } = await this.atomicRunner.run(async (ctx) => {
+      const movementRef = await this.walletGateway.findLatestSettlementTx(
+        ctx,
+        input.id,
+        input.userId,
+      );
+      if (!movementRef)
+        throw new BusinessRuleViolationError(
+          ErrorCode.SETTLEMENT_MOVEMENT_NOT_FOUND,
+          { leafId: input.id },
+        );
+
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        movementRef.walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
+          walletId: movementRef.walletId,
+        });
+
       const reversedRoot = await this.engine.reverse.executeTx(
         ctx,
         input.id,
         input.userId,
       );
 
-      snapshot.credit(amount);
+      wallet.credit(Money.create(movementRef.amount), occurredAt);
+      wallet.closeOverdraftEpisode();
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
@@ -93,16 +96,16 @@ export class ReverseBillUseCase {
         occurredAt: occurredDate,
         createdAt: occurredAt,
       };
-      await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return reversedRoot;
+      await this.walletGateway.saveWalletTx(ctx, wallet, [movement]);
+      return { root: reversedRoot, wallet };
     });
 
     return {
       root: root.toOutput(),
-      wallet: { id: movementRef.walletId, balance: snapshot.balance.value },
+      wallet: { id: wallet.id, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }

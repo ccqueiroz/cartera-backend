@@ -3,7 +3,10 @@ import {
   TransferOutput,
 } from '@/features/transfer/domain/transfer.entity';
 import { TransferMovement } from '@/features/transfer/domain/transfer-movement';
-import { TransferRepository } from '@/features/transfer/domain/ports/transfer.repository.port';
+import {
+  TransferRepository,
+  TransferTxContext,
+} from '@/features/transfer/domain/ports/transfer.repository.port';
 import { WalletGateway } from '@/features/transfer/domain/ports/wallet.gateway.port';
 import { PaymentMethodGateway } from '@/features/transfer/domain/ports/payment-method.gateway.port';
 import { Money } from '@/shared/kernel/value-objects/money.vo';
@@ -17,6 +20,7 @@ import {
   ValidationError,
 } from '@/shared/kernel/errors/domain.error';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { AtomicRunner } from '@/shared/database/atomic-runner';
 
 interface CreateTransferInput {
   userId: string;
@@ -44,6 +48,7 @@ export class CreateTransferUseCase {
     private readonly repository: TransferRepository,
     private readonly walletGateway: WalletGateway,
     private readonly paymentMethodGateway: PaymentMethodGateway,
+    private readonly atomicRunner: AtomicRunner,
     private readonly generateId: () => string,
     private readonly now: () => string,
   ) {}
@@ -52,6 +57,7 @@ export class CreateTransferUseCase {
     repository: TransferRepository,
     walletGateway: WalletGateway,
     paymentMethodGateway: PaymentMethodGateway,
+    atomicRunner: AtomicRunner,
     generateId: () => string,
     now: () => string,
   ): CreateTransferUseCase {
@@ -59,6 +65,7 @@ export class CreateTransferUseCase {
       repository,
       walletGateway,
       paymentMethodGateway,
+      atomicRunner,
       generateId,
       now,
     );
@@ -73,11 +80,24 @@ export class CreateTransferUseCase {
 
     this.assertEdges(input, transferDate, today);
 
-    const fromWallet = await this.walletGateway.findActiveById(
+    return this.atomicRunner.run((ctx) =>
+      this.transferInTransaction(ctx, input, transferDate, createdAt),
+    );
+  }
+
+  private async transferInTransaction(
+    ctx: TransferTxContext,
+    input: CreateTransferInput,
+    transferDate: string,
+    createdAt: string,
+  ): Promise<CreateTransferResult> {
+    const fromWallet = await this.walletGateway.loadWalletTx(
+      ctx,
       input.fromWalletId,
       input.userId,
     );
-    const toWallet = await this.walletGateway.findActiveById(
+    const toWallet = await this.walletGateway.loadWalletTx(
+      ctx,
       input.toWalletId,
       input.userId,
     );
@@ -104,10 +124,10 @@ export class CreateTransferUseCase {
       createdAt,
     });
 
-    fromWallet.debit(amount, transferDate);
-    toWallet.credit(amount);
+    fromWallet.debit(amount, transferDate, createdAt);
+    toWallet.credit(amount, createdAt);
 
-    const movements: TransferMovement[] = [
+    const [debit, credit]: TransferMovement[] = [
       {
         id: this.generateId(),
         userId: input.userId,
@@ -132,12 +152,9 @@ export class CreateTransferUseCase {
       },
     ];
 
-    await this.repository.saveTransfer(
-      fromWallet,
-      toWallet,
-      movements,
-      transfer,
-    );
+    await this.walletGateway.saveWalletTx(ctx, fromWallet, [debit]);
+    await this.walletGateway.saveWalletTx(ctx, toWallet, [credit]);
+    await this.repository.saveTx(ctx, transfer);
 
     return {
       transfer: transfer.toOutput(),

@@ -7,7 +7,10 @@ import {
   WalletMovementDirectionEnum,
   WalletMovementRefTypeEnum,
 } from '@/features/wallet/domain/enums/wallet-movement.enums';
-import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
+import {
+  WalletMutation,
+  WalletRepository,
+} from '@/features/wallet/domain/ports/wallet.repository.port';
 import { FinancialIndicatorGateway } from '@/features/wallet/domain/ports/financial-indicator.gateway.port';
 import { computeAccruedInterest } from '@/features/wallet/application/compute-accrued-interest';
 import {
@@ -69,7 +72,16 @@ export class AdjustBalanceUseCase {
     if (!(input.amount > 0))
       throw new ValidationError(ErrorCode.INVALID_WALLET_ADJUST_AMOUNT);
 
-    const wallet = await this.loadOwned(input.id, input.userId);
+    // O `fn` roda de novo a cada tentativa da transação: ids, horário e movimentos nascem dentro dele.
+    return this.repository.mutate(input.id, input.userId, (loaded) =>
+      this.adjust(this.assertOwned(loaded), input),
+    );
+  }
+
+  private async adjust(
+    wallet: Wallet,
+    input: AdjustBalanceInput,
+  ): Promise<WalletMutation<AdjustBalanceResult>> {
     const timestamp = this.now();
     const occurredAt = input.occurredAt ?? timestamp.slice(0, 10);
     const amount = Money.create(input.amount);
@@ -101,15 +113,16 @@ export class AdjustBalanceUseCase {
       if (!wallet.balance.isNegative()) wallet.closeOverdraftEpisode();
     }
 
-    await this.repository.saveWithMovements(wallet, movements);
-
     return {
-      wallet: wallet.toOutput(),
-      movements: movements.map((movement) => movement.toOutput()),
-      warnings: collectBalanceWarnings({
-        isNegative: wallet.balance.isNegative(),
-        exceedsLimit: wallet.exceedsOverdraftLimit(),
-      }),
+      save: { wallet, movements },
+      value: {
+        wallet: wallet.toOutput(),
+        movements: movements.map((movement) => movement.toOutput()),
+        warnings: collectBalanceWarnings({
+          isNegative: wallet.balance.isNegative(),
+          exceedsLimit: wallet.exceedsOverdraftLimit(),
+        }),
+      },
     };
   }
 
@@ -171,8 +184,7 @@ export class AdjustBalanceUseCase {
     });
   }
 
-  private async loadOwned(id: string, userId: string): Promise<Wallet> {
-    const wallet = await this.repository.findById(id, userId);
+  private assertOwned(wallet: Wallet | null): Wallet {
     if (!wallet) throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND);
     if (!wallet.isActive)
       throw new DuplicateEntityError(ErrorCode.WALLET_DELETED);

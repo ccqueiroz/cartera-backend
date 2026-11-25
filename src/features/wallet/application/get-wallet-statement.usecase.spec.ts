@@ -118,7 +118,7 @@ async function statementWith(input: {
     () => '2026-06-01T00:00:00.000Z',
   ).execute({ userId: 'u1', name: 'Nubank' });
   const [wallet] = await repository.listActiveByUser('u1');
-  await repository.saveWithMovements(
+  await repository.create(
     wallet,
     MOVEMENTS.map(([id, direction, amount, refType, occurredAt, createdAt]) =>
       WalletMovement.create({

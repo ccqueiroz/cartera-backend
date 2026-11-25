@@ -46,7 +46,8 @@ export interface CreateInstallmentBillInput {
  * UC-B2: cria plano de parcelas (`type = BILLS`, `origin = MANUAL`). Com entrada
  * paga, exige `walletId` (B1) e materializa o plano + debita a entrada (com
  * `WalletMovement(SETTLEMENT)` no `refId` da folha de entrada) num **único bloco
- * atômico** (só escritas; não relê o plano recém-criado).
+ * atômico** (a wallet é lida dentro da transação, antes do motor; não relê o
+ * plano recém-criado).
  */
 export class CreateInstallmentBillUseCase {
   private constructor(
@@ -103,17 +104,18 @@ export class CreateInstallmentBillUseCase {
     }
 
     const entry = input.entry;
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      entry.walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: entry.walletId,
-      });
-
     const createdAt = this.now();
-    const plan = await this.atomicRunner.run(async (ctx) => {
+    const { plan, wallet } = await this.atomicRunner.run(async (ctx) => {
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        entry.walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
+          walletId: entry.walletId,
+        });
+
       const materialized = await this.engine.createInstallmentPlan.executeTx(
         ctx,
         {
@@ -129,7 +131,7 @@ export class CreateInstallmentBillUseCase {
         (child) => child.firstInstallment,
       );
       if (entryLeaf) {
-        snapshot.debit(Money.create(entry.amount), entry.paymentDate);
+        wallet.debit(Money.create(entry.amount), entry.paymentDate, createdAt);
         const movement: WalletMovementSpec = {
           id: this.generateId(),
           userId: input.userId,
@@ -141,17 +143,17 @@ export class CreateInstallmentBillUseCase {
           occurredAt: entry.paymentDate,
           createdAt,
         };
-        await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
+        await this.walletGateway.saveWalletTx(ctx, wallet, [movement]);
       }
-      return materialized;
+      return { plan: materialized, wallet };
     });
 
     return {
       root: plan.mother.toOutput(),
-      wallet: { id: entry.walletId, balance: snapshot.balance.value },
+      wallet: { id: entry.walletId, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }

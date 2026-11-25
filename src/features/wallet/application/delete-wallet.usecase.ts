@@ -22,18 +22,19 @@ export class DeleteWalletUseCase {
   }
 
   public async execute(input: DeleteWalletInput): Promise<void> {
-    const wallet = await this.repository.findById(input.id, input.userId);
-    // Idempotente: inexistente ou já removida ⇒ no-op silencioso.
-    if (!wallet || !wallet.isActive) return;
+    await this.repository.mutate(input.id, input.userId, async (wallet) => {
+      // Idempotente: inexistente ou já removida ⇒ no-op silencioso.
+      if (!wallet || !wallet.isActive) return { save: null, value: undefined };
 
-    // A Cartera default é indeletável — barra antes do saldo e ignora `force` (C6).
-    if (wallet.isDefault)
-      throw new BusinessRuleViolationError(ErrorCode.WALLET_NOT_DELETABLE);
+      // A Cartera default é indeletável — barra antes do saldo e ignora `force` (C6).
+      if (wallet.isDefault)
+        throw new BusinessRuleViolationError(ErrorCode.WALLET_NOT_DELETABLE);
 
-    if (!wallet.balance.isZero() && input.force !== true)
-      throw new BusinessRuleViolationError(ErrorCode.WALLET_HAS_BALANCE);
+      if (!wallet.balance.isZero() && input.force !== true)
+        throw new BusinessRuleViolationError(ErrorCode.WALLET_HAS_BALANCE);
 
-    wallet.softDelete(this.now());
-    await this.repository.update(wallet);
+      wallet.softDelete(this.now());
+      return { save: { wallet, movements: [] }, value: undefined };
+    });
   }
 }

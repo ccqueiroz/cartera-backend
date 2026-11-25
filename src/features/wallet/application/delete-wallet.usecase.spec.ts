@@ -3,6 +3,7 @@ import { CreateWalletUseCase } from './create-wallet.usecase';
 import { CreateWalletInternalUseCase } from './create-wallet-internal.usecase';
 import { InMemoryWalletRepository } from '@/features/wallet/infra/persistence/in-memory-wallet.repository';
 import { ErrorCode } from '@/shared/kernel/errors/error-code';
+import { Wallet } from '@/features/wallet/domain/wallet.entity';
 
 function makeIds() {
   let counter = 0;
@@ -89,5 +90,48 @@ describe('DeleteWalletUseCase', () => {
     await expect(
       useCase.execute({ userId: 'u1', id }),
     ).resolves.toBeUndefined();
+  });
+
+  it('[CDC-05] resolves without writing when the wallet does not exist', async () => {
+    const repository = new InMemoryWalletRepository();
+    const useCase = DeleteWalletUseCase.create(repository, now);
+
+    await expect(
+      useCase.execute({ userId: 'u1', id: 'missing' }),
+    ).resolves.toBeUndefined();
+    expect(await repository.findById('missing', 'u1')).toBeNull();
+  });
+
+  it('[CDC-05] leaves an already removed wallet as it was', async () => {
+    const repository = new InMemoryWalletRepository();
+    const id = await seed(repository, makeIds());
+    let clock = '2026-06-14T10:00:00.000Z';
+    const useCase = DeleteWalletUseCase.create(repository, () => clock);
+    await useCase.execute({ userId: 'u1', id });
+    const removed = (await repository.findById(id, 'u1'))?.toPersistence();
+
+    clock = '2026-06-15T10:00:00.000Z';
+    await useCase.execute({ userId: 'u1', id });
+
+    const stored = await repository.findById(id, 'u1');
+    expect(stored?.toPersistence()).toEqual(removed);
+  });
+
+  it('[CDC-05] blocks the default wallet with a balance as WALLET_NOT_DELETABLE', async () => {
+    const repository = new InMemoryWalletRepository();
+    const wallet = Wallet.create({
+      id: 'cartera',
+      userId: 'u1',
+      name: 'Cartera',
+      balance: 50,
+      createdAt: now(),
+      isDefault: true,
+    });
+    await repository.create(wallet, []);
+    const useCase = DeleteWalletUseCase.create(repository, now);
+
+    await expect(
+      useCase.execute({ userId: 'u1', id: wallet.id }),
+    ).rejects.toMatchObject({ code: ErrorCode.WALLET_NOT_DELETABLE });
   });
 });

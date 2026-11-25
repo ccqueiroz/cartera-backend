@@ -22,8 +22,8 @@ export interface SettleBillInput {
 /**
  * UC-B5: liquida uma folha em bloco atômico (B1/B2) — folha paga + rollup (motor)
  * + débito na wallet + `WalletMovement(DEBIT, SETTLEMENT)`, tudo num único
- * `AtomicRunner.run`. A wallet é lida fora da transação (snapshot) e só escrita
- * dentro dela, depois das leituras transacionais do motor (reads-before-writes).
+ * `AtomicRunner.run`. A wallet é lida dentro da transação, antes das leituras do
+ * motor, e só escrita depois delas (reads-before-writes).
  */
 export class SettleBillUseCase {
   private constructor(
@@ -51,19 +51,20 @@ export class SettleBillUseCase {
   }
 
   public async execute(input: SettleBillInput): Promise<SettleBillResult> {
-    const snapshot = await this.walletGateway.findActiveSnapshot(
-      input.walletId,
-      input.userId,
-    );
-    if (!snapshot)
-      throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
-        walletId: input.walletId,
-      });
-
     const amount = Money.create(input.paidAmount);
     const createdAt = this.now();
 
-    const root = await this.atomicRunner.run(async (ctx) => {
+    const { root, wallet } = await this.atomicRunner.run(async (ctx) => {
+      const wallet = await this.walletGateway.loadWalletTx(
+        ctx,
+        input.walletId,
+        input.userId,
+      );
+      if (!wallet)
+        throw new EntityNotFoundError(ErrorCode.WALLET_NOT_FOUND, {
+          walletId: input.walletId,
+        });
+
       const settledRoot = await this.engine.settle.executeTx(ctx, {
         id: input.id,
         userId: input.userId,
@@ -72,7 +73,7 @@ export class SettleBillUseCase {
         paymentMethodDescriptionEnum: input.paymentMethodDescriptionEnum,
       });
 
-      snapshot.debit(amount, input.paymentDate);
+      wallet.debit(amount, input.paymentDate, createdAt);
       const movement: WalletMovementSpec = {
         id: this.generateId(),
         userId: input.userId,
@@ -84,16 +85,16 @@ export class SettleBillUseCase {
         occurredAt: input.paymentDate,
         createdAt,
       };
-      await this.walletGateway.persistSettlement(ctx, snapshot, [movement]);
-      return settledRoot;
+      await this.walletGateway.saveWalletTx(ctx, wallet, [movement]);
+      return { root: settledRoot, wallet };
     });
 
     return {
       root: root.toOutput(),
-      wallet: { id: input.walletId, balance: snapshot.balance.value },
+      wallet: { id: input.walletId, balance: wallet.balance.value },
       warnings: collectBalanceWarnings({
-        isNegative: snapshot.isNegative(),
-        exceedsLimit: snapshot.exceedsOverdraftLimit(),
+        isNegative: wallet.balance.isNegative(),
+        exceedsLimit: wallet.exceedsOverdraftLimit(),
       }),
     };
   }

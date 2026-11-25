@@ -19,7 +19,7 @@ function transfer(id: string, userId: string): Transfer {
 
 function repoWith(transfers: Transfer[]): TransferRepository {
   return {
-    saveTransfer: async () => undefined,
+    saveTx: async () => undefined,
     listByUser: async () => [],
     findById: async (id: string, userId: string) =>
       transfers.find((t) => t.id === id && t.userId === userId) ?? null,

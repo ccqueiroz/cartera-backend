@@ -7,12 +7,19 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
-import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 import {
   WalletMovementSpec,
   SettlementMovementRef,
+  SettlementWallet,
   WalletGateway,
+  WalletTxContext,
 } from '@/features/core-finance/shared/ports/wallet.gateway.port';
+import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
+import {
+  FakeWalletGateway,
+  retryingRunner,
+  TestWallet,
+} from '@/test/support/wallet-gateway-doubles';
 import { SettleReceivableUseCase } from '@/features/core-finance/receivables/application/settle-receivable.usecase';
 import { ReverseReceivableUseCase } from '@/features/core-finance/receivables/application/reverse-receivable.usecase';
 import { GlobalSettleReceivableUseCase } from '@/features/core-finance/receivables/application/global-settle-receivable.usecase';
@@ -25,6 +32,8 @@ import { EditReceivableUseCase } from '@/features/core-finance/receivables/appli
 import { SoftDeleteReceivableUseCase } from '@/features/core-finance/receivables/application/soft-delete-receivable.usecase';
 
 const userId = 'user-1';
+/** The movement `createdAt` as the `updatedAt` of the credit. */
+const CREDIT_DATES = { updatedAt: '2026-06-05T00:00:00.000Z' };
 
 const categoryGateway: CategoryGateway = { resolve: async () => null };
 const paymentMethodGateway: PaymentMethodGateway = {
@@ -47,56 +56,6 @@ const fakeRunner = {
   run: async <T>(work: (ctx: AtomicContext) => Promise<T>): Promise<T> =>
     work({ txn: {} } as AtomicContext),
 } as AtomicRunner;
-
-class FakeWalletGateway implements WalletGateway {
-  public readonly movements: WalletMovementSpec[] = [];
-  private balance: number;
-
-  constructor(
-    private readonly walletId: string,
-    initialBalance: number,
-    private readonly overdraftLimit = 0,
-  ) {
-    this.balance = initialBalance;
-  }
-
-  public async findActiveSnapshot(
-    walletId: string,
-  ): Promise<WalletSnapshot | null> {
-    if (walletId !== this.walletId) return null;
-    return WalletSnapshot.fromRaw(walletId, {
-      userId,
-      balance: this.balance,
-      overdraft:
-        this.overdraftLimit > 0
-          ? {
-              limit: this.overdraftLimit,
-              monthlyRate: 0.08,
-              graceDays: 0,
-              since: null,
-            }
-          : null,
-    });
-  }
-
-  public async findSettlementMovement(
-    leafId: string,
-  ): Promise<SettlementMovementRef | null> {
-    const found = this.movements.find(
-      (m) => m.refId === leafId && m.refType === 'SETTLEMENT',
-    );
-    return found ? { walletId: found.walletId, amount: found.amount } : null;
-  }
-
-  public async persistSettlement(
-    _ctx: AtomicContext,
-    snapshot: WalletSnapshot,
-    movements: WalletMovementSpec[],
-  ): Promise<void> {
-    this.balance = snapshot.balance.value;
-    this.movements.push(...movements);
-  }
-}
 
 /** Wallet com um SETTLEMENT pré-existente e saldo já drenado, para provar o estorno negativar. */
 class SeededReversalWalletGateway implements WalletGateway {
@@ -123,32 +82,30 @@ class SeededReversalWalletGateway implements WalletGateway {
     });
   }
 
-  public async findActiveSnapshot(
+  public async loadWalletTx(
+    _ctx: WalletTxContext,
     walletId: string,
-  ): Promise<WalletSnapshot | null> {
+  ): Promise<SettlementWallet | null> {
     if (walletId !== this.walletId) return null;
-    return WalletSnapshot.fromRaw(walletId, {
-      userId,
-      balance: this.balance,
-      overdraft: null,
-    });
+    return new TestWallet(walletId, SignedMoney.create(this.balance));
   }
 
-  public async findSettlementMovement(
+  public async findLatestSettlementTx(
+    _ctx: WalletTxContext,
     leafId: string,
   ): Promise<SettlementMovementRef | null> {
-    const found = this.movements.find(
-      (m) => m.refId === leafId && m.refType === 'SETTLEMENT',
-    );
-    return found ? { walletId: found.walletId, amount: found.amount } : null;
+    const latest = this.movements
+      .filter((m) => m.refId === leafId && m.refType === 'SETTLEMENT')
+      .pop();
+    return latest ? { walletId: latest.walletId, amount: latest.amount } : null;
   }
 
-  public async persistSettlement(
-    _ctx: AtomicContext,
-    snapshot: WalletSnapshot,
+  public async saveWalletTx(
+    _ctx: WalletTxContext,
+    wallet: SettlementWallet,
     movements: WalletMovementSpec[],
   ): Promise<void> {
-    this.balance = snapshot.balance.value;
+    this.balance = wallet.balance.value;
     this.movements.push(...movements);
   }
 }
@@ -199,6 +156,7 @@ describe('SettleReceivableUseCase', () => {
       refId: leafId,
       amount: 30,
     });
+    expect(wallet.savedDates).toEqual(CREDIT_DATES);
   });
 
   it('missing wallet gives WALLET_NOT_FOUND (writes nothing)', async () => {
@@ -220,10 +178,48 @@ describe('SettleReceivableUseCase', () => {
         walletId: 'other',
         paidAmount: 30,
         paymentDate: '2026-06-05',
-        paymentMethodDescriptionEnum: 'PIX',
+        paymentMethodDescriptionEnum: 'BOLETO',
       }),
     ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
     expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a settlement loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -50, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const settle = SettleReceivableUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const leafId = await createReceivableLeaf(engine, 30);
+
+    const result = await settle.execute({
+      id: leafId,
+      userId,
+      walletId: 'w1',
+      paidAmount: 30,
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -20 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 });
 
@@ -267,6 +263,11 @@ describe('ReverseReceivableUseCase', () => {
       refId: leafId,
       amount: 30,
     });
+    expect(wallet.savedDates).toEqual({
+      occurredAt: '2026-06-06',
+      updatedAt: '2026-06-06T00:00:00.000Z',
+    });
+    expect(result.warnings).toEqual([]);
   });
 
   it('reversal that makes the balance negative gives a BALANCE_NEGATIVE warning, without blocking', async () => {
@@ -312,6 +313,83 @@ describe('ReverseReceivableUseCase', () => {
       },
     );
   });
+
+  it('[CDC-07] a settlement of an unreceived leaf on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', 100);
+    const reverse = ReverseReceivableUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-x',
+      () => '2026-06-06T00:00:00.000Z',
+    );
+    const leafId = await createReceivableLeaf(engine, 30);
+    wallet.movements.push({
+      id: 'mov-1',
+      userId,
+      walletId: 'gone',
+      direction: 'CREDIT',
+      amount: 30,
+      refType: 'SETTLEMENT',
+      refId: leafId,
+      occurredAt: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00.000Z',
+    });
+
+    await expect(reverse.execute({ id: leafId, userId })).rejects.toMatchObject(
+      { code: 'WALLET_NOT_FOUND' },
+    );
+    expect(wallet.movements).toHaveLength(1);
+  });
+
+  it('[CDC-07] a reversal reads the settlement and loads and saves its wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -50, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const leafId = await createReceivableLeaf(engine, 30);
+    await SettleReceivableUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    ).execute({
+      id: leafId,
+      userId,
+      walletId: 'w1',
+      paidAmount: 30,
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+    const find = jest.spyOn(wallet, 'findLatestSettlementTx');
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const reverse = ReverseReceivableUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-2',
+      () => '2026-06-06T00:00:00.000Z',
+    );
+
+    const result = await reverse.execute({ id: leafId, userId });
+
+    expect(find).toHaveBeenCalledWith(ctx, leafId, userId);
+    expect(find.mock.calls[0][0]).toBe(ctx);
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -50 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
+  });
 });
 
 describe('GlobalSettleReceivableUseCase', () => {
@@ -353,6 +431,109 @@ describe('GlobalSettleReceivableUseCase', () => {
       ),
     ).toBe(true);
     expect(result.wallet.balance).toBe(150);
+    expect(wallet.savedDates).toEqual(CREDIT_DATES);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('[CDC-07] a plan already settled writes nothing and answers with the wallet it read and its warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -10);
+    const global = GlobalSettleReceivableUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const plan = await engine.createInstallmentPlan.execute({
+      userId,
+      personId: userId,
+      type: TransactionTypeEnum.RECEIVABLES,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 50, dueDate: '2026-06-10' }],
+    });
+    const input = {
+      nodeId: plan.mother.id,
+      userId,
+      walletId: 'w1',
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    };
+    await engine.globalSettlement.execute(input);
+
+    const result = await global.execute(input);
+
+    expect(wallet.movements).toHaveLength(0);
+    expect(wallet.savedDates).toEqual({});
+    expect(result.wallet).toEqual({ id: 'w1', balance: -10 });
+    expect(result.warnings).toEqual(['BALANCE_NEGATIVE']);
+  });
+
+  it('[CDC-07] a missing node on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const wallet = new FakeWalletGateway('w1', 100);
+    const global = GlobalSettleReceivableUseCase.create(
+      buildEngine(),
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    await expect(
+      global.execute({
+        nodeId: 'missing',
+        userId,
+        walletId: 'other',
+        paymentDate: '2026-06-05',
+        paymentMethodDescriptionEnum: 'PIX',
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a global settlement loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -50, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const global = GlobalSettleReceivableUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const plan = await engine.createInstallmentPlan.execute({
+      userId,
+      personId: userId,
+      type: TransactionTypeEnum.RECEIVABLES,
+      amount: 30,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 30, dueDate: '2026-06-10' }],
+    });
+
+    const result = await global.execute({
+      nodeId: plan.mother.id,
+      userId,
+      walletId: 'w1',
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -20 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 });
 
@@ -451,6 +632,82 @@ describe('CreateSingleReceivableUseCase', () => {
     expect(result.wallet).toEqual({ id: 'w1', balance: 130 });
     expect(wallet.movements).toHaveLength(1);
     expect(wallet.movements[0]).toMatchObject({ direction: 'CREDIT' });
+    expect(wallet.savedDates).toEqual(CREDIT_DATES);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('[CDC-08] a retried run that drops the first attempt writes reads the wallet again: a born-received receivable of 300 on a wallet of 1000 leaves 1300 and one movement', async () => {
+    const wallet = new FakeWalletGateway('w1', 1000);
+    const uc = CreateSingleReceivableUseCase.create(
+      buildEngine(),
+      wallet,
+      retryingRunner(wallet),
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    await uc.execute({
+      userId,
+      amount: 300,
+      dueDate: '2026-06-10',
+      paymentMethodDescriptionEnum: 'PIX',
+      paidAt: '2026-06-05',
+      walletId: 'w1',
+    });
+
+    expect(wallet.balance).toBe(1300);
+    expect(wallet.movements).toHaveLength(1);
+  });
+
+  it('[CDC-07] a born-received receivable with an unknown payment method on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const { uc, wallet } = build();
+    await expect(
+      uc.execute({
+        userId,
+        amount: 30,
+        dueDate: '2026-06-10',
+        paymentMethodDescriptionEnum: 'BOLETO',
+        paidAt: '2026-06-05',
+        walletId: 'other',
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a born-received receivable loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const wallet = new FakeWalletGateway('w1', -50, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const uc = CreateSingleReceivableUseCase.create(
+      buildEngine(),
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    const result = await uc.execute({
+      userId,
+      amount: 30,
+      dueDate: '2026-06-10',
+      paymentMethodDescriptionEnum: 'PIX',
+      paidAt: '2026-06-05',
+      walletId: 'w1',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -20 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 
   it('born received without walletId gives ValidationError', async () => {
@@ -537,6 +794,67 @@ describe('CreateInstallmentReceivableUseCase', () => {
       refType: 'SETTLEMENT',
       amount: 10,
     });
+    expect(wallet.savedDates).toEqual(CREDIT_DATES);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('[CDC-07] a received down payment with an unknown payment method on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const { uc, wallet } = build();
+    await expect(
+      uc.execute({
+        userId,
+        amount: 50,
+        dueDate: '2026-06-10',
+        installments: [{ amount: 40, dueDate: '2026-07-10' }],
+        entry: {
+          amount: 10,
+          paymentDate: '2026-06-05',
+          paymentMethodDescriptionEnum: 'BOLETO',
+          walletId: 'other',
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a received down payment loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const wallet = new FakeWalletGateway('w1', -30, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const uc = CreateInstallmentReceivableUseCase.create(
+      buildEngine(),
+      wallet,
+      runner,
+      () => 'mov-e',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    const result = await uc.execute({
+      userId,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 40, dueDate: '2026-07-10' }],
+      entry: {
+        amount: 10,
+        paymentDate: '2026-06-05',
+        paymentMethodDescriptionEnum: 'PIX',
+        walletId: 'w1',
+      },
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -20 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 });
 

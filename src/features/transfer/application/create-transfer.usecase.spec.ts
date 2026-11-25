@@ -1,8 +1,14 @@
 import { CreateTransferUseCase } from './create-transfer.usecase';
 import { InMemoryTransferRepository } from '@/features/transfer/infra/persistence/in-memory-transfer.repository';
-import { WalletGateway } from '@/features/transfer/domain/ports/wallet.gateway.port';
+import {
+  TransferWallet,
+  WalletGateway,
+} from '@/features/transfer/domain/ports/wallet.gateway.port';
 import { PaymentMethodGateway } from '@/features/transfer/domain/ports/payment-method.gateway.port';
-import { TransferWalletSnapshot } from '@/features/transfer/domain/transfer-wallet-snapshot';
+import { TransferMovement } from '@/features/transfer/domain/transfer-movement';
+import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
+import { Money } from '@/shared/kernel/value-objects/money.vo';
+import { SignedMoney } from '@/shared/kernel/value-objects/signed-money.vo';
 import { BalanceWarning } from '@/shared/kernel/value-objects/balance-warnings';
 import {
   BusinessRuleViolationError,
@@ -18,37 +24,68 @@ function makeIds() {
 
 const now = () => '2026-06-17T10:00:00.000Z';
 
+/** Satisfies the port wallet without importing the wallet feature, which transfer never imports. */
+class TestWallet implements TransferWallet {
+  public occurredAt?: string;
+  public updatedAt?: string;
+
+  constructor(
+    public balance: SignedMoney,
+    private readonly overdraftLimit: number,
+  ) {}
+
+  public debit(amount: Money, occurredAt: string, updatedAt: string): void {
+    this.balance = this.balance.subtract(SignedMoney.create(amount.value));
+    this.occurredAt = occurredAt;
+    this.updatedAt = updatedAt;
+  }
+
+  public credit(amount: Money, updatedAt: string): void {
+    this.balance = this.balance.add(SignedMoney.create(amount.value));
+    this.updatedAt = updatedAt;
+  }
+
+  public exceedsOverdraftLimit(): boolean {
+    return this.overdraftLimit > 0 && this.balance.value < -this.overdraftLimit;
+  }
+}
+
+/** The port wallet carries no overdraft episode, so `overdraftSince` changes nothing here. */
 function snapshot(
   overrides: {
     balance?: number;
     overdraftLimit?: number;
     overdraftSince?: string | null;
   } = {},
-): TransferWalletSnapshot {
-  const limit = overrides.overdraftLimit ?? 0;
-  const since =
-    overrides.overdraftSince === undefined ? null : overrides.overdraftSince;
-  return TransferWalletSnapshot.fromRaw({
-    userId: 'u1',
-    name: 'W',
-    balance: overrides.balance ?? 0,
-    overdraft:
-      limit > 0 || since !== null
-        ? { limit, monthlyRate: 0.08, graceDays: 0, since }
-        : null,
-    createdAt: '2026-06-01T00:00:00.000Z',
-    updatedAt: null,
-    deletedAt: null,
-  });
+): TestWallet {
+  return new TestWallet(
+    SignedMoney.create(overrides.balance ?? 0),
+    overrides.overdraftLimit ?? 0,
+  );
+}
+
+interface SavedWallet {
+  wallet: TransferWallet;
+  movements: TransferMovement[];
 }
 
 function walletGatewayWith(
-  byId: Record<string, TransferWalletSnapshot | null>,
-): WalletGateway {
+  byId: Record<string, TestWallet | null>,
+): WalletGateway & { saved: SavedWallet[] } {
+  const saved: SavedWallet[] = [];
   return {
-    findActiveById: async (walletId: string) => byId[walletId] ?? null,
+    saved,
+    loadWalletTx: async (_ctx, walletId) => byId[walletId] ?? null,
+    saveWalletTx: async (_ctx, wallet, movements) => {
+      saved.push({ wallet, movements });
+    },
   };
 }
+
+const fakeRunner = {
+  run: async <T>(work: (ctx: AtomicContext) => Promise<T>): Promise<T> =>
+    work({ txn: {} } as AtomicContext),
+} as AtomicRunner;
 
 const activePaymentMethod: PaymentMethodGateway = {
   findActiveByEnum: async () => ({ isActive: true }),
@@ -58,11 +95,13 @@ function makeUseCase(
   repository: InMemoryTransferRepository,
   walletGateway: WalletGateway,
   paymentMethodGateway: PaymentMethodGateway = activePaymentMethod,
+  atomicRunner: AtomicRunner = fakeRunner,
 ) {
   return CreateTransferUseCase.create(
     repository,
     walletGateway,
     paymentMethodGateway,
+    atomicRunner,
     makeIds(),
     now,
   );
@@ -108,26 +147,58 @@ describe('CreateTransferUseCase', () => {
 
   it('writes 2 wallets + 2 movements (DEBIT/CREDIT, refType TRANSFER) + 1 transfer', async () => {
     const repository = new InMemoryTransferRepository();
-    const gateway = walletGatewayWith({
-      w1: snapshot({ balance: 300 }),
-      w2: snapshot({ balance: 0 }),
-    });
+    const source = snapshot({ balance: 300 });
+    const destination = snapshot({ balance: 0 });
+    const gateway = walletGatewayWith({ w1: source, w2: destination });
     const useCase = makeUseCase(repository, gateway);
 
-    await useCase.execute(validInput({ amount: 100 }));
+    const result = await useCase.execute(
+      validInput({ amount: 100, transferDate: '2026-06-15' }),
+    );
 
-    expect(repository.savedWallets).toHaveLength(2);
-    expect(repository.savedMovements).toHaveLength(2);
-    const debit = repository.savedMovements.find(
-      (m) => m.direction === 'DEBIT',
+    const movement = {
+      id: expect.any(String),
+      userId: 'u1',
+      amount: 100,
+      refType: 'TRANSFER',
+      refId: result.transfer.id,
+      occurredAt: '2026-06-15',
+      createdAt: now(),
+    };
+    expect(gateway.saved).toHaveLength(2);
+    expect(gateway.saved).toEqual(
+      expect.arrayContaining([
+        {
+          wallet: source,
+          movements: [{ ...movement, walletId: 'w1', direction: 'DEBIT' }],
+        },
+        {
+          wallet: destination,
+          movements: [{ ...movement, walletId: 'w2', direction: 'CREDIT' }],
+        },
+      ]),
     );
-    const credit = repository.savedMovements.find(
-      (m) => m.direction === 'CREDIT',
-    );
-    expect(debit?.walletId).toBe('w1');
-    expect(debit?.refType).toBe('TRANSFER');
-    expect(credit?.walletId).toBe('w2');
-    expect(debit?.refId).toBe(credit?.refId);
+    expect(source).toMatchObject({
+      occurredAt: '2026-06-15',
+      updatedAt: now(),
+    });
+    expect(destination.updatedAt).toBe(now());
+    expect(
+      (await repository.listByUser('u1', {})).map((transfer) =>
+        transfer.toPersistence(),
+      ),
+    ).toEqual([
+      {
+        id: result.transfer.id,
+        userId: 'u1',
+        fromWalletId: 'w1',
+        toWalletId: 'w2',
+        amount: 100,
+        paymentMethodDescriptionEnum: 'PIX',
+        transferDate: '2026-06-15',
+        createdAt: now(),
+      },
+    ]);
   });
 
   it('rejects a source equal to the destination with 400 (ValidationError)', async () => {
@@ -268,4 +339,75 @@ describe('CreateTransferUseCase', () => {
 
     expect(result.transfer.transferDate).toBe('2026-06-17');
   });
+
+  it('[CDC-12] 404 when the source wallet is missing, before the payment method is checked', async () => {
+    const repository = new InMemoryTransferRepository();
+    const gateway = walletGatewayWith({ w1: null, w2: snapshot() });
+    const inactive: PaymentMethodGateway = {
+      findActiveByEnum: async () => null,
+    };
+
+    await expect(
+      makeUseCase(repository, gateway, inactive).execute(validInput()),
+    ).rejects.toMatchObject({ code: ErrorCode.WALLET_NOT_FOUND });
+  });
+
+  it('[CDC-12] loads both wallets, saves both and saves the transfer with the run context and the input owner', async () => {
+    const repository = new InMemoryTransferRepository();
+    const gateway = walletGatewayWith({
+      w1: snapshot({ balance: 300 }),
+      w2: snapshot(),
+    });
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(gateway, 'loadWalletTx');
+    const save = jest.spyOn(gateway, 'saveWalletTx');
+    const saveTransfer = jest.spyOn(repository, 'saveTx');
+
+    await makeUseCase(repository, gateway, activePaymentMethod, runner).execute(
+      validInput(),
+    );
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', 'u1');
+    expect(load).toHaveBeenCalledWith(ctx, 'w2', 'u1');
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(load.mock.calls[1][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[1][0]).toBe(ctx);
+    expect(saveTransfer.mock.calls[0][0]).toBe(ctx);
+  });
+
+  it.each(['w1', 'w2', 'transfer'])(
+    '[CDC-12] rejects with the error of the %s save inside the run',
+    async (failing) => {
+      const repository = new InMemoryTransferRepository();
+      const gateway = walletGatewayWith({
+        w1: snapshot({ balance: 300 }),
+        w2: snapshot(),
+      });
+      const failure = new Error();
+      const handled = Promise.reject(failure);
+      handled.catch(() => undefined);
+      const saveWallet = gateway.saveWalletTx;
+      jest
+        .spyOn(gateway, 'saveWalletTx')
+        .mockImplementation((ctx, wallet, movements) =>
+          movements[0]?.walletId === failing
+            ? handled
+            : saveWallet(ctx, wallet, movements),
+        );
+      jest
+        .spyOn(repository, 'saveTx')
+        .mockImplementation(() =>
+          failing === 'transfer' ? handled : Promise.resolve(),
+        );
+
+      await expect(
+        makeUseCase(repository, gateway).execute(validInput()),
+      ).rejects.toBe(failure);
+    },
+  );
 });

@@ -3,6 +3,7 @@ import { Route } from '@/shared/http/route';
 import { Middleware } from '@/shared/http/middleware';
 import { crypto } from '@/packages/clients/crypto';
 import { FinancialIndicatorGateway } from '@/features/wallet/domain/ports/financial-indicator.gateway.port';
+import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { WalletRepositoryFirestore } from '@/features/wallet/infra/persistence/wallet.repository.firestore';
 import { CreateWalletUseCase } from '@/features/wallet/application/create-wallet.usecase';
 import { ListWalletsUseCase } from '@/features/wallet/application/list-wallets.usecase';
@@ -28,6 +29,10 @@ export interface WalletModule {
   /** Contrato interno (UC8) para o auth semear a wallet "Cartera" via porta — sem rota HTTP. */
   internal: {
     createWallet: CreateWalletInternalUseCase;
+    wallets: Pick<
+      WalletRepository,
+      'findActiveByIdTx' | 'findLatestSettlementTx' | 'saveWithMovementsTx'
+    >;
   };
 }
 
@@ -56,6 +61,7 @@ export function makeWalletModule(deps: WalletModuleDeps): WalletModule {
         generateId,
         now,
       ),
+      wallets: repository,
     },
   };
 }

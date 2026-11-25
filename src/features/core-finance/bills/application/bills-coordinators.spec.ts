@@ -7,12 +7,10 @@ import { CategoryGateway } from '@/features/core-finance/transaction-engine/doma
 import { PaymentMethodGateway } from '@/features/core-finance/transaction-engine/domain/ports/payment-method.gateway.port';
 import { TransactionTypeEnum } from '@/shared/kernel/enums/transaction-type.enum';
 import { AtomicContext, AtomicRunner } from '@/shared/database/atomic-runner';
-import { WalletSnapshot } from '@/features/core-finance/shared/domain/wallet-snapshot';
 import {
-  WalletMovementSpec,
-  SettlementMovementRef,
-  WalletGateway,
-} from '@/features/core-finance/shared/ports/wallet.gateway.port';
+  FakeWalletGateway,
+  retryingRunner,
+} from '@/test/support/wallet-gateway-doubles';
 import { SettleBillUseCase } from '@/features/core-finance/bills/application/settle-bill.usecase';
 import { ReverseBillUseCase } from '@/features/core-finance/bills/application/reverse-bill.usecase';
 import { GlobalSettleBillUseCase } from '@/features/core-finance/bills/application/global-settle-bill.usecase';
@@ -25,6 +23,11 @@ import { EditBillUseCase } from '@/features/core-finance/bills/application/edit-
 import { SoftDeleteBillUseCase } from '@/features/core-finance/bills/application/soft-delete-bill.usecase';
 
 const userId = 'user-1';
+/** The payment date as `occurredAt` and the movement `createdAt` as `updatedAt`. */
+const DEBIT_DATES = {
+  occurredAt: '2026-06-05',
+  updatedAt: '2026-06-05T00:00:00.000Z',
+};
 
 const categoryGateway: CategoryGateway = { resolve: async () => null };
 const paymentMethodGateway: PaymentMethodGateway = {
@@ -47,56 +50,6 @@ const fakeRunner = {
   run: async <T>(work: (ctx: AtomicContext) => Promise<T>): Promise<T> =>
     work({ txn: {} } as AtomicContext),
 } as AtomicRunner;
-
-class FakeWalletGateway implements WalletGateway {
-  public readonly movements: WalletMovementSpec[] = [];
-  private balance: number;
-
-  constructor(
-    private readonly walletId: string,
-    initialBalance: number,
-    private readonly overdraftLimit = 0,
-  ) {
-    this.balance = initialBalance;
-  }
-
-  public async findActiveSnapshot(
-    walletId: string,
-  ): Promise<WalletSnapshot | null> {
-    if (walletId !== this.walletId) return null;
-    return WalletSnapshot.fromRaw(walletId, {
-      userId,
-      balance: this.balance,
-      overdraft:
-        this.overdraftLimit > 0
-          ? {
-              limit: this.overdraftLimit,
-              monthlyRate: 0.08,
-              graceDays: 0,
-              since: null,
-            }
-          : null,
-    });
-  }
-
-  public async findSettlementMovement(
-    leafId: string,
-  ): Promise<SettlementMovementRef | null> {
-    const found = this.movements.find(
-      (m) => m.refId === leafId && m.refType === 'SETTLEMENT',
-    );
-    return found ? { walletId: found.walletId, amount: found.amount } : null;
-  }
-
-  public async persistSettlement(
-    _ctx: AtomicContext,
-    snapshot: WalletSnapshot,
-    movements: WalletMovementSpec[],
-  ): Promise<void> {
-    this.balance = snapshot.balance.value;
-    this.movements.push(...movements);
-  }
-}
 
 async function createBillLeaf(
   engine: TransactionEngine,
@@ -144,6 +97,7 @@ describe('SettleBillUseCase', () => {
       refId: leafId,
       amount: 30,
     });
+    expect(wallet.savedDates).toEqual(DEBIT_DATES);
   });
 
   it('negative balance after debit gives a BALANCE_NEGATIVE warning, without blocking', async () => {
@@ -192,7 +146,7 @@ describe('SettleBillUseCase', () => {
         walletId: 'other',
         paidAmount: 30,
         paymentDate: '2026-06-05',
-        paymentMethodDescriptionEnum: 'PIX',
+        paymentMethodDescriptionEnum: 'BOLETO',
       }),
     ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
     expect(wallet.movements).toHaveLength(0);
@@ -239,6 +193,10 @@ describe('ReverseBillUseCase', () => {
       refId: leafId,
       amount: 30,
     });
+    expect(wallet.savedDates).toEqual({
+      updatedAt: '2026-06-06T00:00:00.000Z',
+    });
+    expect(result.warnings).toEqual([]);
   });
 
   it('no settlement movement gives SETTLEMENT_MOVEMENT_NOT_FOUND', async () => {
@@ -258,6 +216,83 @@ describe('ReverseBillUseCase', () => {
         code: 'SETTLEMENT_MOVEMENT_NOT_FOUND',
       },
     );
+  });
+
+  it('[CDC-07] a settlement of an unpaid leaf on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', 100);
+    const reverse = ReverseBillUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-x',
+      () => '2026-06-06T00:00:00.000Z',
+    );
+    const leafId = await createBillLeaf(engine, 30);
+    wallet.movements.push({
+      id: 'mov-1',
+      userId,
+      walletId: 'gone',
+      direction: 'DEBIT',
+      amount: 30,
+      refType: 'SETTLEMENT',
+      refId: leafId,
+      occurredAt: '2026-06-05',
+      createdAt: '2026-06-05T00:00:00.000Z',
+    });
+
+    await expect(reverse.execute({ id: leafId, userId })).rejects.toMatchObject(
+      { code: 'WALLET_NOT_FOUND' },
+    );
+    expect(wallet.movements).toHaveLength(1);
+  });
+
+  it('[CDC-07] a reversal reads the settlement and loads and saves its wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -50, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const leafId = await createBillLeaf(engine, 30);
+    await SettleBillUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    ).execute({
+      id: leafId,
+      userId,
+      walletId: 'w1',
+      paidAmount: 30,
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+    const find = jest.spyOn(wallet, 'findLatestSettlementTx');
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const reverse = ReverseBillUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-2',
+      () => '2026-06-06T00:00:00.000Z',
+    );
+
+    const result = await reverse.execute({ id: leafId, userId });
+
+    expect(find).toHaveBeenCalledWith(ctx, leafId, userId);
+    expect(find.mock.calls[0][0]).toBe(ctx);
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -50 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 });
 
@@ -298,6 +333,106 @@ describe('GlobalSettleBillUseCase', () => {
       true,
     );
     expect(result.wallet.balance).toBe(50);
+    expect(wallet.savedDates).toEqual(DEBIT_DATES);
+  });
+
+  it('[CDC-07] a plan already settled writes nothing and answers with the wallet it read and its warnings', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', -10);
+    const global = GlobalSettleBillUseCase.create(
+      engine,
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const plan = await engine.createInstallmentPlan.execute({
+      userId,
+      personId: userId,
+      type: TransactionTypeEnum.BILLS,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [
+        { amount: 20, dueDate: '2026-06-10' },
+        { amount: 30, dueDate: '2026-07-10' },
+      ],
+    });
+    const input = {
+      nodeId: plan.mother.id,
+      userId,
+      walletId: 'w1',
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    };
+    await engine.globalSettlement.execute(input);
+
+    const result = await global.execute(input);
+
+    expect(wallet.movements).toHaveLength(0);
+    expect(wallet.savedDates).toEqual({});
+    expect(result.wallet).toEqual({ id: 'w1', balance: -10 });
+    expect(result.warnings).toEqual(['BALANCE_NEGATIVE']);
+  });
+
+  it('[CDC-07] a missing node on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const wallet = new FakeWalletGateway('w1', 100);
+    const global = GlobalSettleBillUseCase.create(
+      buildEngine(),
+      wallet,
+      fakeRunner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    await expect(
+      global.execute({
+        nodeId: 'missing',
+        userId,
+        walletId: 'other',
+        paymentDate: '2026-06-05',
+        paymentMethodDescriptionEnum: 'PIX',
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] loads and saves the wallet with the run context and the input owner', async () => {
+    const engine = buildEngine();
+    const wallet = new FakeWalletGateway('w1', 100);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const global = GlobalSettleBillUseCase.create(
+      engine,
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+    const plan = await engine.createInstallmentPlan.execute({
+      userId,
+      personId: userId,
+      type: TransactionTypeEnum.BILLS,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 50, dueDate: '2026-06-10' }],
+    });
+
+    await global.execute({
+      nodeId: plan.mother.id,
+      userId,
+      walletId: 'w1',
+      paymentDate: '2026-06-05',
+      paymentMethodDescriptionEnum: 'PIX',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
   });
 });
 
@@ -395,6 +530,82 @@ describe('CreateSingleBillUseCase', () => {
     expect(result.root.paid).toBe(true);
     expect(result.wallet).toEqual({ id: 'w1', balance: 70 });
     expect(wallet.movements).toHaveLength(1);
+    expect(wallet.savedDates).toEqual(DEBIT_DATES);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('[CDC-08] a retried run that drops the first attempt writes reads the wallet again: a born-paid bill of 300 on a wallet of 1000 leaves 700 and one movement', async () => {
+    const wallet = new FakeWalletGateway('w1', 1000);
+    const uc = CreateSingleBillUseCase.create(
+      buildEngine(),
+      wallet,
+      retryingRunner(wallet),
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    await uc.execute({
+      userId,
+      amount: 300,
+      dueDate: '2026-06-10',
+      paymentMethodDescriptionEnum: 'PIX',
+      paidAt: '2026-06-05',
+      walletId: 'w1',
+    });
+
+    expect(wallet.balance).toBe(700);
+    expect(wallet.movements).toHaveLength(1);
+  });
+
+  it('[CDC-07] a born-paid bill with an unknown payment method on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const { uc, wallet } = build();
+    await expect(
+      uc.execute({
+        userId,
+        amount: 30,
+        dueDate: '2026-06-10',
+        paymentMethodDescriptionEnum: 'BOLETO',
+        paidAt: '2026-06-05',
+        walletId: 'other',
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a born-paid bill loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const wallet = new FakeWalletGateway('w1', 10, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const uc = CreateSingleBillUseCase.create(
+      buildEngine(),
+      wallet,
+      runner,
+      () => 'mov-1',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    const result = await uc.execute({
+      userId,
+      amount: 30,
+      dueDate: '2026-06-10',
+      paymentMethodDescriptionEnum: 'PIX',
+      paidAt: '2026-06-05',
+      walletId: 'w1',
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -20 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 
   it('born paid without walletId gives ValidationError', async () => {
@@ -493,6 +704,67 @@ describe('CreateInstallmentBillUseCase', () => {
       refType: 'SETTLEMENT',
       amount: 10,
     });
+    expect(wallet.savedDates).toEqual(DEBIT_DATES);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('[CDC-07] a paid down payment with an unknown payment method on a missing wallet gives WALLET_NOT_FOUND and writes nothing', async () => {
+    const { uc, wallet } = build();
+    await expect(
+      uc.execute({
+        userId,
+        amount: 50,
+        dueDate: '2026-06-10',
+        installments: [{ amount: 40, dueDate: '2026-07-10' }],
+        entry: {
+          amount: 10,
+          paymentDate: '2026-06-05',
+          paymentMethodDescriptionEnum: 'BOLETO',
+          walletId: 'other',
+        },
+      }),
+    ).rejects.toMatchObject({ code: 'WALLET_NOT_FOUND' });
+    expect(wallet.movements).toHaveLength(0);
+  });
+
+  it('[CDC-07] a paid down payment loads and saves the wallet with the run context and the input owner, and answers with its balance and warnings', async () => {
+    const wallet = new FakeWalletGateway('w1', 0, 5);
+    const ctx = { txn: {} } as AtomicContext;
+    const runner = {
+      run: async <T>(work: (c: AtomicContext) => Promise<T>): Promise<T> =>
+        work(ctx),
+    } as AtomicRunner;
+    const load = jest.spyOn(wallet, 'loadWalletTx');
+    const save = jest.spyOn(wallet, 'saveWalletTx');
+    const uc = CreateInstallmentBillUseCase.create(
+      buildEngine(),
+      wallet,
+      runner,
+      () => 'mov-e',
+      () => '2026-06-05T00:00:00.000Z',
+    );
+
+    const result = await uc.execute({
+      userId,
+      amount: 50,
+      dueDate: '2026-06-10',
+      installments: [{ amount: 40, dueDate: '2026-07-10' }],
+      entry: {
+        amount: 10,
+        paymentDate: '2026-06-05',
+        paymentMethodDescriptionEnum: 'PIX',
+        walletId: 'w1',
+      },
+    });
+
+    expect(load).toHaveBeenCalledWith(ctx, 'w1', userId);
+    expect(load.mock.calls[0][0]).toBe(ctx);
+    expect(save.mock.calls[0][0]).toBe(ctx);
+    expect(result.wallet).toEqual({ id: 'w1', balance: -10 });
+    expect(result.warnings).toEqual([
+      'BALANCE_NEGATIVE',
+      'OVERDRAFT_LIMIT_EXCEEDED',
+    ]);
   });
 });
 

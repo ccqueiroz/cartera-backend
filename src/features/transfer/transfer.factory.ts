@@ -2,6 +2,7 @@ import { Firestore } from 'firebase-admin/firestore';
 import { Route } from '@/shared/http/route';
 import { Middleware } from '@/shared/http/middleware';
 import { crypto } from '@/packages/clients/crypto';
+import { AtomicRunner } from '@/shared/database/atomic-runner';
 import { WalletGateway } from '@/features/transfer/domain/ports/wallet.gateway.port';
 import { PaymentMethodGateway } from '@/features/transfer/domain/ports/payment-method.gateway.port';
 import { TransferRepositoryFirestore } from '@/features/transfer/infra/persistence/transfer.repository.firestore';
@@ -16,6 +17,7 @@ export interface TransferModuleDeps {
   authMiddleware: Middleware;
   walletGateway: WalletGateway;
   paymentMethodGateway: PaymentMethodGateway;
+  atomicRunner: AtomicRunner;
   generateId?: () => string;
   now?: () => string;
 }
@@ -31,6 +33,7 @@ export function makeTransferModule(deps: TransferModuleDeps): Route[] {
       repository,
       deps.walletGateway,
       deps.paymentMethodGateway,
+      deps.atomicRunner,
       generateId,
       now,
     ),
