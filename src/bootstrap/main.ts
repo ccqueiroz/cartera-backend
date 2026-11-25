@@ -90,10 +90,7 @@ function main(): void {
     db,
     authMiddleware,
     atomicRunner,
-    walletGateway: TransferWalletGatewayAdapter.create(
-      db,
-      wallet.internal.wallets,
-    ),
+    walletGateway: TransferWalletGatewayAdapter.create(wallet.internal.wallets),
     paymentMethodGateway: TransferPaymentMethodGatewayAdapter.create(
       PaymentMethodRepositoryFirestore.create(db),
     ),
