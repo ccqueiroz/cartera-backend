@@ -1,6 +1,4 @@
 import { Transfer } from '@/features/transfer/domain/transfer.entity';
-import { TransferWalletSnapshot } from '@/features/transfer/domain/transfer-wallet-snapshot';
-import { TransferMovement } from '@/features/transfer/domain/transfer-movement';
 import {
   ListTransfersFilter,
   TransferRepository,
@@ -10,19 +8,6 @@ import {
 /** Repositório em memória para testes de caso de uso (espelha o do wallet). */
 export class InMemoryTransferRepository implements TransferRepository {
   private readonly transfers: Transfer[] = [];
-  public readonly savedWallets: TransferWalletSnapshot[] = [];
-  public readonly savedMovements: TransferMovement[] = [];
-
-  public async saveTransfer(
-    fromWallet: TransferWalletSnapshot,
-    toWallet: TransferWalletSnapshot,
-    movements: TransferMovement[],
-    transfer: Transfer,
-  ): Promise<void> {
-    this.savedWallets.push(fromWallet, toWallet);
-    this.savedMovements.push(...movements);
-    this.transfers.push(transfer);
-  }
 
   public async saveTx(
     _ctx: TransferTxContext,

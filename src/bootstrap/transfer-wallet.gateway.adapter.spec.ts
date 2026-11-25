@@ -11,7 +11,7 @@ function setup() {
     findActiveByIdTx: jest.fn(),
     saveWithMovementsTx: jest.fn().mockResolvedValue(undefined),
   };
-  const adapter = TransferWalletGatewayAdapter.create({} as never, wallets);
+  const adapter = TransferWalletGatewayAdapter.create(wallets);
   return { wallets, adapter };
 }
 

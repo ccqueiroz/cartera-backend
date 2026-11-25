@@ -175,7 +175,7 @@ describe('wallet concurrency across features (emulator)', () => {
     };
     const transfer = CreateTransferUseCase.create(
       TransferRepositoryFirestore.create(db),
-      TransferWalletGatewayAdapter.create(db, wallets),
+      TransferWalletGatewayAdapter.create(wallets),
       pausingPaymentMethod,
       runner,
       generateId,

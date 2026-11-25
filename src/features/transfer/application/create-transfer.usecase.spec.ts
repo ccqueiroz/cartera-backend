@@ -75,7 +75,6 @@ function walletGatewayWith(
   const saved: SavedWallet[] = [];
   return {
     saved,
-    findActiveById: async () => null,
     loadWalletTx: async (_ctx, walletId) => byId[walletId] ?? null,
     saveWalletTx: async (_ctx, wallet, movements) => {
       saved.push({ wallet, movements });
