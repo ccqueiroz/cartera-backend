@@ -15,7 +15,7 @@ function setup() {
     findLatestSettlementTx: jest.fn(),
     saveWithMovementsTx: jest.fn().mockResolvedValue(undefined),
   };
-  const adapter = CoreFinanceWalletGatewayAdapter.create({} as never, wallets);
+  const adapter = CoreFinanceWalletGatewayAdapter.create(wallets);
   return { wallets, adapter };
 }
 

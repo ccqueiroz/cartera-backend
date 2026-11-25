@@ -66,7 +66,7 @@ describe('wallet concurrency across features (emulator)', () => {
     let sequence = 0;
     const settle = SettleBillUseCase.create(
       engine,
-      CoreFinanceWalletGatewayAdapter.create(db, wallets),
+      CoreFinanceWalletGatewayAdapter.create(wallets),
       runnerOpeningTogether(),
       () => `mov-${++sequence}`,
       () => '2026-06-05T00:00:00.000Z',
@@ -144,7 +144,7 @@ describe('wallet concurrency across features (emulator)', () => {
     });
     const settling = SettleBillUseCase.create(
       engine,
-      CoreFinanceWalletGatewayAdapter.create(db, wallets),
+      CoreFinanceWalletGatewayAdapter.create(wallets),
       {
         run: async <T>(
           work: (ctx: AtomicContext) => Promise<T>,
