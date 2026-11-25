@@ -8,7 +8,6 @@ import {
 import { WalletRepository } from '@/features/wallet/domain/ports/wallet.repository.port';
 import { Wallet } from '@/features/wallet/domain/wallet.entity';
 import { WalletMovement } from '@/features/wallet/domain/wallet-movement.entity';
-import { Money } from '@/shared/kernel/value-objects/money.vo';
 
 type WalletsInternal = Pick<
   WalletRepository,
@@ -62,9 +61,8 @@ export class CoreFinanceWalletGatewayAdapter implements WalletGateway {
     await this.walletsInternal.saveWithMovementsTx(
       ctx,
       wallet as Wallet,
-      movements.map((spec) =>
-        WalletMovement.create({ ...spec, amount: Money.create(spec.amount) }),
-      ),
+      // `with`, não `create`: o movimento de valor zero é gravado como antes, e o `create` recusa o zero.
+      movements.map((spec) => WalletMovement.with(spec)),
     );
   }
 }

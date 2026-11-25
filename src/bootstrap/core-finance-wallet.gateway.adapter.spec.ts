@@ -124,4 +124,29 @@ describe('CoreFinanceWalletGatewayAdapter', () => {
     expect(wallets.findActiveByIdTx.mock.calls[0][0]).toBe(ctx);
     expect(wallets.findLatestSettlementTx.mock.calls[0][0]).toBe(ctx);
   });
+
+  it('[CDC-06] saveWalletTx saves a zero-amount movement with the same 9 fields, as the settlement saved it before', async () => {
+    const { wallets, adapter } = setup();
+    const zero: WalletMovementSpec = {
+      id: 'mov-0',
+      userId: 'user-1',
+      walletId: 'w1',
+      direction: 'DEBIT',
+      amount: 0,
+      refType: 'SETTLEMENT',
+      refId: 'leaf-1',
+      occurredAt: '2026-06-05',
+      createdAt: '2026-06-05T10:00:00.000Z',
+    };
+
+    await expect(
+      adapter.saveWalletTx(ctx, wallet(), [zero]),
+    ).resolves.toBeUndefined();
+    const [passedCtx, , movements] = wallets.saveWithMovementsTx.mock.calls[0];
+    expect(passedCtx).toBe(ctx);
+    expect(movements[0]).toBeInstanceOf(WalletMovement);
+    expect(
+      movements.map((movement: WalletMovement) => movement.toPersistence()),
+    ).toEqual([zero]);
+  });
 });
